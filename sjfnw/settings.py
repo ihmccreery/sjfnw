@@ -46,6 +46,7 @@ else:
     }
   }
   DEBUG = True
+  # Uncomment below to enable debugging toolbar
   #INSTALLED_APPS.append('django.contrib.staticfiles')
   #INSTALLED_APPS.append('debug_toolbar')
 

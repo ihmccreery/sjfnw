@@ -5,10 +5,9 @@ import logging
 
 logger = logging.getLogger('sjfnw')
 
-#404
+# 404
 def page_not_found(request):
-  """ Modified version of default handler - returns app-specific template.
-    Needs to give template: title_addition, contact_url """
+  """ Modified version of default handler which returns app-specific template. """
   path = request.path
   if path.find('/fund') == 0:
     title_addition = ' - Project Central'
@@ -25,10 +24,9 @@ def page_not_found(request):
                                    {'title_addition': title_addition,
                                     'contact_url':contact_url})))
 
-#500
+# 500
 def server_error(request):
-  """ Modified version of default handler - returns app-specific template.
-    Needs to give template: title_addition, contact_url """
+  """ Modified version of default handler which returns app-specific template. """
   path = request.path
   if path.find('/fund') == 0:
     title_addition = ' - Project Central'
@@ -45,17 +43,17 @@ def server_error(request):
                                   {'title_addition': title_addition,
                                    'contact_url':contact_url})))
 
-#admin -> admin/
+# admin -> admin/
 def admin_redirect(request):
   return redirect('/admin/')
 
-#admin-advanced -> admin-advanced/
+# admin-advanced -> admin-advanced/
 def admin_adv_redirect(request):
   return redirect('/admin-advanced/')
 
+# endpoint for logging javascript errors to server log
 def log_javascript(request):
   if request.method == 'POST':
-    logger.info('log_js')
     log = ''
     for k in request.POST:
       log = log + '\n' + k + ': ' + str(request.POST[k])
