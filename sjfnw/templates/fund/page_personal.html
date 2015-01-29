@@ -257,56 +257,84 @@
   });
 </script>
 {% endblock %}
+
 {% block content %}
 <div id="form_saved"></div>
 
-{% if notif %}
-<div id="notifications">{{ notif|safe }}</div>
-{% endif %}
+{% if notif %}<div id="notifications">{{ notif|safe }}</div>{% endif %}
 
 {% if donor_list.0 %}
-<span class="header">YOUR PROGRESS</span><!-- PROGRESS -->
+<span class="header">YOUR PROGRESS</span>
 <table style="width:90%;margin-left:8%;margin-top:10px;margin-bottom:15px;text-align:center;">
   <tr>
-    <td><div align="center">{{ progress.contacts }} contacts</div><div align="center" id ="chart_div" style="width:240px;height:110px;margin-left:auto;margin-right:auto;"></div></td>
+    <td>
+      <div align="center">{{ progress.contacts }} contacts</div>
+      <div align="center" id ="chart_div" style="width:240px;height:110px;margin-left:auto;margin-right:auto;"></div>
+    </td>
     {% if progress.estimated > 0 %}
-    <td><div align="center" title = "Personal fundraising goal of ${{ progress.estimated }} calculated based on your ask amount and estimated likelihood for each contact">{{ progress.header }}</div><div align="center" id ="chart_div2" style="width:260px;height:110px;margin-left:25px;"></div></td>
+    <td>
+      <div align="center" title="Personal fundraising goal of ${{ progress.estimated }} calculated based on your ask amount and estimated likelihood for each contact">{{ progress.header }}</div>
+      <div align="center" id="chart_div2" style="width:260px;height:110px;margin-left:25px;"></div>
+    </td>
     {% endif %}
   </tr>
 </table>
 {% endif %}
 
-<span class="header" id="your-contacts">YOUR CONTACTS & NEXT STEPS</span><!-- CONTACTS -->
-{% if donor_list.0 %} <!-- add contacts link (only if mass add won't be showing) -->
-{% if not load %}<div class="edit_done">[<a onclick="loadView('{% url 'sjfnw.fund.views.add_mult' %}', 'addmult')">add contacts</a>]</div>{% endif %}
-  <div class="donor indent" id="addmult"></div><!-- mass forms area #1 -->
+<span class="header" id="your-contacts">YOUR CONTACTS &amp; NEXT STEPS</span>
+
+{% if donor_list.0 %}
+  {% if not load %} {# add contacts link only if mass add won't be showing #}
+  <div class="edit_done">
+    [<a onclick="loadView('{% url 'sjfnw.fund.views.add_mult' %}', 'addmult')">add contacts</a>]
+  </div>
+  {% endif %}
+  {# this div is where form to add multiple donors is placed #}
+  <div class="donor indent" id="addmult"></div>
 {% endif %}
-{% load humanize %}
-{% for dict in donor_list %} <!-- donors -->
+
+{% load humanize %} 
+
+{% for dict in donor_list %}
 <div class="donor indent" id="donor-{{ dict.donor.pk }}">
-  <!-- line 1 name click to toggle -->
-  <a class="{% if dict.donor.promised != None %}promised{% endif %}" onclick="toggle('details-{{ dict.donor.pk }}', 'donor-{{ dict.donor.pk }}')"><b>{{ dict.donor.firstname }} {{ dict.donor.lastname }}</b></a><br>
+
+  {# name - click to toggle display of details #}
+  <a class="{% if dict.donor.promised != None %}promised{% endif %}"
+     onclick="toggle('details-{{ dict.donor.pk }}', 'donor-{{ dict.donor.pk }}')">
+    <b>{{ dict.donor.firstname }} {{ dict.donor.lastname }}</b>
+  </a>
+  <br>
+
+  {# next step summary #}
   {% if dict.next_step %}
-    <!-- line 2 next step summary -->
-    <div id="{{ dict.donor.pk }}-nextstep">{% if dict.overdue %}<span title="This step's goal date has passed! Edit or complete it" style="display:inline;"><span class="overdue_step">! </span>{{ dict.next_step }}</span>{% else %}{{ dict.next_step }}{% endif %}
-    <!-- edit/complete links -->
-    <div class="edit_done"> [<a class="edit_done" onclick="loadView('/fund/{{ dict.donor.pk }}/{{ dict.next_step.pk }}', '{{ dict.donor.pk }}-nextstep')">edit</a>|<a class="edit_done" onclick="loadView('/fund/{{ dict.donor.pk }}/{{ dict.next_step.pk }}/done', '{{ dict.donor.pk }}-nextstep', '{{ dict.donor.asked }}', '{{ dict.donor.promised }}');">complete</a>]</div>
-    </div>
-  {% else %}
-    <div id="{{ dict.donor.pk }}-addstep">
-    {% if dict.donor.promised == None and dict.donor.received == 0 %}
-      <!-- line 2 add a step -->
-      No next step. <a onclick="loadView('/fund/{{ dict.donor.pk }}/step', '{{ dict.donor.pk }}-addstep')">Add one.</a>
+  <div id="{{ dict.donor.pk }}-nextstep">
+    {% if dict.overdue %}
+    <span title="This step's goal date has passed! Edit or complete it" style="display:inline;">
+      <span class="overdue_step">! </span>{{ dict.next_step }}
+    </span>
     {% else %}
-      <!-- line 2 summary of response -->
-      <img src="/static/images/check.png" alt="complete checkmark">Asked. {% if dict.donor.received %}${{ dict.donor.received|intcomma }} received by SJF.{% elif dict.donor.promised != None %}{% if dict.donor.promised > 0 %}Promised ${{ dict.donor.promised|intcomma }}.{% else %}Declined to donate.{% endif %}{% endif %}
+    {{ dict.next_step }}
     {% endif %}
-    </div>
+    {# edit/complete links #}
+    <div class="edit_done">[<a class="edit_done" onclick="loadView('/fund/{{ dict.donor.pk }}/{{ dict.next_step.pk }}', '{{ dict.donor.pk }}-nextstep')">edit</a>|<a class="edit_done" onclick="loadView('/fund/{{ dict.donor.pk }}/{{ dict.next_step.pk }}/done', '{{ dict.donor.pk }}-nextstep', '{{ dict.donor.asked }}', '{{ dict.donor.promised }}');">complete</a>]</div>
+  </div>
+
+  {% else %}
+
+  {# no next step #}
+  <div id="{{ dict.donor.pk }}-addstep">
+    {% if dict.donor.promised == None and dict.donor.received == 0 %}{# add a step #}
+    No next step. <a onclick="loadView('/fund/{{ dict.donor.pk }}/step', '{{ dict.donor.pk }}-addstep')">Add one.</a>
+    {% else %}{# summary of response #}
+    <img src="/static/images/check.png" alt="complete checkmark">Asked. {% if dict.donor.received %}${{ dict.donor.received|intcomma }} received by SJF.{% elif dict.donor.promised != None %}{% if dict.donor.promised > 0 %}Promised ${{ dict.donor.promised|intcomma }}.{% else %}Declined to donate.{% endif %}{% endif %}
+    {% endif %}
+  </div>
   {% endif %}
 
-  <div class="donor_details indent" id="details-{{ dict.donor.pk }}" style="display:none;"><!-- donor details (hidden) -->
+  {# donor details (initially hidden) #}
+  <div class="donor_details indent" id="details-{{ dict.donor.pk }}" style="display:none;">
     <table>
-      {% if dict.donor.received > 0 %}<!-- received, promised, asked, etc. -->
+      {% if dict.donor.received > 0 %}{# received, promised, asked, etc. #}
         <tr><td>Received by SJF:</td><td>${{ dict.donor.received|intcomma }}</td></tr>
         <tr><td>Original estimation:</td><td>${{ dict.donor.estimated|intcomma }}</td></tr>
       {% elif dict.donor.promised != None %}
@@ -325,7 +353,7 @@
           <tr><td>Likelihood:</td><td>{{ dict.donor.likelihood }}%</td></tr>
         {% endif %}
       {% endif %}
-      <tr><!-- basic fields -->
+      <tr>{# basic fields #}
         <td>{% if dict.donor.email or dict.donor.phone %}Contact info:</td>
         <td>{{ dict.donor.email|default:""}} {{ dict.donor.phone|default:""}}{% endif %}</td>
       </tr>
@@ -333,7 +361,7 @@
         <td>Notes:</td>
         <td>{{ dict.donor.notes|default:"<i>None entered.</i>"}}<br><br></td>
       </tr>
-      {% if dict.complete_steps %}<!-- list of complete steps -->
+      {% if dict.complete_steps %}{# list of complete steps #}
         <tr>
           <td>Completed steps:{% if dict.donor.promised != None and not dict.next_step %}<br>[<a onclick="loadView('/fund/{{ dict.donor.pk }}/step', '{{ dict.donor.pk }}-addstep')">add step</a>]{% endif %}</td>
           <td>{% for step in dict.complete_steps %}{{ step.date|date:"n/d/y"}}: {{ step.description }}<br>{% endfor %}</td>
@@ -341,20 +369,20 @@
       {% endif %}
     </table>
     <br>
-    <div class="donor_delete" id="delete-{{ dict.donor.pk }}"><!-- delete/edit -->
+    <div class="donor_delete" id="delete-{{ dict.donor.pk }}">{# delete/edit #}
       [<a onclick="loadView('/fund/{{ dict.donor.pk }}/edit', 'donor-{{ dict.donor.pk }}')">edit contact</a>] [<a onclick="loadView('/fund/{{ dict.donor.pk }}/delete', 'delete-{{ dict.donor.pk }}')">remove contact</a>]
     </div>
-  </div> <!-- ends donor_details -->
-</div> <!-- ends donor -->
-{% empty %} <!--no contacts yet -->
-  {% if fd %}
-    {% include 'fund/add_estimates.html' %}<!-- add estimates -->
-  {% else %}<!-- add contacts -->
+  </div> {# ends donor_details #}
+
+</div> {# ends donor #}
+{% empty %} {# no contacts yet #}
+  {% if fd %}{# add estimates #}
+    {% include 'fund/add_estimates.html' %}
+  {% else %}{# add contacts #}
     <div class="donor indent" id="addmult">
     <p>You don't have any contacts yet!  Get started by adding some.  You'll be able to add, change or remove contacts at any time.</p>
     {% include mult_template %}
     </div>
   {% endif %}
-{% endfor %} <!--ends contacts check/loop -->
-
+{% endfor %}
 {% endblock %}

@@ -1,12 +1,13 @@
+import logging
+import sys
+import time
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.simple import DjangoTestSuiteRunner
 
 from unittest import TextTestRunner, TextTestResult
 from unittest.signals import registerResult
-import logging
-import sys
-import time
 
 """ Shared testing base classes, utilities """
 
