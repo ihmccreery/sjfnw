@@ -1,4 +1,4 @@
-﻿{% extends 'grants/base.html' %}
+{% extends 'grants/base.html' %}
 {% block title %}Application form | {{ block.super }}{% endblock %}
 {% block script %}
 {{ block.super }}
@@ -86,7 +86,7 @@ function setInfoClicks(){
 
 $(document).ready(function() {
   formUtils.init('apply', {{ draft.pk }}, {{ cycle.pk }}, setUserID(), '{{ user_override|default:"" }}');
-  var counted_fields = $('[onKeyUp]');
+  var counted_fields = $('[onKeyUp]'); // TODO hacky
   for(var i = 0; i < counted_fields.length; i++) {
     $(counted_fields[i]).keyup();
   }
