@@ -1,11 +1,12 @@
+'use strict';
 /** Shared form functions - utils, autosave, file handling **/
 
 /**----------------------------- formUtils ---------------------------------**/
 var formUtils = {};
 
-formUtils.loading_image = '<img src="/static/images/ajaxloader2.gif" height="16" width="16" alt="Loading...">';
+formUtils.loadingImage = '<img src="/static/images/ajaxloader2.gif" height="16" width="16" alt="Loading...">';
 
-formUtils.status_texts = { //for ajax error messages
+formUtils.statusTexts = { //for ajax error messages
   400: '400 Bad request',
   401: '401 Unauthorized',
   403: '403 Forbidden',
@@ -18,44 +19,41 @@ formUtils.status_texts = { //for ajax error messages
 
 
 /**
- * @param {string} url_prefix - beginning of path (i.e. 'apply'). no slashes
- * @param {number} draft_id - pk of draft object
- * @param {number} submit_id - pk of object used in post TODO is this just cycle?
- * @param {string.alphanum} user_id - randomly generated user id for mult edit warning
- * @param {string} staff_user - querystring for user override (empty string if n/a)
+ * @param {string} urlPrefix - beginning of path (i.e. 'apply'). no slashes
+ * @param {number} draftId - pk of draft object
+ * @param {number} submitId - pk of object used in post TODO is this just cycle?
+ * @param {string.alphanum} userId - randomly generated user id for mult edit warning
+ * @param {string} staffUser - querystring for user override (empty string if n/a)
  */
-formUtils.init = function(url_prefix, draft_id, submit_id, user_id, staff_user) {
-  if (staff_user && staff_user !== 'None') {
-    formUtils.staff_user = staff_user;
+formUtils.init = function(urlPrefix, draftId, submitId, userId, staffUser) {
+  if (staffUser && staffUser !== 'None') {
+    formUtils.staffUser = staffUser;
   } else {
-    formUtils.staff_user = '';
+    formUtils.staffUser = '';
   }
-  autoSave.init(url_prefix, submit_id, user_id);
-  fileUploads.init(url_prefix, draft_id);
+  autoSave.init(urlPrefix, submitId, userId);
+  fileUploads.init(urlPrefix, draftId);
 };
 
 
 formUtils.currentTimeDisplay = function(){
   /* returns current time as a string. format = May 12, 2:45p.m. */
   var monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"];
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'];
   var d = new Date();
   var h = d.getHours();
   var m = d.getMinutes();
-  /*var s = d.getSeconds();*/
-  var dd = "a.m.";
+  var dd = 'a.m.';
   if (h >= 12) {
     h = h-12;
-    dd = "p.m.";
+    dd = 'p.m.';
   }
   if (h === 0) {
     h = 12;
   }
-  m = m<10?"0"+m:m;
-  /* s = s<10?"0"+s:s; */
-  /* s = s<!-- <10?"0"+s:s; */
-  return monthNames[d.getMonth()]+' '+d.getDate()+', '+h+':'+m+dd;
+  m = m < 10 ? '0' + m:m;
+  return monthNames[d.getMonth()] + ' ' + d.getDate() + ', ' + h + ':' + m + dd;
 };
 
 
@@ -63,7 +61,7 @@ formUtils.logTime = function (){
   /* returns current time as a string for console logs. hh:mm:ss */
   var d = new Date();
   var m = d.getMinutes();
-  m = m<10?"0"+m:m;
+  m = m < 10 ? '0' + m : m;
   return d.getHours() + ':' + m + ':' + d.getSeconds() + ' ';
 };
 
@@ -72,7 +70,6 @@ formUtils.logTime = function (){
 function charLimitDisplay(area, limit){
   var counter = document.getElementById(area.name + '_counter');
   var words = area.value.match(/[^ \r\n]+/g) || [];
-  //console.log(words);
   var diff = limit - words.length;
   if (diff >= 0) {
     counter.innerHTML = diff + ' words remaining';
@@ -86,24 +83,24 @@ function charLimitDisplay(area, limit){
 /**------------------------------- autoSave --------------------------------**/
 
 var autoSave = {};
-autoSave.save_timer = false;
-autoSave.pause_timer = false;
+autoSave.saveTimer = false;
+autoSave.pauseTimer = false;
 
 /* autosave flow:
 
    page load -> --> init ->
-   page blur -> pause() -> sets onfocus, sets pause_timer -30-> clears save_timer
+   page blur -> pause() -> sets onfocus, sets pauseTimer -30-> clears saveTimer
 
 */
 
-autoSave.init = function(url_prefix, submit_id, user_id) {
-  autoSave.submit_url = '/' + url_prefix + '/' + submit_id;
-  autoSave.save_url = autoSave.submit_url + '/autosave' + formUtils.staff_user;
-  autoSave.submit_url += formUtils.staff_user;
-  if (user_id) {
-    autoSave.user_id = user_id;
+autoSave.init = function(urlPrefix, submitId, userId) {
+  autoSave.submitUrl = '/' + urlPrefix + '/' + submitId;
+  autoSave.saveUrl = autoSave.submitUrl + '/autosave' + formUtils.staffUser;
+  autoSave.submitUrl += formUtils.staffUser;
+  if (userId) {
+    autoSave.userId = userId;
   } else {
-    autoSave.user_id = '';
+    autoSave.userId = '';
   }
   console.log('Autosave variables loaded');
   autoSave.resume();
@@ -114,10 +111,10 @@ autoSave.pause = function() {
   if ( !window.onfocus ) {
     console.log(formUtils.logTime() + 'autoSave.pause called; setting timer');
     // pause auto save
-    autoSave.pause_timer = window.setTimeout(function(){
-       console.log(formUtils.logTime() + 'autoSave.pause_timer up, pausing autosave');
-       window.clearInterval(autoSave.save_timer);
-       autoSave.pause_timer = false;
+    autoSave.pauseTimer = window.setTimeout(function(){
+       console.log(formUtils.logTime() + 'autoSave.pauseTimer up, pausing autosave');
+       window.clearInterval(autoSave.saveTimer);
+       autoSave.pauseTimer = false;
        }, 30000);
     // set to resume when window gains focus
     $(window).on('focus', autoSave.resume);
@@ -133,15 +130,15 @@ autoSave.resume = function() {
     console.log(formUtils.logTime() + ' autoSave.resume called');
     // reload the pause binding
     $(window).on('blur', autoSave.pause);
-    if (autoSave.pause_timer) {
+    if (autoSave.pauseTimer) {
       // clear timer if window recently lost focus (autosave is still going)
       console.log('pause had been set; clearing it');
-      window.clearTimeout(autoSave.pause_timer);
-      autoSave.pause_timer = false;
+      window.clearTimeout(autoSave.pauseTimer);
+      autoSave.pauseTimer = false;
     } else {
       // set up save timer
       console.log('Setting autosave interval');
-      autoSave.save_timer = window.setInterval("autoSave.save()", 30000);
+      autoSave.saveTimer = window.setInterval('autoSave.save()', 30000); // TODO should this be without parens?
     }
     // unload the resume binding
     $(window).off('focus');
@@ -152,21 +149,21 @@ autoSave.resume = function() {
 
 autoSave.save = function (submit, override){
   if (!override){ override = 'false'; }
-  if (formUtils.staff_user) { //TODO use querystring function
+  if (formUtils.staffUser) { //TODO use querystring function
     override = '&override=' + override;
   } else {
     override = '?override=' + override;
   }
-  console.log(formUtils.logTime() + "autosaving");
+  console.log(formUtils.logTime() + 'autosaving');
   $.ajax({
-    url: autoSave.save_url + override,
-    type:"POST",
-    data:$('form').serialize() + '&user_id=' + autoSave.user_id,
+    url: autoSave.saveUrl + override,
+    type:'POST',
+    data:$('form').serialize() + '&user_id=' + autoSave.userId,
     success:function(data, textStatus, jqXHR){
-      if (jqXHR.status==200) {
+      if (jqXHR.status === 200) {
         if (submit) { //trigger the submit button
-          var submit_all = document.getElementById('hidden_submit_app');
-          submit_all.click();
+          var submitAll = document.getElementById('hidden_submit_app');
+          submitAll.click();
         } else { //update 'last saved'
           $('.autosaved').html(formUtils.currentTimeDisplay());
         }
@@ -176,15 +173,15 @@ autoSave.save = function (submit, override){
     },
     error:function(jqXHR, textStatus, errorThrown){
       var errortext = '';
-      if (jqXHR.status==409){ //conflict - pause autosave and confirm override
-        window.clearInterval(autoSave.save_timer);
-        showOverrideWarning(2);
+      if (jqXHR.status === 409){ //conflict - pause autosave and confirm override
+        window.clearInterval(autoSave.saveTimer);
+        showOverrideWarning(2); // defined in forms.js
       } else {
-        if(jqXHR.status==401){
+        if(jqXHR.status === 401){
           location.href = jqXHR.responseText + '?next=' + location.href;
-        } else if (formUtils.status_texts[jqXHR.status]) {
-          errortext = formUtils.status_texts[jqXHR.status];
-        } else if (textStatus=='timeout') {
+        } else if (formUtils.statusTexts[jqXHR.status]) {
+          errortext = formUtils.statusTexts[jqXHR.status];
+        } else if (textStatus === 'timeout') {
           errortext = 'Request timeout';
         } else {
           errortext = 'Unknown error';
@@ -199,13 +196,13 @@ autoSave.save = function (submit, override){
 var fileUploads = {};
 
 fileUploads.uploading = false;
-fileUploads.uploading_span = '';
-fileUploads.current_field = '';
+fileUploads.uploadingSpan = '';
+fileUploads.currentField = '';
 
-fileUploads.init = function(url_prefix, draft_id) {
-  fileUploads.get_url = '/get-upload-url/?type=' + url_prefix + '&id=' + draft_id;
-  fileUploads.remove_url = '/' + url_prefix + '/' + draft_id + '/remove/';
-  $('[type="file"]').change(function() {
+fileUploads.init = function(urlPrefix, draftId) {
+  fileUploads.getUrl = '/get-upload-url/?type=' + urlPrefix + '&id=' + draftId;
+  fileUploads.removeUrl = '/' + urlPrefix + '/' + draftId + '/remove/';
+  $("[type='file']").change(function() {
       fileUploads.fileChanged(this.id);
     });
   console.log('fileUploads vars loaded, file fields scripted');
@@ -218,12 +215,12 @@ fileUploads.init = function(url_prefix, draft_id) {
   span for upload status: 	fieldname + '_uploaded'
   submit button: 						fieldname + '_submit' */
 
-fileUploads.clickFileInput = function(event, input_id) {
-  /* triggered when "choose file" label is clicked
+fileUploads.clickFileInput = function(event, inputId) {
+  /* triggered when 'choose file' label is clicked
      transfers the click to the hidden file input */
   console.log(event);
-  console.log('clickFileInput' + input_id);
-  var input = document.getElementById(input_id);
+  console.log('clickFileInput' + inputId);
+  var input = document.getElementById(inputId);
   if (input) {
     input.control.click();
     console.log('Clicked it');
@@ -232,7 +229,7 @@ fileUploads.clickFileInput = function(event, input_id) {
   }
 };
 
-fileUploads.fileChanged = function(field_id) {
+fileUploads.fileChanged = function(fieldId) {
   /* triggered when a file is selected
      show loader, call getuploadurl */
   console.log('fileChanged');
@@ -240,14 +237,14 @@ fileUploads.fileChanged = function(field_id) {
     console.log('Upload in progress; returning');
     return false;
   }
-  console.log(field_id + " onchange");
-  var file = document.getElementById(field_id).value;
-  console.log("Value: " + file);
+  console.log(fieldId + ' onchange');
+  var file = document.getElementById(fieldId).value;
+  console.log('Value: ' + file);
   if (file) {
     fileUploads.uploading = true;
-    fileUploads.current_field = field_id.replace('id_', '');
-    fileUploads.uploading_span = document.getElementById(field_id.replace('id_', '') + '_uploaded');
-    fileUploads.uploading_span.innerHTML = formUtils.loading_image;
+    fileUploads.currentField = fieldId.replace('id_', '');
+    fileUploads.uploadingSpan = document.getElementById(fieldId.replace('id_', '') + '_uploaded');
+    fileUploads.uploadingSpan.innerHTML = formUtils.loadingImage;
     fileUploads.getUploadURL();
   }
 };
@@ -255,12 +252,12 @@ fileUploads.fileChanged = function(field_id) {
 fileUploads.getUploadURL = function() {
   console.log('getUploadURL');
   $.ajax({
-    url: fileUploads.get_url,
+    url: fileUploads.getUrl,
     success: function(data) {
-      console.log('current field: ' + fileUploads.current_field);
-      var cform = document.getElementById(fileUploads.current_field + '_form');
+      console.log('current field: ' + fileUploads.currentField);
+      var cform = document.getElementById(fileUploads.currentField + '_form');
       cform.action = data;
-      var cbutton = document.getElementById(fileUploads.current_field + '_submit');
+      var cbutton = document.getElementById(fileUploads.currentField + '_submit');
       cbutton.click();
     }
   });
@@ -269,26 +266,26 @@ fileUploads.getUploadURL = function() {
 fileUploads.iframeUpdated = function(iframe) { //process response
   console.log(formUtils.logTime() + 'iframeUpdated');
   var results = iframe.contentDocument.body.innerHTML;
-  console.log("The iframe changed! New contents: " + results);
+  console.log('The iframe changed! New contents: ' + results);
   if (results) {
-    var field_name = results.split("~~")[0];
-    var linky = results.split("~~")[1];
-    var file_input = document.getElementById('id_' + field_name);
-    if (file_input && linky) {
-      fileUploads.uploading_span.innerHTML = linky;
+    var fieldName = results.split('~~')[0];
+    var linky = results.split('~~')[1];
+    var fileInput = document.getElementById('id_' + fieldName);
+    if (fileInput && linky) {
+      fileUploads.uploadingSpan.innerHTML = linky;
     } else {
-      fileUploads.uploading_span.innerHTML = 'There was an error uploading your file. Try again or <a href="/apply/support">contact us</a>.';
+      fileUploads.uploadingSpan.innerHTML = 'There was an error uploading your file. Try again or <a href="/apply/support">contact us</a>.';
     }
     fileUploads.uploading = false;
   }
 };
 
-fileUploads.removeFile = function(field_name) {
+fileUploads.removeFile = function(fieldName) {
   $.ajax({
-    url: fileUploads.remove_url + field_name + formUtils.staff_user,
-    success: function(data) {
-      r_span = document.getElementById(field_name + '_uploaded');
-      r_span.innerHTML = '<i>no file uploaded</i>';
+    url: fileUploads.removeUrl + fieldName + formUtils.staffUser,
+    success: function() {
+      var rSpan = document.getElementById(fieldName + '_uploaded');
+      rSpan.innerHTML = '<i>no file uploaded</i>';
     }
   });
 };
