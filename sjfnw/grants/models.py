@@ -1,4 +1,4 @@
-﻿from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import BaseValidator
 from django.db import models
@@ -699,7 +699,7 @@ class YearEndReport(models.Model):
       verbose_name=
         ('1. Thinking about the Giving Project volunteers who decided to fund '
         'you last year, including those you met on your site visit, what would '
-        'you like to tell them about what you’ve done over the last year?'))
+        'you like to tell them about what you\'ve done over the last year?'))
   goal_progress = models.TextField(verbose_name=
         ('2. Please refer back to your application from last year. Looking at '
          'the goals you outlined in your application, what progress have you '

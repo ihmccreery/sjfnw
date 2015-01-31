@@ -46,13 +46,13 @@ formUtils.currentTimeDisplay = function(){
   var m = d.getMinutes();
   var dd = 'a.m.';
   if (h >= 12) {
-    h = h-12;
+    h = h - 12;
     dd = 'p.m.';
   }
   if (h === 0) {
     h = 12;
   }
-  m = m < 10 ? '0' + m:m;
+  m = m < 10 ? '0' + m : m;
   return monthNames[d.getMonth()] + ' ' + d.getDate() + ', ' + h + ':' + m + dd;
 };
 
@@ -157,9 +157,9 @@ autoSave.save = function (submit, override){
   console.log(formUtils.logTime() + 'autosaving');
   $.ajax({
     url: autoSave.saveUrl + override,
-    type:'POST',
-    data:$('form').serialize() + '&user_id=' + autoSave.userId,
-    success:function(data, textStatus, jqXHR){
+    type: 'POST',
+    data: $('form').serialize() + '&user_id=' + autoSave.userId,
+    success: function(data, textStatus, jqXHR){
       if (jqXHR.status === 200) {
         if (submit) { //trigger the submit button
           var submitAll = document.getElementById('hidden_submit_app');
@@ -171,7 +171,7 @@ autoSave.save = function (submit, override){
         $('.autosaved').html('Unknown error<br>If you are seeing errors repeatedly please <a href="/apply/support#contact">contact us</a>');
       }
     },
-    error:function(jqXHR, textStatus, errorThrown){
+    error: function(jqXHR, textStatus){
       var errortext = '';
       if (jqXHR.status === 409){ //conflict - pause autosave and confirm override
         window.clearInterval(autoSave.saveTimer);
@@ -289,5 +289,3 @@ fileUploads.removeFile = function(fieldName) {
     }
   });
 };
-
-

@@ -89,7 +89,7 @@ def org_register(request):
 
       # create or update org
       try: # if matching org with no email exists
-        org = models.Organization.objects.get(name = org)
+        org = models.Organization.objects.get(name=org)
         org.email = username_email
         logger.info("matching org name found. setting email")
         org.save()
@@ -138,19 +138,19 @@ def cycle_info(request, cycle_id):
     raise Http404
   try:
     info_page = urllib2.urlopen(cycle.info_page)
-  except urllib2.HTTPError as e:
-    logger.error('Error fetching cycle info page; HTTPError: %s %s' % (e.code, e.reason))
-  except urllib2.URLError as e:
-    logger.error('Error fetching cycle info page; URLError: ' + str(e.reason))
-  except IOError as e:
-    logger.error('Unknown error fetching cycle info page: %s' % e)
+  except urllib2.HTTPError as err:
+    logger.error('Error fetching cycle info page; HTTPError: %s %s', err.code, err.reason)
+  except urllib2.URLError as err:
+    logger.error('Error fetching cycle info page; URLError: ' + str(err.reason))
+  except IOError as err:
+    logger.error('Unknown error fetching cycle info page: %s', err)
   else:
     content = info_page.read()
     start = content.find('<div id="content"')
     end = content.find('<!-- /#content')
     content = content[start:end].replace('modules/file/icons', 'static/images')
     if content == '':
-      logger.error('Info page content at %s could not be split' % cycle.info_page)
+      logger.error('Info page content at %s could not be split', cycle.info_page)
     else:
       logger.info('Received info page content from ' + cycle.info_page)
   finally:
@@ -162,20 +162,30 @@ def cycle_info(request, cycle_id):
 @registered_org()
 def org_home(request, organization):
 
-  saved = models.DraftGrantApplication.objects.filter(organization=organization).select_related('grant_cycle')
-  submitted = models.GrantApplication.objects.filter(organization=organization).order_by('-submission_time').select_related('giving_projects')
-  cycles = models.GrantCycle.objects.exclude(private=True).filter(close__gt=timezone.now()-datetime.timedelta(days=180)).order_by('open')
+  saved = (models.DraftGrantApplication.objects
+      .select_related('grant_cycle')
+      .filter(organization=organization))
+  submitted = (models.GrantApplication.objects
+      .select_related('giving_projects')
+      .filter(organization=organization)
+      .order_by('-submission_time'))
+  cycles = (models.GrantCycle.objects
+      .exclude(private=True)
+      .filter(close__gt=timezone.now()-datetime.timedelta(days=180))
+      .order_by('open'))
   submitted_cycles = submitted.values_list('grant_cycle', flat=True)
-  yer_drafts = models.YERDraft.objects.select_related().filter(award__projectapp__application__organization_id = organization.pk)
+  yer_drafts = (models.YERDraft.objects
+      .select_related()
+      .filter(award__projectapp__application__organization_id=organization.pk))
 
-  closed, open, applied, upcoming = [], [], [], []
+  closed, current, applied, upcoming = [], [], [], []
   for cycle in cycles:
     status = cycle.get_status()
     if status == 'open':
       if cycle.pk in submitted_cycles:
         applied.append(cycle)
       else:
-        open.append(cycle)
+        current.append(cycle)
     elif status == 'closed':
       closed.append(cycle)
     elif status == 'upcoming':
@@ -191,7 +201,7 @@ def org_home(request, organization):
     'saved':saved,
     'cycles':cycles,
     'closed':closed,
-    'open':open,
+    'open':current,
     'upcoming':upcoming,
     'applied':applied,
     'ydrafts': yer_drafts,
@@ -215,7 +225,7 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
     return render(request, 'grants/already_applied.html', {'organization':organization, 'cycle':cycle})
 
   #get or create draft
-  draft, cr = models.DraftGrantApplication.objects.get_or_create(organization = organization, grant_cycle=cycle)
+  draft, created = models.DraftGrantApplication.objects.get_or_create(organization=organization, grant_cycle=cycle)
   profiled = False
 
   #TEMP HACK
@@ -229,7 +239,7 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
     #get fields & files from draft
     draft_data = json.loads(draft.contents)
     #logger.debug('draft data: ' + str(draft_data))
-    files_data = model_to_dict(draft, fields = draft.file_fields())
+    files_data = model_to_dict(draft, fields=draft.file_fields())
     #logger.debug('Files data from draft: ' + str(files_data))
 
     #add automated fields
@@ -271,22 +281,22 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
     flag = draft.modified + datetime.timedelta(seconds=35) > timezone.now()
 
     #get initial data
-    if cr or draft.contents == '{}': #load profile
-      dict = model_to_dict(organization, exclude = ['fiscal_letter',])
+    if created or draft.contents == '{}': #load profile
+      org_dict = model_to_dict(organization, exclude=['fiscal_letter'])
       draft.fiscal_letter = organization.fiscal_letter
-      draft.contents = json.dumps(dict)
+      draft.contents = json.dumps(org_dict)
       draft.save()
       logger.debug('Created new draft')
       if cycle.info_page: #redirect to instructions first
         return render(request, 'grants/cycle_info.html', {'cycle':cycle})
 
     else: #load a draft
-      dict = json.loads(draft.contents)
+      org_dict = json.loads(draft.contents)
       timeline = []
       for i in range(15): #covering both timeline formats
-        if 'timeline_' + str(i) in dict:
-          timeline.append(dict['timeline_' + str(i)])
-      dict['timeline'] = json.dumps(timeline)
+        if 'timeline_' + str(i) in org_dict:
+          timeline.append(org_dict['timeline_' + str(i)])
+      org_dict['timeline'] = json.dumps(timeline)
       logger.debug('Loading draft')
 
     #check if draft can be submitted
@@ -300,11 +310,11 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
     referer = request.META.get('HTTP_REFERER')
     if (not (referer and referer.find('copy') != -1) and
         organization.mission and
-        ((not 'grant_request' in dict) or (not dict['grant_request']))):
+        ((not 'grant_request' in org_dict) or (not org_dict['grant_request']))):
       profiled = True
 
     #create form
-    form = GrantApplicationModelForm(cycle, initial=dict)
+    form = GrantApplicationModelForm(cycle, initial=org_dict)
 
   #get draft files
   file_urls = GetFileURLs(request, draft)
@@ -373,9 +383,9 @@ def add_file(request, draft_type, draft_id):
     logger.debug(unicode(draft.organization) + u' adding a file')
   elif draft_type == 'report':
     draft = get_object_or_404(models.YERDraft, pk=draft_id)
-    logger.debug('Adding a file to YER draft %s' % draft_id)
+    logger.debug('Adding a file to YER draft %s', draft_id)
   else:
-    logger.error('Invalid draft_type %s for add_file' % draft_type)
+    logger.error('Invalid draft_type %s for add_file', draft_type)
     return Http404
 
   logger.debug([request.body]) #don't remove this without fixing storage to not access body blob_file = False
@@ -476,11 +486,11 @@ def year_end_report(request, organization, award_id):
     return redirect(org_home)
 
   # get or create draft
-  draft, cr = models.YERDraft.objects.get_or_create(award=award)
+  draft, created = models.YERDraft.objects.get_or_create(award=award)
 
   if request.method == 'POST':
     draft_data = json.loads(draft.contents)
-    files_data = model_to_dict(draft, fields = ['photo1', 'photo2', 'photo3', 'photo4', 'photo_release'])
+    files_data = model_to_dict(draft, fields=['photo1', 'photo2', 'photo3', 'photo4', 'photo_release'])
     logger.info(files_data)
     draft_data['award'] = award.pk
     form = YearEndReportForm(draft_data, files_data)
@@ -507,7 +517,7 @@ def year_end_report(request, organization, award_id):
       logger.info(form.errors)
 
   else: # GET
-    if cr:
+    if created:
       initial_data = {'website': app.website, 'sit_website': app.website,
                       'contact_person': app.contact_person + ', ' + app.contact_person_title,
                       'phone': app.telephone_number, 'email': app.email_address}
@@ -552,24 +562,24 @@ def CopyApp(request, organization):
 
       #get cycle
       try:
-        cycle = models.GrantCycle.objects.get(pk = int(new_cycle))
+        cycle = models.GrantCycle.objects.get(pk=int(new_cycle))
       except models.GrantCycle.DoesNotExist:
         logger.error('CopyApp GrantCycle ' + new_cycle + ' not found')
         return render(request, 'grants/copy_app_error.html')
 
       #make sure the combo does not exist already
-      new_draft, cr = models.DraftGrantApplication.objects.get_or_create(
+      new_draft, created = models.DraftGrantApplication.objects.get_or_create(
           organization=organization, grant_cycle=cycle)
-      if not cr:
+      if not created:
         logger.error("CopyApp the combo already exists!?")
         return render(request, 'grants/copy_app_error.html')
 
       #get app/draft and its contents (json format for draft)
       if app:
         try:
-          application = models.GrantApplication.objects.get(pk = int(app))
+          application = models.GrantApplication.objects.get(pk=int(app))
           content = model_to_dict(application,
-                                  exclude = application.file_fields() + [
+                                  exclude=application.file_fields() + [
                                     'organization', 'grant_cycle',
                                     'submission_time', 'pre_screening_status',
                                     'giving_projects', 'scoring_bonus_poc',
@@ -585,7 +595,7 @@ def CopyApp(request, organization):
           logger.error('CopyApp - submitted app ' + app + ' not found')
       elif draft:
         try:
-          application = models.DraftGrantApplication.objects.get(pk = int(draft))
+          application = models.DraftGrantApplication.objects.get(pk=int(draft))
           content = json.loads(application.contents)
           logger.info(content)
           content['cycle_question'] = ''
@@ -630,7 +640,7 @@ def DiscardDraft(request, organization, draft_id):
 
   #look for saved draft
   try:
-    saved = models.DraftGrantApplication.objects.get(pk = draft_id)
+    saved = models.DraftGrantApplication.objects.get(pk=draft_id)
     if saved.organization == organization:
       saved.delete()
       logger.info('Draft ' + str(draft_id) + ' discarded')
@@ -701,7 +711,7 @@ def rollover_yer(request, organization):
       new_draft.save()
       return redirect(reverse('sjfnw.grants.views.year_end_report', kwargs={'award_id': award_id}))
     else: # INVALID FORM
-      logger.error('Invalid YER rollover. %s' % form.errors)
+      logger.error('Invalid YER rollover. %s', form.errors)
       return render(request, 'grants/yer_rollover.html', {'error_msg': 'Invalid selection. Retry or contact an admin for assistance.'})
 
   else: # GET
@@ -773,14 +783,14 @@ def view_file(request, obj_type, obj_id, field_name):
     'rdraft': models.YERDraft
   }
   if not obj_type in MODEL_TYPES:
-    logger.warning('Unknown obj type %s' % obj_type)
+    logger.warning('Unknown obj type %s', obj_type)
     raise Http404
 
-  obj =  get_object_or_404(MODEL_TYPES[obj_type], pk = obj_id)
+  obj = get_object_or_404(MODEL_TYPES[obj_type], pk=obj_id)
   return ServeBlob(obj, field_name)
 
 def ViewDraftFile(request, draft_id, field_name):
-  application =  get_object_or_404(models.DraftGrantApplication, pk = draft_id)
+  application = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
   return ServeBlob(application, field_name)
 
 def view_yer(request, report_id):
@@ -798,7 +808,7 @@ def view_yer(request, report_id):
   if not report.visible and perm < 2:
     return render(request, 'grants/blocked.html', {})
 
-  form = YearEndReportForm(instance = report)
+  form = YearEndReportForm(instance=report)
 
   file_urls = GetFileURLs(request, report, printing=False)
 
@@ -813,15 +823,15 @@ def RedirToApply(request):
 
 def AppToDraft(request, app_id):
 
-  submitted_app = get_object_or_404(models.GrantApplication, pk = app_id)
+  submitted_app = get_object_or_404(models.GrantApplication, pk=app_id)
   organization = submitted_app.organization
   grant_cycle = submitted_app.grant_cycle
 
   if request.method == 'POST':
     #create draft from app
-    draft = models.DraftGrantApplication(organization = organization, grant_cycle = grant_cycle)
+    draft = models.DraftGrantApplication(organization=organization, grant_cycle=grant_cycle)
     content = model_to_dict(submitted_app,
-                            exclude = submitted_app.file_fields() + [
+                            exclude=submitted_app.file_fields() + [
                                 'organization', 'grant_cycle',
                                 'submission_time', 'pre_screening_status',
                                 'giving_projects', 'scoring_bonus_poc',
@@ -845,13 +855,13 @@ def AppToDraft(request, app_id):
                 {'application':submitted_app})
 
 def AdminRollover(request, app_id):
-  application = get_object_or_404(models.GrantApplication, pk = app_id)
+  application = get_object_or_404(models.GrantApplication, pk=app_id)
   org = application.organization
 
   if request.method == 'POST':
     form = AdminRolloverForm(org, request.POST)
     if form.is_valid():
-      cycle = get_object_or_404(models.GrantCycle, pk = int(form.cleaned_data['cycle']))
+      cycle = get_object_or_404(models.GrantCycle, pk=int(form.cleaned_data['cycle']))
       logger.info('Success rollover of ' + unicode(application) +
                    ' to ' + str(cycle))
       application.pk = None # this + save makes new copy
@@ -1049,7 +1059,7 @@ def get_app_results(options):
           convert = dict(models.PRE_SCREENING)
           val = convert[val]
         row.append(val)
-      elif field=='submission_time':
+      elif field == 'submission_time':
         row.append(local_date_str(getattr(app, field)))
       else:
         row.append(getattr(app, field))
@@ -1070,7 +1080,7 @@ def get_app_results(options):
             try:
               award = papp.givingprojectgrant
               if award_col != '':
-               award_col += ', '
+                award_col += ', '
               award_col += '%s %s ' % (award.amount, papp.giving_project.title)
             except models.GivingProjectGrant.DoesNotExist:
               pass
