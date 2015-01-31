@@ -1,0 +1,43 @@
+[MASTER]
+
+[MESSAGES CONTROL]
+
+disable=C0111,C0301,C0330,E1002,E1101,E1103,F0401,R0903,W0105,W0232
+
+# C0111  missing docstring
+# C0301  line too long
+# C0330  bad continuation (hanging indent. fails a lot)
+# E1002  use of super on old style class
+# E1101  <name> has no <name> member
+# E1103  maybe no member
+# F0401  couldn't import
+# R0903  mininum public methods for class (fails on Meta)
+# W0105  string statement has no effect (docstrings)
+# W0232  class missing __init__
+
+[REPORTS]
+
+output-format=colorized
+
+[BASIC]
+
+# qs = common shorthand for queryset. pk = primary key
+good-names+=qs,pk
+# don't require docstring for Meta (in addition to default __x__ funcs)
+no-docstring-rgx=__.*__|Meta
+# allow setUp as an exception since it's built in
+method-rgx=setUp|([a-z_][a-z0-9_]{2,30})$
+
+[FORMAT]
+
+# expect 2-space indents
+indent-string='  '
+# let's start with something a bit generous
+max-line-length=90
+
+
+[TYPECHECK]
+
+generated-members=REQUEST,objects,_meta,id
+#generated-members=REQUEST,acl_users,aq_parent,objects,_meta,id
+
