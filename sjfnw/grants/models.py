@@ -326,8 +326,8 @@ class GrantApplication(models.Model):
                                   choices=STATE_CHOICES, blank=True)
   fiscal_zip = models.CharField(verbose_name='ZIP', max_length=50, blank=True)
 
-  #narratives
-  NARRATIVE_CHAR_LIMITS = [0, 300, 150, 450, 300, 300, 450, 500]
+  # narratives. index matches question number
+  NARRATIVE_CHAR_LIMITS = [0, 300, 150, 450, 300, 300, 450, 750]
   NARRATIVE_TEXTS = ['Placeholder for 0',
     ('Describe your organization\'s mission, history and major '
      'accomplishments.'), #1
