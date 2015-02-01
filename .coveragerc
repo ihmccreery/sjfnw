@@ -1,0 +1,12 @@
+[run]
+branch = true
+source = sjfnw
+omit =
+  sjfnw/wsgi.py
+  sjfnw/mail.py
+  */tests.py
+  *__init__.py
+  *commands/*
+
+[html]
+directory = .coverage-html

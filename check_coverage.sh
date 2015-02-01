@@ -3,7 +3,9 @@
 # uses coverage package - https://pypi.python.org/pypi/coverage
 
 # run all tests with coverage wrapper
-coverage run --source='sjfnw' --omit='sjfnw/wsgi.py,sjfnw/mail.py,*/tests.py,*__init__.py,*commands/*' manage.py test grants fund
+coverage run manage.py test grants fund
 
-# output html results in /coverage
-coverage html -d ~/Projects/coverage
+# output html results (to dir specified in .coveragerc)
+coverage html
+
+echo 'Coverage information collected. See .coverage/index.html'
