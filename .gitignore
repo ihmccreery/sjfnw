@@ -1,8 +1,7 @@
-# Python #
+# python
 *.pyc
 
-# Vim
-*.swp
-*.vim
-*.vim!
+# coverage.py
+.coverage
+.coverage-html/*
 
