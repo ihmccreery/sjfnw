@@ -22,7 +22,41 @@ Install **mysql-server** and **python-mysqldb**. When prompted, enter the passwo
 Once those have installed, create the database:
 
 1. `mysql -uroot -p` to get into the mysql shell. This will prompt you for the password you set when you installed.
-2. `create database sjfdb_local;`
+2. Make sure mysql is set to use `utf8` encoding everywhere. You can check with `show variables like 'char%';`. If anything is set to `latin1`, change it with `set [variable name]=utf8;`
+3. `create database sjfdb_local;`
+
+## Running a local server
+
+The first time, or after adding new models, you'll need to sync the database first. From root level of the repo, run:
+
+`./manage.py syncdb`
+
+You should see output as tables are created in the local database.
+Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.
+
+_If this doesn't work, make sure `manage.py` has execute permissions. `chmod a+x manage.py` should work._
+
+##### To run the server:
+
+Move up one level to the directory containing the repo and run:
+
+`dev_appserver.py sjfnw`
+
+_If you get something like 'command not found', make sure GAE is in your path. Use `echo $PATH` to confirm._
+
+## Loading fixtures into local db
+
+To populate your local db with data, do `./manage.py load_testing_data1`. This olds old fixtures from the live database.
+
+## Running tests
+
+`./manage.py test fund grants`
+
+To check test coverage, install [coverage.py](http://nedbatchelder.com/code/coverage/), then do
+
+`sh check_coverage.sh`
+
+which will output coverage details as html files in `/.coverage-html`
 
 ## Project conventions
 
@@ -51,33 +85,4 @@ Once those have installed, create the database:
 - [Link issues](https://help.github.com/articles/closing-issues-via-commit-messages/) in your commit descriptions when applicable.
 
 See [this post](http://nvie.com/posts/a-successful-git-branching-model/) for more details on the general git branching model we're going for.
-
-## Running a local server
-
-The first time, or after adding new models, you'll need to sync the database first. From root level of the repo, run:
-
-`./manage.py syncdb`
-
-You should see output as tables are created in the local database.
-Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.
-
-_If this doesn't work, make sure `manage.py` has execute permissions. `chmod a+x manage.py` should work._
-
-##### To run the server:
-
-Move up one level to the directory containing the repo and run:
-
-`dev_appserver.py sjfnw`
-
-_If you get something like 'command not found', make sure GAE is in your path. Use `echo $PATH` to confirm._
-
-## Running tests
-
-`./manage.py test fund grants`
-
-To check test coverage, install [coverage.py](http://nedbatchelder.com/code/coverage/), then do
-
-`sh check_coverage.sh`
-
-which will output coverage details as html files in `/.coverage-html`
 
