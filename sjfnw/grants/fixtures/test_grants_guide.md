@@ -1,8 +1,8 @@
-﻿GUIDE TO TEST_GRANTS.JSON
+# GUIDE TO TEST\_GRANTS.JSON
 
-(some test use live dump fixtures with more objects)
+Note: some tests use live dump fixtures with more objects
 
-GRANT CYCLES
+### GRANT CYCLES
 
   1 Open cycle
   2 Another open cycle
@@ -11,9 +11,9 @@ GRANT CYCLES
   5 Let's have a kiki [open]
   6 Oui [open]
 
-* For all but closed, set the dates in setUp using set_cycle_dates()
+* For all but closed, dates are set in setUp using `set_cycle_dates()`
 
-ORGANIZATIONS
+### ORGANIZATIONS
 
   1 Fresh New Org - neworg@gmail.com
     (nothing associated)
@@ -22,12 +22,12 @@ ORGANIZATIONS
     Drafts:     1 (cycle 2), 2 (cycle 3)
     Submitted:  1 (cycle 1), 2 (cycle 5)
 
-GIVING PROJECTS
+### GIVING PROJECTS
 
   3 LGBTQ
   4 Immigration Reform
 
-SUBMITTED
+### GRANT APPLICATIONS
 
   1 OfficeMax (2), Open cycle (1)
     Complete as of 11/2013
@@ -36,7 +36,7 @@ SUBMITTED
 
   2 OfficeMax (2), Let's have a kiki (5)
 
-DRAFTS
+### DRAFTS
 
   1 OfficeMax (2), Closed cycle (3)
     Missing a lot of stuff
@@ -45,7 +45,7 @@ DRAFTS
     Complete (as of 5/1/14)
     No fiscal info, general support (no project info), all-in-one budget option, includes partial timeline
 
-DRAFT FILES
+### DRAFT FILES
 
   Any file in the media folder will work.  Currently (in order of files list):
     budget.doc
