@@ -10,21 +10,8 @@ import json, logging
 logger = logging.getLogger('sjfnw')
 
 
-""" NOTE: some tests depend on having these files in sjfnw/media
-  budget.docx      diversity.doc      funding_sources.docx
-  budget1.docx     budget2.txt         budget3.png  """
-
-LIVE_FIXTURES = ['sjfnw/fund/fixtures/live_gp_dump.json', #not using these yet in most
-                 'sjfnw/grants/fixtures/orgs.json',
-                 'sjfnw/grants/fixtures/grant_cycles.json',
-                 'sjfnw/grants/fixtures/apps.json',
-                 'sjfnw/grants/fixtures/drafts.json',
-                 'sjfnw/grants/fixtures/project_apps.json',
-                 'sjfnw/grants/fixtures/gp_grants.json']
-
-
 class BaseGrantFilesTestCase(BaseGrantTestCase):
-  """ Can handle file uploads too """
+  """ Extension of BaseGrantTestCase that can handle file uploads """
 
   def setUp(self, login):
     super(BaseGrantFilesTestCase, self).setUp(login=login)
@@ -34,7 +21,6 @@ class BaseGrantFilesTestCase(BaseGrantTestCase):
 
   class Meta:
     abstract = True
-
 
 
 def alter_draft_timeline(draft, values):
@@ -54,7 +40,6 @@ def alter_draft_files(draft, files_dict):
   for key, val in files.iteritems():
     setattr(draft, key, val)
   draft.save()
-
 
 
 @override_settings(DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage',

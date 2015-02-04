@@ -3,7 +3,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 
 from sjfnw.constants import TEST_MIDDLEWARE
-from sjfnw.grants.tests.base import BaseGrantTestCase, assert_app_matches_draft
+from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
 from datetime import timedelta
@@ -112,7 +112,7 @@ class OrgRollover(BaseGrantTestCase):
     self.assertEqual(1, models.DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=2).count())
 
     draft = models.DraftGrantApplication.objects.get(organization_id=1, grant_cycle_id=2)
-    assert_app_matches_draft(self, draft, app, True)
+    self.assert_draft_matches_app(draft, app, exclude_cycle_q=True)
 
   def test_rollover_form_display(self):
     """ Verify that rollover form displays correctly for both orgs

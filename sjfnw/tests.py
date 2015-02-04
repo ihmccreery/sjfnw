@@ -11,7 +11,6 @@ from unittest.signals import registerResult
 
 """ Shared testing base classes, utilities """
 
-
 # Sets root & sjfnw loggers level. Comment out for less output.
 logging.getLogger().setLevel(0)
 logging.getLogger('sjfnw').setLevel(0)
@@ -215,5 +214,4 @@ class ColorTestRunner(TextTestRunner):
       self.stream.writeln(" (%s)" % (", ".join(infos),))
     self.stream.write('\n')
     return result
-
 
