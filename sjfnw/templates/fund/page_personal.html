@@ -4,7 +4,6 @@
 {{ block.super }}
 <script type="text/javascript" src="/static/js/modernizr.custom.js"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<!--- charts -->
 <script type="text/javascript">
   var text_progress = false;
   if (Modernizr.inlinesvg) {
@@ -84,9 +83,7 @@
 		}
   }
 </script>
-<!--- custom functions -->
 <script type="text/javascript">
-  //on load
   $(document).ready(function() {
     var load = '{{ load }}';
     var loadto = '{{ loadto }}';
@@ -216,8 +213,8 @@
     </div>
   </div> {# ends donor_details #}
 
-</div> {# ends donor #}
-{% empty %} {# no contacts yet #}
+</div>{# ends donor #}
+{% empty %}{# no contacts yet #}
   {% if fd %}{# add estimates #}
     {% include 'fund/add_estimates.html' %}
   {% else %}{# add contacts #}
