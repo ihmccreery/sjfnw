@@ -1,3 +1,12 @@
+[Installation](#installation)  
+[Running a local server](#running-a-local-server)  
+[Using fixtures](#using-fixtures-to-populate-your-local-database)  
+[Running tests](#running-tests)  
+[Project conventions](#project-conventions)  
+[Deploying](#deploying)  
+
+-----
+
 ## Installation
 
 Instructions assume you're running linux or mac osx and can use a package manager as needed - homebrew, apt-get, etc.
@@ -44,9 +53,9 @@ Move up one level to the directory containing the repo and run:
 
 _If you get something like 'command not found', make sure GAE is in your path. Use `echo $PATH` to confirm._
 
-## Loading fixtures into local db
+## Using fixtures to populate your local database
 
-To populate your local db with data, do `./manage.py load_testing_data1`. This olds old fixtures from the live database.
+To populate your local db with data, do `./manage.py load_testing_data`. This olds old fixtures from the live database.
 
 ## Running tests
 
@@ -86,3 +95,11 @@ which will output coverage details as html files in `/.coverage-html`
 
 See [this post](http://nvie.com/posts/a-successful-git-branching-model/) for more details on the general git branching model we're going for.
 
+## Deploying
+
+There are currently a couple ways to deploy code to app engine:
+
+1. Recommended: Set up push-to-deploy. See 'existing repository' section of [these instructions](https://console.developers.google.com/project/sjf-nw/clouddev/source/repo). You can either install gcloud, or click the link at the bottom to set up auth without it (it's quite quick to do so). Once you're set up, you can deploy by just pushing to that remote, i.e. `git push google master`
+2. Use `appcfg.py` from the GAE SDK. Instructions [here](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Uploading_the_app)
+
+I recommend 1 because it fits nicely into git workflow and makes it very easy to tell exactly what code is in production - you can browse code and commits though the cloud console. `appcfg.py` is useful if you want to deploy at a non-default version without having to change the `app.yaml` file accordingly.
