@@ -10,11 +10,11 @@
     {% if forloop.counter == 1 %}
     <tr>
       {% for field in form %}
-        <td>{% if field.name != 'confirm' %}{{ field.label }}{% endif %}</td>
+      <td>{% if field.name != 'confirm' %}{{ field.label }}{% endif %}</td>
       {% endfor %}
     </tr>
     <tr>
-      <td colspan="4">{{empty_error|safe}}</td>
+      <td colspan="4">{{ empty_error|safe }}</td>
     </tr>
     {% endif %}
     <tr>
