@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.grants.forms import AppReportForm, AwardReportForm, OrgReportForm
-from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES, assert_app_matches_draft
+from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
 
 import unicodecsv
@@ -401,7 +401,7 @@ class AdminRevert(BaseGrantTestCase):
 
     self.assertEqual(1, models.DraftGrantApplication.objects.filter(organization_id=2, grant_cycle_id=1).count())
     draft = models.DraftGrantApplication.objects.get(organization_id=2, grant_cycle_id=1)
-    assert_app_matches_draft(self, draft, app, False)
+    self.assert_draft_matches_app(draft, app)
 
 @unittest.skip('Incomplete')
 @override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)

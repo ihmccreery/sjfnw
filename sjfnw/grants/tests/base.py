@@ -7,10 +7,8 @@ from sjfnw.tests import BaseTestCase
 from datetime import timedelta
 import json
 
-
-""" NOTE: some tests depend on having these files in sjfnw/media
-  budget.docx      diversity.doc      funding_sources.docx
-  budget1.docx     budget2.txt         budget3.png  """
+""" This file provides a base test class and utilities specific to the grants
+    module. See other files in sjfnw/grants/tests for actual tests """
 
 LIVE_FIXTURES = ['sjfnw/fund/fixtures/live_gp_dump.json', #not using these yet in most
                  'sjfnw/grants/fixtures/orgs.json',
@@ -21,7 +19,7 @@ LIVE_FIXTURES = ['sjfnw/fund/fixtures/live_gp_dump.json', #not using these yet i
                  'sjfnw/grants/fixtures/gp_grants.json']
 
 def set_cycle_dates():
-  """ Updates grant cycle dates to make sure they have the expected statuses:
+  """ Update grant cycle dates to make sure they have the expected statuses:
       open, open, closed, upcoming, open """
 
   now = timezone.now()
@@ -54,11 +52,11 @@ def set_cycle_dates():
   cycle.save()
 
 class BaseGrantTestCase(BaseTestCase):
-  """ Base for grants tests. Provides fixture and basic setUp
-      as well as several helper functions """
+  """ Abstract base cass for grants tests. """
 
   fixtures = ['sjfnw/grants/fixtures/test_grants.json']
 
+  # see ./test_grants_guide.md for what is associated with each org
   def logInNeworg(self):
     user = User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
     self.client.login(username = 'neworg@gmail.com', password = 'noob')
@@ -77,25 +75,28 @@ class BaseGrantTestCase(BaseTestCase):
       self.logInAdmin()
     set_cycle_dates()
 
+  def assert_draft_matches_app(self, draft, app, exclude_cycle_q=False):
+    """ Assert that app is a superset of draft
+        (All draft fields match app, but app may have additional fields)
+        Handles conversion of timeline format between the two.
+
+        If exclude_cycle_q is True, verify that draft does not have
+        cycle_question field (useful for rollover) """
+
+    draft_contents = json.loads(draft.contents)
+    app_timeline = json.loads(app.timeline)
+    for field, value in draft_contents.iteritems():
+      if 'timeline' in field:
+        i = int(field.split('_')[-1])
+        self.assertEqual(value, app_timeline[i])
+      else:
+        self.assertEqual(value, getattr(app, field))
+    for field in models.GrantApplication.file_fields():
+      if hasattr(draft, field):
+        self.assertEqual(getattr(draft, field), getattr(app, field))
+    if exclude_cycle_q:
+      self.assertNotIn('cycle_question', draft_contents)
+
   class Meta:
     abstract = True
-
-
-def assert_app_matches_draft(self, draft, app, exclude_cycle): #only checks fields in draft
-  """ Timeline formats:
-        submitted: json'd list, in order, no file names
-        draft: mixed in with other contents by widget name: timeline_0 - timeline_14 """
-  draft_contents = json.loads(draft.contents)
-  app_timeline = json.loads(app.timeline)
-  for field, value in draft_contents.iteritems():
-    if 'timeline' in field:
-      i = int(field.split('_')[-1])
-      self.assertEqual(value, app_timeline[i])
-    else:
-      self.assertEqual(value, getattr(app, field))
-  for field in models.GrantApplication.file_fields():
-    if hasattr(draft, field):
-      self.assertEqual(getattr(draft, field), getattr(app, field))
-  if exclude_cycle:
-    self.assertNotIn('cycle_question', draft_contents)
 
