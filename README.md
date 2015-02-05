@@ -74,7 +74,20 @@ which will output coverage details as html files in `/.coverage-html`
 - **2 space indents** Python is space/indent sensitive and varying indents will throw errors.
   - An [editorconfig](http://editorconfig.org/#download) plugin may be useful if you use other indentation levels in other projects.
 - Generally follow google's [Python style guide](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html) (a work in progress in the current code)
-- Project contains configs for [pylint](http://www.pylint.org/) and [eslint](http://eslint.org/docs/)
+
+##### Linters
+- Project contains configs for [pylint](http://www.pylint.org/) and [eslint](http://eslint.org/docs/) which check the syntax and style of the python and javascript code in the project.
+- Installation
+  - pylint:
+    - `sudo apt-get install pylint` or `pip install pylint` on mac os (more details [here](http://www.pylint.org/#install)
+    - make sure you have v1.4+ (do `pip list` to see, `pip -U pylint` to upgrade)
+  - eslint:
+    - You'll need npm first, which requires node. `sudo apt-get install node` + `sudo apt-get install npm` or see their [docs](https://docs.npmjs.com/getting-started/installing-node) for instructions.
+    - `npm install -g eslint` See [this page](https://docs.npmjs.com/getting-started/fixing-npm-permissions) if you get a permissions error.
+- Usage
+  - You can run each from the command line (see links for details)
+  - Some text editors have plugins to run them from within the editor. For example, with vim, you can use [syntastic](https://github.com/scrooloose/syntastic).
+  
 
 #### Issue tracking
 
