@@ -188,7 +188,7 @@ function toggle(a, b) { //donor info
 
 
 function loadView(get_url, div_id, dasked, dpromised) {
-  if (request_processing) {
+  if (requestProcessing) {
     console.log('Request processing; load view denied');
     return false;
   }
