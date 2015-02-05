@@ -44,7 +44,7 @@ function endProcessing() {
 }
 
 /* Submits form data, displays errors or redirects if successful */
-function Submit(subUrl, formId, divId, date, dasked, dpromised){
+function Submit(subUrl, formId, divId, date, dasked, dpromised) {
   if (requestProcessing) {
     console.log('Request processing; submit denied');
     return false;
@@ -56,7 +56,7 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised){
     type: 'POST',
     data: $(formId).serialize(),
     timeout: 10000,
-    success: function(data, textStatus, jqXHR){
+    success: function(data, textStatus, jqXHR) {
       trackEvents(subUrl, divId, 'POST');
       if (jqXHR.responseText === 'success') { // successful
         console.log('Submission to ' + subUrl + ' returned success; redirecting');
@@ -82,7 +82,7 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised){
       if (date) { datepicker();}
       endProcessing();
     },
-    error: function(jqXHR, textStatus){
+    error: function(jqXHR, textStatus) {
       endProcessing();
       var errortext = '';
         if (STATUS_TEXTS[jqXHR.status]) {
@@ -169,131 +169,133 @@ function suggestFill(source, target) { // fills input with selected step
 }
 
 
-function toggle(a, b) { //donor info
-  //toggles a, border on b if a is shown
-  var e=document.getElementById(a);
-  var f=document.getElementById(b);
-  if(!e){
+function toggle(a, b) { // donor info
+  // toggles a, border on b if a is shown
+  var e = document.getElementById(a);
+  var f = document.getElementById(b);
+  if (!e) {
     return true;
   }
-  if(e.style.display=="none"){
-    e.style.display="block";
-    f.style.borderColor="#555";
+  if(e.style.display === 'none') {
+    e.style.display = 'block';
+    f.style.borderColor = '#555';
   } else {
-    e.style.display="none";
-    f.style.borderColor="#FFF";
+    e.style.display = 'none';
+    f.style.borderColor = '#FFF';
   }
   return true;
 }
 
 
-function loadView(get_url, div_id, dasked, dpromised) {
+function loadView(getUrl, divId, dasked, dpromised) {
   if (requestProcessing) {
     console.log('Request processing; load view denied');
     return false;
   }
-  console.log(get_url + ' load requested');
+  console.log(getUrl + ' load requested');
   startProcessing();
   $.ajax({
-    url:get_url,
-    type:"GET",
+    url: getUrl,
+    type: 'GET',
     timeout: 10000,
-    success: function(data, textStatus, jqXHR){
-      console.log(get_url + ' loaded');
-      document.getElementById(div_id).innerHTML=jqXHR.responseText; //fill the div
-      var pks = get_url.match(/\d+/g);
-      if (pks && pks[1]) { //donor-specific form loading
+    success: function(data, textStatus, jqXHR) {
+      console.log(getUrl + ' loaded');
+      document.getElementById(divId).innerHTML = jqXHR.responseText; // fill the div
+      var pks = getUrl.match(/\d+/g);
+      if (pks && pks[1]) { // donor-specific form loading
         var a = document.getElementById('donor-' + pks[0]);
-        a.style.borderColor="#555";
+        a.style.borderColor = '#555';
         if (dasked) {
           completeLoaded(pks[1], dasked, dpromised);
         }
-      } else if (div_id == 'addmult') {
-        document.getElementById(div_id).style.borderColor="#555";
+      } else if (divId === 'addmult') {
+        document.getElementById(divId).style.borderColor = '#555';
       }
       datepicker();
-      trackEvents(get_url, div_id, 'GET');
+      trackEvents(getUrl, divId, 'GET');
       endProcessing();
     },
-    error: function(jqXHR, textStatus, errorThrown){
+    error: function(jqXHR, textStatus) {
       endProcessing();
-      var errortext = ''
-      if (status_texts[jqXHR.status]) {
-        errortext = status_texts[jqXHR.status]
-      } else if (textStatus=='timeout') {
-        errortext = 'Request timeout'
+      var errortext = '';
+      if (STATUS_TEXTS[jqXHR.status]) {
+        errortext = STATUS_TEXTS[jqXHR.status];
+      } else if (textStatus === 'timeout') {
+        errortext = 'Request timeout';
       } else {
         errortext = (jqXHR.status || '') + ' Unknown error';
       }
-      console.log('Error loading ' + get_url + ': ' + errortext)
-      document.getElementById(div_id).innerHTML='<p>An error occurred while handling your request.  We apologize for the inconvenience.</p><p>URL: ' + get_url + '<br>Error: ' + errortext + '</p><p><a href="/fund/support" target="_blank">Contact us</a> for assistance if necessary.  Please include the above error text.</p>';
+      console.log('Error loading ' + getUrl + ': ' + errortext);
+      document.getElementById(divId).innerHTML = '<p>An error occurred while handling your request.  We apologize for the inconvenience.</p><p>URL: ' + getUrl + '<br>Error: ' + errortext + '</p><p><a href="/fund/support" target="_blank">Contact us</a> for assistance if necessary.  Please include the above error text.</p>';
     }
   });
 }
 
-function addRow(selector, type) { //add row to form
+function addRow(selector, type) { // add row to form
   console.log('Adding a row to form');
   var newElement = $(selector).clone(true);
   var total = $('#id_' + type + '-TOTAL_FORMS').val();
+  var oldTotalString = '-' + (total - 1) + '-';
+  var newTotalString = '-' + total + '-';
+
   newElement.find(':input').each(function() {
-      var name = $(this).attr('name').replace('-' + (total-1) + '-','-' + total + '-');
-  var id = 'id_' + name;
-  $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+    var name = $(this).attr('name').replace(oldTotalString, newTotalString);
+    var id = 'id_' + name;
+    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
   });
   newElement.find('label').each(function() {
-  var newFor = $(this).attr('for').replace('-' + (total-1) + '-','-' + total + '-');
-  $(this).attr('for', newFor);
+    var newFor = $(this).attr('for').replace(oldTotalString, newTotalString);
+    $(this).attr('for', newFor);
   });
   total++;
   $('#id_' + type + '-TOTAL_FORMS').val(total);
   $(selector).after(newElement); // only copies last row, not incl error row. but error row will load when form reloads
 }
 
-
-//complete step form
+// complete step form
 function completeLoaded(pk, dasked, dpromised, submitted) {
-  //hide fields based on what is already in the database for the contact
-  //console.log('completeloaded called, submitted is ' +submitted);
-  var asked_span = document.getElementById(pk+'_asked');
-  var response_span = document.getElementById(pk+'_response');
-  var promised_span = document.getElementById(pk+'_promise');
-  if (dasked != 'False') {  //have asked
-    asked_span.style.display = "none";
-    if (dpromised != 'None') { // promise complete, hide 2&3
-      response_span.style.display = "none";
-      promised_span.style.display = "none";
-      //console.log('in completeloaded promise in db, hiding')
+  // hide fields based on what is already in the database for the contact
+  // console.log('completeloaded called, submitted is ' +submitted);
+  var askedSpan = document.getElementById(pk + '_asked');
+  var responseSpan = document.getElementById(pk + '_response');
+  var promisedSpan = document.getElementById(pk + '_promise');
+  if (dasked !== 'False') {  // have asked
+    askedSpan.style.display = 'none';
+    if (dpromised !== 'None') { // promise complete, hide 2&3
+      responseSpan.style.display = 'none';
+      promisedSpan.style.display = 'none';
+      // console.log('in completeloaded promise in db, hiding')
     } else { // check response
-      var response = document.getElementById(pk+'_id_response');
+      var response = document.getElementById(pk + '_id_response');
       responseSelected(response);
     }
-  } else { //haven't asked yet, hide 2&3
-    response_span.style.display = "none";
-    promised_span.style.display = "none";
+  } else { // haven't asked yet, hide 2&3
+    responseSpan.style.display = 'none';
+    promisedSpan.style.display = 'none';
     if (submitted) {
-      //console.log('in completeloaded promise in db, calling askedtoggled')
-      var asked = document.getElementById(pk+'_id_asked');
+      // console.log('in completeloaded promise in db, calling askedtoggled')
+      var asked = document.getElementById(pk + '_id_asked');
       askedToggled(asked);
     }
   }
-  //follow up is hidden by defalt, don't need to hide it
+  // follow up is hidden by defalt, don't need to hide it
 }
 
-function askedToggled(asked) { 
-  //show or hide the response field
+function askedToggled(asked) {
+  // show or hide the response field
   // called by step complete form - asked input changed
   var num = asked.id.match(/\d+/);
-  var response_span = document.getElementById(num+'_response');
+  var responseSpan = document.getElementById(num + '_response');
   if (asked.checked) {
-    //console.log('askedtoggled checked');
-    response_span.style.display="inline";
-    var response = document.getElementById(num+'_id_response');
+    // console.log('askedtoggled checked');
+    responseSpan.style.display = 'inline';
+    var response = document.getElementById(num + '_id_response');
     responseSelected(response);
-  } else { //hide all following
-    //console.log('askedtoggled un checked');
-    response_span.style.display="none";
-    var hide_span = document.getElementById(num+'_promise');
-    hide_span.style.display="none";
+  } else { // hide all following
+    // console.log('askedtoggled un checked');
+    responseSpan.style.display = 'none';
+    var hideSpan = document.getElementById(num + '_promise');
+    hideSpan.style.display = 'none';
     promised(num, false);
   }
 }
@@ -301,28 +303,28 @@ function askedToggled(asked) {
 function responseSelected(response) {
   // show or hide the promised field
   // called when step complete form - response input changed
-  var donor_id = response.id.match(/\d+/);
-  var promised_span = document.getElementById(donor_id +'_promise');
-  if (response.value == 1) { //1 = promised, 2 = unsure, 3 = dec
-    //console.log('in respselected, calling promise entered')
-    promised(donor_id, true);
+  var donorId = response.id.match(/\d+/);
+  var promisedSpan = document.getElementById(donorId + '_promise');
+  console.log(typeof response.value);
+  if (response.value === '1') { // 1 = promised, 2 = unsure, 3 = dec
+    console.log('in respselected, calling promise entered');
+    promised(donorId, true);
   } else {
-    //console.log('in respselected, calling promise entered hide')
-    promised(donor_id, false);
+    console.log('in respselected, calling promise entered hide');
+    promised(donorId, false);
   }
 }
 
-function promised(donor_id, show) { //step complete form - promise input changed
-  //show or hide the last name & contact info fields
-  //console.log('in promiseentered, amt = ' + promise_amt +', donor_id = ' +donor_id)
-  var followup_class = '#' + donor_id + '_promise_follow';
-  var promise_amount = '#' + donor_id + '_promise';
+function promised(donorId, show) { // step complete form - promise input changed
+  // show or hide the last name & contact info fields
+  // console.log('in promiseentered, amt = ' + promise_amt +', donor_id = ' +donor_id)
+  var followupClass = '#' + donorId + '_promise_follow';
+  var promiseAmount = '#' + donorId + '_promise';
   if (show) {
-    $(promise_amount).show();
-    $(followup_class).show("drop");
+    $(promiseAmount).show();
+    $(followupClass).show('drop');
   } else {
-    $(promise_amount).hide();
-    $(followup_class).hide();
+    $(promiseAmount).hide();
+    $(followupClass).hide();
   }
 }
-
