@@ -1,4 +1,4 @@
-﻿from django.conf import settings
+from django.conf import settings
 from django.conf.urls import patterns, include
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -60,8 +60,7 @@ urlpatterns = patterns('',
   (r'^mail/yer/?', 'sjfnw.grants.views.yer_reminder_email'),
 
   # dev
-  (r'^dev/jslog/?', 'sjfnw.views.log_javascript'),
-  (r'^dev/donor-dups', 'sjfnw.fund.views.find_duplicates'),
+  (r'^dev/jslog/?', 'sjfnw.views.log_javascript')
 )
 
 #for dev_appserver
