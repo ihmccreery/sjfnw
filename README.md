@@ -81,6 +81,7 @@ which will output coverage details as html files in `/.coverage-html`
   - pylint:
     - `sudo apt-get install pylint` or `pip install pylint` on mac os (more details [here](http://www.pylint.org/#install)
     - make sure you have v1.4+ (do `pip list` to see, `pip -U pylint` to upgrade)
+    - `pip install pylint-django` - [plugin](https://github.com/landscapeio/pylint-django) that makes pylint more django friendly
   - eslint:
     - You'll need npm first, which requires node. `sudo apt-get install node` + `sudo apt-get install npm` or see their [docs](https://docs.npmjs.com/getting-started/installing-node) for instructions.
     - `npm install -g eslint` See [this page](https://docs.npmjs.com/getting-started/fixing-npm-permissions) if you get a permissions error.
