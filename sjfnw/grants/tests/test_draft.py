@@ -15,7 +15,8 @@ logger = logging.getLogger('sjfnw')
 class DraftExtension(BaseGrantTestCase):
 
   def setUp(self):
-    super(DraftExtension, self).setUp(login='admin')
+    super(DraftExtension, self).setUp()
+    self.logInAdmin()
 
   def test_create_draft(self):
     """ Admin create a draft for Fresh New Org """
@@ -40,7 +41,8 @@ class DraftExtension(BaseGrantTestCase):
 class Draft(BaseGrantTestCase):
 
   def setUp(self):
-    super(Draft, self).setUp(login='testy')
+    super(Draft, self).setUp()
+    self.logInTestorg()
 
   def test_autosave1(self):
     """ scenario: steal contents of draft 2, turn it into a dict. submit that as request.POST for cycle 5
@@ -66,7 +68,8 @@ class Draft(BaseGrantTestCase):
 class DraftWarning(BaseGrantTestCase):
 
   def setUp(self):
-    super(DraftWarning, self).setUp(login='admin')
+    super(DraftWarning, self).setUp()
+    self.logInAdmin()
 
   def test_long_alert(self):
     """ Cycle created 12 days ago with cycle closing in 7.5 days

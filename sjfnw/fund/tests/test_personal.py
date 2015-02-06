@@ -2,9 +2,10 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.constants import TEST_MIDDLEWARE
+from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
 
-import logging, json
+import logging, json, unittest
 logger = logging.getLogger('sjfnw')
 
 @override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE,
@@ -16,9 +17,13 @@ class Home(BaseFundTestCase):
   fixtures = TEST_FIXTURE
 
   def setUp(self):
-    super(Home, self).setUp('newbie')
+    logger.info('Home setUp')
+    super(Home, self).setUp()
+    logger.info('post super')
+    self.use_new_acct()
 
   def test_new(self):
+    logger.warning('WAT')
     """ Verify that add mult form is shown to new memberships
 
     Setup:
@@ -141,11 +146,13 @@ class StepComplete(BaseFundTestCase):
 
   fixtures = TEST_FIXTURE
 
-
   def setUp(self):
-    super(StepComplete, self).setUp('testy')
-    self.url = reverse('sjfnw.fund.views.done_step', kwargs = {
-      'donor_id': self.donor_id, 'step_id': self.step_id })
+    logger.info('BaseFundTestCase setUp')
+    super(StepComplete, self).setUp()
+    logger.info('post super')
+    self.use_test_acct()
+    self.url = reverse('sjfnw.fund.views.done_step',
+        kwargs = {'donor_id': self.donor_id, 'step_id': self.step_id})
     self.form_data = {
         'asked': 'on',
         'response': 2,
@@ -156,11 +163,11 @@ class StepComplete(BaseFundTestCase):
         'notes': '',
         'next_step': '',
         'next_step_date': '',
-        'likely_to_join': '' }
+        'likely_to_join': ''}
 
     # 'asked': 'on', 'promise_reason': ['GP topic', 'Social justice']
 
-  # helper functions used by >1 test
+  # helper function used by >1 test
   def add_followup(self):
 
     self.form_data['last_name'] = 'Sozzity'

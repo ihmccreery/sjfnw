@@ -378,7 +378,8 @@ class AdminInlines(BaseGrantTestCase):
 class AdminRevert(BaseGrantTestCase):
 
   def setUp(self):
-    super(AdminRevert, self).setUp(login='admin')
+    super(AdminRevert, self).setUp()
+    self.logInAdmin()
 
   def test_load_revert(self):
 
@@ -408,6 +409,7 @@ class AdminRevert(BaseGrantTestCase):
 class AdminRollover(BaseGrantTestCase):
 
   def setUp(self):
-    super(AdminRollover, self).setUp(login='admin')
+    super(AdminRollover, self).setUp()
+    self.logInAdmin()
 
 

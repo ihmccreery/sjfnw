@@ -42,12 +42,11 @@ class GivingProject(models.Model):
   site_visits = models.BooleanField(default=False,
       help_text=('If checked, members will only see grants with a screening '
                 'status of at least "site visit awarded"'))
-  calendar = models.CharField(max_length=255, blank=True,
-                              help_text= ('Calendar ID of a google calendar - '
-                              'format: ____@group.calendar.google.com'))
-  resources = models.ManyToManyField('Resource', through = 'ProjectResource',
+  calendar = models.CharField(max_length=255, blank=True, help_text=('Calendar ID '
+    'of a google calendar - format: ____@group.calendar.google.com'))
+  resources = models.ManyToManyField('Resource', through='ProjectResource',
                                      null=True, blank=True)
-  surveys = models.ManyToManyField('Survey', through = 'GPSurvey',
+  surveys = models.ManyToManyField('Survey', through='GPSurvey',
                                    null=True, blank=True)
 
   class Meta:
@@ -57,6 +56,7 @@ class GivingProject(models.Model):
     return self.title + ' ' + unicode(self.fundraising_deadline.year)
 
   def save(self, *args, **kwargs):
+    # prune CR (from Windows) that would result in extra line breaks
     self.suggested_steps = self.suggested_steps.replace('\r', '')
     super(GivingProject, self).save(*args, **kwargs)
 
@@ -72,7 +72,7 @@ class GivingProject(models.Model):
 
 
 class Member(models.Model):
-  email = models.EmailField(max_length=100, unique=True) # used to find User
+  email = models.EmailField(max_length=100, unique=True) # used to match with User
   first_name = models.CharField(max_length=100)
   last_name = models.CharField(max_length=100)
 
@@ -80,7 +80,7 @@ class Member(models.Model):
   current = models.IntegerField(default=0) # pk of current membership
 
   def __unicode__(self):
-    return unicode(self.first_name + u' ' + self.last_name)
+    return self.first_name + ' ' + self.last_name
 
   class Meta:
     ordering = ['first_name', 'last_name']
@@ -95,7 +95,7 @@ class Membership(models.Model):
 
   # have they already been prompted to re-use contacts from previous gps
   copied_contacts = models.BooleanField(default=False)
-  #json encoded list of gp eval surveys completed
+  # json encoded list of gp eval surveys completed
   completed_surveys = models.CharField(max_length=255, default='[]')
 
   emailed = models.DateField(blank=True, null=True,
@@ -110,8 +110,7 @@ class Membership(models.Model):
     unique_together = ('giving_project', 'member')
 
   def __unicode__(self):
-    # warning: does a query to get gp
-    return unicode(self.member) + u', ' + unicode(self.giving_project)
+    return u'%s, %s' % (self.member, self.giving_project)
 
   def save(self, skip=False, *args, **kwargs):
     """ Checks whether to send an approval email unless skip is True """

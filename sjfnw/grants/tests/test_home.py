@@ -19,7 +19,8 @@ class OrgHomeAwards(BaseGrantTestCase):
   template = 'grants/org_home.html'
 
   def setUp(self):
-    super(OrgHomeAwards, self).setUp(login='testy')
+    super(OrgHomeAwards, self).setUp()
+    self.logInTestorg()
 
   #TODO test mult awards per app
 
@@ -57,8 +58,9 @@ class OrgRollover(BaseGrantTestCase):
   """ Basic success
   content,   timeline,   files,   not extra cycle q   """
 
-  def setUp(self, *args):
-    super(OrgRollover, self).setUp(login='newbie')
+  def setUp(self):
+    super(OrgRollover, self).setUp()
+    self.logInNeworg()
 
   def test_draft_rollover(self):
     """ scenario: take complete draft, make it belong to new org, rollover to cycle 1

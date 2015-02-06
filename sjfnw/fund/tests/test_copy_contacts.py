@@ -2,6 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.constants import TEST_MIDDLEWARE
+from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
 
 import logging, json
@@ -20,7 +21,8 @@ class CopyContacts(BaseFundTestCase):
   template = 'fund/copy_contacts.html'
 
   def setUp(self):
-    super(CopyContacts, self).setUp('testy')
+    super(CopyContacts, self).setUp()
+    self.use_test_acct()
 
     # create a new empty membership for testy, set as current
     pre = models.GivingProject.objects.get(title='Pre training')
