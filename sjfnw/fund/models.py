@@ -80,7 +80,7 @@ class Member(models.Model):
   current = models.IntegerField(default=0) # pk of current membership
 
   def __unicode__(self):
-    return self.first_name + ' ' + self.last_name
+    return u'%s %s' % (self.first_name, self.last_name)
 
   class Meta:
     ordering = ['first_name', 'last_name']
