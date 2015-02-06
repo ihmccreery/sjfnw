@@ -18,7 +18,7 @@ class Register(BaseGrantTestCase):
   template_error = 'grants/org_login_register.html'
 
   def setUp(self):
-    super(Register, self).setUp(login='')
+    super(Register, self).setUp()
 
   def test_valid_registration(self):
     """ All fields provided, neither email nor name match an org in db """

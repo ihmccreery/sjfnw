@@ -2,9 +2,11 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.constants import TEST_MIDDLEWARE
+from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.grants.models import ProjectApp
 
-import logging, json
+import logging
 logger = logging.getLogger('sjfnw')
 
 @override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE,
@@ -20,7 +22,8 @@ class Grants(BaseFundTestCase):
   url = reverse('sjfnw.fund.views.grant_list')
 
   def setUp(self):
-    super(Grants, self).setUp('testy')
+    super(Grants, self).setUp()
+    self.use_test_acct()
 
   def test_grants_display(self):
     """ Verify that assigned grants are shown on grants page

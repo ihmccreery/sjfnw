@@ -1,7 +1,11 @@
+from datetime import timedelta
+
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.utils import timezone
 
 from sjfnw.constants import TEST_MIDDLEWARE
+from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
 
 import logging, json
@@ -17,7 +21,7 @@ class GPSurveys(BaseFundTestCase):
   template = 'fund/fill_gp_survey.html'
 
   def setUp(self):
-    super(GPSurveys, self).setUp('')
+    super(GPSurveys, self).setUp()
 
   def test_creation(self):
     """ Create a survey, verify basic display

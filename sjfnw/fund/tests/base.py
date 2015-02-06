@@ -1,15 +1,11 @@
-from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.utils import timezone
 
-from sjfnw.constants import TEST_MIDDLEWARE
-from sjfnw.fund import models, forms
+from sjfnw.fund import models
 from sjfnw.grants.models import ProjectApp
 from sjfnw.tests import BaseTestCase
 
 from datetime import timedelta
-import unittest, logging, json
+import logging
 logger = logging.getLogger('sjfnw')
 
 
@@ -31,19 +27,20 @@ class BaseFundTestCase(BaseTestCase):
       sets project dates
   """
 
-  def setUp(self, login):
-    super(BaseFundTestCase, self).setUp(login)
-
+  def setUp(self):
+    logger.info('BaseFundTestCase setUp')
     self.create_projects()
 
-    if login == 'testy':
-      self.create_test()
-      self.logInTesty()
-    elif login == 'newbie':
-      self.create_new()
-      self.logInNewbie()
-    elif login == 'admin':
-      self.logInAdmin()
+  def use_test_acct(self):
+    self.create_test()
+    self.logInTesty()
+
+  def use_new_acct(self):
+    self.create_new()
+    self.logInNewbie()
+
+  def use_admin_acct(self):
+    self.logInAdmin()
 
   def create_projects(self):
     """ Creates pre- and post-training giving projects """

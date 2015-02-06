@@ -13,18 +13,13 @@ from unittest.signals import registerResult
 
 # Sets root & sjfnw loggers level. Comment out for less output.
 logging.getLogger().setLevel(0)
-logging.getLogger('sjfnw').setLevel(0)
+logger = logging.getLogger('sjfnw')
+logger.setLevel(0)
 
 class BaseTestCase(TestCase):
 
-  def setUp(self, login):
-    pass #self.printName()
-
-  def printName(self):
-    """ Outputs class name, method name and method desc to console """
-    full =  self.id().split('.')
-    cls, meth = full[-2], full[-1]
-    print('\n\033[1m' + cls + ' ' + meth + '\033[m ' + (self.shortDescription() or ''))
+  def setUp(self, *args):
+    logger.warn(args)
 
   def logInTesty(self):
     user = User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')

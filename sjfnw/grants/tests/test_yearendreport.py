@@ -18,7 +18,8 @@ class YearEndReportForm(BaseGrantTestCase):
       Form validation with YER modelform """
 
   def setUp(self):
-    super(YearEndReportForm, self).setUp(login='testy')
+    super(YearEndReportForm, self).setUp()
+    self.logInTestorg()
     today = timezone.now()
     award = models.GivingProjectGrant(projectapp_id = 1, amount = 5000,
         agreement_mailed = today - timedelta(days = 345),
@@ -172,7 +173,8 @@ class YearEndReportReminders(BaseGrantTestCase):
   url = reverse('sjfnw.grants.views.yer_reminder_email')
 
   def setUp(self):
-    super(YearEndReportReminders, self).setUp(login='admin')
+    super(YearEndReportReminders, self).setUp()
+    self.logInAdmin()
 
   def test_two_months_prior(self):
     """ Verify reminder is not sent 2 months before report is due """
@@ -290,7 +292,8 @@ class RolloverYER(BaseGrantTestCase):
   url = reverse('sjfnw.grants.views.rollover_yer')
 
   def setUp(self):
-    super(RolloverYER, self).setUp(login='testy')
+    super(RolloverYER, self).setUp()
+    self.logInTestorg()
 
   def create_yer(self, award_id):
     yer = models.YearEndReport(

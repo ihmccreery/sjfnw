@@ -13,8 +13,8 @@ logger = logging.getLogger('sjfnw')
 class BaseGrantFilesTestCase(BaseGrantTestCase):
   """ Extension of BaseGrantTestCase that can handle file uploads """
 
-  def setUp(self, login):
-    super(BaseGrantFilesTestCase, self).setUp(login=login)
+  def setUp(self):
+    super(BaseGrantFilesTestCase, self).setUp()
     self.testbed = testbed.Testbed()
     self.testbed.activate()
     self.testbed.init_datastore_v3_stub()
@@ -51,7 +51,8 @@ class ApplySuccessful(BaseGrantFilesTestCase):
   cycle_id = 2
 
   def setUp(self):
-    super(ApplySuccessful, self).setUp(login='testy')
+    super(ApplySuccessful, self).setUp()
+    self.logInTestorg()
 
   def test_saved_timeline1(self):
     """ Verify that a timeline with just a complete first row is accepted
@@ -147,7 +148,8 @@ class ApplySuccessful(BaseGrantFilesTestCase):
 class ApplyBlocked(BaseGrantTestCase):
 
   def setUp(self):
-    super(ApplyBlocked, self).setUp(login='testy')
+    super(ApplyBlocked, self).setUp()
+    self.logInTestorg()
 
   def test_closed_cycle(self):
     response = self.client.get('/apply/3/')
@@ -181,7 +183,8 @@ class ApplyValidation(BaseGrantFilesTestCase):
   org_id = 2
 
   def setUp(self):
-    super(ApplyValidation, self).setUp(login='testy')
+    super(ApplyValidation, self).setUp()
+    self.logInTestorg()
 
   def test_project_requirements(self):
     """ scenario: support type = project, b1 & b2, no other project info given

@@ -56,6 +56,9 @@ class BaseGrantTestCase(BaseTestCase):
 
   fixtures = ['sjfnw/grants/fixtures/test_grants.json']
 
+  def setUp(self):
+    set_cycle_dates()
+
   # see ./test_grants_guide.md for what is associated with each org
   def logInNeworg(self):
     user = User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
@@ -64,16 +67,6 @@ class BaseGrantTestCase(BaseTestCase):
   def logInTestorg(self):
     user = User.objects.create_user('testorg@gmail.com', 'testorg@gmail.com', 'noob')
     self.client.login(username = 'testorg@gmail.com', password = 'noob')
-
-  def setUp(self, login=''):
-    super(BaseGrantTestCase, self).setUp(login)
-    if login == 'testy':
-      self.logInTestorg()
-    elif login == 'newbie':
-      self.logInNeworg()
-    elif login == 'admin':
-      self.logInAdmin()
-    set_cycle_dates()
 
   def assert_draft_matches_app(self, draft, app, exclude_cycle_q=False):
     """ Assert that app is a superset of draft
