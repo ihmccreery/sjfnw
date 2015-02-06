@@ -1,4 +1,4 @@
-﻿from django.contrib.humanize.templatetags.humanize import intcomma
+from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils import timezone
@@ -6,7 +6,6 @@ from django.utils import timezone
 from sjfnw.fund.utils import NotifyApproval
 
 import datetime, json, logging
-
 logger = logging.getLogger('sjfnw')
 
 class GivingProject(models.Model):
@@ -30,8 +29,7 @@ class GivingProject(models.Model):
       'each contact.'))
   fundraising_deadline = models.DateField(
       help_text='Members will stop receiving reminder emails at this date.')
-  fund_goal = models.PositiveIntegerField(
-      verbose_name='Fundraising goal', default=0,
+  fund_goal = models.PositiveIntegerField(verbose_name='Fundraising goal', default=0,
       help_text=('Fundraising goal agreed upon by the group. If 0, it will not '
         'be displayed to members and they won\'t see a group progress chart '
         'for money raised.'))
@@ -56,7 +54,7 @@ class GivingProject(models.Model):
     ordering = ['-fundraising_deadline']
 
   def __unicode__(self):
-    return self.title+u' '+unicode(self.fundraising_deadline.year)
+    return self.title + ' ' + unicode(self.fundraising_deadline.year)
 
   def save(self, *args, **kwargs):
     self.suggested_steps = self.suggested_steps.replace('\r', '')
@@ -72,35 +70,37 @@ class GivingProject(models.Model):
       estimated += donor.estimated()
     return estimated
 
+
 class Member(models.Model):
-  email = models.EmailField(max_length=100, unique=True)
+  email = models.EmailField(max_length=100, unique=True) # used to find User
   first_name = models.CharField(max_length=100)
   last_name = models.CharField(max_length=100)
 
   giving_project = models.ManyToManyField(GivingProject, through='Membership')
-  current = models.IntegerField(default=0)
+  current = models.IntegerField(default=0) # pk of current membership
 
   def __unicode__(self):
-    return unicode(self.first_name +u' '+self.last_name)
+    return unicode(self.first_name + u' ' + self.last_name)
 
   class Meta:
     ordering = ['first_name', 'last_name']
 
-class Membership(models.Model): #relationship b/n member and gp
+
+class Membership(models.Model):
+  """ Represents a relationship between a member and a giving project """
   giving_project = models.ForeignKey(GivingProject)
   member = models.ForeignKey(Member)
   approved = models.BooleanField(default=False)
   leader = models.BooleanField(default=False)
 
+  # have they already been prompted to re-use contacts from previous gps
   copied_contacts = models.BooleanField(default=False)
   #json encoded list of gp eval surveys completed
   completed_surveys = models.CharField(max_length=255, default='[]')
 
-  emailed = models.DateField(
-      blank=True, null=True,
+  emailed = models.DateField(blank=True, null=True,
       help_text=('Last time this member was sent an overdue steps reminder'))
-  last_activity = models.DateField(
-      blank=True, null=True,
+  last_activity = models.DateField(blank=True, null=True,
       help_text=('Last activity by this user on this membership.'))
 
   notifications = models.TextField(default='', blank=True)
@@ -110,18 +110,19 @@ class Membership(models.Model): #relationship b/n member and gp
     unique_together = ('giving_project', 'member')
 
   def __unicode__(self):
-    return unicode(self.member)+u', '+unicode(self.giving_project)
+    # warning: does a query to get gp
+    return unicode(self.member) + u', ' + unicode(self.giving_project)
 
   def save(self, skip=False, *args, **kwargs):
+    """ Checks whether to send an approval email unless skip is True """
     if not skip:
       try:
-        previous = Membership.objects.get(id=self.id)
-        logger.debug('Previously: ' + str(previous.approved) + ', now: ' +
-                      str(self.approved))
-        if self.approved and not previous.approved: #newly approved!
+        previous = Membership.objects.get(id=self.id) # TODO why id instead of pk?
+        logger.debug('Previously: %s, now %s ' % (previous.approved, self.approved))
+        if self.approved and not previous.approved:
           logger.debug('Detected approval on save for ' + unicode(self))
           NotifyApproval(self)
-      except Membership.DoesNotExist:
+      except Membership.DoesNotExist: # this is the first save for this membership
         pass
     super(Membership, self).save(*args, **kwargs)
 
