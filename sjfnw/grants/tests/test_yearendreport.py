@@ -174,7 +174,7 @@ class YearEndReportReminders(BaseGrantTestCase):
 
   def setUp(self):
     super(YearEndReportReminders, self).setUp()
-    self.logInAdmin()
+    self.log_in_admin()
 
   def test_two_months_prior(self):
     """ Verify reminder is not sent 2 months before report is due """

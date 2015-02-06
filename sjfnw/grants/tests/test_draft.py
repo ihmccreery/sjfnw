@@ -16,7 +16,7 @@ class DraftExtension(BaseGrantTestCase):
 
   def setUp(self):
     super(DraftExtension, self).setUp()
-    self.logInAdmin()
+    self.log_in_admin()
 
   def test_create_draft(self):
     """ Admin create a draft for Fresh New Org """
@@ -69,7 +69,7 @@ class DraftWarning(BaseGrantTestCase):
 
   def setUp(self):
     super(DraftWarning, self).setUp()
-    self.logInAdmin()
+    self.log_in_admin()
 
   def test_long_alert(self):
     """ Cycle created 12 days ago with cycle closing in 7.5 days

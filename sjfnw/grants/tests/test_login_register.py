@@ -124,7 +124,7 @@ class Register(BaseGrantTestCase):
     # stayed on login page
     self.assertTemplateUsed(response, self.template_error)
     # message telling them to contact admin
-    self.assertMessage(response, ('You have registered successfully but your '
+    self.assert_message(response, ('You have registered successfully but your '
         'account needs administrator approval. Please contact '
         '<a href="mailto:info@socialjusticefund.org">info@socialjusticefund.org</a>'))
 

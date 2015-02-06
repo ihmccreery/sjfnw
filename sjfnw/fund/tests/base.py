@@ -33,14 +33,14 @@ class BaseFundTestCase(BaseTestCase):
 
   def use_test_acct(self):
     self.create_test()
-    self.logInTesty()
+    self.log_in_testy()
 
   def use_new_acct(self):
     self.create_new()
-    self.logInNewbie()
+    self.log_in_newbie()
 
   def use_admin_acct(self):
-    self.logInAdmin()
+    self.log_in_admin()
 
   def create_projects(self):
     """ Creates pre- and post-training giving projects """

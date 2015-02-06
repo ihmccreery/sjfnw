@@ -113,7 +113,7 @@ class Home(BaseFundTestCase):
       ASSERTIONS
     """
 
-    self.logInTesty()
+    self.log_in_testy()
     member = models.Member.objects.get(pk=1)
     member.current = 96
     member.save()
