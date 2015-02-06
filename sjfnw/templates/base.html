@@ -31,9 +31,8 @@
       };
     </script>
     {% block script %}
-    {# google analytics for error pages #}
     <script type="text/javascript">
-
+      {# google analytics for error pages #}
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-28076150-2']);
       _gaq.push(['_trackPageview']);
@@ -49,7 +48,7 @@
   </head>
 
   <body>
-    {% block body %}
+    {% block content %}
     {% endblock %}
   </body>
 </html>
