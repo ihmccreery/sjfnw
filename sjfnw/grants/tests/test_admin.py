@@ -28,7 +28,7 @@ class Reporting(BaseGrantTestCase):
   template_error = 'grants/reporting.html'
 
   def setUp(self): #don't super, can't set cycle dates with this fixture
-    self.logInAdmin()
+    self.log_in_admin()
 
   def fill_report_form(self, form, filters=False, fields=False, fmt='browse'):
     """ Shared method to create POST data for the given form
@@ -321,7 +321,7 @@ class AdminInlines(BaseGrantTestCase):
   fixtures = LIVE_FIXTURES
 
   def setUp(self): #don't super, can't set cycle dates with this fixture
-    self.logInAdmin()
+    self.log_in_admin()
 
   def test_organization(self):
     """ Verify that related inlines show existing objs
@@ -379,7 +379,7 @@ class AdminRevert(BaseGrantTestCase):
 
   def setUp(self):
     super(AdminRevert, self).setUp()
-    self.logInAdmin()
+    self.log_in_admin()
 
   def test_load_revert(self):
 
@@ -410,6 +410,6 @@ class AdminRollover(BaseGrantTestCase):
 
   def setUp(self):
     super(AdminRollover, self).setUp()
-    self.logInAdmin()
+    self.log_in_admin()
 
 

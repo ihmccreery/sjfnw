@@ -32,7 +32,7 @@ class GPSurveys(BaseFundTestCase):
     """
 
     # Create form through admin site
-    self.logInAdmin()
+    self.log_in_admin()
     form_data = {
      'title': 'Another Survey',
      'intro': 'Please fill this out!',
@@ -58,7 +58,7 @@ class GPSurveys(BaseFundTestCase):
     gp_survey = models.GPSurvey(survey=survey, giving_project_id=1, date=timezone.now())
     gp_survey.save()
 
-    self.logInTesty()
+    self.log_in_testy()
 
     response = self.client.get(self.url, follow=True)
 
@@ -91,7 +91,7 @@ class GPSurveys(BaseFundTestCase):
       Post and check the resulting object
     """
     self.pre_create_survey()
-    self.logInTesty()
+    self.log_in_testy()
 
     membership = models.Membership.objects.get(pk=1)
     self.assertEqual(membership.completed_surveys, '[]')
@@ -121,7 +121,7 @@ class GPSurveys(BaseFundTestCase):
     """ Verify that survey doesn't show if the date has not been reached """
 
     self.pre_create_survey()
-    self.logInTesty()
+    self.log_in_testy()
 
     # Change survey date to future
     gp_survey = models.GPSurvey.objects.get(giving_project_id=1)
@@ -137,7 +137,7 @@ class GPSurveys(BaseFundTestCase):
     """ Verify that survey doesn't show if it has been completed """
 
     self.pre_create_survey()
-    self.logInTesty()
+    self.log_in_testy()
 
     # Mark completed
     membership = models.Membership.objects.get(pk=1)

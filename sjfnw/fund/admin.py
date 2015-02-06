@@ -1,7 +1,6 @@
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
 from django.http import HttpResponse
-from django.forms import ValidationError
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
@@ -11,7 +10,6 @@ from sjfnw.fund import forms, utils, modelforms
 from sjfnw.grants.models import ProjectApp, GrantApplication
 
 import datetime, unicodecsv, logging, json
-
 logger = logging.getLogger('sjfnw')
 
 # display methods
@@ -30,6 +28,7 @@ gp_year.allow_tags = True
 
 def ship_progress(obj):
   p = obj.get_progress()
+  # TODO use string formatting with dict
   return ('<table><tr><td style="width:25%;padding:1px;">$' +
           str(p['estimated']) + '</td><td style="width:25%;padding:1px;">$' +
           str(p['promised']) + '</td><td style="width:25%;padding:1px;">$' +
@@ -98,7 +97,7 @@ class GPYearFilter(SimpleListFilter):
     try:
       year = int(val)
     except:
-      logger.error('GPYearFilter received invalid value %s' % val)
+      logger.error('GPYearFilter received invalid value %s', val)
       messages.error(request,
           'Error loading filter. Contact techsupport@socialjusticefund.org')
       return queryset
@@ -121,7 +120,7 @@ class MembershipInline(admin.TabularInline): #GP
       cached_choices = getattr(request, 'cached_members', None)
       if cached_choices:
         logger.debug('Using cached choices for membership inline')
-        formfield = super(ProjectAppInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        formfield = super(MembershipInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
         formfield.choices = cached_choices
 
       else:
@@ -339,22 +338,22 @@ class SurveyResponseA(admin.ModelAdmin):
     response['Content-Disposition'] = 'attachment; filename=survey_responses %s.csv' % (timezone.now().strftime('%Y-%m-%d'),)
     writer = unicodecsv.writer(response)
 
-    header = ['Date', 'Survey ID', 'Giving Project', 'Survey'] #base
+    header = ['Date', 'Survey ID', 'Giving Project', 'Survey'] # base
     questions = 0
     response_rows = []
-    for sr in queryset:
-      fields = [sr.date, sr.gp_survey_id,
-                sr.gp_survey.giving_project.title,
-                sr.gp_survey.survey.title]
-      logger.info(isinstance(sr.responses, str))
-      qa = json.loads(sr.responses)
-      for i in range(0, len(qa), 2):
-        fields.append(qa[i])
-        fields.append(qa[i+1])
+    for survey in queryset:
+      fields = [survey.date, survey.gp_survey_id,
+                survey.gp_survey.giving_project.title,
+                survey.gp_survey.survey.title]
+      logger.info(isinstance(survey.responses, str))
+      responses = json.loads(survey.responses)
+      for i in range(0, len(responses), 2):
+        fields.append(responses[i])
+        fields.append(responses[i+1])
         questions = max(questions, (i+2)/2)
       response_rows.append(fields)
 
-    logger.info('Max %d questions' % questions)
+    logger.info('Max %d questions', questions)
     for i in range(0, questions):
       header.append('Question')
       header.append('Answer')

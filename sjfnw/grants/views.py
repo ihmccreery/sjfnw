@@ -1,4 +1,4 @@
-﻿from django.conf import settings
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -54,7 +54,7 @@ def org_login(request):
   register = RegisterForm()
   logger.info('org_login' + login_error)
   return render(request, 'grants/org_login_register.html',
-      {'form':form, 'register':register, 'login_error':login_error})
+      {'form': form, 'register': register, 'login_error': login_error})
 
 def org_register(request):
   """ Register an organization.
@@ -121,12 +121,12 @@ def org_register(request):
     register = RegisterForm()
   form = LoginForm()
 
-  return render(request, 'grants/org_login_register.html', {'form':form, 'register':register})
+  return render(request, 'grants/org_login_register.html', {'form': form, 'register': register})
 
 def org_support(request):
   return render(request, 'grants/org_support.html', {
-  'support_email':constants.SUPPORT_EMAIL,
-  'support_form':constants.GRANT_SUPPORT_FORM})
+  'support_email': constants.SUPPORT_EMAIL,
+  'support_form': constants.GRANT_SUPPORT_FORM})
 
 def cycle_info(request, cycle_id):
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
@@ -196,16 +196,16 @@ def org_home(request, organization):
     user_override = '?user=' + user_override
 
   return render(request, 'grants/org_home.html', {
-    'organization':organization,
-    'submitted':submitted,
-    'saved':saved,
-    'cycles':cycles,
-    'closed':closed,
-    'open':current,
-    'upcoming':upcoming,
-    'applied':applied,
+    'organization': organization,
+    'submitted': submitted,
+    'saved': saved,
+    'cycles': cycles,
+    'closed': closed,
+    'open': current,
+    'upcoming': upcoming,
+    'applied': applied,
     'ydrafts': yer_drafts,
-    'user_override':user_override})
+    'user_override': user_override})
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
@@ -222,7 +222,7 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
 
   #check for app already submitted
   if models.GrantApplication.objects.filter(organization=organization, grant_cycle=cycle):
-    return render(request, 'grants/already_applied.html', {'organization':organization, 'cycle':cycle})
+    return render(request, 'grants/already_applied.html', {'organization': organization, 'cycle': cycle})
 
   #get or create draft
   draft, created = models.DraftGrantApplication.objects.get_or_create(organization=organization, grant_cycle=cycle)
@@ -234,7 +234,7 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
   if request.method == 'POST': #POST
     #check if draft can be submitted
     if not draft.editable():
-      return render(request, 'grants/submitted_closed.html', {'cycle':cycle})
+      return render(request, 'grants/submitted_closed.html', {'cycle': cycle})
 
     #get fields & files from draft
     draft_data = json.loads(draft.contents)
@@ -258,7 +258,7 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
       #send email confirmation
       subject, from_email = 'Grant application submitted', constants.GRANT_EMAIL
       to = organization.email
-      html_content = render_to_string('grants/email_submitted.html', {'org':organization, 'cycle':cycle})
+      html_content = render_to_string('grants/email_submitted.html', {'org': organization, 'cycle': cycle})
       text_content = strip_tags(html_content)
       msg = EmailMultiAlternatives(subject, text_content, from_email, [to], [constants.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, "text/html")
@@ -288,7 +288,7 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
       draft.save()
       logger.debug('Created new draft')
       if cycle.info_page: #redirect to instructions first
-        return render(request, 'grants/cycle_info.html', {'cycle':cycle})
+        return render(request, 'grants/cycle_info.html', {'cycle': cycle})
 
     else: #load a draft
       org_dict = json.loads(draft.contents)
@@ -301,7 +301,7 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
 
     #check if draft can be submitted
     if not draft.editable():
-      return render(request, 'grants/closed.html', {'cycle':cycle})
+      return render(request, 'grants/closed.html', {'cycle': cycle})
 
     #try to determine initial load - cheaty way
     # 1) if referer, make sure it wasn't from copy
@@ -633,7 +633,7 @@ def CopyApp(request, organization):
     logger.info(apps_count)
 
   return render(request, 'grants/org_app_copy.html',
-                {'form':form, 'cycle_count':cycle_count, 'apps_count':apps_count})
+                {'form': form, 'cycle_count': cycle_count, 'apps_count': apps_count})
 
 @registered_org()
 def DiscardDraft(request, organization, draft_id):
@@ -763,7 +763,7 @@ def view_application(request, app_id):
   form_only = request.GET.get('form')
   if form_only:
     return render(request, 'grants/reading.html',
-                  {'app':app, 'form':form, 'perm':perm})
+                  {'app': app, 'form': form, 'perm': perm})
   file_urls = GetFileURLs(request, app)
   print_urls = GetFileURLs(request, app, printing=True)
   awards = {}
@@ -772,8 +772,8 @@ def view_application(request, app_id):
       awards[papp.giving_project] = papp.givingprojectgrant
 
   return render(request, 'grants/reading_sidebar.html',
-                {'app':app, 'form':form, 'file_urls':file_urls, 'print_urls':print_urls,
-                 'awards': awards, 'perm':perm})
+                {'app': app, 'form': form, 'file_urls': file_urls, 'print_urls': print_urls,
+                 'awards': awards, 'perm': perm})
 
 def view_file(request, obj_type, obj_id, field_name):
   MODEL_TYPES = {
@@ -852,7 +852,7 @@ def AppToDraft(request, app_id):
     return redirect('/admin/grants/draftgrantapplication/'+str(draft.pk)+'/')
   #GET
   return render(request, 'admin/grants/confirm_revert.html',
-                {'application':submitted_app})
+                {'application': submitted_app})
 
 def AdminRollover(request, app_id):
   application = get_object_or_404(models.GrantApplication, pk=app_id)
@@ -877,7 +877,7 @@ def AdminRollover(request, app_id):
     cycle_count = str(form['cycle']).count('<option value')
 
   return render(request, 'admin/grants/rollover.html',
-                {'form':form, 'application':application, 'count':cycle_count})
+                {'form': form, 'application': application, 'count': cycle_count})
 
 def Impersonate(request):
 
@@ -887,7 +887,7 @@ def Impersonate(request):
       org = form.cleaned_data['organization']
       return redirect('/apply/?user='+org)
   form = LoginAsOrgForm()
-  return render(request, 'admin/grants/impersonate.html', {'form':form})
+  return render(request, 'admin/grants/impersonate.html', {'form': form})
 
 def grants_report(request):
   """ Handles grant reporting
@@ -939,7 +939,7 @@ def grants_report(request):
       #format results
       if options['format'] == 'browse':
         return render_to_response('grants/report_results.html',
-                                  {'results':results, 'field_names':field_names})
+                                  {'results': results, 'field_names': field_names})
       elif options['format'] == 'csv':
         response = HttpResponse(mimetype='text/csv')
         response['Content-Disposition'] = 'attachment; filename=%s.csv' % 'grantapplications'
@@ -996,7 +996,6 @@ def get_app_results(options):
   if options.get('has_fiscal_sponsor'):
     apps = apps.exclude(fiscal_org='')
 
-  #TODO screening status
   if options.get('pre_screening_status'):
     apps = apps.filter(pre_screening_status__in=options.get('pre_screening_status'))
   if options.get('screening_status'):
@@ -1007,11 +1006,11 @@ def get_app_results(options):
     apps = apps.filter(scoring_bonus_geo=True)
   if options.get('grant_cycle'):
     apps = apps.filter(grant_cycle__title__in=options.get('grant_cycle'))
-  if options.get('giving_projects'): #TODO test this
+  if options.get('giving_projects'):
     apps = apps.prefetch_related('giving_projects')
     apps = apps.filter(giving_projects__title__in=options.get('giving_projects'))
 
-  #fields
+  # fields
   fields = (['submission_time', 'organization', 'grant_cycle'] +
             options['report_basics'] + options['report_contact'] +
             options['report_org'] + options['report_proposal'] +
@@ -1052,7 +1051,7 @@ def get_app_results(options):
 
     # application fields
     for field in fields:
-      if field == 'pre_screening_status': #TODO
+      if field == 'pre_screening_status':
         # convert screening status to human-readable version
         val = getattr(app, field)
         if val:
@@ -1104,7 +1103,7 @@ def get_app_results(options):
   return field_names, results
 
 def get_award_results(options):
-  """ Fetches award (all types) report results
+  """ Fetch award (all types) report results
 
   Args:
     options: cleaned_data from a request.POST-filled instance of AwardReportForm
@@ -1114,8 +1113,7 @@ def get_award_results(options):
       ['Amount', 'Check mailed', 'Organization']
 
     A list of awards & related info. Each item is a list of requested values
-    Example:
-      [
+    Example: [
         ['10000', '2013-10-23 09:08:56+0:00', 'Fancy pants org'],
         ['5987', '2011-08-04 09:08:56+0:00', 'Justice League']
       ]
@@ -1205,7 +1203,7 @@ def get_award_results(options):
   return field_names, results
 
 def get_org_results(options):
-  """ Fetches organization report results
+  """ Fetch organization report results
 
   Args:
     options: cleaned_data from a request.POST-filled instance of OrgReportForm
@@ -1215,8 +1213,7 @@ def get_org_results(options):
       ['Name', 'Login', 'State']
 
     A list of organization & related info. Each item is a list of requested values
-    Example:
-      [
+    Example: [
         ['Fancy pants org', 'fancy@pants.org', 'ID'],
         ['Justice League', 'trouble@gender.org', 'WA']
       ]
@@ -1308,10 +1305,11 @@ def get_org_results(options):
   return field_names, results
 
 # CRON
+
 def DraftWarning(request):
   """ Warn orgs of impending draft freezes
-  Do not change cron sched -- it depends on running only once/day
-  7 day warning if created 7+ days before close, otherwise 3 day warning """
+      NOTE: must run exactly once a day
+      Gives 7 day warning if created 7+ days before close, otherwise 3 day warning """
 
   drafts = models.DraftGrantApplication.objects.all()
   eight = datetime.timedelta(days=8)
@@ -1323,7 +1321,7 @@ def DraftWarning(request):
       subject, from_email = 'Grant cycle closing soon', constants.GRANT_EMAIL
       to = draft.organization.email
       html_content = render_to_string('grants/email_draft_warning.html',
-                                      {'org':draft.organization, 'cycle':draft.grant_cycle})
+                                      {'org': draft.organization, 'cycle': draft.grant_cycle})
       text_content = strip_tags(html_content)
       msg = EmailMultiAlternatives(subject, text_content, from_email, [to],
                                    [constants.SUPPORT_EMAIL])
@@ -1334,35 +1332,18 @@ def DraftWarning(request):
 
 def yer_reminder_email(request):
   """ Remind orgs of upcoming year end reports that are due
-    Depends on running once a day
-    Sends reminder emails at 1 month and 1 week
-  """
+      NOTE: Must run exactly once a day
+      Sends reminder emails at 1 month and 1 week """
 
   # get awards due in 7 or 30 days by agreement_returned date
-  year_ago = timezone.now().date().replace(year = timezone.now().year - 1)
-  award_dates = [year_ago + datetime.timedelta(days = 30), year_ago + datetime.timedelta(days = 7)]
+  year_ago = timezone.now().date().replace(year=timezone.now().year - 1)
+  award_dates = [year_ago + datetime.timedelta(days=30), year_ago + datetime.timedelta(days=7)]
   awards = (models.GivingProjectGrant.objects.select_related()
                                              .prefetch_related('yearendreport')
                                              .filter(agreement_mailed__in=award_dates))
 
   return send_yer_email(awards, 'grants/email_yer_due.html')
 
-
-
-def yer_first_email(request):
-  """ One-time reminder email to go out for intitial launch """
-
-  logger.info('yer first email')
-
-  # get awards due between 9 and 30 days
-  year_ago = timezone.now().date().replace(year = timezone.now().year - 1)
-  date_min = year_ago + datetime.timedelta(days = 9)
-  date_max = year_ago + datetime.timedelta(days = 30)
-  awards = (models.GivingProjectGrant.objects.select_related()
-                                             .prefetch_related('yearendreport')
-                                             .filter(agreement_mailed__range=(date_min, date_max)))
-
-  return send_yer_email(awards, 'grants/yer_correction_email.html')
 
 def send_yer_email(awards, template):
 
@@ -1373,8 +1354,10 @@ def send_yer_email(awards, template):
       subject = 'Year end report'
       from_email =  constants.GRANT_EMAIL
       to = app.organization.email
-      html_content = render_to_string(template, 
-          {'award': award, 'app': app, 'gp': award.projectapp.giving_project, 'base_url': constants.APP_BASE_URL})
+      html_content = render_to_string(template, {
+        'award': award, 'app': app, 'gp': award.projectapp.giving_project,
+        'base_url': constants.APP_BASE_URL
+      })
       text_content = strip_tags(html_content)
 
       msg = EmailMultiAlternatives(subject, text_content, from_email, [to], [constants.SUPPORT_EMAIL])
@@ -1385,7 +1368,7 @@ def send_yer_email(awards, template):
   return HttpResponse("success")
 
 # UTILS
-# (caused import probs in utils.py)
+# (in views because it caused import problems when in utils.py)
 def GetFileURLs(request, app, printing=False):
   """ Get viewing urls for the files in a given app or year-end report, draft or final
 
@@ -1399,10 +1382,9 @@ def GetFileURLs(request, app, printing=False):
     Raises:
       returns an empty dict if the given object is not valid
   """
-  app_urls = {'funding_sources':'', 'demographics':'',
-               'fiscal_letter':'', 'budget1': '', 'budget2': '', 'budget3': '',
-               'project_budget_file': ''}
-  report_urls = {'photo1': '', 'photo2': '', 'photo3': '', 'photo4': '', 'photo_release': '' }
+  app_urls = {'funding_sources': '', 'demographics': '', 'fiscal_letter': '', 'budget1': '',
+              'budget2': '', 'budget3': '', 'project_budget_file': ''}
+  report_urls = {'photo1': '', 'photo2': '', 'photo3': '', 'photo4': '', 'photo_release': ''}
 
 
   base_url = request.build_absolute_uri('/')
@@ -1430,7 +1412,7 @@ def GetFileURLs(request, app, printing=False):
     value = getattr(app, field)
     if value:
       ext = value.name.lower().split(".")[-1]
-      file_urls[field] +=  base_url + str(app.pk) + u'-' + field + u'.' + ext
+      file_urls[field] += base_url + str(app.pk) + u'-' + field + u'.' + ext
       if not settings.DEBUG and ext in constants.VIEWER_FORMATS: #doc viewer
         if printing:
           if not (ext == 'xls' or ext == 'xlsx'):
@@ -1441,6 +1423,7 @@ def GetFileURLs(request, app, printing=False):
   return file_urls
 
 def update_profile(request, org_id):
+  # TODO this should be a command
 
   message = ''
   org = get_object_or_404(models.Organization, pk=org_id)

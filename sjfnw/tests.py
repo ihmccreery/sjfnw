@@ -21,24 +21,24 @@ class BaseTestCase(TestCase):
   def setUp(self, *args):
     logger.warn(args)
 
-  def logInTesty(self):
-    user = User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')
-    self.client.login(username = 'testacct@gmail.com', password = 'testy')
+  def log_in_testy(self):
+    User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')
+    self.client.login(username='testacct@gmail.com', password='testy')
 
-  def logInNewbie(self):
-    user = User.objects.create_user('newacct@gmail.com', 'newacct@gmail.com', 'noob')
-    self.client.login(username = 'newacct@gmail.com', password = 'noob')
+  def log_in_newbie(self):
+    User.objects.create_user('newacct@gmail.com', 'newacct@gmail.com', 'noob')
+    self.client.login(username='newacct@gmail.com', password='noob')
 
-  def logInAdmin(self): #just a django superuser
-    superuser = User.objects.create_superuser('admin@gmail.com', 'admin@gmail.com', 'admin')
-    self.client.login(username = 'admin@gmail.com', password = 'admin')
+  def log_in_admin(self): #just a django superuser
+    User.objects.create_superuser('admin@gmail.com', 'admin@gmail.com', 'admin')
+    self.client.login(username='admin@gmail.com', password='admin')
 
-  def assertMessage(self, response, text):
+  def assert_message(self, response, text):
     """ Asserts that a message (django.contrib.messages) with the given text
         is displayed """
-    m = list(response.context['messages'])
-    self.assertEqual(1, len(m))
-    self.assertEqual(str(m[0]), text)
+    messages = list(response.context['messages'])
+    self.assertEqual(1, len(messages))
+    self.assertEqual(str(messages[0]), text)
 
   class Meta:
     abstract = True
@@ -67,19 +67,19 @@ class ColorTextResult(TextTestResult):
   def getDescription(self, test):
     """ modified to bold test name """
     doc_first_line = test.shortDescription()
-    name =  test.id().replace('sjfnw.', '').replace('tests.', '').replace('.test_', '  ')
+    name = test.id().replace('sjfnw.', '').replace('tests.', '').replace('.test_', '  ')
     if self.descriptions and doc_first_line:
       return '\033[1m' + name + '\033[00m ' + doc_first_line
     else:
       return '\033[1m' + name + '\033[00m '
 
   def startTest(self, test):
-    super(TextTestResult, self).startTest(test)
+    super(ColorTextResult, self).startTest(test)
     if self.showAll:
       self.stream.writeln(self.getDescription(test))
 
   def addSuccess(self, test):
-    super(TextTestResult, self).addSuccess(test)
+    super(ColorTextResult, self).addSuccess(test)
     if self.showAll:
       self.stream.writeln("    \033[00;32mok\033[00m")
     elif self.dots:
@@ -87,7 +87,7 @@ class ColorTextResult(TextTestResult):
       self.stream.flush()
 
   def addError(self, test, err):
-    super(TextTestResult, self).addError(test, err)
+    super(ColorTextResult, self).addError(test, err)
     if self.showAll:
       self.stream.writeln("    \033[00;31mERROR\033[00m")
     elif self.dots:
@@ -95,7 +95,7 @@ class ColorTextResult(TextTestResult):
       self.stream.flush()
 
   def addFailure(self, test, err):
-    super(TextTestResult, self).addFailure(test, err)
+    super(ColorTextResult, self).addFailure(test, err)
     if self.showAll:
       self.stream.writeln("    \033[00;31mFAIL\033[00m")
     elif self.dots:
@@ -103,7 +103,7 @@ class ColorTextResult(TextTestResult):
       self.stream.flush()
 
   def addSkip(self, test, reason):
-    super(TextTestResult, self).addSkip(test, reason)
+    super(ColorTextResult, self).addSkip(test, reason)
     if self.showAll:
       self.stream.writeln("    \033[00;33mskipped\033[00m {0!r}".format(reason))
     elif self.dots:
@@ -111,7 +111,7 @@ class ColorTextResult(TextTestResult):
       self.stream.flush()
 
   def addExpectedFailure(self, test, err):
-    super(TextTestResult, self).addExpectedFailure(test, err)
+    super(ColorTextResult, self).addExpectedFailure(test, err)
     if self.showAll:
       self.stream.writeln("    expected failure")
     elif self.dots:
@@ -119,7 +119,7 @@ class ColorTextResult(TextTestResult):
       self.stream.flush()
 
   def addUnexpectedSuccess(self, test):
-    super(TextTestResult, self).addUnexpectedSuccess(test)
+    super(ColorTextResult, self).addUnexpectedSuccess(test)
     if self.showAll:
       self.stream.writeln("    unexpected success")
     elif self.dots:
@@ -148,7 +148,7 @@ class ColorTestRunner(TextTestRunner):
                failfast=False, buffer=False, resultclass=None):
     super(ColorTestRunner, self).__init__(stream, descriptions, verbosity,
                                           failfast, buffer, resultclass)
-    self.resultclass=ColorTextResult
+    self.resultclass = ColorTextResult
 
   def run(self, test):
     """ Copied and modified from TextTestRunner

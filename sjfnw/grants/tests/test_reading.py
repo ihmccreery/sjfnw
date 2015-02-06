@@ -39,7 +39,7 @@ class ViewGrantPermissions(BaseGrantTestCase):
     self.assertEqual(0, response.context['perm'])
 
   def test_staff(self):
-    self.logInAdmin()
+    self.log_in_admin()
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -47,7 +47,7 @@ class ViewGrantPermissions(BaseGrantTestCase):
     self.assertEqual(2, response.context['perm'])
 
   def test_valid_member(self):
-    self.logInNewbie()
+    self.log_in_newbie()
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -55,7 +55,7 @@ class ViewGrantPermissions(BaseGrantTestCase):
     self.assertEqual(1, response.context['perm'])
 
   def test_invalid_member(self):
-    self.logInTesty()
+    self.log_in_testy()
 
     response = self.client.get('/grants/view/1', follow=True)
 
