@@ -46,7 +46,6 @@ class CycleTypeFilter(admin.SimpleListFilter):
     else:
       return queryset.filter(projectapp__application__grant_cycle__title__startswith=self.value())
 
-
 # INLINES
 
 class BaseShowInline(admin.TabularInline):
@@ -260,6 +259,10 @@ class OrganizationAdvA(OrganizationA):
              LogI]
 
 class GrantApplicationA(admin.ModelAdmin):
+  list_display = ('organization', 'grant_cycle', 'submission_time', 'view_link')
+  list_filter = ('grant_cycle',)
+  search_fields = ('organization__name',)
+
   fieldsets = (
     ('Application', {
         'fields': (('organization_link', 'grant_cycle', 'submission_time',
@@ -283,10 +286,6 @@ class GrantApplicationA(admin.ModelAdmin):
   )
   readonly_fields = ('organization_link', 'grant_cycle', 'submission_time',
                      'view_link', 'revert_grant', 'rollover')
-  list_display = ('organization', 'grant_cycle', 'submission_time',
-                  'view_link')
-  list_filter = ('grant_cycle',)
-  search_fields = ('organization__name',)
   inlines = [ProjectAppI, LogReadonlyI, LogI]
 
   def has_add_permission(self, request):
@@ -394,8 +393,11 @@ class SponsoredProgramGrantA(admin.ModelAdmin):
   #readonly_fields = ()
 
 class YearEndReportA(admin.ModelAdmin):
-  list_display = ('org', 'award', 'submitted', 'visible', 'view_link')
+  list_display = ('org', 'award', 'cycle', 'submitted', 'visible', 'view_link')
+  list_filter = ('award__projectapp__application__grant_cycle',)
   list_select_related = True
+  ordering = ('-submitted',)
+
   fieldsets = (
     ('', {
       'fields': ('award', 'submitted', 'view_link')
@@ -410,7 +412,6 @@ class YearEndReportA(admin.ModelAdmin):
         'major_changes', 'total_size', 'donations_count', 'donations_count_prev')
     })
   )
-
   readonly_fields = ('award', 'submitted', 'view_link')
 
   def view_link(self, obj):
@@ -422,6 +423,12 @@ class YearEndReportA(admin.ModelAdmin):
 
   def org(self, obj):
     return obj.award.projectapp.application.organization.name
+  org.admin_order_field = 'award__projectapp__application__organization'
+
+  def cycle(self, obj):
+    return obj.award.projectapp.application.grant_cycle
+  cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
+  
 
 # REGISTER
 
