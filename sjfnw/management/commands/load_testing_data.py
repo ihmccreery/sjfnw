@@ -38,6 +38,9 @@ class Command(BaseCommand):
     self.stdout.write('Loading awards..')
     call_command('loaddata', 'sjfnw/grants/fixtures/gp_grants.json')
 
+    self.stdout.write('Loading year end reports..')
+    call_command('loaddata', 'sjfnw/grants/fixtures/live_yer.json')
+
     self.stdout.write('Loading drafts..')
     call_command('loaddata', 'sjfnw/grants/fixtures/drafts.json')
 
