@@ -46,12 +46,12 @@ class BaseFundTestCase(BaseTestCase):
     """ Creates pre- and post-training giving projects """
     today = timezone.now()
     gp = models.GivingProject(title="Post training", fund_goal=5000,
-        fundraising_training = today - timedelta(days=10),
-        fundraising_deadline = today + timedelta(days=80))
+        fundraising_training=today-timedelta(days=10),
+        fundraising_deadline=today+timedelta(days=80))
     gp.save()
-    gp = models.GivingProject(title = "Pre training", fund_goal=10000,
-        fundraising_training = today + timedelta(days=10),
-        fundraising_deadline = today + timedelta(days=30))
+    gp = models.GivingProject(title="Pre training", fund_goal=10000,
+        fundraising_training=today+timedelta(days=10),
+        fundraising_deadline=today+timedelta(days=30))
     gp.save()
 
   def create_test(self):
@@ -74,17 +74,17 @@ class BaseFundTestCase(BaseTestCase):
     self.step_id = step.pk
 
   def create_new(self):
-    """ Creates newbie member and associated objs """
+    """ Creates newbie member with memberships in pre & post """
     mem = models.Member(first_name='New', last_name='Account',
                         email='newacct@gmail.com')
     mem.save()
     self.member_id = mem.pk
     post = models.GivingProject.objects.get(title="Post training")
-    ship = models.Membership(giving_project=post, member = mem, approved=True)
+    ship = models.Membership(giving_project=post, member=mem, approved=True)
     ship.save()
     self.post_id = ship.pk
     pre = models.GivingProject.objects.get(title='Pre training')
-    ship = models.Membership(giving_project=pre, member = mem, approved=True)
+    ship = models.Membership(giving_project=pre, member=mem, approved=True)
     ship.save()
     self.pre_id = ship.pk
     mem.current = ship.pk

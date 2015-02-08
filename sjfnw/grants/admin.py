@@ -169,7 +169,7 @@ class DraftI(BaseShowInline): #Adv only
   fields = ('grant_cycle', 'modified', 'overdue', 'extended_deadline', 'adv_viewdraft')
   readonly_fields = ('grant_cycle', 'modified', 'overdue', 'extended_deadline', 'adv_viewdraft')
 
-  def adv_viewdraft(obj): #Link from Draft inline on Org to Draft page
+  def adv_viewdraft(self, obj): #Link from Draft inline on Org to Draft page
     return '<a href="/admin-advanced/grants/draftgrantapplication/' + str(obj.pk) + '/" target="_blank">View</a>'
   adv_viewdraft.allow_tags = True
 

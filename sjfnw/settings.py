@@ -1,4 +1,4 @@
-﻿import os, sys, logging
+import os, sys, logging
 
 WSGI_APPLICATION = 'sjfnw.wsgi.application'
 

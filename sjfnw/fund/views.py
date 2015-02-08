@@ -36,9 +36,9 @@ def get_block_content(membership, get_steps=True):
 
   Args:
     membership: current Membership
-    get_steps: include list of upcoming steps or not (default True)
+    get_steps: include list of upcoming steps or not
 
-  Returns:
+  Returns: List with
     steps: 2 closest upcoming steps
     news: news items, sorted by date descending
     grants: ProjectApps ordered by org name
@@ -99,35 +99,19 @@ def home(request):
 
   if surveys:
     logger.info('Needs to fill out survey; redirecting')
-    return redirect(reverse('sjfnw.fund.views.gp_survey', kwargs = {'gp_survey': surveys[0].pk}))
-
+    return redirect(reverse('sjfnw.fund.views.gp_survey', kwargs = {
+      'gp_survey': surveys[0].pk
+    }))
 
   # check if they have contacts
   donors = membership.donor_set.all()
   if not donors:
     if not membership.copied_contacts:
       all_donors = models.Donor.objects.filter(membership__member=membership.member)
-      logger.info(all_donors)
       if all_donors:
+        logger.info('Eligible to copy contacts; redirecting')
         return redirect(copy_contacts)
     return redirect(add_mult)
-
-  # parse url params
-  step = request.GET.get('step')
-  donor = request.GET.get('donor')
-  form_type = request.GET.get('t')
-  load_form = request.GET.get('load')
-  if step and donor and form_type:
-    load = '/fund/'+donor+'/'+step
-    if form_type == "complete":
-      load += '/done'
-    loadto = donor + '-nextstep'
-  elif load_form == 'stepmult':
-    load = '/fund/stepmult'
-    loadto = 'addmult'
-  else: # no form specified
-    load = ''
-    loadto = ''
 
     # check whether to redirect to add estimates
     if (membership.giving_project.require_estimates() and
@@ -207,6 +191,23 @@ def home(request):
   # suggested steps for step forms
   suggested = membership.giving_project.suggested_steps.splitlines()
   suggested = [sug for sug in suggested if sug] # filter out empty lines
+
+  # parse url params
+  step = request.GET.get('step')
+  donor = request.GET.get('donor')
+  form_type = request.GET.get('t')
+  load_form = request.GET.get('load')
+  if step and donor and form_type:
+    load = '/fund/'+donor+'/'+step
+    if form_type == "complete":
+      load += '/done'
+    loadto = donor + '-nextstep'
+  elif load_form == 'stepmult':
+    load = '/fund/stepmult'
+    loadto = 'addmult'
+  else: # no form specified
+    load = ''
+    loadto = ''
 
   return render(request, 'fund/page_personal.html', {
     '1active': 'true', 'header': header, 'news': news, 'grants': grants,

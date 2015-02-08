@@ -17,13 +17,10 @@ class Home(BaseFundTestCase):
   fixtures = TEST_FIXTURE
 
   def setUp(self):
-    logger.info('Home setUp')
     super(Home, self).setUp()
-    logger.info('post super')
     self.use_new_acct()
 
   def test_new(self):
-    logger.warning('WAT')
     """ Verify that add mult form is shown to new memberships
 
     Setup:

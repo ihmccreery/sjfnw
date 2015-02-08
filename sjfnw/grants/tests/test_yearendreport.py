@@ -19,7 +19,7 @@ class YearEndReportForm(BaseGrantTestCase):
 
   def setUp(self):
     super(YearEndReportForm, self).setUp()
-    self.logInTestorg()
+    self.log_in_test_org()
     today = timezone.now()
     award = models.GivingProjectGrant(projectapp_id = 1, amount = 5000,
         agreement_mailed = today - timedelta(days = 345),
@@ -293,7 +293,7 @@ class RolloverYER(BaseGrantTestCase):
 
   def setUp(self):
     super(RolloverYER, self).setUp()
-    self.logInTestorg()
+    self.log_in_test_org()
 
   def create_yer(self, award_id):
     yer = models.YearEndReport(
@@ -312,7 +312,7 @@ class RolloverYER(BaseGrantTestCase):
   def test_display_no_awards(self):
     """ Verify correct error msg, no form, if org has no grants """
 
-    self.logInNeworg()
+    self.log_in_new_org()
     response = self.client.get(self.url, follow=True)
     self.assertEqual(response.context['error_msg'], 'You don\'t have any submitted reports to copy.')
 
