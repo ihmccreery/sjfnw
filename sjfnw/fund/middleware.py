@@ -1,4 +1,6 @@
-﻿from sjfnw.fund import models
+from sjfnw import constants as c
+from sjfnw.fund import models
+
 import logging
 logger = logging.getLogger('sjfnw')
 
@@ -18,10 +20,10 @@ class MembershipMiddleware(object):
 
   resulting request vars
     .membership_status
-      0 = no member object
-      1 = no membership objects assoc w/member
-      2 = no approved memberships
-      3 = approved :) (current was, or current was changed -> is now)
+      0 c.NO_MEMBER = no member object
+      1 c.NO_MEMBERSHIP = no membership objects assoc w/member
+      2 c.NO_APPROVED = no approved memberships
+      3 c.APPROVED = approved :) (current was, or current was changed -> is now)
     .member - present in 1-3
     .membership - present in 2-3
   """
@@ -30,7 +32,7 @@ class MembershipMiddleware(object):
     #logger.debug('fund middleware running for ' + str(view_func.__module__))
     if 'fund' in view_func.__module__:
       if request.user.is_authenticated():
-        request.membership_status = 0
+        request.membership_status = c.NO_MEMBER
         request.membership = None
 
         try:
@@ -41,15 +43,15 @@ class MembershipMiddleware(object):
           return None
 
         try: # get current membership
-          membership = models.Membership.objects.select_related().get(member = member, pk=member.current) #q4
-          request.membership_status = 3
+          membership = models.Membership.objects.select_related().get(member=member, pk=member.current) #q4
+          request.membership_status = c.APPROVED
           request.membership = membership
           logger.info(membership)
         except models.Membership.DoesNotExist: #current is wrong
           all = member.membership_set.all()
           if all: #if 1+ memberships, update current & set ship var
             logger.warning('Custom middleware: Current was wrong even though memberships exist')
-            request.membership_status = 3
+            request.membership_status = c.APPROVED
             request.membership = all[0] ###
             membership = all[0]
             member.current = membership.pk
@@ -58,20 +60,20 @@ class MembershipMiddleware(object):
             logger.info('%s (no memberships)')
             member.current = 0
             member.save()
-            request.membership_status = 1
+            request.membership_status = c.NO_MEMBERSHIP
             return None
 
-        #membership exists, status is 3
+        #membership exists, status is c.APPROVED
         if membership.approved == False: #current not approved
           logger.warning('Current membership not approved')
           ships = member.membership_set.filter(approved=True)
           if ships: #switch default to their first approved gp
-            request.membership_status = 3
+            request.membership_status = c.APPROVED
             request.membership = ships[0]
             member.current = membership.pk
             member.save()
           else: #no approved GPs
-            request.membership_status = 2
+            request.membership_status = c.NO_APPROVED
       else:
         request.membership_status = -1 #not logged in
     return None

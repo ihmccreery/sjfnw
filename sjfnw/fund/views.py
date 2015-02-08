@@ -378,9 +378,9 @@ def registered(request):
   Checks membership for pre-approval status
   """
 
-  if request.membership_status == 0:
+  if request.membership_status == c.NO_MEMBER:
     return redirect(not_member)
-  elif request.membership_status == 1:
+  elif request.membership_status == c.NO_MEMBERSHIP:
     return redirect(manage_account)
   else:
     member = models.Member.objects.get(email=request.user.username)
@@ -423,7 +423,7 @@ def registered(request):
 @login_required(login_url='/fund/login/')
 def manage_account(request):
 
-  if request.membership_status == 0:
+  if request.membership_status == c.NO_MEMBER:
     return redirect(not_member)
   else:
     member = models.Member.objects.get(email=request.user.username)
@@ -498,9 +498,9 @@ def blocked(request):
 
 def support(request):
   member = False
-  if request.membership_status > 1:
+  if request.membership_status > c.NO_MEMBERSHIP:
     member = request.membership.member
-  elif request.membership_status == 1:
+  elif request.membership_status == c.NO_MEMBERSHIP:
     member = models.Member.objects.get(email=request.user.username)
 
   return render(request, 'fund/support.html', {
