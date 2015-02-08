@@ -1,4 +1,4 @@
-﻿APP_BASE_URL = 'https://sjf-nw.appspot.com/' # used by cron jobs
+APP_BASE_URL = 'https://sjf-nw.appspot.com/' # used by cron jobs
 
 """ App-specific settings/constants """
 
@@ -18,3 +18,8 @@ PHOTO_FILE_TYPES = ['jpeg', 'jpg', 'png', 'gif', 'bmp']
 VIEWER_FORMATS = ('doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'mpeg4', 'mov', 'avi', 'wmv')
 
 TIMELINE_FIELDS = ['timeline_0', 'timeline_1', 'timeline_2', 'timeline_3', 'timeline_4', 'timeline_5', 'timeline_6', 'timeline_7', 'timeline_8', 'timeline_9', 'timeline_10', 'timeline_11', 'timeline_12', 'timeline_13', 'timeline_14'] #len 15
+
+NO_MEMBER = 0
+NO_MEMBERSHIP = 1
+NO_APPROVED = 2
+APPROVED = 3
