@@ -23,7 +23,7 @@ class ViewGrantPermissions(BaseGrantTestCase):
     GP: #2, which newacct is a member of, test is not
   """
   def test_author(self):
-    self.logInTestorg()
+    self.log_in_test_org()
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -31,7 +31,7 @@ class ViewGrantPermissions(BaseGrantTestCase):
     self.assertEqual(3, response.context['perm'])
 
   def test_other_org(self):
-    self.logInNeworg()
+    self.log_in_new_org()
 
     response = self.client.get('/grants/view/1', follow=True)
 

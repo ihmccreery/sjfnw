@@ -42,7 +42,7 @@ class Draft(BaseGrantTestCase):
 
   def setUp(self):
     super(Draft, self).setUp()
-    self.logInTestorg()
+    self.log_in_test_org()
 
   def test_autosave1(self):
     """ scenario: steal contents of draft 2, turn it into a dict. submit that as request.POST for cycle 5

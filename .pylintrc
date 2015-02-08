@@ -1,14 +1,18 @@
 [MESSAGES CONTROL]
 
-disable=C0111,C0330,R0903,W0105
+disable=C0111,C0330,R0201,R0903,W0105,W0201,W0232
 
+# see http://docs.pylint.org/features.html for list of codes
 # pylint-django plugin takes care of many of the django incompatibilities
 
 # disabled:
+# R0201 no-self-use                     
 # C0111 missing-docstring               would want to customize
 # C0330 bad-continuation                hanging indent. fails a lot
 # R0903 too-few-public-methods          Meta
 # W0105 pointless-string-statement      docstrings
+# W0201 attribute-defined-outside-init  done in tests
+# W0232 no-init
 
 [REPORTS]
 

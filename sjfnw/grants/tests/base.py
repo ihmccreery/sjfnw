@@ -60,13 +60,13 @@ class BaseGrantTestCase(BaseTestCase):
     set_cycle_dates()
 
   # see ./test_grants_guide.md for what is associated with each org
-  def logInNeworg(self):
+  def log_in_new_org(self):
     user = User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
-    self.client.login(username = 'neworg@gmail.com', password = 'noob')
+    self.client.login(username='neworg@gmail.com', password='noob')
 
-  def logInTestorg(self):
+  def log_in_test_org(self):
     user = User.objects.create_user('testorg@gmail.com', 'testorg@gmail.com', 'noob')
-    self.client.login(username = 'testorg@gmail.com', password = 'noob')
+    self.client.login(username='testorg@gmail.com', password='noob')
 
   def assert_draft_matches_app(self, draft, app, exclude_cycle_q=False):
     """ Assert that app is a superset of draft

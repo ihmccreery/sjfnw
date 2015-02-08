@@ -20,7 +20,7 @@ class OrgHomeAwards(BaseGrantTestCase):
 
   def setUp(self):
     super(OrgHomeAwards, self).setUp()
-    self.logInTestorg()
+    self.log_in_test_org()
 
   #TODO test mult awards per app
 
@@ -60,7 +60,7 @@ class OrgRollover(BaseGrantTestCase):
 
   def setUp(self):
     super(OrgRollover, self).setUp()
-    self.logInNeworg()
+    self.log_in_new_org()
 
   def test_draft_rollover(self):
     """ scenario: take complete draft, make it belong to new org, rollover to cycle 1
@@ -131,7 +131,7 @@ class OrgRollover(BaseGrantTestCase):
     self.assertNotContains(response, 'Select')
     self.client.logout()
     # login to testorg (officemax)
-    self.logInTestorg()
+    self.log_in_test_org()
     response = self.client.get('/apply/copy')
     self.assertTemplateUsed(response, 'grants/org_app_copy.html')
     self.assertEqual(response.context['apps_count'], 4)
