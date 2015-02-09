@@ -1,9 +1,12 @@
+[![Build Status](https://travis-ci.org/aisapatino/sjfnw.svg?branch=master)](https://travis-ci.org/aisapatino/sjfnw) [![Coverage Status](https://coveralls.io/repos/aisapatino/sjfnw/badge.svg?branch=develop)](https://coveralls.io/r/aisapatino/sjfnw?branch=master)
+
 [Installation](#installation)  
 [Running a local server](#running-a-local-server)  
 [Using fixtures](#using-fixtures-to-populate-your-local-database)  
 [Running tests](#running-tests)  
 [Project conventions](#project-conventions)  
 [Deploying](#deploying)  
+TODO: project tools and maintenance
 
 -----
 
@@ -63,9 +66,9 @@ To populate your local db with data, do `./manage.py load_testing_data`. This ol
 
 To check test coverage, install [coverage.py](http://nedbatchelder.com/code/coverage/), then do
 
-`sh check_coverage.sh`
+`./scripts/coverage.sh`
 
-which will output coverage details as html files in `/.coverage-html`
+which will output coverage details as html files in `./coverage-html`
 
 ## Project conventions
 
@@ -86,8 +89,10 @@ which will output coverage details as html files in `/.coverage-html`
     - You'll need npm first, which requires node. `sudo apt-get install node` + `sudo apt-get install npm` or see their [docs](https://docs.npmjs.com/getting-started/installing-node) for instructions.
     - `npm install -g eslint` See [this page](https://docs.npmjs.com/getting-started/fixing-npm-permissions) if you get a permissions error.
 - Usage
-  - You can run each from the command line (see links for details)
+  - There are a lot of lint errors currently, so running them in text editor is probably preferable to CLI.
   - Some text editors have plugins to run them from within the editor. For example, with vim, you can use [syntastic](https://github.com/scrooloose/syntastic).
+  - pylint: `./scripts/lint.sh`
+  - eslint: in progress, for now you can run `eslint sjfnw/static/js/forms.js sjfnw/static/js/fund_personal.js`
   
 
 #### Issue tracking
