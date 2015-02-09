@@ -1,0 +1,30 @@
+branches:
+  only:
+    - master
+    - develop
+
+language: python
+python:
+  - "2.7"
+
+# install deps
+install:
+  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.17.zip
+  - unzip -q google_appengine_1.9.17.zip
+  - pip install coverage
+  - pip install python-coveralls
+  # - "pip install pylint"
+  # - "pip install pylint-django"
+
+before_script:
+  - export PATH=$PATH:$PWD/google_appengine
+  - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine
+  - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/django-1.5
+  - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/yaml/lib
+  - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/webob-1.2.3
+
+# script to run tests
+script: ./scripts/coverage.sh
+
+after_script:
+  coveralls
