@@ -18,7 +18,7 @@ from sjfnw import constants as c
 from sjfnw.grants.models import Organization, GrantApplication, ProjectApp
 
 from sjfnw.fund.decorators import approved_membership
-from sjfnw.fund import forms, modelforms, models, utils
+from sjfnw.fund import forms, modelforms, models, utils, modelutils
 
 import datetime, logging, os, json
 
@@ -30,47 +30,6 @@ logger = logging.getLogger('sjfnw')
 #-----------------------------------------------------------------------------
 # MAIN VIEWS
 #-----------------------------------------------------------------------------
-
-def get_block_content(membership, get_steps=True):
-  """ Provide upper block content for the 3 main views
-
-  Args:
-    membership: current Membership
-    get_steps: include list of upcoming steps or not
-
-  Returns: List with
-    steps: 2 closest upcoming steps
-    news: news items, sorted by date descending
-    grants: ProjectApps ordered by org name
-  """
-
-  blocks = []
-  # upcoming steps
-  if get_steps:
-    blocks.append(models.Step.objects
-        .select_related('donor')
-        .filter(donor__membership=membership, completed__isnull=True)
-        .order_by('date')[:2])
-
-  # project news
-  blocks.append(models.NewsItem.objects
-      .filter(membership__giving_project=membership.giving_project)
-      .order_by('-date')[:25])
-
-  # grants
-  p_apps = ProjectApp.objects.filter(giving_project=membership.giving_project)
-  p_apps = p_apps.select_related('giving_project', 'application',
-      'application__organization')
-  # never show screened out by sub-committee
-  p_apps = p_apps.exclude(application__pre_screening_status=45)
-  if membership.giving_project.site_visits == 1:
-    logger.info('Filtering grants for site visits')
-    p_apps = p_apps.filter(screening_status__gte=70)
-  p_apps = p_apps.order_by('application__organization__name')
-  blocks.append(p_apps)
-
-  return blocks
-
 
 @login_required(login_url='/fund/login/')
 @approved_membership()
@@ -121,7 +80,7 @@ def home(request):
   # from here we know we're not redirecting
 
   # top content
-  news, grants = get_block_content(membership, get_steps=False)
+  news, grants = modelutils.get_block_content(membership, get_steps=False)
   header = membership.giving_project.title
 
   # collect & organize contact data
@@ -225,7 +184,7 @@ def project_page(request):
   project = membership.giving_project
 
   # blocks
-  steps, news, grants = get_block_content(membership)
+  steps, news, grants = modelutils.get_block_content(membership)
 
   header = project.title
 
@@ -268,7 +227,7 @@ def grant_list(request):
   project = membership.giving_project
 
   # blocks
-  steps, news, grants = get_block_content(membership)
+  steps, news, grants = modelutils.get_block_content(membership)
 
   # base
   header = project.title
@@ -298,9 +257,9 @@ def fund_login(request):
         logger.warning("Inactive account tried to log in. Username: "+username)
     else:
       error_msg = "Your login and password didn't match."
+    logger.info(error_msg)
   else:
     form = forms.LoginForm()
-  logger.info(error_msg)
   return render(request, 'fund/login.html', {'form': form, 'error_msg': error_msg})
 
 
@@ -312,39 +271,21 @@ def fund_register(request):
 
       username_email = request.POST['email'].lower()
       password = request.POST['password']
+      first_name = request.POST['first_name']
+      last_name = request.POST['last_name']
 
-      # check if Member already
-      if models.Member.objects.filter(email = username_email):
-        error_msg = 'That email is already registered.  <a href="/fund/login/">Login</a> instead.'
-        logger.warning(username_email + ' tried to re-register')
+      error_msg, user, member = modelutils.create_user(username_email, password,
+                                                   first_name, last_name)
 
-      # check User already but not Member
-      elif User.objects.filter(username=username_email):
-        error_msg = 'That email is already registered through Social Justice Fund\'s online grant application.  Please use a different email address.'
-        logger.warning('User already exists, but not Member: ' + username_email)
-
-      else:
-        # ok to register - create User and Member
-        new_user = User.objects.create_user(username_email, username_email, password)
-        fn = request.POST['first_name']
-        ln = request.POST['last_name']
-        new_user.first_name = fn
-        new_user.last_name = ln
-        new_user.save()
-        member = models.Member(email = username_email, first_name = fn, last_name = ln)
-        member.save()
-        logger.info('Registration - user and member objects created for ' + username_email)
+      if not error_msg:
 
         # if they specified a GP, create Membership
-        gp = request.POST['giving_project']
-        if gp:
-          giv = models.GivingProject.objects.get(pk=gp)
-          membership = models.Membership(member = member, giving_project = giv)
+        membership = False
+        if request.POST['giving_project']:
+          giv = models.GivingProject.objects.get(pk=request.POST['giving_project'])
           # TODO get from file? something more readable/editable
-          membership.notifications = '<table><tr><td>Welcome to Project Central!<br>I\'m Odo, your Online Donor Organizing assistant. I\'ll be here to guide you through the fundraising process and cheer you on.</td><td><img src="/static/images/odo1.png" height=88 width=54 alt="Odo waving"></td></tr></table>'
-          membership.save()
-          member.current = membership.pk
-          member.save()
+          notif = '<table><tr><td>Welcome to Project Central!<br>I\'m Odo, your Online Donor Organizing assistant. I\'ll be here to guide you through the fundraising process and cheer you on.</td><td><img src="/static/images/odo1.png" height=88 width=54 alt="Odo waving"></td></tr></table>'
+          error, membership = modelutils.create_membership(member, giv, notif=notif)
           logger.info('Registration - membership in ' + unicode(giv) + 'created, welcome message set')
 
         # try to log in
@@ -353,7 +294,13 @@ def fund_register(request):
           if user.is_active:
             # success! log in and redirect
             login(request, user)
-            return redirect('/fund/registered')
+            if not membership:
+              return redirect(manage_account)
+            if membership.approved:
+              return redirect(home)
+            return render(request, 'fund/registered.html', {
+              'member': member, 'proj': giv
+            })
           else: # not active
             error_msg = 'Your account is not active. Please contact a site admin for assistance.'
             logger.error('Inactive right after registering. Email: ' + username_email)
@@ -402,8 +349,8 @@ def registered(request):
   proj = ship.giving_project
   if proj.pre_approved:
     app_list = [email.strip().lower() for email in proj.pre_approved.split(',')]
-    logger.info('Checking pre-approval for ' + request.user.username +
-                ' in ' + unicode(proj) + ', list: ' + proj.pre_approved)
+    logger.info(u'Checking pre-approval for %s in %s. Pre-approved list: %s',
+                request.user.username, proj, proj.pre_approved)
     if ship.member.email in app_list:
       ship.approved = True
       ship.save(skip=True)
@@ -415,6 +362,8 @@ def registered(request):
   return render(request, 'fund/registered.html', {
     'member': member, 'proj': proj
   })
+
+
 
 #-----------------------------------------------------------------------------
 # MEMBERSHIP MANAGEMENT
@@ -437,9 +386,13 @@ def manage_account(request):
       logger.debug('Valid add project')
       gp = request.POST['giving_project']
       giv = models.GivingProject.objects.get(pk=gp)
-      ship, new = models.Membership.objects.get_or_create(member=member, giving_project=giv)
-      if new:
-        return redirect('/fund/registered?sh=' + str(ship.pk))
+      error_msg, membership = modelutils.create_membership(member, giv)
+      if membership:
+        if membership.approved:
+          return redirect(home)
+        return render(request, 'fund/registered.html', {
+          'member': member, 'proj': giv
+        })
       else:
         printout = 'You are already registered with that giving project.'
   else: # GET
@@ -538,7 +491,7 @@ def gp_survey(request, gp_survey):
     form = modelforms.SurveyResponseForm(gp_survey.survey,
                                          initial={'gp_survey': gp_survey})
 
-  steps, news, grants = get_block_content(request.membership)
+  steps, news, grants = modelutils.get_block_content(request.membership)
 
   return render(request, 'fund/fill_gp_survey.html', {
     'form': form, 'survey': gp_survey.survey, 'news': news,
@@ -692,7 +645,7 @@ def add_mult(request):
 
   else: # GET
     formset = contact_formset()
-    steps, news, grants = get_block_content(membership)
+    steps, news, grants = modelutils.get_block_content(membership)
     header = membership.giving_project.title
 
     return render(request, 'fund/add_mult_flex.html', {
@@ -739,7 +692,7 @@ def add_estimates(request):
     logger.info('Adding estimates - loading initial formset, size ' +
                  str(len(dlist)))
     # get vars for base templates
-    steps, news, grants = get_block_content(membership)
+    steps, news, grants = modelutils.get_block_content(membership)
 
     fd = zip(formset, dlist)
     return render(request, 'fund/add_estimates.html', {
