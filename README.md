@@ -134,8 +134,7 @@ Installation
 Usage
   - There are a lot of lint errors currently, so you'll often want to lint just the file(s) you're currently working on.
   - Some text editors have plugins to run them from within the editor. For example, with vim, you can use [syntastic](https://github.com/scrooloose/syntastic).
-  - pylint: `./scripts/lint.sh` _TODO: accept args to limit files linted_
-  - eslint: in progress, for now you can run `eslint sjfnw/static/js/forms.js sjfnw/static/js/fund_personal.js`
+  - To lint the whole project: `./scripts/lint.sh`
 
 Configuration
   - [.pylintrc](https://github.com/aisapatino/sjfnw/blob/master/.pylintrc) ([docs](http://docs.pylint.org/features.html))
