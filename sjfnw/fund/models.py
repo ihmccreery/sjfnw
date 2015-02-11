@@ -60,6 +60,23 @@ class GivingProject(models.Model):
     self.suggested_steps = self.suggested_steps.replace('\r', '')
     super(GivingProject, self).save(*args, **kwargs)
 
+  def get_suggested_steps(self):
+    """ Return suggested steps as a list """
+    suggested = self.suggested_steps.splitlines()
+    # filter out empty lines, strip whitespace
+    return [step.strip() for step in suggested if step and step.strip()]
+
+  def is_pre_approved(self, email):
+    """ Check new membership for pre-approval status """
+    if self.pre_approved:
+      approved_emails = [email.strip().lower() for email in self.pre_approved.split(',')]
+      logger.info(u'Checking pre-approval for %s in %s. Pre-approved list: %s',
+                  email, self, self.pre_approved)
+      if email in approved_emails:
+        return True
+    return False
+
+
   def require_estimates(self):
     return self.fundraising_training <= timezone.now()
 
