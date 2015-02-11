@@ -18,9 +18,6 @@ logger.setLevel(0)
 
 class BaseTestCase(TestCase):
 
-  def setUp(self, *args):
-    logger.warn(args)
-
   def log_in_testy(self):
     User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')
     self.client.login(username='testacct@gmail.com', password='testy')
@@ -69,14 +66,12 @@ class ColorTextResult(TextTestResult):
     doc_first_line = test.shortDescription()
     name = test.id().replace('sjfnw.', '').replace('tests.', '').replace('.test_', '  ')
     if self.descriptions and doc_first_line:
-      return '\033[1m' + name + '\033[00m ' + doc_first_line
+      return '\033[1m %s \033[00m %s\n' % (name, doc_first_line)
     else:
-      return '\033[1m' + name + '\033[00m '
+      return '\033[1m %s \033[00m\n' % name
 
   def startTest(self, test):
     super(ColorTextResult, self).startTest(test)
-    if self.showAll:
-      self.stream.writeln(self.getDescription(test))
 
   def addSuccess(self, test):
     super(ColorTextResult, self).addSuccess(test)
