@@ -150,6 +150,10 @@ Configuration
 
 See [this post](http://nvie.com/posts/a-successful-git-branching-model/) for more details on the general git branching model we're going for.
 
+## Database management
+
+TODO - keeping models and db table structure synced over time
+
 ## Tools
 
 #### Issue tracking
@@ -186,8 +190,19 @@ There are currently a couple ways to deploy code to app engine:
 
 I recommend 1 because it fits nicely into git workflow and makes it very easy to tell exactly what code is in production - you can browse code and commits though the cloud console. `appcfg.py` is useful if you want to deploy at a non-default version without having to change the `app.yaml` file accordingly.
 
-## To do
+## Reference
 
-- "migrations" - our hacky pre-1.7 equivalent
-- useful links
+- [Git](http://git-scm.com/docs)
+- [Django](https://docs.djangoproject.com/en/1.5/)
+  - Note: If you google something you'll often wind up at the most recent docs. Make sure you're looking at the docs version that matches our current Django version (currently 1.5)
+- [Python](https://docs.python.org/2/library/index.html)
+  - [Regular expressions](http://doc.pyschools.com/html/regex.html)
+- Google App Engine (TODO)
+  - Note: much of the GAE python docs don't apply when using Django
+- MySQL (TODO)
+  - CloudSQL is basically a hosted MySQL with some restrictions.
+- [Intro to CSS](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Getting_started)
+- [CSS properties reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
+- [HTML guide](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML)
+- [Intro to HTTP and REST](http://code.tutsplus.com/tutorials/a-beginners-guide-to-http-and-rest--net-16340)
 
