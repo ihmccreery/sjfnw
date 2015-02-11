@@ -18,7 +18,7 @@ from sjfnw import constants as c
 from sjfnw.grants.models import Organization, GrantApplication, ProjectApp
 
 from sjfnw.fund.decorators import approved_membership
-from sjfnw.fund import forms, modelforms, models, utils, modelutils
+from sjfnw.fund import forms, modelforms, models, utils
 
 import datetime, logging, os, json
 
@@ -26,6 +26,7 @@ if not settings.DEBUG:
   ereporter.register_logger()
 
 logger = logging.getLogger('sjfnw')
+logger.info(logger)
 
 #-----------------------------------------------------------------------------
 # MAIN VIEWS
@@ -47,6 +48,9 @@ def home(request):
     Url param can trigger display of a form on a specific donor/step
   """
 
+  logger.info('help')
+  req_logger = logging.getLogger('django.request')
+  logger.info(req_logger.handlers)
   membership = request.membership
 
   # check if there's a survey to fill out
@@ -80,45 +84,11 @@ def home(request):
   # from here we know we're not redirecting
 
   # top content
-  news, grants = modelutils.get_block_content(membership, get_steps=False)
+  news, grants = _get_block_content(membership, get_steps=False)
   header = membership.giving_project.title
 
-  # collect & organize contact data
-  prog = {'contacts': len(donors), 'estimated': 0, 'talked': 0,
-          'asked': 0, 'promised': 0, 'received': 0}
-  donor_data = {}
-  empty_date = datetime.date(2500, 1, 1)
-  for donor in donors:
-    donor_data[donor.pk] = {'donor': donor, 'complete_steps': [],
-                            'next_step': False, 'next_date': empty_date,
-                            'overdue': False}
-    prog['estimated'] += donor.estimated()
-    if donor.asked:
-      prog['asked'] += 1
-      donor_data[donor.pk]['next_date'] = datetime.date(2600, 1, 1)
-    elif donor.talked:
-      prog['talked'] += 1
-    if donor.received() > 0:
-      prog['received'] += donor.received()
-      donor_data[donor.pk]['next_date'] = datetime.date(2800, 1, 1)
-    elif donor.promised:
-      prog['promised'] += donor.promised
-      donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
-
-  # progress chart calculations
-  if prog['contacts'] > 0:
-    prog['bar'] = 100 * prog['asked']/prog['contacts']
-    prog['contactsremaining'] = prog['contacts'] - prog['talked'] - prog['asked']
-    prog['togo'] = prog['estimated'] - prog['promised'] - prog['received']
-    prog['header'] = '$' + intcomma(prog['estimated']) + ' fundraising goal'
-    if prog['togo'] < 0:
-      # met or exceeded goal - override goal header with total fundraised
-      prog['togo'] = 0
-      prog['header'] = ('$' + intcomma(prog['promised'] + prog['received']) +
-                        ' raised')
-  else:
-    logger.error('No contacts but no redirect to add_mult')
-    prog['contactsremaining'] = 0
+  logger.info(donors)
+  donor_data, progress = _compile_membership_progress(donors)
 
   notif = membership.notifications # TODO replace with messages
   # on live, only show a notification once
@@ -128,28 +98,13 @@ def home(request):
     membership.save(skip=True)
 
   # get all steps
-  step_list = list(models.Step.objects.filter(donor__membership=membership)
-                                      .order_by('date'))
-  # split into complete/not, attach to donors
-  upcoming_steps = []
-  ctz = timezone.get_current_timezone()
-  today = ctz.normalize(timezone.now()).date()
-  for step in step_list:
-    if step.completed:
-      donor_data[step.donor_id]['complete_steps'].append(step)
-    else:
-      upcoming_steps.append(step)
-      donor_data[step.donor_id]['next_step'] = step
-      donor_data[step.donor_id]['next_date'] = step.date
-      if step.date < today:
-        donor_data[step.donor_id]['overdue'] = True
-  upcoming_steps.sort(key = lambda step: step.date)
-  donor_list = donor_data.values() # convert outer dict to list and sort it
-  donor_list.sort(key = lambda donor: donor['next_date'])
+  steps = models.Step.objects.filter(donor__membership=membership).order_by('date')
+
+  # split steps into complete/not, attach to donors
+  donor_list, upcoming_steps = _compile_steps(donor_data, list(steps))
 
   # suggested steps for step forms
-  suggested = membership.giving_project.suggested_steps.splitlines()
-  suggested = [sug for sug in suggested if sug] # filter out empty lines
+  suggested = membership.giving_project.get_suggested_steps()
 
   # parse url params
   step = request.GET.get('step')
@@ -170,10 +125,79 @@ def home(request):
 
   return render(request, 'fund/page_personal.html', {
     '1active': 'true', 'header': header, 'news': news, 'grants': grants,
-    'steps': upcoming_steps, 'donor_list': donor_list, 'progress': prog,
+    'steps': upcoming_steps, 'donor_list': donor_list, 'progress': progress,
     'notif': notif, 'suggested': suggested, 'load': load, 'loadto': loadto
   })
 
+def _compile_membership_progress(donors):
+  # collect & organize contact data
+  progress = {'contacts': len(donors), 'estimated': 0, 'talked': 0,
+          'asked': 0, 'promised': 0, 'received': 0}
+  donor_data = {}
+
+  if not donors:
+    logger.error('No contacts but no redirect to add_mult')
+    progress['contactsremaining'] = 0
+    return donor_data, progress
+
+  empty_date = datetime.date(2500, 1, 1)
+  logger.info(donors)
+  for donor in donors:
+    donor_data[donor.pk] = {'donor': donor, 'complete_steps': [],
+                            'next_step': False, 'next_date': empty_date,
+                            'overdue': False}
+    progress['estimated'] += donor.estimated()
+    if donor.asked:
+      progress['asked'] += 1
+      donor_data[donor.pk]['next_date'] = datetime.date(2600, 1, 1)
+    elif donor.talked:
+      progress['talked'] += 1
+    if donor.received() > 0:
+      progress['received'] += donor.received()
+      donor_data[donor.pk]['next_date'] = datetime.date(2800, 1, 1)
+    elif donor.promised:
+      progress['promised'] += donor.promised
+      donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
+
+  progress = _compile_membership_chart_data(progress)
+
+  return donor_data, progress
+
+def _compile_membership_chart_data(progress):
+  # progress chart calculations
+  if progress['contacts'] > 0:
+    progress['bar'] = 100 * progress['asked']/progress['contacts']
+    progress['contactsremaining'] = progress['contacts'] - progress['talked'] - progress['asked']
+    progress['togo'] = progress['estimated'] - progress['promised'] - progress['received']
+    progress['header'] = '$' + intcomma(progress['estimated']) + ' fundraising goal'
+    if progress['togo'] < 0:
+      # met or exceeded goal - override goal header with total fundraised
+      progress['togo'] = 0
+      progress['header'] = ('$' + intcomma(progress['promised'] + progress['received']) +
+                        ' raised')
+  return progress
+
+def _compile_steps(donor_data, steps):
+  if not steps:
+    return donor_data.values(), []
+
+  upcoming = []
+  ctz = timezone.get_current_timezone()
+  today = ctz.normalize(timezone.now()).date()
+  for step in steps:
+    if step.completed:
+      donor_data[step.donor_id]['complete_steps'].append(step)
+    else:
+      upcoming.append(step)
+      donor_data[step.donor_id]['next_step'] = step
+      donor_data[step.donor_id]['next_date'] = step.date
+      if step.date < today:
+        donor_data[step.donor_id]['overdue'] = True
+  upcoming.sort(key=lambda step: step.date)
+  donor_list = donor_data.values() # convert outer dict to list and sort it
+  donor_list.sort(key=lambda donor: donor['next_date'])
+
+  return donor_list, upcoming
 
 @login_required(login_url='/fund/login/')
 @approved_membership()
@@ -184,7 +208,7 @@ def project_page(request):
   project = membership.giving_project
 
   # blocks
-  steps, news, grants = modelutils.get_block_content(membership)
+  steps, news, grants = _get_block_content(membership)
 
   header = project.title
 
@@ -227,7 +251,7 @@ def grant_list(request):
   project = membership.giving_project
 
   # blocks
-  steps, news, grants = modelutils.get_block_content(membership)
+  steps, news, grants = _get_block_content(membership)
 
   # base
   header = project.title
@@ -274,7 +298,7 @@ def fund_register(request):
       first_name = request.POST['first_name']
       last_name = request.POST['last_name']
 
-      error_msg, user, member = modelutils.create_user(username_email, password,
+      error_msg, user, member = _create_user(username_email, password,
                                                    first_name, last_name)
 
       if not error_msg:
@@ -285,7 +309,7 @@ def fund_register(request):
           giv = models.GivingProject.objects.get(pk=request.POST['giving_project'])
           # TODO get from file? something more readable/editable
           notif = '<table><tr><td>Welcome to Project Central!<br>I\'m Odo, your Online Donor Organizing assistant. I\'ll be here to guide you through the fundraising process and cheer you on.</td><td><img src="/static/images/odo1.png" height=88 width=54 alt="Odo waving"></td></tr></table>'
-          error, membership = modelutils.create_membership(member, giv, notif=notif)
+          error, membership = _create_membership(member, giv, notif=notif)
           logger.info('Registration - membership in ' + unicode(giv) + 'created, welcome message set')
 
         # try to log in
@@ -386,7 +410,7 @@ def manage_account(request):
       logger.debug('Valid add project')
       gp = request.POST['giving_project']
       giv = models.GivingProject.objects.get(pk=gp)
-      error_msg, membership = modelutils.create_membership(member, giv)
+      error_msg, membership = _create_membership(member, giv)
       if membership:
         if membership.approved:
           return redirect(home)
@@ -491,7 +515,7 @@ def gp_survey(request, gp_survey):
     form = modelforms.SurveyResponseForm(gp_survey.survey,
                                          initial={'gp_survey': gp_survey})
 
-  steps, news, grants = modelutils.get_block_content(request.membership)
+  steps, news, grants = _get_block_content(request.membership)
 
   return render(request, 'fund/fill_gp_survey.html', {
     'form': form, 'survey': gp_survey.survey, 'news': news,
@@ -645,7 +669,7 @@ def add_mult(request):
 
   else: # GET
     formset = contact_formset()
-    steps, news, grants = modelutils.get_block_content(membership)
+    steps, news, grants = _get_block_content(membership)
     header = membership.giving_project.title
 
     return render(request, 'fund/add_mult_flex.html', {
@@ -692,7 +716,7 @@ def add_estimates(request):
     logger.info('Adding estimates - loading initial formset, size ' +
                  str(len(dlist)))
     # get vars for base templates
-    steps, news, grants = modelutils.get_block_content(membership)
+    steps, news, grants = _get_block_content(membership)
 
     fd = zip(formset, dlist)
     return render(request, 'fund/add_estimates.html', {
@@ -771,7 +795,7 @@ def delete_donor(request, donor_id):
 def add_step(request, donor_id):
 
   membership = request.membership
-  suggested = membership.giving_project.suggested_steps.splitlines()
+  suggested = membership.giving_project.get_suggested_steps()
 
   logger.info('Single step - start of view. ' + unicode(membership.member) +
                ', donor id: ' + str(donor_id))
@@ -817,7 +841,7 @@ def add_mult_step(request):
   dlist = [] # list of donors for zipping to formset
   size = 0
   membership = request.membership
-  suggested = membership.giving_project.suggested_steps.splitlines()
+  suggested = membership.giving_project.get_suggested_steps()
 
   for donor in membership.donor_set.order_by('-added'): # sort by added
     if (donor.received() == 0 and donor.promised is None and donor.get_next_step() is None):
@@ -857,8 +881,7 @@ def add_mult_step(request):
 @approved_membership()
 def edit_step(request, donor_id, step_id):
 
-  suggested = request.membership.giving_project.suggested_steps.splitlines()
-  logger.info(suggested)
+  suggested = request.membership.giving_project.get_suggested_steps()
 
   try:
     donor = models.Donor.objects.get(pk=donor_id,
@@ -903,7 +926,7 @@ def edit_step(request, donor_id, step_id):
 def done_step(request, donor_id, step_id):
 
   membership = request.membership
-  suggested = membership.giving_project.suggested_steps.splitlines()
+  suggested = membership.giving_project.get_suggested_steps()
 
   try:
     donor = models.Donor.objects.get(pk=donor_id, membership=membership)
@@ -1008,6 +1031,96 @@ def done_step(request, donor_id, step_id):
                  'suggested': suggested,
                  'target': str(step.pk) + '_id_next_step', 'step_id': step_id,
                  'step': step})
+
+#-----------------------------------------------------------------------------
+# METHODS USED BY MULTIPLE VIEWS
+#-----------------------------------------------------------------------------
+
+def _get_block_content(membership, get_steps=True):
+  """ Provide upper block content for the 3 main views
+
+  Args:
+    membership: current Membership
+    get_steps: include list of upcoming steps or not
+
+  Returns: List with
+    steps: 2 closest upcoming steps
+    news: news items, sorted by date descending
+    grants: ProjectApps ordered by org name
+  """
+
+  blocks = []
+  # upcoming steps
+  if get_steps:
+    blocks.append(models.Step.objects
+        .select_related('donor')
+        .filter(donor__membership=membership, completed__isnull=True)
+        .order_by('date')[:2])
+
+  # project news
+  blocks.append(models.NewsItem.objects
+      .filter(membership__giving_project=membership.giving_project)
+      .order_by('-date')[:25])
+
+  # grants
+  p_apps = ProjectApp.objects.filter(giving_project=membership.giving_project)
+  p_apps = p_apps.select_related('giving_project', 'application',
+      'application__organization')
+  # never show screened out by sub-committee
+  p_apps = p_apps.exclude(application__pre_screening_status=45)
+  if membership.giving_project.site_visits == 1:
+    logger.info('Filtering grants for site visits')
+    p_apps = p_apps.filter(screening_status__gte=70)
+  p_apps = p_apps.order_by('application__organization__name')
+  blocks.append(p_apps)
+
+  return blocks
+
+def _create_user(email, password, first_name, last_name):
+  error, user, member = None, None, None
+
+  # check if Member already
+  if models.Member.objects.filter(email=email):
+    error = 'That email is already registered.  <a href="/fund/login/">Login</a> instead.'
+    logger.warning(email + ' tried to re-register')
+
+  # check User already but not Member
+  elif User.objects.filter(username=email):
+    error = 'That email is already registered through Social Justice Fund\'s online grant application.  Please use a different email address.'
+    logger.warning('User already exists, but not Member: ' + email)
+
+  else:
+    # ok to register - create User and Member
+    user = User.objects.create_user(email, email, password)
+    user.first_name = first_name
+    user.last_name = last_name
+    user.save()
+    member = models.Member(email=email, first_name=first_name,
+                           last_name=last_name)
+    member.save()
+    logger.info('Registration - user and member objects created for ' + email)
+
+  return error, user, member
+
+def _create_membership(member, giving_project, notif=''):
+  error, membership = None, None
+
+  approved = giving_project.is_pre_approved(member.email)
+
+  membership, new = models.Membership.objects.get_or_create(
+      member=member, giving_project=giving_project,
+      defaults={
+        'approved': approved, 'notifications': notif
+      }
+  )
+
+  if not new:
+    error = 'You are already registered with that giving project.'
+  else:
+    member.current = membership.pk
+    member.save()
+
+  return error, membership
 
 #-----------------------------------------------------------------------------
 # CRON TASKS
