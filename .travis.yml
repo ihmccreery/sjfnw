@@ -24,6 +24,6 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/webob-1.2.3
 
 # script to run tests
-script: ./scripts/coverage.sh
+script: ./scripts/coverage.sh skip-html
 
 after_script: coveralls
