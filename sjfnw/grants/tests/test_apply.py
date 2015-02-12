@@ -44,7 +44,7 @@ def alter_draft_files(draft, files_dict):
 
 @override_settings(DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage',
     FILE_UPLOAD_HANDLERS = ('django.core.files.uploadhandler.MemoryFileUploadHandler',),
-    MIDDLEWARE_CLASSES = TEST_MIDDLEWARE, MEDIA_ROOT = 'media/')
+    MIDDLEWARE_CLASSES = TEST_MIDDLEWARE, MEDIA_ROOT = 'sjfnw/grants/tests/media/')
 class ApplySuccessful(BaseGrantFilesTestCase):
 
   org_id = 2
