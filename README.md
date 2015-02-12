@@ -17,6 +17,7 @@
   - [Loading fixtures](#loading-fixtures)
 - **[Running a local server](#running-a-local-server)**
 - **[Running tests](#running-tests)**
+- **[Project structure](#project-structure)**
 - **[Code conventions](#code-conventions)**
   - [Linters](#linters)
 - **[Git workflow](#git-workflow)**
@@ -25,6 +26,7 @@
   - [Travis CI](#travis-ci)
   - [Coveralls.io](#coverallsio)
 - **[Deploying](#deploying)**
+- **[References](#references)**
 
 -----
 
@@ -110,6 +112,15 @@ To check test coverage, install [coverage.py](http://nedbatchelder.com/code/cove
 
 which will output coverage details as html files in `./coverage-html`
 
+## Project structure
+
+Most of the project structure is determined by Django; see link under [references](#references).
+
+Some things that may warrant explaining:
+- `pytz` is [highly recommended](https://docs.djangoproject.com/en/1.5/topics/i18n/timezones/) by Django for handling time zones/time zone aware datetimes.
+- `unicodecsv` a pretty small wrapper around python's `csv` module, which [does not support Unicode input](https://docs.python.org/2/library/csv.html)) in 2.7.9. There is some export functionality through the admin site that uses it.
+- `sjfnw/static/django_admin` is a copy of `django/contrib/admin/media`. GAE can provide the library, but [does not provide the assets](http://stackoverflow.com/a/9863345).
+
 ## Code conventions
 
 All of this is a work in progress in the current code. Expect a lot of pylint errors for the time being.
@@ -190,7 +201,7 @@ There are currently a couple ways to deploy code to app engine:
 
 I recommend 1 because it fits nicely into git workflow and makes it very easy to tell exactly what code is in production - you can browse code and commits though the cloud console. `appcfg.py` is useful if you want to deploy at a non-default version without having to change the `app.yaml` file accordingly.
 
-## Reference
+## References
 
 - [Git](http://git-scm.com/docs)
 - [Django](https://docs.djangoproject.com/en/1.5/)
