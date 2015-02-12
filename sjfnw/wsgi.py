@@ -1,5 +1,8 @@
 import os, sys
 
+# put pytz on path first so django can find it
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'libs'))
+
 from django.core.wsgi import get_wsgi_application
 from django.core.signals import got_request_exception
 

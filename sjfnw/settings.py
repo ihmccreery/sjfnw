@@ -17,7 +17,7 @@ INSTALLED_APPS = [
   'sjfnw.grants',
   'sjfnw.fund',
   'sjfnw.support',
-  'pytz',
+  'libs.pytz',
 ]
 
 if (os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine') or os.getenv('SETTINGS_MODE') == 'prod'):

@@ -14,7 +14,7 @@ from django.utils.html import strip_tags
 
 from google.appengine.ext import blobstore, deferred
 
-import unicodecsv
+from libs import unicodecsv
 
 from sjfnw import constants
 from sjfnw.fund.models import Member

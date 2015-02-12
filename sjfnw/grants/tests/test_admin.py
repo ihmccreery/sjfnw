@@ -8,7 +8,7 @@ from sjfnw.grants.forms import AppReportForm, AwardReportForm, OrgReportForm
 from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
 
-import unicodecsv
+from libs import unicodecsv
 
 import logging, unittest
 logger = logging.getLogger('sjfnw')
