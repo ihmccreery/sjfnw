@@ -2,9 +2,11 @@
 branch = true
 source = sjfnw
 omit =
-  sjfnw/wsgi.py
+  sjfnw/constants.py
   sjfnw/mail.py
-  */tests.py
+  sjfnw/settings.py
+  sjfnw/wsgi.py
+  *tests*
   *__init__.py
   *commands/*
 
