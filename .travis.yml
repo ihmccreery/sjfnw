@@ -26,5 +26,4 @@ before_script:
 # script to run tests
 script: ./scripts/coverage.sh
 
-after_script:
-  coveralls
+after_script: coveralls
