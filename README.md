@@ -153,11 +153,20 @@ Configuration
 
 ## Git workflow
 
-- `master` represents code that is in production.
-- `develop` is the main integration branch. _(When there is long term work and/or more than one dev)_
-- Short-lived branches should be created and then merged into develop.
-- Generally aim for small commits with descriptive summaries.
-- [Link issues](https://help.github.com/articles/closing-issues-via-commit-messages/) in your commit descriptions when applicable.
+Branches
+- `master` represents code that is production-ready
+- `develop` is the main integration branch, so we can make sure our changes work together before pushing them to `master`
+- When working on a feature/change, create a new branch based off of `develop`:
+```
+  git checkout develop
+  git pull
+  git checkout -b new-feature
+```
+
+Commits
+- Try to keep commits pretty granular
+- First line should be a short overview of the changes
+- Use the commit body to give more detail and/or [link issues](https://help.github.com/articles/closing-issues-via-commit-messages/) if applicable
 
 See [this post](http://nvie.com/posts/a-successful-git-branching-model/) for more details on the general git branching model we're going for.
 
@@ -204,6 +213,7 @@ I recommend 1 because it fits nicely into git workflow and makes it very easy to
 ## References
 
 - [Git](http://git-scm.com/docs)
+  - Has links to a good cheatsheet and an interactive intro to git
 - [Django](https://docs.djangoproject.com/en/1.5/)
   - Note: If you google something you'll often wind up at the most recent docs. Make sure you're looking at the docs version that matches our current Django version (currently 1.5)
 - [Python](https://docs.python.org/2/library/index.html)
@@ -216,4 +226,3 @@ I recommend 1 because it fits nicely into git workflow and makes it very easy to
 - [CSS properties reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
 - [HTML guide](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML)
 - [Intro to HTTP and REST](http://code.tutsplus.com/tutorials/a-beginners-guide-to-http-and-rest--net-16340)
-
