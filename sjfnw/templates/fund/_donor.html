@@ -5,11 +5,17 @@
 <div class="donor indent" id="donor-{{ pk }}">
 
   {# name - click to toggle display of details #}
-  <a class="{% if d.donor.promised != None %}promised{% endif %}"
-     onclick="toggle('details-{{ pk }}', 'donor-{{ pk }}')">
-    <b>{{ d.donor.firstname }} {{ d.donor.lastname }}</b>
-  </a>
-  <br>
+  <div>
+    <a onclick="toggle('details-{{ pk }}', 'donor-{{ pk }}')">
+      <b>{{ d.donor.firstname }} {{ d.donor.lastname }}</b>
+    </a>
+    {% if d.summary %}
+      <div class="edit_done">
+        <i id="checkmark"></i>
+        {{ d.summary }}
+      </div>
+    {% endif %}
+  </div>
 
   {% if d.next_step %}
     <div id="{{ pk }}-nextstep">
@@ -37,18 +43,6 @@
       {% if d.donor.promised == None and d.donor.received == 0 %}
         {# link to add a step #}
         No next step. <a onclick="loadView('/fund/{{ pk }}/step', '{{ pk }}-addstep')">Add one.</a>
-      {% else %}
-        {# summary of response #}
-        <img src="/static/images/check.png" alt="complete checkmark">Asked.
-        {% if d.donor.received %}
-          ${{ d.donor.received|intcomma }} received by SJF.
-        {% elif d.donor.promised != None %}
-          {% if d.donor.promised > 0 %}
-            Promised ${{ d.donor.promised|intcomma }}.
-          {% else %}
-            Declined to donate.
-          {% endif %}
-        {% endif %}
       {% endif %}
     </div>
 
@@ -122,7 +116,7 @@
         <tr>
           <td>
             Completed steps:
-            {% if d.donor.promised != None and not d.next_step %}
+            {% if not d.next_step %}
               <br>
               [<a onclick="loadView('/fund/{{ pk }}/step', '{{ pk }}-addstep')">add step</a>]
             {% endif %}
