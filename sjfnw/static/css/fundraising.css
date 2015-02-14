@@ -173,6 +173,7 @@ div.donor {
   border: 1px solid;
   border-color:#FFF;
 	border-radius:8px;
+  line-height: 1.25em;
 }
 
 div.donor_delete {
@@ -181,6 +182,11 @@ div.donor_delete {
 
 div.edit_done {
 	float:right;
+}
+
+#checkmark {
+  width: 12px;
+  content: url('/static/images/check.png');
 }
 
 a.edit_done {

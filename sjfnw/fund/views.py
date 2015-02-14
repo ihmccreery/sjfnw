@@ -145,19 +145,27 @@ def _compile_membership_progress(donors):
   for donor in donors:
     donor_data[donor.pk] = {'donor': donor, 'complete_steps': [],
                             'next_step': False, 'next_date': empty_date,
-                            'overdue': False}
+                            'overdue': False, 'summary': ''}
     progress['estimated'] += donor.estimated()
     if donor.asked:
       progress['asked'] += 1
       donor_data[donor.pk]['next_date'] = datetime.date(2600, 1, 1)
+      donor_data[donor.pk]['summary'] = 'Asked. '
     elif donor.talked:
       progress['talked'] += 1
     if donor.received() > 0:
       progress['received'] += donor.received()
       donor_data[donor.pk]['next_date'] = datetime.date(2800, 1, 1)
+      donor_data[donor.pk]['summary'] += ' $%s received by SJF.' % intcomma(donor.received())
     elif donor.promised:
       progress['promised'] += donor.promised
       donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
+      donor_data[donor.pk]['summary'] += ' Promised $%s.' % intcomma(donor.promised)
+    elif donor.asked:
+      if donor.promised == 0:
+        donor_data[donor.pk]['summary'] += ' Declined to donate.'
+      else:
+        donor_data[donor.pk]['summary'] += ' Awaiting response.'
 
   progress = _compile_membership_chart_data(progress)
 
@@ -217,6 +225,7 @@ def project_page(request):
   donors = list(models.Donor.objects.filter(membership__giving_project=project))
   progress['contacts'] = len(donors)
   for donor in donors:
+    donor.summary = []
     if donor.asked:
       progress['asked'] += 1
     elif donor.talked:
