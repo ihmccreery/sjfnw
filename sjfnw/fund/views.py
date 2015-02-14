@@ -48,9 +48,6 @@ def home(request):
     Url param can trigger display of a form on a specific donor/step
   """
 
-  logger.info('help')
-  req_logger = logging.getLogger('django.request')
-  logger.info(req_logger.handlers)
   membership = request.membership
 
   # check if there's a survey to fill out
