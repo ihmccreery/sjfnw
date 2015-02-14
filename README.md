@@ -218,9 +218,11 @@ When previewing or creating a pull request, there will be icons next to some com
 
 https://coveralls.io/r/aisapatino/sjfnw
 
-This project needs better test coverage and coveralls is a tool for tracking test coverage over time. When travis runs tests, it reports the coverage results and they're recorded at the link above.
+Tool for tracking test coverage over time. When Travis runs tests, it reports the coverage results and they're recorded at the link above. You can click on a commit to see a breakdown by file, and click on a file to see line-by-line coverage.
 
 Coveralls is configured to leave a comment on every pull request with the change in code coverage.
+
+_Note: Coveralls is currently very slow to update, so if you see "no data" or your PR status stays at pending, that's probably why._
 
 ## Deploying
 
