@@ -1,4 +1,4 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}- Project Central{% endblock %}
 
@@ -9,7 +9,7 @@
 {% block script %}
   {{ block.super }}
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
-  <!--google analytics -->
+  {# google analytics #}
   <script type="text/javascript">
     var _gaq = _gaq || [];
     _gaq.push(['_setAccount', 'UA-28076150-2']);
@@ -30,15 +30,12 @@
 {% endblock script %}
 
 {% block body %}
-  <!-- HEADER -->
-  <table class="header"><tr>
-    <td style="width:161px;">
-      <div align="center" style="padding-bottom:5px;">
-        <a href="/fund"><img src="/static/images/logo2.png" alt="Project Central logo" height=80 width=160></a>
-      </div>
-    </td>
+  <div class="center" id="header">
+    <div id="logo">
+      <a href="/fund"><img src="/static/images/logo2.png" alt="Project Central logo"></a>
+    </div>
     {% block header %}{% endblock header %}
-  </tr></table>
+  </div>
   {% block top %}{% endblock %}<!-- TOP BLOCKS -->
   <div class="content_area">
     {% block content %}{% endblock %}<!-- CONTENT -->
@@ -48,4 +45,3 @@
     <a href="http://socialjusticefund.org" target="_blank">socialjusticefund.org</a>
   </div>
 {% endblock body %}
-
