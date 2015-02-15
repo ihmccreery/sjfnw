@@ -1,4 +1,5 @@
 # pylint: disable=wildcard-import,relative-import
+from test_add_estimates import *
 from test_copy_contacts import *
 from test_grants import *
 from test_models import *
