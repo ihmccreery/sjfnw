@@ -62,7 +62,7 @@ class MassDonorPre(forms.Form):
 
 class MassDonor(MassDonorPre):
   amount = IntegerCommaField(label='*Estimated donation ($)',
-                             min_value=1,
+                             min_value=0,
                              widget=forms.TextInput(attrs={'class':'tq'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
                                   min_value=0, max_value=100,
@@ -73,7 +73,7 @@ class DonorEstimates(forms.Form):
   donor = forms.ModelChoiceField(queryset=models.Donor.objects.all(),
                                  widget=forms.HiddenInput())
   amount = IntegerCommaField(label='*Estimated donation ($)',
-                             min_value=1,
+                             min_value=0,
                              widget=forms.TextInput(attrs={'class':'tq'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
                                   min_value=0, max_value=100,
