@@ -3,7 +3,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.grants import models
 from sjfnw.grants.tests.base import BaseGrantTestCase
 
@@ -11,7 +10,7 @@ from datetime import timedelta
 import json, unittest, logging
 logger = logging.getLogger('sjfnw')
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
+
 class YearEndReportForm(BaseGrantTestCase):
   """ Test functionality related to the YER form:
       Views that handle autosave, file upload, submission
@@ -165,7 +164,7 @@ class YearEndReportForm(BaseGrantTestCase):
 
     self.test_start_report()
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
+
 class YearEndReportReminders(BaseGrantTestCase):
   """ Test reminder email functionality """
 

@@ -3,7 +3,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.grants.forms import AppReportForm, AwardReportForm, OrgReportForm
 from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
@@ -14,7 +13,6 @@ import logging, unittest
 logger = logging.getLogger('sjfnw')
 
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class Reporting(BaseGrantTestCase):
   """ Admin reporting on applications, awards and organizations
 
@@ -314,7 +312,6 @@ class Reporting(BaseGrantTestCase):
     self.assertEqual(0, len(results))
 
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class AdminInlines(BaseGrantTestCase):
   """ Verify basic display of related inlines for grants objects in admin """
 
@@ -374,7 +371,6 @@ class AdminInlines(BaseGrantTestCase):
     self.assertContains(response, papp.screening_status)
 
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class AdminRevert(BaseGrantTestCase):
 
   def setUp(self):
@@ -405,7 +401,6 @@ class AdminRevert(BaseGrantTestCase):
     self.assert_draft_matches_app(draft, app)
 
 @unittest.skip('Incomplete')
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class AdminRollover(BaseGrantTestCase):
 
   def setUp(self):

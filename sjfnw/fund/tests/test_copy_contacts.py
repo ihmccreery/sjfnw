@@ -1,7 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
 
@@ -9,8 +8,6 @@ import logging, json
 logger = logging.getLogger('sjfnw')
 
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE,
-    PASSWORD_HASHERS = ('django.contrib.auth.hashers.MD5PasswordHasher',))
 class CopyContacts(BaseFundTestCase):
   """ Test copy_contacts view """
 

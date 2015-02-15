@@ -2,7 +2,6 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
@@ -11,7 +10,6 @@ import json, logging
 logger = logging.getLogger('sjfnw')
 
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class OrgHomeAwards(BaseGrantTestCase):
   """ Verify that correct data is showing on the org home page """
 
@@ -53,7 +51,6 @@ class OrgHomeAwards(BaseGrantTestCase):
     self.assertTemplateUsed(response, self.template)
     self.assertContains(response, 'Agreement mailed')
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class OrgRollover(BaseGrantTestCase):
   """ Basic success
   content,   timeline,   files,   not extra cycle q   """
