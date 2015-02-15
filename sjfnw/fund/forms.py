@@ -1,4 +1,4 @@
-﻿from django import forms
+from django import forms
 from django.core import validators
 from django.utils import timezone
 from sjfnw.forms import IntegerCommaField
@@ -62,9 +62,10 @@ class MassDonorPre(forms.Form):
 
 class MassDonor(MassDonorPre):
   amount = IntegerCommaField(label='*Estimated donation ($)',
+                             min_value=0,
                              widget=forms.TextInput(attrs={'class':'tq'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
-                                  validators=[validators.MaxValueValidator(100)],
+                                  min_value=0, max_value=100,
                                   widget=forms.TextInput(attrs={'class':'half'}))
 
 
@@ -72,9 +73,10 @@ class DonorEstimates(forms.Form):
   donor = forms.ModelChoiceField(queryset=models.Donor.objects.all(),
                                  widget=forms.HiddenInput())
   amount = IntegerCommaField(label='*Estimated donation ($)',
+                             min_value=0,
                              widget=forms.TextInput(attrs={'class':'tq'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
-                                  validators=[validators.MaxValueValidator(100)],
+                                  min_value=0, max_value=100,
                                   widget=forms.TextInput(attrs={'class':'half'}))
 
 
