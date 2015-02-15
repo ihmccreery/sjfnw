@@ -1,6 +1,5 @@
 from django.test.utils import override_settings
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
@@ -8,8 +7,6 @@ import logging
 logger = logging.getLogger('sjfnw')
 
 
-
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class ViewGrantPermissions(BaseGrantTestCase):
 
   fixtures = ['sjfnw/grants/fixtures/test_grants.json', 'sjfnw/fund/fixtures/test_fund.json']

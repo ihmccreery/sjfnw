@@ -2,7 +2,6 @@ from django.core import mail
 from django.test.utils import override_settings
 from django.utils import timezone
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
@@ -11,7 +10,6 @@ import json, unittest, logging
 logger = logging.getLogger('sjfnw')
 
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class DraftExtension(BaseGrantTestCase):
 
   def setUp(self):
@@ -37,7 +35,6 @@ class DraftExtension(BaseGrantTestCase):
   def test_org_drafts_list(self):
     pass
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class Draft(BaseGrantTestCase):
 
   def setUp(self):
@@ -63,8 +60,6 @@ class Draft(BaseGrantTestCase):
     self.assertEqual(json.loads(complete_draft.contents), new_c)
 
 
-
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class DraftWarning(BaseGrantTestCase):
 
   def setUp(self):

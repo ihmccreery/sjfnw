@@ -11,8 +11,6 @@ GRANT_SUPPORT_FORM = 'https://docs.google.com/forms/d/1SKjXMmDgXeM0IFp0yiJTJgLt6
 SUPPORT_EMAIL = 'techsupport@socialjusticefund.org' #displayed on support page
 SUPPORT_FORM_URL = 'https://docs.google.com/spreadsheet/viewform?formkey=dHZ2cllsc044U2dDQkx1b2s4TExzWUE6MQ'
 
-TEST_MIDDLEWARE = ('django.middleware.common.CommonMiddleware', 'django.contrib.sessions.middleware.SessionMiddleware', 'django.contrib.auth.middleware.AuthenticationMiddleware', 'django.contrib.messages.middleware.MessageMiddleware', 'sjfnw.fund.middleware.MembershipMiddleware',)
-
 ALLOWED_FILE_TYPES = ('jpeg', 'jpg', 'png', 'gif', 'bmp', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'txt')
 PHOTO_FILE_TYPES = ['jpeg', 'jpg', 'png', 'gif', 'bmp']
 VIEWER_FORMATS = ('doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf', 'mpeg4', 'mov', 'avi', 'wmv')

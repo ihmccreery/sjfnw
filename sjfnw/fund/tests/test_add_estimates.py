@@ -3,14 +3,11 @@ import logging
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
 
-@override_settings(MIDDLEWARE_CLASSES=TEST_MIDDLEWARE,
-    PASSWORD_HASHERS=('django.contrib.auth.hashers.MD5PasswordHasher',))
 class AddEstimates(BaseFundTestCase):
 
   get_url = reverse('sjfnw.fund.views.home')

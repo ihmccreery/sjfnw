@@ -2,7 +2,6 @@ from django.test.utils import override_settings
 
 from google.appengine.ext import testbed
 
-from sjfnw.constants import TEST_MIDDLEWARE
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
@@ -42,9 +41,9 @@ def alter_draft_files(draft, files_dict):
   draft.save()
 
 
-@override_settings(DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage',
-    FILE_UPLOAD_HANDLERS = ('django.core.files.uploadhandler.MemoryFileUploadHandler',),
-    MIDDLEWARE_CLASSES = TEST_MIDDLEWARE, MEDIA_ROOT = 'sjfnw/grants/tests/media/')
+@override_settings(MEDIA_ROOT='sjfnw/grants/tests/media/',
+    DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage',
+    FILE_UPLOAD_HANDLERS=('django.core.files.uploadhandler.MemoryFileUploadHandler',))
 class ApplySuccessful(BaseGrantFilesTestCase):
 
   org_id = 2
@@ -144,7 +143,6 @@ class ApplySuccessful(BaseGrantFilesTestCase):
     self.assertEqual(draft_contents['mission'], org.mission)
 
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
 class ApplyBlocked(BaseGrantTestCase):
 
   def setUp(self):
@@ -171,7 +169,7 @@ class ApplyBlocked(BaseGrantTestCase):
     response = self.client.get('/apply/79/')
     self.assertEqual(404, response.status_code)
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
+
 class ApplyValidation(BaseGrantFilesTestCase):
   """TO DO
       fiscal
@@ -234,7 +232,7 @@ class ApplyValidation(BaseGrantFilesTestCase):
     response = self.client.post('/apply/%d/' % self.cycle_id, follow=True)
     self.assertFormError(response, 'form', 'timeline', '<div class="form_error">This field is required.</div>')
 
-@override_settings(MIDDLEWARE_CLASSES = TEST_MIDDLEWARE)
+
 class StartApplication(BaseGrantTestCase):
 
   def test_load_first_app(self):
