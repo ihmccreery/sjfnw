@@ -57,15 +57,19 @@ class AddMultipleDonorsPre(BaseFundTestCase):
 
     donors = models.Donor.objects.filter(membership_id=self.pre_id).order_by('firstname')
     self.assertEqual(len(donors), 2)
+
     self.assertEqual(donors[0].firstname, u'First')
     self.assertEqual(donors[0].lastname, u'')
+
     self.assertEqual(donors[1].firstname, u'Seattle')
-    self.assertEqual(donors[1].firstname, u'Washington')
+    self.assertEqual(donors[1].lastname, u'Washington')
 
   def test_post_multiple_invalid(self):
     self.form_data['form-0-lastname'] = u'Last'
+
     self.form_data['form-1-firstname'] = u'Seattle'
     self.form_data['form-1-lastname'] = u'Washington'
+
     self.form_data['form-3-lastname'] = u'Smith'
 
     response = self.client.post(self.url, self.form_data, follow=True)
