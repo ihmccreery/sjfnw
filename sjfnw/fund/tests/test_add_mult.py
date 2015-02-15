@@ -3,11 +3,10 @@
 from django.core.urlresolvers import reverse
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 class AddMultipleDonorsPre(BaseFundTestCase):
   
-  fixtures = TEST_FIXTURE
   url = reverse('sjfnw.fund.views.add_mult')
 
   def setUp(self):
@@ -87,7 +86,6 @@ class AddMultipleDonorsPre(BaseFundTestCase):
 
 class AddMultipleDonorsPost(BaseFundTestCase):
   
-  fixtures = TEST_FIXTURE
   url = reverse('sjfnw.fund.views.add_mult')
 
   def setUp(self):

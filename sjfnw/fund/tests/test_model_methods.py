@@ -1,5 +1,5 @@
 from sjfnw.fund.models import GivingProject
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 class GetSuggestedSteps(BaseFundTestCase):
 
@@ -39,5 +39,4 @@ class GetSuggestedSteps(BaseFundTestCase):
     self.assertEqual(suggested[0], 'Talk to person')
     self.assertEqual(suggested[1], 'Invite them to a thing')
     self.assertEqual(suggested[2], 'Thanks!!')
-
 

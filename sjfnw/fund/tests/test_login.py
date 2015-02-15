@@ -1,13 +1,12 @@
+import unittest
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-import unittest
-
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 class Login(BaseFundTestCase):
 
-  fixtures = TEST_FIXTURE
   url = reverse('sjfnw.fund.views.fund_login')
 
   def setUp(self):

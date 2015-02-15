@@ -5,7 +5,7 @@ from django.test.utils import override_settings
 from django.utils import timezone
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 import logging, json
 logger = logging.getLogger('sjfnw')
@@ -13,7 +13,6 @@ logger = logging.getLogger('sjfnw')
 class GPSurveys(BaseFundTestCase):
   """ Test GP eval surveys creation, display, responses """
 
-  fixtures = TEST_FIXTURE
   url = reverse('sjfnw.fund.views.home')
   template = 'fund/fill_gp_survey.html'
 

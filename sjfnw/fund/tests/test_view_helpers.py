@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 from sjfnw.fund import models
 from sjfnw.fund.views import _create_user, _create_membership, _compile_membership_progress
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
 TEST_EMAIL = 'testemail124@gmail.com'
@@ -94,8 +94,6 @@ class CreateMembership(BaseFundTestCase):
 
 class CompileMembershipProgress(BaseFundTestCase):
 
-  fixtures = TEST_FIXTURE
-
   def setUp(self):
     super(CompileMembershipProgress, self).setUp()
 
@@ -142,3 +140,4 @@ class CompileMembershipProgress(BaseFundTestCase):
     donor_data, progress = _compile_membership_progress(donors)
     logger.info(donor_data)
     logger.info(progress)
+    # TODO finish this test

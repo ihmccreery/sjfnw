@@ -5,15 +5,13 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
 
 class Home(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.home')
-
-  fixtures = TEST_FIXTURE
 
   def setUp(self):
     super(Home, self).setUp()
@@ -133,8 +131,6 @@ class Home(BaseFundTestCase):
 class HomeSurveys(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.home')
-
-  fixtures = TEST_FIXTURE
 
   def setUp(self):
     super(HomeSurveys, self).setUp()
