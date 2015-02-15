@@ -48,9 +48,6 @@ def home(request):
     Url param can trigger display of a form on a specific donor/step
   """
 
-  logger.info('help')
-  req_logger = logging.getLogger('django.request')
-  logger.info(req_logger.handlers)
   membership = request.membership
 
   # check if there's a survey to fill out
@@ -76,10 +73,10 @@ def home(request):
         return redirect(copy_contacts)
     return redirect(add_mult)
 
-    # check whether to redirect to add estimates
-    if (membership.giving_project.require_estimates() and
-        donors.filter(amount__isnull=True)):
-      return redirect(add_estimates)
+  # check whether to redirect to add estimates
+  if (membership.giving_project.require_estimates() and
+      donors.filter(amount__isnull=True)):
+    return redirect(add_estimates)
 
   # from here we know we're not redirecting
 
@@ -87,7 +84,6 @@ def home(request):
   news, grants = _get_block_content(membership, get_steps=False)
   header = membership.giving_project.title
 
-  logger.info(donors)
   donor_data, progress = _compile_membership_progress(donors)
 
   notif = membership.notifications # TODO replace with messages
@@ -690,15 +686,16 @@ def add_mult(request):
 @login_required(login_url='/fund/login/')
 @approved_membership()
 def add_estimates(request):
-  initiald = [] # list of dicts for form initial
-  dlist = [] # list of donors for zipping to formset
   membership = request.membership
 
+  initial_form_data = []
+  donor_names = [] # to display with forms (which only have pks)
+
   # get all donors without estimates
-  for donor in membership.donor_set.all():
-    if not donor.amount:
-      initiald.append({'donor': donor})
-      dlist.append(donor)
+  for donor in membership.donor_set.filter(amount__isnull=True):
+    initial_form_data.append({'donor': donor})
+    donor_names.append(unicode(donor))
+
   # create formset
   est_formset = formset_factory(forms.DonorEstimates, extra=0)
 
@@ -707,27 +704,32 @@ def add_estimates(request):
     membership.save(skip=True)
     formset = est_formset(request.POST)
     logger.debug('Adding estimates - posted: ' + str(request.POST))
+
     if formset.is_valid():
       logger.debug('Adding estimates - is_valid passed, cycling through forms')
       for form in formset.cleaned_data:
         if form:
-          current = form['donor']
-          current.amount = form['amount']
-          current.likelihood = form['likelihood']
-          current.save()
+          donor = form['donor']
+          donor.amount = form['amount']
+          donor.likelihood = form['likelihood']
+          donor.save()
       return HttpResponse("success")
+
     else: # invalid form
-      fd = zip(formset, dlist)
-      return render(request, 'fund/add_estimates.html',
-                {'formset': formset, 'fd': fd})
+      fd = zip(formset, donor_names)
+      return render(request, 'fund/add_estimates.html', {
+        'formset': formset, 'fd': fd
+      })
+
   else: # GET
-    formset = est_formset(initial=initiald)
+    formset = est_formset(initial=initial_form_data)
     logger.info('Adding estimates - loading initial formset, size ' +
-                 str(len(dlist)))
+                 str(len(donor_names)))
+
     # get vars for base templates
     steps, news, grants = _get_block_content(membership)
 
-    fd = zip(formset, dlist)
+    fd = zip(formset, donor_names)
     return render(request, 'fund/add_estimates.html', {
       'news': news, 'grants': grants, 'steps': steps,
       '1active': 'true', 'formset': formset, 'fd': fd
@@ -846,7 +848,7 @@ def add_step(request, donor_id):
 @login_required(login_url='/fund/login/')
 @approved_membership()
 def add_mult_step(request):
-  initiald = [] # list of dicts for form initial
+  initial_form_data = [] # list of dicts for form initial
   dlist = [] # list of donors for zipping to formset
   size = 0
   membership = request.membership
@@ -854,7 +856,7 @@ def add_mult_step(request):
 
   for donor in membership.donor_set.order_by('-added'): # sort by added
     if (donor.received() == 0 and donor.promised is None and donor.get_next_step() is None):
-      initiald.append({'donor': donor})
+      initial_form_data.append({'donor': donor})
       dlist.append(donor)
       size = size +1
     if size > 9:
@@ -877,7 +879,7 @@ def add_mult_step(request):
     else:
       logger.info('Multiple steps invalid')
   else:
-    formset = step_formset(initial=initiald)
+    formset = step_formset(initial=initial_form_data)
     logger.info('Multiple steps - loading initial formset, size ' + str(size) +
                  ': ' +str(dlist))
   fd = zip(formset, dlist)
