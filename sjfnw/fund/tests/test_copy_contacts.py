@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 import logging, json
 logger = logging.getLogger('sjfnw')
@@ -10,8 +10,6 @@ logger = logging.getLogger('sjfnw')
 
 class CopyContacts(BaseFundTestCase):
   """ Test copy_contacts view """
-
-  fixtures = TEST_FIXTURE
 
   get_url = reverse('sjfnw.fund.views.home')
   post_url = reverse('sjfnw.fund.views.copy_contacts')

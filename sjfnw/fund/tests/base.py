@@ -1,34 +1,21 @@
+from datetime import timedelta
+import logging
+
 from django.utils import timezone
 
 from sjfnw.fund import models
 from sjfnw.grants.models import ProjectApp
 from sjfnw.tests import BaseTestCase
 
-from datetime import timedelta
-import logging
 logger = logging.getLogger('sjfnw')
 
 
-BASE_FIXTURES = ['sjfnw/fund/fixtures/live_gp_dump.json',
-                 'sjfnw/fund/fixtures/live_member_dump.json',
-                 'sjfnw/fund/fixtures/live_membership_dump.json',
-                 'sjfnw/fund/fixtures/live_donor_dump.json']
-STEPS_FIXTURE = ['sjfnw/fund/fixtures/live_step_dump.json']
-TEST_FIXTURE = ['sjfnw/fund/fixtures/testy.json']
-
-
 class BaseFundTestCase(BaseTestCase):
-  """ Base test case for fundraising tests
+  """ Base test case for fundraising tests """
 
-  Defines:
-    Fixtures (all live dumps)
-    setUp
-      handles logins based on string passed in
-      sets project dates
-  """
+  fixtures = ['sjfnw/fund/fixtures/testy.json']
 
   def setUp(self):
-    logger.info('BaseFundTestCase setUp')
     self.create_projects()
 
   def use_test_acct(self):
@@ -55,7 +42,7 @@ class BaseFundTestCase(BaseTestCase):
     gp.save()
 
   def create_test(self):
-    """ Creates testy membership in Post. Should be run after loading fixtures """
+    """ Creates testy membership in Post """
     post = models.GivingProject.objects.get(title="Post training")
     ship = models.Membership(giving_project=post, member_id=1, approved=True)
     ship.save()

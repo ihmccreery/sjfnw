@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 import logging, json, unittest
 logger = logging.getLogger('sjfnw')

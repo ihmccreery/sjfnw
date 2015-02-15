@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 import logging, json, unittest
 logger = logging.getLogger('sjfnw')
@@ -11,8 +11,6 @@ logger = logging.getLogger('sjfnw')
 class GivingProjectPage(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.project_page')
-
-  fixtures = TEST_FIXTURE
 
   def setUp(self):
     super(GivingProjectPage, self).setUp()

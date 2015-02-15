@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 from sjfnw.grants.models import ProjectApp
 
 import logging
@@ -11,11 +11,13 @@ logger = logging.getLogger('sjfnw')
 class Grants(BaseFundTestCase):
   """ Grants listing page """
 
-  fixtures = TEST_FIXTURE + ['sjfnw/fund/fixtures/live_gp_dump.json',
-                             'sjfnw/grants/fixtures/orgs.json',
-                             'sjfnw/grants/fixtures/grant_cycles.json',
-                             'sjfnw/grants/fixtures/apps.json',
-                             'sjfnw/grants/fixtures/project_apps.json']
+  fixtures = ['sjfnw/fund/fixtures/testy.json',
+              'sjfnw/fund/fixtures/live_gp_dump.json',
+              'sjfnw/grants/fixtures/orgs.json',
+              'sjfnw/grants/fixtures/grant_cycles.json',
+              'sjfnw/grants/fixtures/apps.json',
+              'sjfnw/grants/fixtures/project_apps.json']
+
   url = reverse('sjfnw.fund.views.grant_list')
 
   def setUp(self):

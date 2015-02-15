@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.fund import models
-from sjfnw.fund.tests.base import BaseFundTestCase, TEST_FIXTURE
+from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
 
@@ -22,8 +22,6 @@ class StepComplete(BaseFundTestCase):
   3) next step
     a) validation
     b) creation """
-
-  fixtures = TEST_FIXTURE
 
   def setUp(self):
     logger.info('BaseFundTestCase setUp')
