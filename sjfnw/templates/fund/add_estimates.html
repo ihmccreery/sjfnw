@@ -5,26 +5,26 @@
   <p>Example: You want to ask Jill for $500 and you think it's pretty likely they will give: Ask ($500) x Likelihood (75%) = Fundraising Goal ($375)</p>
   <div align="center">
     <form method="post" id="add_estimates">
-    <table class="form" style="width:460px;">
-      <tr align="center">
-        <td></td>
-        <td>Amount to ask</td>
-        <td>Likelihood</td>
-      </tr>
-      {{ formset.management_form }}
-      {% for form, d in fd %}
+      <table class="form" style="width:460px;">
         <tr align="center">
-          <td>{{form.donor.errors}}</td>
-          <td>{{form.amount.errors}}</td>
-          <td>{{form.likelihood.errors}}</td>
+          <td></td>
+          <td>Amount to ask</td>
+          <td>Likelihood</td>
         </tr>
-        <tr align="center">
-          <td>{{form.donor}}{{d}}</td>
-          <td>${{form.amount}}</td>
-          <td>{{form.likelihood}}%</td>
-        </tr>
-    {% endfor %}
-    </table>
+        {{ formset.management_form }}
+        {% for form, donor_name in fd %}
+          <tr align="center">
+            <td>{{ form.donor.errors }}</td>
+            <td>{{ form.amount.errors }}</td>
+            <td>{{ form.likelihood.errors }}</td>
+          </tr>
+          <tr align="center">
+            <td>{{ form.donor }}{{ donor_name }}</td>
+            <td>${{ form.amount }}</td>
+            <td>{{ form.likelihood }}%</td>
+          </tr>
+      {% endfor %}
+      </table>
     </form>
 		<img id = "ajax_loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
     <button onclick="Submit('/fund/add-estimates', '#add_estimates', 'estimates')">Save</button><button onclick="location.href='/fund/'">Cancel</button>
