@@ -241,10 +241,11 @@ I recommend 1 because it fits nicely into git workflow and makes it very easy to
   - Note: If you google something you'll often wind up at the most recent docs. Make sure you're looking at the docs version that matches our current Django version (currently 1.5)
 - [Python](https://docs.python.org/2/library/index.html)
   - [Regular expressions](http://doc.pyschools.com/html/regex.html)
-- Google App Engine (TODO)
-  - Note: much of the GAE python docs don't apply when using Django
-- MySQL (TODO)
-  - CloudSQL is basically a hosted MySQL with some restrictions.
+- [Google App Engine](https://cloud.google.com/appengine/docs/python/)
+  - Note: Those docs don't apply to this project in many cases since we use Django
+  - [app.yaml](https://cloud.google.com/appengine/docs/python/config/appconfig) is the GAE app config file
+  - The project's [cron tasks](https://cloud.google.com/appengine/docs/python/config/cron) use GAE
+- [MySQL reference/tutorial](http://sqlzoo.net/wiki/Main_Page)
 - [Intro to CSS](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Getting_started)
 - [CSS properties reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
 - [HTML guide](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML)
