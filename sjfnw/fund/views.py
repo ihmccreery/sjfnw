@@ -18,7 +18,7 @@ from sjfnw import constants as c
 from sjfnw.grants.models import Organization, GrantApplication, ProjectApp
 
 from sjfnw.fund.decorators import approved_membership
-from sjfnw.fund import forms, modelforms, models, utils
+from sjfnw.fund import forms, modelforms, models
 
 import datetime, logging, os, json
 
@@ -599,40 +599,49 @@ def copy_contacts(request):
 @login_required(login_url='/fund/login/')
 @approved_membership()
 def add_mult(request):
-  """ Add multiple contacts
-  GET is via redirect from home, and should render top blocks as well as form
+  """ Add multiple contacts, with or without estimates
 
-  POST will be via AJAX and does not need block info
-  (template extends only when not ajax)
+    If a user enters duplicates (same first & last name), they'll get a
+      confirmation form before donors are saved
+
+    GET is via redirect from home, and should render top blocks as well as form
+    POST will be via AJAX and does not need block info
   """
-
   membership = request.membership
 
-  est = membership.giving_project.require_estimates() # showing estimates t/f
+  est = membership.giving_project.require_estimates()
   if est:
     contact_formset = formset_factory(forms.MassDonor, extra=5)
   else:
     contact_formset = formset_factory(forms.MassDonorPre, extra=5)
+
   empty_error = ''
 
   if request.method == 'POST':
     membership.last_activity = timezone.now()
     membership.save()
+
     formset = contact_formset(request.POST)
+
     if formset.is_valid():
+
       if formset.has_changed():
         logger.info('AddMult valid formset')
-        # count = 0
+
+        # get list of existing donors to check for duplicates
         donors = models.Donor.objects.filter(membership=membership)
-        donors = [donor.firstname + ' ' + donor.lastname for donor in donors]
+        donors = [unicode(donor) for donor in donors]
         duplicates = []
+
         for form in formset.cleaned_data:
-          if form:
+          if form: # ignore blank rows
             confirm = form['confirm'] and form['confirm'] == '1'
+
             if not confirm and (form['firstname'] + ' ' + form['lastname'] in donors):
-              initial = {'confirm': u'1',
-                         'firstname': form['firstname'],
-                         'lastname': form['lastname']}
+              # this entry is a duplicate that has not yet been confirmed
+              initial = {'firstname': form['firstname'],
+                         'lastname': form['lastname'],
+                         'confirm': u'1'}
               if est:
                 initial['amount'] = form['amount']
                 initial['likelihood'] = form['likelihood']
@@ -640,17 +649,15 @@ def add_mult(request):
 
             else: # not a duplicate
               if est:
-                contact = models.Donor(firstname = form['firstname'],
-                                       lastname= form['lastname'],
-                                       amount= form['amount'],
-                                       likelihood= form['likelihood'],
-                                       membership = membership)
+                contact = models.Donor(membership = membership,
+                    firstname = form['firstname'], lastname= form['lastname'],
+                    amount= form['amount'], likelihood= form['likelihood'])
               else:
-                contact = models.Donor(firstname = form['firstname'],
-                                       lastname= form['lastname'],
-                                       membership = membership)
+                contact = models.Donor( membership = membership,
+                    firstname = form['firstname'], lastname= form['lastname'])
               contact.save()
               logger.info('contact created')
+
         if duplicates:
           logger.info('Showing confirmation page for duplicates: ' + str(duplicates))
           empty_error = '<ul class="errorlist"><li>The contacts below have the same name as contacts you have already entered. Press submit again to confirm that you want to add them.</li></ul>'
@@ -659,13 +666,14 @@ def add_mult(request):
           else:
             contact_formset = formset_factory(forms.MassDonorPre)
           formset = contact_formset(initial=duplicates)
-          return render(request, 'fund/add_mult_flex.html',
-                  {'formset': formset, 'empty_error': empty_error})
-        else:
+
+        else: # saved successfully (no duplicates check needed)
           return HttpResponse("success")
+
       else: # empty formset
         empty_error = u'<ul class="errorlist"><li>Please enter at least one contact.</li></ul>'
-    else: # invalid
+
+    else: # invalid formset
       logger.info(formset.errors)
 
     return render(request, 'fund/add_mult_flex.html', {
