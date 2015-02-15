@@ -182,7 +182,6 @@ class AddMultipleDonorsPost(BaseFundTestCase):
     errors = response.context['formset'].errors
 
     self.assertRegexpMatches(errors[0]['firstname'][0], 'required')
-    self.assertRegexpMatches(errors[0]['amount'][0], 'greater than')
     self.assertRegexpMatches(errors[0]['likelihood'][0], 'required')
 
     self.assertRegexpMatches(errors[1]['likelihood'][0], 'less than')
