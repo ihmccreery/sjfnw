@@ -274,19 +274,20 @@ def fund_login(request):
   error_msg = ''
   if request.method == 'POST':
     form = forms.LoginForm(request.POST)
-    username = request.POST['email'].lower()
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user:
-      if user.is_active:
-        login(request, user)
-        return redirect(home)
+    if form.is_valid():
+      username = request.POST['email'].lower()
+      password = request.POST['password']
+      user = authenticate(username=username, password=password)
+      if user:
+        if user.is_active:
+          login(request, user)
+          return redirect(home)
+        else:
+          error_msg = 'Your account is not active.  Contact an administrator.'
+          logger.warning("Inactive account tried to log in. Username: "+username)
       else:
-        error_msg = 'Your account is not active.  Contact an administrator.'
-        logger.warning("Inactive account tried to log in. Username: "+username)
-    else:
-      error_msg = "Your login and password didn't match."
-    logger.info(error_msg)
+        error_msg = "Your login and password didn't match."
+      logger.info(error_msg)
   else:
     form = forms.LoginForm()
   return render(request, 'fund/login.html', {'form': form, 'error_msg': error_msg})
@@ -458,7 +459,7 @@ def not_member(request):
     org = False
 
   return render(request, 'fund/not_member.html', {
-    'contact_url': '/fund/support# contact', 'org': org
+    'contact_url': '/fund/support#contact', 'org': org
   })
 
 
