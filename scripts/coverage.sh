@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# exit with error code if tests fail
+set -e
+
 # run all tests with coverage wrapper
 coverage run manage.py test fund grants
 
