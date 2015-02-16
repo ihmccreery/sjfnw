@@ -42,15 +42,20 @@ class BaseFundTestCase(BaseTestCase):
     gp.save()
 
   def create_test(self):
-    """ Creates testy membership in Post """
+    """ Sets up "test" membership - in post GP with one donor """
+
+    member = models.Member.objects.get(email='testacct@gmail.com')
+    self.member_id = member.pk
+
+    # create membership in post-training gp
     post = models.GivingProject.objects.get(title="Post training")
-    ship = models.Membership(giving_project=post, member_id=1, approved=True)
+    ship = models.Membership(giving_project=post, member_id=member.pk, approved=True)
     ship.save()
     self.ship_id = ship.pk
-    member = models.Member.objects.get(email='testacct@gmail.com')
     member.current = ship.pk
     member.save()
-    self.member_id = member.pk
+
+    # create donor & step
     donor = models.Donor(membership=ship, firstname='Anna', amount=500,
                          talked=True, likelihood=50)
     donor.save()
