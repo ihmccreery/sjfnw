@@ -2,7 +2,6 @@ import logging
 import unittest
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from sjfnw.fund import models
 from sjfnw.fund.views import _compile_membership_progress
