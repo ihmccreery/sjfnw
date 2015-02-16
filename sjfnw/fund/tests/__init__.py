@@ -2,6 +2,7 @@
 from test_add_estimates import *
 from test_add_mult import *
 from test_copy_contacts import *
+from test_cron import *
 from test_login import *
 from test_grants import *
 from test_home import *

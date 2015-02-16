@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from sjfnw.fund import models
+from sjfnw.fund.views import _compile_membership_progress
 from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
@@ -119,14 +120,6 @@ class Home(BaseFundTestCase):
 
     response = self.client.get(self.url)
 
-  @unittest.skip('Incomplete')
-  def test_gift_notification(self):
-    pass
-
-    """ add a gift to donor
-        test that notif shows up on next load
-        test that notif is gone on next load """
-
 
 class HomeSurveys(BaseFundTestCase):
 
@@ -144,3 +137,53 @@ class HomeSurveys(BaseFundTestCase):
   def test_surveys_complete(self):
     pass
 
+class CompileMembershipProgress(BaseFundTestCase):
+  """ Test _compile_membership_progress method used by home view """
+
+  def setUp(self):
+    super(CompileMembershipProgress, self).setUp()
+
+  def test_empty(self):
+    donor_data, progress = _compile_membership_progress([])
+
+    self.assertEqual(donor_data, {})
+    for _, value in progress.iteritems():
+      self.assertEqual(value, 0)
+
+  def test_single(self):
+    # membership with a few donors, some progress
+    self.use_test_acct()
+    donors = models.Donor.objects.filter(membership_id=self.ship_id)
+
+    donor_data, progress = _compile_membership_progress(donors)
+
+    # TODO detailed assertions
+    self.assertIsNotNone(donor_data[self.donor_id])
+    self.assertIsNotNone(progress)
+
+  def test_several(self):
+    self.use_test_acct()
+    membership = models.Membership.objects.get(pk=self.ship_id)
+    donors = models.Donor.objects.filter(membership_id=self.ship_id)
+    donors = list(donors)
+    donor = models.Donor(membership=membership, firstname='Al', lastname='Bautista')
+    donor.save()
+    donors.append(donor)
+    donor = models.Donor(membership=membership, firstname='Alx',
+                         lastname='Zereskh', talked=True)
+    donor.save()
+    donors.append(donor)
+    donor = models.Donor(membership=membership, firstname='Irene',
+                         lastname='Uadfhaf', talked=True, amount=500, likelihood=40)
+    donor.save()
+    donors.append(donor)
+    donor = models.Donor(membership=membership, firstname='Velcro',
+                         lastname='The Cat', talked=True, amount=3,
+                         likelihood=1, asked=True)
+    donor.save()
+    donors.append(donor)
+
+    donor_data, progress = _compile_membership_progress(donors)
+    logger.info(donor_data)
+    logger.info(progress)
+    # TODO finish this test

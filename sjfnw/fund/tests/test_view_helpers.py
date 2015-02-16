@@ -3,7 +3,7 @@ import logging
 from django.contrib.auth.models import User
 
 from sjfnw.fund import models
-from sjfnw.fund.views import _create_user, _create_membership, _compile_membership_progress
+from sjfnw.fund.views import _create_user, _create_membership
 from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
@@ -92,52 +92,3 @@ class CreateMembership(BaseFundTestCase):
     self.assertIsInstance(membership, models.Membership)
     self.assertTrue(membership.approved)
 
-class CompileMembershipProgress(BaseFundTestCase):
-
-  def setUp(self):
-    super(CompileMembershipProgress, self).setUp()
-
-  def test_empty(self):
-    donor_data, progress = _compile_membership_progress([])
-
-    self.assertEqual(donor_data, {})
-    for _, value in progress.iteritems():
-      self.assertEqual(value, 0)
-
-  def test_single(self):
-    # membership with a few donors, some progress
-    self.use_test_acct()
-    donors = models.Donor.objects.filter(membership_id=self.ship_id)
-
-    donor_data, progress = _compile_membership_progress(donors)
-
-    # TODO detailed assertions
-    self.assertIsNotNone(donor_data[self.donor_id])
-    self.assertIsNotNone(progress)
-
-  def test_several(self):
-    self.use_test_acct()
-    membership = models.Membership.objects.get(pk=self.ship_id)
-    donors = models.Donor.objects.filter(membership_id=self.ship_id)
-    donors = list(donors)
-    donor = models.Donor(membership=membership, firstname='Al', lastname='Bautista')
-    donor.save()
-    donors.append(donor)
-    donor = models.Donor(membership=membership, firstname='Alx',
-                         lastname='Zereskh', talked=True)
-    donor.save()
-    donors.append(donor)
-    donor = models.Donor(membership=membership, firstname='Irene',
-                         lastname='Uadfhaf', talked=True, amount=500, likelihood=40)
-    donor.save()
-    donors.append(donor)
-    donor = models.Donor(membership=membership, firstname='Velcro',
-                         lastname='The Cat', talked=True, amount=3,
-                         likelihood=1, asked=True)
-    donor.save()
-    donors.append(donor)
-
-    donor_data, progress = _compile_membership_progress(donors)
-    logger.info(donor_data)
-    logger.info(progress)
-    # TODO finish this test
