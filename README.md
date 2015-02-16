@@ -3,7 +3,7 @@
     <img src="https://travis-ci.org/aisapatino/sjfnw.svg?branch=master">
   </a>
   <a href="https://coveralls.io/r/aisapatino/sjfnw?branch=master">
-   <img src="https://coveralls.io/repos/aisapatino/sjfnw/badge.svg?branch=develop">
+   <img src="https://coveralls.io/repos/aisapatino/sjfnw/badge.svg?branch=master">
   </a>
 </p>
 
