@@ -119,7 +119,7 @@ def home(request):
     load = ''
     loadto = ''
 
-  return render(request, 'fund/page_personal.html', {
+  return render(request, 'fund/home.html', {
     '1active': 'true', 'header': header, 'news': news, 'grants': grants,
     'steps': upcoming_steps, 'donor_list': donor_list, 'progress': progress,
     'notif': notif, 'suggested': suggested, 'load': load, 'loadto': loadto
