@@ -1174,41 +1174,44 @@ def email_overdue(request):
 
 
 def new_accounts(request):
+  """ Send GP leaders an email saying how many unapproved memberships exist
+
+    Will continue emailing about the same membership until it's approved/deleted.
   """
-  Sends GP leaders an email saying how many unapproved memberships exist
-  Will continue emailing about the same membership until it's approved/deleted.
-  """
+
   subject, from_email = 'Accounts pending approval', c.FUND_EMAIL
-  for gp in models.GivingProject.objects.all():
-    memberships = models.Membership.objects.filter(giving_project=gp, approved=False).count()
-    leaders = models.Membership.objects.filter(giving_project=gp, leader=True)
-    if memberships > 0:
-      for leader in leaders:
-        to = leader.member.email
-        html_content = render_to_string('fund/email_new_accounts.html',
-                                        {'admin_url': c.APP_BASE_URL+'admin/fund/membership/',
-                                        'count': memberships,
-                                        'support_email': c.SUPPORT_EMAIL})
+  for gp in models.GivingProject.objects.filter(fundraising_deadline__lte=timezone.now().date())
+    memberships = models.Membership.objects.filter(giving_project=gp)
+    need_approval = memberships.filter(approved=False).count()
+    if need_approval > 0:
+      leaders = memberships.filter(leader=True)
+      to = [leader.member.email for leader in leaders]
+      if to:
+        html_content = render_to_string('fund/email_new_accounts.html', {
+          'admin_url': c.APP_BASE_URL+'admin/fund/membership/',
+          'count': need_approval, 'giving_project': unicode(gp),
+          'support_email': c.SUPPORT_EMAIL
+        })
         text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, [to],
-                                     [c.SUPPORT_EMAIL])
+        msg = EmailMultiAlternatives(subject, text_content, from_email, to, [c.SUPPORT_EMAIL])
         msg.attach_alternative(html_content, "text/html")
         msg.send()
-  return HttpResponse("")
+
+  return HttpResponse('')
 
 
 def gift_notify(request):
-  """
-  Send an email to members letting them know gifts have been received
-  Mark donors as notified
-  Put details in membership notif
+  """ Send an email to members letting them know gifts have been received
+
+    Mark donors as notified
+    Put details in membership notif
   """
 
-  donors = models.Donor.objects.filter(
-      gift_notified=False
-  ).exclude(
-      received_this=0, received_next=0, received_afternext=0
-  ).select_related('membership__member')
+  donors = (models.Donor.objects
+      .select_related('membership__member')
+      .filter(gift_notified=False)
+      .exclude(received_this=0, received_next=0, received_afternext=0))
+
   memberships = {}
   for donor in donors: # group donors by membership
     if not donor.membership in memberships:
