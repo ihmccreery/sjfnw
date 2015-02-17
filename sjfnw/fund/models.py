@@ -8,12 +8,14 @@ from sjfnw.fund.utils import NotifyApproval
 import datetime, json, logging
 logger = logging.getLogger('sjfnw')
 
+
 class GivingProject(models.Model):
   title = models.CharField(max_length=255)
+
   public = models.BooleanField(default=True,
-                               help_text=('Whether this project should show in'
-                               ' the dropdown menu for members registering or '
-                               'adding a project to their account.'))
+     help_text=('Whether this project '
+    'should show in the dropdown menu for members registering or adding a '
+    'project to their account.'))
 
   pre_approved = models.TextField(blank=True,
       help_text=('List of member emails, separated by commas.  Anyone who '
@@ -22,17 +24,21 @@ class GivingProject(models.Model):
       'feature stop working; in that case memberships will default to '
       'requiring manual approval by an administrator.'))
 
-  #fundraising
+  # fundraising
   fundraising_training = models.DateTimeField(
       help_text=('Date & time of fundraising training.  At this point the app '
       'will require members to enter an ask amount & estimated likelihood for '
       'each contact.'))
+
   fundraising_deadline = models.DateField(
       help_text='Members will stop receiving reminder emails at this date.')
-  fund_goal = models.PositiveIntegerField(verbose_name='Fundraising goal', default=0,
+
+  fund_goal = models.PositiveIntegerField(default=0,
+      verbose_name='Fundraising goal',
       help_text=('Fundraising goal agreed upon by the group. If 0, it will not '
         'be displayed to members and they won\'t see a group progress chart '
         'for money raised.'))
+
   suggested_steps = models.TextField(
       default=('Talk to about project\nInvite to SJF event\nSet up time to '
                'meet for the ask\nAsk\nFollow up\nThank'),
@@ -42,10 +48,14 @@ class GivingProject(models.Model):
   site_visits = models.BooleanField(default=False,
       help_text=('If checked, members will only see grants with a screening '
                 'status of at least "site visit awarded"'))
-  calendar = models.CharField(max_length=255, blank=True, help_text=('Calendar ID '
-    'of a google calendar - format: ____@group.calendar.google.com'))
+
+  calendar = models.CharField(max_length=255, blank=True,
+      help_text=('Calendar ID of a google calendar - format: '
+                 '____@group.calendar.google.com'))
+
   resources = models.ManyToManyField('Resource', through='ProjectResource',
                                      null=True, blank=True)
+
   surveys = models.ManyToManyField('Survey', through='GPSurvey',
                                    null=True, blank=True)
 
