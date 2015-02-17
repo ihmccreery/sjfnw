@@ -18,17 +18,6 @@ class BaseFundTestCase(BaseTestCase):
   def setUp(self):
     self.create_projects()
 
-  def use_test_acct(self):
-    self.create_test()
-    self.log_in_testy()
-
-  def use_new_acct(self):
-    self.create_new()
-    self.log_in_newbie()
-
-  def use_admin_acct(self):
-    self.log_in_admin()
-
   def create_projects(self):
     """ Creates pre- and post-training giving projects """
     today = timezone.now()
@@ -40,6 +29,20 @@ class BaseFundTestCase(BaseTestCase):
         fundraising_training=today+timedelta(days=10),
         fundraising_deadline=today+timedelta(days=30))
     gp.save()
+
+  # convenience methods for use in child test classes
+  # login methods are defined on BaseTestCase
+
+  def use_test_acct(self):
+    self.create_test()
+    self.log_in_testy()
+
+  def use_new_acct(self):
+    self.create_new()
+    self.log_in_newbie()
+
+  def use_admin_acct(self):
+    self.log_in_admin()
 
   def create_test(self):
     """ Sets up "test" membership - in post GP with one donor """

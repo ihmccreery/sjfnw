@@ -9,7 +9,6 @@ from django.test.simple import DjangoTestSuiteRunner
 from unittest import TextTestRunner, TextTestResult
 from unittest.signals import registerResult
 
-""" Shared testing base classes, utilities """
 
 # Sets root & sjfnw loggers level. Comment out for less output.
 logging.getLogger().setLevel(0)
@@ -17,6 +16,9 @@ logger = logging.getLogger('sjfnw')
 logger.setLevel(0)
 
 class BaseTestCase(TestCase):
+  """ Base test case used by all other tests
+
+    Provides login methods and custom assertion(s) """
 
   def log_in_testy(self):
     User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')
@@ -41,6 +43,9 @@ class BaseTestCase(TestCase):
     abstract = True
 
 
+# Code below overrides the default test runner to provide colored
+# output in the console
+
 class ColorTestSuiteRunner(DjangoTestSuiteRunner):
   """ Redirects run_suite to ColorTestRunner """
 
@@ -51,10 +56,10 @@ class ColorTestSuiteRunner(DjangoTestSuiteRunner):
 class ColorTextResult(TextTestResult):
   """Copied and modified from py2.7
 
-  A test result class that can print formatted text results to a stream.
+    A test result class that can print formatted text results to a stream.
 
-  Used by TextTestRunner.
-  """
+    Used by TextTestRunner.  """
+
   separator1 = '=' * 70
   separator2 = '-' * 70
 
