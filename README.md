@@ -162,7 +162,9 @@ Installation
 
 Usage
   - There are a lot of lint errors currently, so you'll often want to lint just the file(s) you're currently working on.
-  - Some text editors have plugins to run them from within the editor. For example, with vim, you can use [syntastic](https://github.com/scrooloose/syntastic).
+  - Some text editors have plugins to run them from within the editor.
+      - Vim: [syntastic](https://github.com/scrooloose/syntastic)
+      - Sublime3: [SublimeLinter](http://sublimelinter.readthedocs.org/en/latest/) + [SublimeLinter-pylint](https://packagecontrol.io/packages/SublimeLinter-pylint) + [SublimeLinter-eslint](https://github.com/roadhump/SublimeLinter-eslint)
   - To lint the whole project: `./scripts/lint.sh`
 
 Configuration
@@ -240,6 +242,7 @@ I recommend 1 because it fits nicely into git workflow and makes it very easy to
 - [Django](https://docs.djangoproject.com/en/1.5/)
   - Note: If you google something you'll often wind up at the most recent docs. Make sure you're looking at the docs version that matches our current Django version (currently 1.5)
 - [Python](https://docs.python.org/2/library/index.html)
+  - [TestCase built-in methods & assertions](https://docs.python.org/2/library/unittest.html#unittest.TestCase)
   - [Regular expressions](http://doc.pyschools.com/html/regex.html)
 - [Google App Engine](https://cloud.google.com/appengine/docs/python/)
   - Note: Those docs don't apply to this project in many cases since we use Django
