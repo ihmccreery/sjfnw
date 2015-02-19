@@ -18,7 +18,7 @@ class CreateUser(BaseFundTestCase):
     existing_member = models.Member(email=TEST_EMAIL, first_name='A', last_name='P')
     existing_member.save()
 
-    error, user, member = _create_user(TEST_EMAIL, 'pass', 'anna luisa', 'patino')
+    user, member, error = _create_user(TEST_EMAIL, 'pass', 'anna luisa', 'patino')
 
     self.assertRegexpMatches(error, 'login')
     self.assertIsNone(user, msg='user should be None')
@@ -30,7 +30,7 @@ class CreateUser(BaseFundTestCase):
   def test_user_exists(self):
     User.objects.create_user(TEST_EMAIL, 'pass')
 
-    error, user, member = _create_user(TEST_EMAIL, 'pass', 'anna luisa', 'patino')
+    user, member, error = _create_user(TEST_EMAIL, 'pass', 'anna luisa', 'patino')
 
     self.assertRegexpMatches(error, 'use a different')
     self.assertIsNone(user, msg='user should be None')
@@ -45,7 +45,7 @@ class CreateUser(BaseFundTestCase):
     existing_member = models.Member.objects.filter(email=TEST_EMAIL)
     self.assertQuerysetEqual(existing_member, [])
 
-    error, user, member = _create_user(TEST_EMAIL, 'pass', 'anna luisa', 'patino')
+    user, member, error = _create_user(TEST_EMAIL, 'pass', 'anna luisa', 'patino')
 
     self.assertIsNone(error)
     self.assertIsInstance(user, User)
@@ -63,7 +63,7 @@ class CreateMembership(BaseFundTestCase):
     existing_ship = models.Membership(member=member, giving_project=gp)
     existing_ship.save()
 
-    error, membership = _create_membership(member, gp)
+    membership, error = _create_membership(member, gp)
 
     self.assertRegexpMatches(error, 'already registered')
     self.assertEqual(membership, existing_ship, msg='Returns the pre-existing membership')
@@ -73,7 +73,7 @@ class CreateMembership(BaseFundTestCase):
     member = models.Member(email=TEST_EMAIL, first_name='A', last_name='P')
     member.save()
 
-    error, membership = _create_membership(member, gp)
+    membership, error = _create_membership(member, gp)
 
     self.assertIsNone(error)
     self.assertIsInstance(membership, models.Membership)
@@ -86,7 +86,7 @@ class CreateMembership(BaseFundTestCase):
     member = models.Member(email=TEST_EMAIL, first_name='A', last_name='P')
     member.save()
 
-    error, membership = _create_membership(member, gp)
+    membership, error = _create_membership(member, gp)
 
     self.assertIsNone(error)
     self.assertIsInstance(membership, models.Membership)
