@@ -1,13 +1,14 @@
+from datetime import timedelta
+import json
+import logging
+
 from django.core import mail
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.utils import timezone
 
 from sjfnw.grants import models
 from sjfnw.grants.tests.base import BaseGrantTestCase
 
-from datetime import timedelta
-import json, unittest, logging
 logger = logging.getLogger('sjfnw')
 
 
@@ -20,15 +21,17 @@ class YearEndReportForm(BaseGrantTestCase):
     super(YearEndReportForm, self).setUp()
     self.log_in_test_org()
     today = timezone.now()
-    award = models.GivingProjectGrant(projectapp_id = 1, amount = 5000,
-        agreement_mailed = today - timedelta(days = 345),
-        agreement_returned = today - timedelta(days = 350))
+    award = models.GivingProjectGrant(
+        projectapp_id=1, amount=5000,
+        agreement_mailed=today - timedelta(days=345),
+        agreement_returned=today - timedelta(days=350))
     award.save()
     self.award_id = award.pk
 
   def create_draft(self):
     # create the initial draft by visiting report page
     response = self.client.get('/report/%d' % self.award_id)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(1, models.YERDraft.objects.filter(award_id=self.award_id).count())
 
   def test_home_link(self):
@@ -56,7 +59,7 @@ class YearEndReportForm(BaseGrantTestCase):
   def test_late_home_link(self):
     """ Load home page, verify it links to report even if report is overdue """
     award = models.GivingProjectGrant.objects.get(projectapp_id=1)
-    award.agreement_mailed = timezone.now() - timedelta(days = 400)
+    award.agreement_mailed = timezone.now() - timedelta(days=400)
     award.save()
 
     response = self.client.get('/apply/')
@@ -89,11 +92,11 @@ class YearEndReportForm(BaseGrantTestCase):
 
     # send additional content to autosave
     post_data = {
-        'summarize_last_year': 'We did soooooo much stuff last year!!',
-        'goal_progress': 'What are goals?',
-        'total_size': '546 or 547',
-        'other_comments': 'All my single ladies'
-        }
+      'summarize_last_year': 'We did soooooo much stuff last year!!',
+      'goal_progress': 'What are goals?',
+      'total_size': '546 or 547',
+      'other_comments': 'All my single ladies'
+    }
 
     response = self.client.post('/report/%d/autosave/' % self.award_id, post_data)
     self.assertEqual(200, response.status_code)
@@ -128,14 +131,13 @@ class YearEndReportForm(BaseGrantTestCase):
       'achieved': 'Achievement awards.'
     }
 
-
     # autosave the post_data (mimic page js which does that prior to submitting)
     response = self.client.post(reverse('sjfnw.grants.views.autosave_yer',
-      kwargs = {'award_id': self.award_id}),
+                                        kwargs={'award_id': self.award_id}),
                                 post_data)
     self.assertEqual(200, response.status_code)
     # confirm draft updated
-    draft = models.YERDraft.objects.get(award_id = self.award_id)
+    draft = models.YERDraft.objects.get(award_id=self.award_id)
     self.assertEqual(json.loads(draft.contents), post_data)
     # add files to draft
     draft.photo1 = 'cats.jpg'
@@ -151,7 +153,7 @@ class YearEndReportForm(BaseGrantTestCase):
   def test_valid_late(self):
     """ Run the valid test but with a YER that is overdue """
     award = models.GivingProjectGrant.objects.get(projectapp_id=1)
-    award.agreement_mailed = timezone.now() - timedelta(days = 400)
+    award.agreement_mailed = timezone.now() - timedelta(days=400)
     award.save()
 
     self.test_valid_stay_informed()
@@ -159,7 +161,7 @@ class YearEndReportForm(BaseGrantTestCase):
   def test_start_late(self):
     """ Run the start draft test but with a YER that is overdue """
     award = models.GivingProjectGrant.objects.get(projectapp_id=1)
-    award.agreement_mailed = timezone.now() - timedelta(days = 400)
+    award.agreement_mailed = timezone.now() - timedelta(days=400)
     award.save()
 
     self.test_start_report()
@@ -180,22 +182,21 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 60 days
     today = timezone.now()
-    mailed = today.date().replace(year = today.year - 1) + timedelta(days = 60)
+    mailed = today.date().replace(year=today.year - 1) + timedelta(days=60)
     award = models.GivingProjectGrant(
-        projectapp_id = 1, amount = 5000,
-        agreement_mailed = mailed,
-        agreement_returned = mailed + timedelta(days = 3)
+        projectapp_id=1, amount=5000,
+        agreement_mailed=mailed,
+        agreement_returned=mailed + timedelta(days=3)
     )
     award.save()
-    print(models.GivingProjectGrant.objects.all())
 
     # verify that yer is due in 60 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days = 60))
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=60))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url)
-    print(mail.outbox)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 0)
 
   def test_first_email(self):
@@ -203,20 +204,21 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 30 days
     today = timezone.now()
-    mailed = today.date().replace(year = today.year - 1) + timedelta(days = 30)
+    mailed = today.date().replace(year=today.year - 1) + timedelta(days=30)
     award = models.GivingProjectGrant(
-        projectapp_id = 1, amount = 5000,
-        agreement_mailed = mailed,
-        agreement_returned = mailed + timedelta(days = 3)
+        projectapp_id=1, amount=5000,
+        agreement_mailed=mailed,
+        agreement_returned=mailed + timedelta(days=3)
     )
     award.save()
 
     # verify that yer is due in 30 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days = 30))
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=30))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 1)
 
   def test_15_days_prior(self):
@@ -224,21 +226,21 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 15 days
     today = timezone.now()
-    mailed = today.date().replace(year = today.year - 1) + timedelta(days = 15)
+    mailed = today.date().replace(year=today.year - 1) + timedelta(days=15)
     award = models.GivingProjectGrant(
-        projectapp_id = 1, amount = 5000,
-        agreement_mailed = mailed,
-        agreement_returned = mailed + timedelta(days = 3)
+        projectapp_id=1, amount=5000,
+        agreement_mailed=mailed,
+        agreement_returned=mailed + timedelta(days=3)
     )
     award.save()
-    print(models.GivingProjectGrant.objects.all())
 
     # verify that yer is due in 15 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days = 15))
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=15))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 0)
 
   def test_second_email(self):
@@ -246,20 +248,18 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 7 days
     today = timezone.now()
-    mailed = today.date().replace(year = today.year - 1) + timedelta(days = 7)
-    award = models.GivingProjectGrant(
-        projectapp_id = 1, amount = 5000,
-        agreement_mailed = mailed,
-        agreement_returned = mailed + timedelta(days = 3)
-    )
+    mailed = today.date().replace(year=today.year - 1) + timedelta(days=7)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+        agreement_mailed=mailed, agreement_returned=mailed + timedelta(days=3))
     award.save()
 
     # verify that yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days = 7))
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
 
     # verify that email is sent
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 1)
 
   def test_yer_complete(self):
@@ -267,23 +267,25 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 7 days
     today = timezone.now()
-    mailed = today.date().replace(year = today.year - 1) + timedelta(days = 7)
+    mailed = today.date().replace(year=today.year - 1) + timedelta(days=7)
     award = models.GivingProjectGrant(
-        projectapp_id = 1, amount = 5000,
-        agreement_mailed = mailed,
-        agreement_returned = mailed + timedelta(days = 3)
+        projectapp_id=1, amount=5000,
+        agreement_mailed=mailed,
+        agreement_returned=mailed + timedelta(days=3)
     )
     award.save()
-    yer = models.YearEndReport(award = award, total_size=10, donations_count=50)
+    yer = models.YearEndReport(award=award, total_size=10, donations_count=50)
     yer.save()
 
     # verify that yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days = 7))
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 0)
+
 
 class RolloverYER(BaseGrantTestCase):
   """ Test display and function of the rollover feature for YER """
@@ -296,7 +298,7 @@ class RolloverYER(BaseGrantTestCase):
 
   def create_yer(self, award_id):
     yer = models.YearEndReport(
-        award_id = award_id,
+        award_id=award_id,
         total_size=10,
         donations_count=50,
         contact_person='Mr. Spier, Exec. Dir.')
@@ -313,7 +315,8 @@ class RolloverYER(BaseGrantTestCase):
 
     self.log_in_new_org()
     response = self.client.get(self.url, follow=True)
-    self.assertEqual(response.context['error_msg'], 'You don\'t have any submitted reports to copy.')
+    self.assertEqual(response.context['error_msg'],
+        'You don\'t have any submitted reports to copy.')
 
   def test_display_no_reports(self):
     """ Verify error msg, no form if org has grant(s) but no reports """
@@ -324,35 +327,33 @@ class RolloverYER(BaseGrantTestCase):
       projectapp__application__organization_id=2).count(), 0)
 
     response = self.client.get(self.url, follow=True)
-    self.assertEqual(response.context['error_msg'], 'You don\'t have any submitted reports to copy.')
+    self.assertEqual(response.context['error_msg'],
+        'You don\'t have any submitted reports to copy.')
 
   def test_display_all_reports_done(self):
     """ Verify error msg, no form if org has reports for all grants """
-    award = models.GivingProjectGrant(projectapp_id = 1, amount = 5000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000)
     award.save()
     self.create_yer(award.pk)
 
     response = self.client.get(self.url, follow=True)
-    self.assertEqual(response.context['error_msg'], 'You have a submitted or draft year-end report for all of your grants. <a href="/apply">Go back</a>')
-
+    self.assertRegexpMatches(response.context['error_msg'],
+        'You have a submitted or draft year-end report for all of your grants')
 
   def test_display_form(self):
     """ Verify display of form when there is a valid rollover option """
 
     # create award and YER
-    award = models.GivingProjectGrant(projectapp_id = 1, amount = 5000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000)
     award.save()
     self.create_yer(award.pk)
 
     # create 2nd award without YER
     papp = models.ProjectApp(application_id=2, giving_project_id=3)
     papp.save()
-    mailed = timezone.now() - timedelta(days = 355)
-    award = models.GivingProjectGrant(
-        projectapp = papp, amount = 8000,
-        agreement_mailed = mailed, 
-        agreement_returned = mailed + timedelta(days = 3),
-    )
+    mailed = timezone.now() - timedelta(days=355)
+    award = models.GivingProjectGrant(projectapp=papp, amount=8000,
+        agreement_mailed=mailed, agreement_returned=mailed + timedelta(days=3))
     award.save()
 
     response = self.client.get(self.url, follow=True)
@@ -377,10 +378,6 @@ class RolloverYER(BaseGrantTestCase):
     }
 
     response = self.client.post(self.url, post_data, follow=True)
-  
+
     self.assertTemplateUsed(response, 'grants/yer_form.html')
     self.assertEqual(1, models.YERDraft.objects.filter(award=award2).count())
-    
-    
-
-

@@ -6,7 +6,7 @@ from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
 
 class AddMultipleDonorsPre(BaseFundTestCase):
-  
+
   url = reverse('sjfnw.fund.views.add_mult')
 
   def setUp(self):
@@ -85,7 +85,7 @@ class AddMultipleDonorsPre(BaseFundTestCase):
     self.assertEqual(len(donors), 0)
 
 class AddMultipleDonorsPost(BaseFundTestCase):
-  
+
   url = reverse('sjfnw.fund.views.add_mult')
 
   def setUp(self):

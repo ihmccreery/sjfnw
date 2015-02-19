@@ -1,9 +1,10 @@
+import logging
+
 from django import forms
-from django.core import validators
 from django.utils import timezone
+
 from sjfnw.forms import IntegerCommaField
 from sjfnw.fund import models
-import logging
 
 logger = logging.getLogger('sjfnw')
 
@@ -56,7 +57,7 @@ class CopyContacts(forms.Form):
 class MassDonorPre(forms.Form):
   firstname = forms.CharField(max_length=100, label='*First name')
   lastname = forms.CharField(max_length=100, required=False, label='Last name')
-  
+
   confirm = forms.CharField(max_length=5, widget=forms.HiddenInput(), required=False)
 
 
@@ -84,7 +85,7 @@ class MassStep(forms.Form):
   date = forms.DateField(
       required=False,
       widget=forms.DateInput(attrs={'class':'datePicker'}, format = '%m/%d/%Y'),
-      error_messages = {'invalid':'Please enter a date in mm/dd/yyyy format.'})
+      error_messages={'invalid':'Please enter a date in mm/dd/yyyy format.'})
   description = forms.CharField(
       max_length=255, required=False,
       widget=forms.TextInput(attrs={'onfocus':'showSuggestions(this.id)'}))
@@ -122,14 +123,14 @@ class StepDoneForm(forms.Form):
   promised_amount = IntegerCommaField(
       required=False, min_value=0,
       error_messages={'min_value': 'Promise amounts cannot be negative'},
-      widget=forms.TextInput(attrs = {'size':10}))
+      widget=forms.TextInput(attrs={'size':10}))
   promise_reason = forms.MultipleChoiceField(required=False,
-      label = 'Why did this person give? Check all that apply.',
-      choices = PROMISE_REASON_CHOICES,
-      widget = forms.CheckboxSelectMultiple())
+      label='Why did this person give? Check all that apply.',
+      choices=PROMISE_REASON_CHOICES,
+      widget=forms.CheckboxSelectMultiple())
   likely_to_join = forms.ChoiceField(required=False,
-      label = 'Are they likely to join a giving project?',
-      choices = models.Donor.LIKELY_TO_JOIN_CHOICES)
+      label='Are they likely to join a giving project?',
+      choices=models.Donor.LIKELY_TO_JOIN_CHOICES)
 
   last_name = forms.CharField(max_length=255, required=False)
   phone = forms.CharField(max_length=15, required=False)
@@ -141,12 +142,9 @@ class StepDoneForm(forms.Form):
   next_step = forms.CharField(max_length=100, required=False)
   next_step_date = forms.DateField(
       required=False,
-      widget=forms.DateInput(
-          format = '%m/%d/%Y', 
-          attrs={
-              'class':'datePicker',
-              'input_formats':"['%m/%d/%Y', '%m-%d-%Y', '%n/%j/%Y', '%n-%j-%Y']"}),
-      error_messages = {'invalid':'Please enter a date in mm/dd/yyyy format.'})
+      widget=forms.DateInput(format='%m/%d/%Y', attrs={'class':'datePicker',
+          'input_formats':"['%m/%d/%Y', '%m-%d-%Y', '%n/%j/%Y', '%n-%j-%Y']"}),
+      error_messages={'invalid':'Please enter a date in mm/dd/yyyy format.'})
 
   def clean(self):
     cleaned_data = super(StepDoneForm, self).clean()
@@ -205,5 +203,3 @@ class MembershipInlineFormset(forms.models.BaseInlineFormSet):
         pass
     if leader < 1:
       raise forms.ValidationError('You must have at least one leader')
-
-

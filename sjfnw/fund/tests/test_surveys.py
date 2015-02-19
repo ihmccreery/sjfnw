@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.utils import timezone
 
 from sjfnw.fund import models
@@ -43,7 +42,8 @@ class GPSurveys(BaseFundTestCase):
      'questions_8': '',
      'questions_9': '',
      'questions_10': '',
-     'questions_11': '' }
+     'questions_11': ''
+    }
     response = self.client.post('/admin/fund/survey/add/', form_data)
 
     # Verify it was created
@@ -70,7 +70,7 @@ class GPSurveys(BaseFundTestCase):
         intro=('Please fill out this quick survey evaluating our last meeting.'
                ' Responses are completely anonymous. Once you have completed '
                'it, you\'ll be taken to your regular home page.'),
-        questions = (
+        questions=(
           '[{"question": "How well did we meet our goals? (1 = did not meet, 5 = met all our goals)",'
           ' "choices": [1, 2, 3, 4, 5]}, '
           '{"question": "Any other comments for us?", "choices": []}]'))
@@ -103,8 +103,8 @@ class GPSurveys(BaseFundTestCase):
                  'responses_1': 'No comments.',
                  'date': str(timezone.now()).split('+')[0],
                  'gp_survey': self.gps_pk}
-    post_url = reverse('sjfnw.fund.views.gp_survey',
-                       kwargs = {'gp_survey': self.gps_pk})
+    post_url = reverse('sjfnw.fund.views.project_survey',
+                       kwargs={'gp_survey_id': self.gps_pk})
     response = self.client.post(post_url, form_data)
 
     self.assertEqual(response.content, 'success')

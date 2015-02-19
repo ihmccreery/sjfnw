@@ -1,35 +1,31 @@
+import json
+import logging
+
 from django.db import models
 from django.forms import ModelForm, widgets, ValidationError
-from django.utils import timezone
 
 from sjfnw.forms import IntegerCommaField
-from sjfnw.fund.models import Donor, Step, Survey, GPSurvey, GivingProject, SurveyResponse
+from sjfnw.fund.models import Donor, Step, Survey, GivingProject, SurveyResponse
 
-import json
-
-import logging
 logger = logging.getLogger('sjfnw')
 
 
-
-def custom_integer_field(f, **kwargs):
-  if f.verbose_name == '*Amount to ask ($)':
+def custom_integer_field(field, **kwargs):
+  if field.verbose_name == '*Amount to ask ($)':
     return IntegerCommaField(**kwargs)
   else:
-    return f.formfield()
+    return field.formfield()
 
-
-def make_custom_datefield(f):
+def make_custom_datefield(field):
   """
-  date selector implementation from
-  http://strattonbrazil.blogspot.com/2011/03/using-jquery-uis-date-picker-on-all.html
+    date selector implementation from
+    http://strattonbrazil.blogspot.com/2011/03/using-jquery-uis-date-picker-on-all.html
   """
-  formfield = f.formfield()
-  if isinstance(f, models.DateField):
+  formfield = field.formfield()
+  if isinstance(field, models.DateField):
     formfield.error_messages['invalid'] = 'Please enter a date in mm/dd/yyyy format.'
     formfield.widget.format = '%m/%d/%Y'
-    formfield.widget.input_formats = ['%m/%d/%Y', '%m-%d-%Y', '%n/%j/%Y',
-                                      '%n-%j-%Y']
+    formfield.widget.input_formats = ['%m/%d/%Y', '%m-%d-%Y', '%n/%j/%Y', '%n-%j-%Y']
     formfield.widget.attrs.update({'class':'datePicker'})
   return formfield
 
@@ -67,13 +63,13 @@ class CreateQuestionsWidget(widgets.MultiWidget):
 
   def __init__(self, attrs=None):
     _widgets = []
-    for i in range(1, 6):
-      _widgets += [widgets.Textarea(attrs = {'rows': 2}),
-                   widgets.Textarea(attrs = {'rows': 1, 'class': 'survey-choice'}),
-                   widgets.Textarea(attrs = {'rows': 1, 'class': 'survey-choice'}),
-                   widgets.Textarea(attrs = {'rows': 1, 'class': 'survey-choice'}),
-                   widgets.Textarea(attrs = {'rows': 1, 'class': 'survey-choice'}),
-                   widgets.Textarea(attrs = {'rows': 1, 'class': 'survey-choice'})]
+    for _ in range(1, 6):
+      _widgets += [widgets.Textarea(attrs={'rows': 2}),
+                   widgets.Textarea(attrs={'rows': 1, 'class': 'survey-choice'}),
+                   widgets.Textarea(attrs={'rows': 1, 'class': 'survey-choice'}),
+                   widgets.Textarea(attrs={'rows': 1, 'class': 'survey-choice'}),
+                   widgets.Textarea(attrs={'rows': 1, 'class': 'survey-choice'}),
+                   widgets.Textarea(attrs={'rows': 1, 'class': 'survey-choice'})]
     super(CreateQuestionsWidget, self).__init__(_widgets, attrs)
 
 
@@ -88,7 +84,7 @@ class CreateQuestionsWidget(widgets.MultiWidget):
         for choice in q['choices']:
           val_list.append(choice)
           count += 1
-        for i in range(count, 6):
+        for _ in range(count, 6):
           val_list.append(None)
       return val_list
     else:
@@ -120,7 +116,7 @@ class CreateQuestionsWidget(widgets.MultiWidget):
       if val:
         dic = {'question': val, 'choices': []}
         for c in range(1, 6):
-          w = i+c
+          w = i + c
           val = self.widgets[w].value_from_datadict(data, files, name + '_%s' % w)
           if val:
             dic['choices'].append(val)
@@ -132,8 +128,6 @@ class CreateQuestionsWidget(widgets.MultiWidget):
 
     #logger.info('Returning ' + json.dumps(value))
     return json.dumps(value)
-
-
 
 class CreateSurvey(ModelForm):
 
@@ -158,8 +152,8 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
     _widgets = []
     for question in self.questions:
       if question['choices']:
-        _widgets.append(widgets.RadioSelect(choices =
-            [(choice, choice) for i, choice in enumerate(question['choices'])]))
+        choices = [(choice, choice) for _, choice in enumerate(question['choices'])]
+        _widgets.append(widgets.RadioSelect(choices=choices))
       else:
         _widgets.append(widgets.Textarea(attrs={'class':'survey-text'}))
 
@@ -176,7 +170,7 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
         return_list.append(val_list[i])
       return return_list
     else:
-      return [None for widget in self.widgets]
+      return [None for _ in self.widgets]
 
   def format_output(self, rendered_widgets):
     """ Formats widgets for display.
@@ -184,7 +178,7 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
     html = '<table id="survey-questions">'
     i = 0
     for q in self.questions:
-      html += ('<tr><th>' + str(i+1) + '.</th><td>' + q['question'] + 
+      html += ('<tr><th>' + str(i+1) + '.</th><td>' + q['question'] +
                rendered_widgets[i] + '</td></tr>')
       i += 1
     html += '</table>'
@@ -205,8 +199,7 @@ class SurveyResponseForm(ModelForm):
 
   class Meta:
     model = SurveyResponse
-    widgets = {'date': widgets.HiddenInput(),
-               'gp_survey': widgets.HiddenInput() }
+    widgets = {'date': widgets.HiddenInput(), 'gp_survey': widgets.HiddenInput()}
 
   def __init__(self, survey, *args, **kwargs):
     #logger.info('SurveyResponseForm __init__')
@@ -222,10 +215,9 @@ class SurveyResponseForm(ModelForm):
 
 class GivingProjectAdminForm(ModelForm):
   fund_goal = IntegerCommaField(label='Fundraising goal', initial=0,
-                                help_text=('Fundraising goal agreed upon by '
-                                'the group. If 0, it will not be displayed to '
-                                'members and they won\'t see a group progress '
-                                'chart for money raised.'))
+      help_text=('Fundraising goal agreed upon by the group. If 0, it will not be '
+                 'displayed to members and they won\'t see a group progress chart '
+                 'for money raised.'))
 
   class Meta:
     model = GivingProject
