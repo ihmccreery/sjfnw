@@ -3,14 +3,11 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import intcomma
-from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
-from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.html import strip_tags
 
 from google.appengine.ext import deferred, ereporter
 
@@ -26,7 +23,6 @@ if not settings.DEBUG:
   ereporter.register_logger()
 
 logger = logging.getLogger('sjfnw')
-logger.info(logger)
 
 #-----------------------------------------------------------------------------
 # MAIN VIEWS
@@ -81,7 +77,7 @@ def home(request):
   # from here we know we're not redirecting
 
   # top content
-  news, grants = _get_block_content(membership, get_steps=False)
+  _, news, grants = _get_block_content(membership, get_steps=False)
   header = membership.giving_project.title
 
   donor_data, progress = _compile_membership_progress(donors)
@@ -302,13 +298,11 @@ def fund_register(request):
       first_name = request.POST['first_name']
       last_name = request.POST['last_name']
 
-      error_msg, user, member = _create_user(username_email, password,
-                                                   first_name, last_name)
-
+      user, member, error_msg = _create_user(username_email, password,
+                                             first_name, last_name)
       if not error_msg:
-
         # if they specified a GP, create Membership
-        membership = False
+        membership = None
         if request.POST['giving_project']:
           giv = models.GivingProject.objects.get(pk=request.POST['giving_project'])
           notif = ('<table><tr><td>Welcome to Project Central!<br>'
@@ -316,7 +310,7 @@ def fund_register(request):
               'guide you through the fundraising process and cheer you on.</td>'
               '<td><img src="/static/images/odo1.png" height=88 width=54 alt="Odo waving">'
               '</td></tr></table>')
-          _, membership = _create_membership(member, giv, notif=notif)
+          membership, _ = _create_membership(member, giv, notif=notif)
           logger.info('Registration - membership in %s created, welcome message set', unicode(giv))
 
         # try to log in
@@ -415,7 +409,7 @@ def manage_account(request):
       logger.debug('Valid add project')
       gp = request.POST['giving_project']
       giv = models.GivingProject.objects.get(pk=gp)
-      error_msg, membership = _create_membership(member, giv)
+      membership, error_msg = _create_membership(member, giv)
       if membership:
         if membership.approved:
           return redirect(home)
@@ -891,9 +885,9 @@ def add_mult_step(request):
     formset = step_formset(initial=initial_form_data)
     logger.info('Multiple steps - loading initial formset, size ' + str(size) +
                  ': ' +str(donor_list))
-  fd = zip(formset, donor_list)
+  formset_with_donors = zip(formset, donor_list)
   return render(request, 'fund/add_mult_step.html',
-                {'size': size, 'formset': formset, 'fd': fd, 'multi': True,
+                {'size': size, 'formset': formset, 'fd': formset_with_donors, 'multi': True,
                  'suggested': suggested})
 
 
@@ -1064,22 +1058,22 @@ def _get_block_content(membership, get_steps=True):
     membership: current Membership
     get_steps: include list of upcoming steps or not
 
-  Returns: List with
-    steps: 2 closest upcoming steps
+  Returns: Tuple:
+    steps: 2 closest upcoming steps (None if get_steps=False)
     news: news items, sorted by date descending
     grants: ProjectApps ordered by org name
   """
 
-  blocks = []
+  steps, news, grants = None, None, None
   # upcoming steps
   if get_steps:
-    blocks.append(models.Step.objects
+    steps = (models.Step.objects
         .select_related('donor')
         .filter(donor__membership=membership, completed__isnull=True)
         .order_by('date')[:2])
 
   # project news
-  blocks.append(models.NewsItem.objects
+  news = (models.NewsItem.objects
       .filter(membership__giving_project=membership.giving_project)
       .order_by('-date')[:25])
 
@@ -1092,13 +1086,12 @@ def _get_block_content(membership, get_steps=True):
   if membership.giving_project.site_visits == 1:
     logger.info('Filtering grants for site visits')
     p_apps = p_apps.filter(screening_status__gte=70)
-  p_apps = p_apps.order_by('application__organization__name')
-  blocks.append(p_apps)
+  grants = p_apps.order_by('application__organization__name')
 
-  return blocks
+  return steps, news, grants
 
 def _create_user(email, password, first_name, last_name):
-  error, user, member = None, None, None
+  user, member, error = None, None, None
 
   # check if Member already
   if models.Member.objects.filter(email=email):
@@ -1122,17 +1115,16 @@ def _create_user(email, password, first_name, last_name):
     member.save()
     logger.info('Registration - user and member objects created for ' + email)
 
-  return error, user, member
+  return user, member, error
 
 def _create_membership(member, giving_project, notif=''):
-  error, membership = None, None
+  error = None
 
   approved = giving_project.is_pre_approved(member.email)
 
   membership, new = models.Membership.objects.get_or_create(
       member=member, giving_project=giving_project,
-      defaults={'approved': approved, 'notifications': notif}
-  )
+      defaults={'approved': approved, 'notifications': notif})
 
   if not new:
     error = 'You are already registered with that giving project.'
@@ -1140,119 +1132,5 @@ def _create_membership(member, giving_project, notif=''):
     member.current = membership.pk
     member.save()
 
-  return error, membership
+  return membership, error
 
-#-----------------------------------------------------------------------------
-# CRON TASKS
-#-----------------------------------------------------------------------------
-
-def email_overdue(request):
-  today = datetime.date.today()
-  ships = models.Membership.objects.filter(giving_project__fundraising_deadline__gte=today)
-  limit = today - datetime.timedelta(days=7)
-  subject = 'Fundraising Steps'
-  from_email = c.FUND_EMAIL
-  bcc = [c.SUPPORT_EMAIL]
-
-  for ship in ships:
-    user = ship.member
-    if not ship.emailed or (ship.emailed <= limit):
-      count, step = ship.overdue_steps(get_next=True)
-      if count > 0 and step:
-        logger.info(user.email + ' has overdue step(s), emailing.')
-        to_emails = [user.email]
-        html_content = render_to_string('fund/email_overdue.html', {
-          'login_url': c.APP_BASE_URL+'fund/login', 'ship': ship, 'num': count,
-          'step': step, 'base_url': c.APP_BASE_URL
-        })
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to_emails, bcc)
-        msg.attach_alternative(html_content, "text/html")
-        msg.send()
-        ship.emailed = today
-        ship.save(skip=True)
-  return HttpResponse('')
-
-
-def new_accounts(request):
-  """ Send GP leaders an email saying how many unapproved memberships exist
-
-    Will continue emailing about the same membership until it's approved/deleted.
-  """
-
-  subject = 'Accounts pending approval'
-  from_email = c.FUND_EMAIL
-  bcc = [c.SUPPORT_EMAIL]
-
-  active_gps = models.GivingProject.objects.filter(fundraising_deadline__gte=timezone.now().date())
-
-  for gp in active_gps:
-    memberships = models.Membership.objects.filter(giving_project=gp)
-    need_approval = memberships.filter(approved=False).count()
-    if need_approval > 0:
-      leaders = memberships.filter(leader=True)
-      to_emails = [leader.member.email for leader in leaders]
-      if to_emails:
-        html_content = render_to_string('fund/email_new_accounts.html', {
-          'admin_url': c.APP_BASE_URL + 'admin/fund/membership/',
-          'count': need_approval,
-          'giving_project': unicode(gp),
-          'support_email': c.SUPPORT_EMAIL
-        })
-        text_content = strip_tags(html_content)
-        msg = EmailMultiAlternatives(subject, text_content, from_email, to_emails, bcc)
-        msg.attach_alternative(html_content, 'text/html')
-        msg.send()
-        logger.info('%d unapproved memberships in %s. Email sent to %s',
-            need_approval, unicode(gp), ', '.join(to_emails))
-
-  return HttpResponse('')
-
-def gift_notify(request):
-  """ Send an email to members letting them know gifts have been received
-
-    Mark donors as notified
-    Put details in membership notif
-  """
-
-  donors = (models.Donor.objects
-      .select_related('membership__member')
-      .filter(gift_notified=False)
-      .exclude(received_this=0, received_next=0, received_afternext=0))
-
-  memberships = {}
-  for donor in donors: # group donors by membership
-    if not donor.membership in memberships:
-      memberships[donor.membership] = []
-    memberships[donor.membership].append(donor)
-
-  for ship, donor_list in memberships.iteritems():
-    gift_str = ''
-    for donor in donor_list:
-      gift_str += ('$' + str(donor.received()) + ' gift or pledge received from ' +
-                  donor.firstname)
-      if donor.lastname:
-        gift_str += ' ' + donor.lastname
-      gift_str += '!<br>'
-    ship.notifications = ('<table><tr><td>' + gift_str +
-                         '</td><td><img src="/static/images/odo2.png"' +
-                         'height=86 width=176 alt="Odo flying">' +
-                         '</td></tr></table>')
-    ship.save(skip=True)
-    logger.info('Gift notification set for %s', unicode(ship))
-
-  login_url = c.APP_BASE_URL + 'fund/'
-  subject = 'Gift or pledge received'
-  from_email = c.FUND_EMAIL
-  bcc = [c.SUPPORT_EMAIL]
-  for ship in memberships:
-    to_emails = [ship.member.email]
-    html_content = render_to_string('fund/email_gift.html', {'login_url': login_url})
-    text_content = strip_tags(html_content)
-    msg = EmailMultiAlternatives(subject, text_content, from_email, to_emails, bcc)
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
-    logger.info('Emailed gift notification to %s' + ship.member.email)
-
-  donors.update(gift_notified=True)
-  return HttpResponse('')
