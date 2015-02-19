@@ -79,7 +79,7 @@ Once those have installed, create the database:
 1. `mysql -uroot -p` to get into the mysql shell. This will prompt you for the password you set when you installed.
 2. Make sure mysql is set to use `utf8` encoding everywhere.
 - You can check with `show variables like 'char%';`
-- If anything is set to `latin1`, change it with `set [variable name]=utf8;`
+- If anything is set to `latin1`, change it with `set variable_name=utf8;`
 3. `create database sjfdb_local;`
 
 #### Setting up the database
@@ -107,7 +107,7 @@ _If you get something like 'command not found', make sure GAE is in your path. U
 
 The superuser you created in the `syncdb` step gives you access to the admin site. For testing locally you'll want to be able to log into the fundraising and grant application areas too.
 
-1. Go to `/admin-advanced`* and log in with superuser email & pw you created when you ran `syncdb`.
+1. Go to `/admin-advanced`\* and log in with superuser email & pw you created when you ran `syncdb`.
 2. Create a `Member` object so you can log into the fundraising app:
   - Click on `+ Add` next to `Members`
   - Enter the email you used to log in, and whatever first & last name you want.
@@ -181,17 +181,15 @@ Configuration
 
 #### Branches
 
-`master` is the main branch\*. - To start, avoid ever pushing directly to `master`. Instead, when working on a feature/change, create a new branch:
+`master` is the main branch. Avoid ever pushing directly to `master`. Instead, when working on a feature/change, create a new branch:
 
 ```
   git checkout master
   git pull
-  git checkout -b new-feature
+  git checkout -b new-branch-name
 ```
 
-When your changes are ready, open a [pull request](https://help.github.com/articles/using-pull-requests/) so the code can be reviewed and merged into master.
-
-\* _We can add a `develop` branch if needed, but for now it doesn't seem necessary_
+When your changes are ready, open a [pull request](https://help.github.com/articles/using-pull-requests/) so the code can be reviewed and merged into `master`.
 
 ## Database management
 
