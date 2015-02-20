@@ -1,4 +1,4 @@
-﻿from django import forms
+from django import forms
 from django.core import validators
 from django.core.exceptions import ValidationError
 import re
@@ -78,4 +78,4 @@ class IntegerCommaField(forms.Field):
 class GaeLogsForm(forms.Form):
   start = forms.SplitDateTimeField()
   end = forms.SplitDateTimeField()
-  version_ids = forms.MultipleChoiceField(choices = [('1', '1'), ('devel', 'devel')])
+  version_ids = forms.MultipleChoiceField(choices=[('1', '1'), ('devel', 'devel')])
