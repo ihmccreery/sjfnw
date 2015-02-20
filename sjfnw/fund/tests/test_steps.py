@@ -9,6 +9,23 @@ from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
 
+class AddStep(BaseFundTestCase):
+
+  def setUp(self):
+    super(AddStep, self).setUp()
+    self.use_new_acct()
+    donor =models.Donor(firstname='user', lastname='', membership_id=self.pre_id)
+    donor.save()
+    self.url=reverse('sjfnw.fund.views.add_step', kwargs={"donor_id": donor.pk})
+
+  def test_blank(self):
+    form_data ={
+      'date': u'',
+      'description': u''
+    }
+    response = self.client.post(self.url, form_data, follow=True)
+    self.assertTemplateUsed(response, 'fund/add_step.html')
+
 
 class StepComplete(BaseFundTestCase):
   """ Tests various scenarios of step completion
