@@ -144,7 +144,7 @@ Some things that may warrant explaining:
 All of this is a work in progress in the current code. Expect a lot of pylint errors for the time being.
 
 - 2 space indents! Python is space/indent sensitive and varying indents will throw errors.
-  - An [editorconfig](http://editorconfig.org/#download) plugin may be useful if you use other indentation levels in other projects.
+  - An [editorconfig](http://editorconfig.org/#download) plugin may be useful if you use other indentation levels in other projects. Install instructions: [Sublime](https://github.com/sindresorhus/editorconfig-sublime#readme), [vim](https://github.com/editorconfig/editorconfig-vim#readme).
 - Generally follow google's [Python style guide](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html)
 
 #### Linters
