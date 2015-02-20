@@ -1,6 +1,5 @@
 from datetime import timedelta
 import logging
-import unittest
 
 from django.core import mail
 from django.core.urlresolvers import reverse
@@ -189,6 +188,7 @@ class OverdueEmails(BaseFundTestCase):
   def test_none(self):
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url, follow=True)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 0)
 
   def test_several(self):
@@ -200,6 +200,7 @@ class OverdueEmails(BaseFundTestCase):
 
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url, follow=True)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 2)
 
   def test_several_per_donor(self):
@@ -212,6 +213,7 @@ class OverdueEmails(BaseFundTestCase):
 
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url, follow=True)
+    self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 1)
 
   def test_same_member(self):
@@ -226,4 +228,5 @@ class OverdueEmails(BaseFundTestCase):
 
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url, follow=True)
-    self.assertEqual(len(mail.outbox), 1)
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(mail.outbox), 2)
