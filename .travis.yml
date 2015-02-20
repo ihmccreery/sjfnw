@@ -6,6 +6,7 @@ python:
 notifications:
   email:
     on_success: never
+    on_failure: change
 
 install:
   - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.17.zip
