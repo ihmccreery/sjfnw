@@ -48,6 +48,23 @@ class GiftNotifications(BaseFundTestCase):
     self.assertTemplateUsed(response, 'fund/home.html')
     self.assertNotContains(response, 'gift or pledge received')
 
+  def test_gift_notification_next(self):
+    # enter gift received from donor for next year
+    donor = models.Donor.objects.get(pk=self.donor_id)
+    donor.received_next = 100
+    donor.save()
+
+    # run cron task
+    response = self.client.get(self.cron_url, follow=True)
+    self.assertEqual(response.status_code, 200)
+
+    # verify notification shows
+    response = self.client.get(self.url, follow=True)
+
+    self.assertTemplateUsed(response, 'fund/home.html')
+    self.assertContains(response, 'gift or pledge received')
+
+
 class PendingApproval(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.cron.new_accounts')
@@ -159,6 +176,7 @@ class PendingApproval(BaseFundTestCase):
     self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 1)
 
+
 class OverdueEmails(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.cron.email_overdue')
@@ -203,6 +221,11 @@ class OverdueEmails(BaseFundTestCase):
     self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 2)
 
+    # doesn't send emails again
+    response = self.client.get(self.url, follow=True)
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(mail.outbox), 2)
+
   def test_several_per_donor(self):
     """ Two overdue steps for one membership; expect only one email """
 
@@ -215,6 +238,9 @@ class OverdueEmails(BaseFundTestCase):
     response = self.client.get(self.url, follow=True)
     self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 1)
+
+    membership = models.Membership.objects.get(pk=self.pre_id)
+    assertEqual(membership.emailed.day, timezone().now().date().day)
 
   def test_same_member(self):
     """ overdue step in two memberships for same member """
@@ -230,3 +256,16 @@ class OverdueEmails(BaseFundTestCase):
     response = self.client.get(self.url, follow=True)
     self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 2)
+
+  def test_completed(self):
+    """ overdue step in two memberships (different members) """
+    now = timezone.now()
+    step = models.Step(donor_id=self.donor1, date=now-timedelta(days=3), completed=now)
+    step.save()
+    step = models.Step(donor_id=self.donor3, date=ow-timedelta(days=9), completed=now)
+    step.save()
+
+    self.assertEqual(len(mail.outbox), 0)
+    response = self.client.get(self.url, follow=True)
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(mail.outbox), 0)
