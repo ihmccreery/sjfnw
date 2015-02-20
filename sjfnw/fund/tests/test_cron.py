@@ -1,7 +1,10 @@
+from datetime import timedelta
 import logging
+import unittest
 
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
@@ -157,3 +160,70 @@ class PendingApproval(BaseFundTestCase):
     self.assertEqual(response.status_code, 200)
     self.assertEqual(len(mail.outbox), 1)
 
+class OverdueEmails(BaseFundTestCase):
+
+  url = reverse('sjfnw.fund.cron.email_overdue')
+
+  def setUp(self):
+    super(OverdueEmails, self).setUp()
+    self.use_new_acct()
+
+    # create 2 donors on new member's pre membership
+    donor = models.Donor(firstname='En', membership_id=self.pre_id)
+    donor.save()
+    self.donor1 = donor.pk
+    donor = models.Donor(firstname='Tva', membership_id=self.pre_id)
+    donor.save()
+    self.donor2 = donor.pk
+
+    # create another member, membership, donor
+    member = models.Member(email='two@gmail.com', first_name='Two')
+    member.save()
+    gp = models.GivingProject.objects.get(title='Post training')
+    membership = models.Membership(giving_project=gp, member=member, approved=True)
+    membership.save()
+    donor = models.Donor(firstname='Tre', membership=membership)
+    donor.save()
+    self.donor3 = donor.pk
+
+  def test_none(self):
+    self.assertEqual(len(mail.outbox), 0)
+    response = self.client.get(self.url, follow=True)
+    self.assertEqual(len(mail.outbox), 0)
+
+  def test_several(self):
+    """ overdue step in two memberships (different members) """
+    step = models.Step(donor_id=self.donor1, date=timezone.now()-timedelta(days=3))
+    step.save()
+    step = models.Step(donor_id=self.donor3, date=timezone.now()-timedelta(days=9))
+    step.save()
+
+    self.assertEqual(len(mail.outbox), 0)
+    response = self.client.get(self.url, follow=True)
+    self.assertEqual(len(mail.outbox), 2)
+
+  def test_several_per_donor(self):
+    """ Two overdue steps for one membership; expect only one email """
+
+    step = models.Step(donor_id=self.donor1, date=timezone.now()-timedelta(days=3))
+    step.save()
+    step = models.Step(donor_id=self.donor2, date=timezone.now()-timedelta(days=9))
+    step.save()
+
+    self.assertEqual(len(mail.outbox), 0)
+    response = self.client.get(self.url, follow=True)
+    self.assertEqual(len(mail.outbox), 1)
+
+  def test_same_member(self):
+    """ overdue step in two memberships for same member """
+    donor = models.Donor(membership_id=self.post_id, firstname='Other')
+    donor.save()
+
+    step = models.Step(donor_id=self.donor1, date=timezone.now()-timedelta(days=3))
+    step.save()
+    step = models.Step(donor=donor, date=timezone.now()-timedelta(days=9))
+    step.save()
+
+    self.assertEqual(len(mail.outbox), 0)
+    response = self.client.get(self.url, follow=True)
+    self.assertEqual(len(mail.outbox), 1)
