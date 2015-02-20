@@ -1,3 +1,6 @@
+import json
+import logging
+
 from django import forms
 from django.forms import ValidationError, ModelForm
 from django.db.models import PositiveIntegerField
@@ -7,9 +10,11 @@ from django.utils.text import capfirst
 from sjfnw.forms import IntegerCommaField, PhoneNumberField
 from sjfnw.grants.models import Organization, GrantApplication, DraftGrantApplication, YearEndReport
 
-import json, logging
 logger = logging.getLogger('sjfnw')
 
+
+def _form_error(text):
+  return '<div class="form_error">%s</div>' % text
 
 
 class OrgProfile(ModelForm):
@@ -80,20 +85,20 @@ class TimelineWidget(forms.widgets.MultiWidget):
     return json.dumps(val_list)
 
 
-def custom_fields(f, **kwargs): #sets phonenumber and money fields
+def custom_fields(field, **kwargs): #sets phonenumber and money fields
   money_fields = ['budget_last', 'budget_current', 'amount_requested', 'project_budget']
   phone_fields = ['telephone_number', 'fax_number', 'fiscal_telephone',
                   'collab_ref1_phone', 'collab_ref2_phone',
                   'racial_justice_ref1_phone', 'racial_justice_ref2_phone']
-  kwargs['required'] = not f.blank
-  if f.verbose_name:
-    kwargs['label'] = capfirst(f.verbose_name)
-  if f.name in money_fields:
+  kwargs['required'] = not field.blank
+  if field.verbose_name:
+    kwargs['label'] = capfirst(field.verbose_name)
+  if field.name in money_fields:
     return IntegerCommaField(**kwargs)
-  elif f.name in phone_fields:
+  elif field.name in phone_fields:
     return PhoneNumberField(**kwargs)
   else:
-    return f.formfield(**kwargs)
+    return field.formfield(**kwargs)
 
 class GrantApplicationModelForm(forms.ModelForm):
 
@@ -103,18 +108,34 @@ class GrantApplicationModelForm(forms.ModelForm):
     model = GrantApplication
     exclude = ['pre_screening_status', 'submission_time', 'giving_projects']
     widgets = {
-      #char limits
-      'mission': forms.Textarea(attrs={'rows': 3, 'onKeyUp':'charLimitDisplay(this, 150)'}),
-      'grant_request': forms.Textarea(attrs={'rows': 3, 'onKeyUp':'charLimitDisplay(this, 100)'}),
-      'narrative1': forms.Textarea(attrs={'onKeyUp':'charLimitDisplay(this, ' + str(GrantApplication.NARRATIVE_CHAR_LIMITS[1]) + ')'}),
-      'narrative2': forms.Textarea(attrs={'onKeyUp':'charLimitDisplay(this, ' + str(GrantApplication.NARRATIVE_CHAR_LIMITS[2]) + ')'}),
-      'narrative3': forms.Textarea(attrs={'onKeyUp':'charLimitDisplay(this, ' + str(GrantApplication.NARRATIVE_CHAR_LIMITS[3]) + ')'}),
-      'narrative4': forms.Textarea(attrs={'onKeyUp':'charLimitDisplay(this, ' + str(GrantApplication.NARRATIVE_CHAR_LIMITS[4]) + ')'}),
-      'narrative5': forms.Textarea(attrs={'onKeyUp':'charLimitDisplay(this, ' + str(GrantApplication.NARRATIVE_CHAR_LIMITS[5]) + ')'}),
-      'narrative6': forms.Textarea(attrs={'onKeyUp':'charLimitDisplay(this, ' + str(GrantApplication.NARRATIVE_CHAR_LIMITS[6]) + ')'}),
-      'cycle_question': forms.Textarea(attrs={'onKeyUp':'charLimitDisplay(this, ' + str(GrantApplication.NARRATIVE_CHAR_LIMITS[7]) + ')'}),
-      #timeline
-      'timeline':TimelineWidget(),
+      'mission': forms.Textarea(attrs={
+        'rows': 3, 'onKeyUp': 'charLimitDisplay(this, 150)'
+      }),
+      'grant_request': forms.Textarea(attrs={
+        'rows': 3, 'onKeyUp': 'charLimitDisplay(this, 100)'
+      }),
+      'narrative1': forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[1]
+      }),
+      'narrative2': forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[2]
+      }),
+      'narrative3': forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[3]
+      }),
+      'narrative4': forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[4]
+      }),
+      'narrative5': forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[5]
+      }),
+      'narrative6': forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[6]
+      }),
+      'cycle_question': forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[7]
+      }),
+      'timeline': TimelineWidget()
     }
 
   def __init__(self, cycle, *args, **kwargs):
@@ -128,32 +149,34 @@ class GrantApplicationModelForm(forms.ModelForm):
     cleaned_data = super(GrantApplicationModelForm, self).clean()
 
     #timeline
-    timeline = cleaned_data.get('timeline')
-    timeline = json.loads(timeline)
+    timeline = json.loads(cleaned_data.get('timeline'))
     empty = False
     incomplete = False
     for i in range(0, 13, 3):
       date = timeline[i]
       act = timeline[i+1]
       obj = timeline[i+2]
+
       if i == 0 and not (date or act or obj):
         empty = True
       if (date or act or obj) and not (date and act and obj):
         incomplete = True
+
     if incomplete:
-      self._errors['timeline'] = '<div class="form_error">All three columns are required for each quarter that you include in your timeline.</div>'
+      self._errors['timeline'] = _form_error('All three columns are required '
+          'for each quarter that you include in your timeline.')
     elif empty:
-      self._errors['timeline'] = '<div class="form_error">This field is required.</div>'
+      self._errors['timeline'] = _form_error('This field is required.')
 
     #collab refs - require phone or email
     phone = cleaned_data.get('collab_ref1_phone')
     email = cleaned_data.get('collab_ref1_email')
     if not phone and not email:
-      self._errors["collab_ref1_phone"] = '<div class="form_error">Enter a phone number or email.</div>'
+      self._errors['collab_ref1_phone'] = _form_error('Enter a phone number or email.')
     phone = cleaned_data.get('collab_ref2_phone')
     email = cleaned_data.get('collab_ref2_email')
     if not phone and not email:
-      self._errors["collab_ref2_phone"] = '<div class="form_error">Enter a phone number or email.</div>'
+      self._errors['collab_ref2_phone'] = _form_error('Enter a phone number or email.')
 
     #racial justice refs - require full set if any
     name = cleaned_data.get('racial_justice_ref1_name')
@@ -162,30 +185,32 @@ class GrantApplicationModelForm(forms.ModelForm):
     email = cleaned_data.get('racial_justice_ref1_email')
     if name or org or phone or email:
       if not name:
-        self._errors["racial_justice_ref1_name"] = '<div class="form_error">Enter a contact person.</div>'
+        self._errors['racial_justice_ref1_name'] = _form_error('Enter a contact person.')
       if not org:
-        self._errors["racial_justice_ref1_org"] = '<div class="form_error">Enter the organization name.</div>'
+        self._errors['racial_justice_ref1_org'] = _form_error('Enter the organization name.')
       if not phone and not email:
-        self._errors["racial_justice_ref1_phone"] = '<div class="form_error">Enter a phone number or email.</div>'
+        self._errors['racial_justice_ref1_phone'] = _form_error('Enter a phone number or email.')
     name = cleaned_data.get('racial_justice_ref2_name')
     org = cleaned_data.get('racial_justice_ref2_org')
     phone = cleaned_data.get('racial_justice_ref2_phone')
     email = cleaned_data.get('racial_justice_ref2_email')
     if name or org or phone or email:
       if not name:
-        self._errors["racial_justice_ref2_name"] = '<div class="form_error">Enter a contact person.</div>'
+        self._errors['racial_justice_ref2_name'] = _form_error('Enter a contact person.')
       if not org:
-        self._errors["racial_justice_ref2_org"] = '<div class="form_error">Enter the organization name.</div>'
+        self._errors['racial_justice_ref2_org'] = _form_error('Enter the organization name.')
       if not phone and not email:
-        self._errors["racial_justice_ref2_phone"] = '<div class="form_error">Enter a phone number or email.</div>'
+        self._errors['racial_justice_ref2_phone'] = _form_error('Enter a phone number or email.')
 
     #project - require title & budget if type
     support_type = cleaned_data.get('support_type')
     if support_type == 'Project support':
       if not cleaned_data.get('project_budget'):
-        self._errors["project_budget"] = '<div class="form_error">This field is required when applying for project support.</div>'
+        self._errors['project_budget'] = _form_error(
+            'This field is required when applying for project support.')
       if not cleaned_data.get('project_title'):
-        self._errors["project_title"] = '<div class="form_error">This field is required when applying for project support.</div>'
+        self._errors['project_title'] = _form_error(
+            'This field is required when applying for project support.')
 
     #fiscal info/file - require all if any
     org = cleaned_data.get('fiscal_org')
@@ -195,27 +220,27 @@ class GrantApplicationModelForm(forms.ModelForm):
     address = cleaned_data.get('fiscal_address')
     city = cleaned_data.get('fiscal_city')
     state = cleaned_data.get('fiscal_state')
-    zip = cleaned_data.get('fiscal_zip')
-    file = cleaned_data.get('fiscal_letter')
-    if (org or person or phone or email or address or city or state or zip):
+    zipcode = cleaned_data.get('fiscal_zip')
+    fiscal_letter = cleaned_data.get('fiscal_letter')
+    if org or person or phone or email or address or city or state or zipcode:
       if not org:
-        self._errors["fiscal_org"] = '<div class="form_error">This field is required.</div>'
+        self._errors['fiscal_org'] = _form_error('This field is required.')
       if not person:
-        self._errors["fiscal_person"] = '<div class="form_error">This field is required.</div>'
+        self._errors['fiscal_person'] = _form_error('This field is required.')
       if not phone:
-        self._errors["fiscal_telephone"] = '<div class="form_error">This field is required.</div>'
+        self._errors['fiscal_telephone'] = _form_error('This field is required.')
       if not email:
-        self._errors["fiscal_email"] = '<div class="form_error">This field is required.</div>'
+        self._errors['fiscal_email'] = _form_error('This field is required.')
       if not address:
-        self._errors["fiscal_address"] = '<div class="form_error">This field is required.</div>'
+        self._errors['fiscal_address'] = _form_error('This field is required.')
       if not city:
-        self._errors["fiscal_city"] = '<div class="form_error">This field is required.</div>'
+        self._errors['fiscal_city'] = _form_error('This field is required.')
       if not state:
-        self._errors["fiscal_state"] = '<div class="form_error">This field is required.</div>'
-      if not zip:
-        self._errors["fiscal_zip"] = '<div class="form_error">This field is required.</div>'
-      if not file:
-        self._errors["fiscal_letter"] = '<div class="form_error">This field is required.</div>'
+        self._errors['fiscal_state'] = _form_error('This field is required.')
+      if not zipcode:
+        self._errors['fiscal_zip'] = _form_error('This field is required.')
+      if not fiscal_letter:
+        self._errors['fiscal_letter'] = _form_error('This field is required.')
 
     return cleaned_data
 
@@ -238,7 +263,9 @@ class ContactPersonWidget(forms.widgets.MultiWidget):
 
   def format_output(self, rendered_widgets):
     """ format widgets for display - add any additional labels, html, etc """
-    return (rendered_widgets[0] + '<label for="contact_person_1" style="margin-left:5px">Title</label>' + rendered_widgets[1])
+    return (rendered_widgets[0] +
+            '<label for="contact_person_1" style="margin-left:5px">Title</label>' +
+            rendered_widgets[1])
 
   def value_from_datadict(self, data, files, name):
     """ Consolidate widget data into single value for db storage """
@@ -282,7 +309,7 @@ class YearEndReportForm(ModelForm):
     widgets = {'award': forms.HiddenInput(),
                'stay_informed': forms.HiddenInput(),
                'contact_person': ContactPersonWidget}
-  
+
   def clean(self):
     stay_informed = {}
     for field_name in self.declared_fields:
@@ -312,5 +339,3 @@ class DraftAdminForm(ModelForm):
         raise ValidationError('This organization has already submitted an '
                               'application to this grant cycle.')
     return cleaned_data
-
-

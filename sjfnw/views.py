@@ -1,6 +1,5 @@
-﻿from django import http
-from django.shortcuts import redirect
-from django.template import RequestContext, loader
+from django import http
+from django.shortcuts import render
 import logging
 
 logger = logging.getLogger('sjfnw')
@@ -18,11 +17,9 @@ def page_not_found(request):
   else:
     title_addition = ' - Social Justice Fund Apps'
     contact_url = False
-  template_name = '404.html'
-  t = loader.get_template(template_name)
-  return http.HttpResponseNotFound(t.render(RequestContext(request,
-                                   {'title_addition': title_addition,
-                                    'contact_url':contact_url})))
+  return http.HttpResponseNotFound(render(request, '404.html', {
+    'title_addition': title_addition, 'contact_url':contact_url
+  }))
 
 # 500
 def server_error(request):
@@ -37,26 +34,15 @@ def server_error(request):
   else:
     title_addition = ' - Social Justice Fund Apps'
     contact_url = False
-  template_name = '500.html'
-  t = loader.get_template(template_name)
-  return http.HttpResponseNotFound(t.render(RequestContext(request,
-                                  {'title_addition': title_addition,
-                                   'contact_url':contact_url})))
-
-# admin -> admin/
-def admin_redirect(request):
-  return redirect('/admin/')
-
-# admin-advanced -> admin-advanced/
-def admin_adv_redirect(request):
-  return redirect('/admin-advanced/')
+  return http.HttpResponseNotFound(render(request, '500.html', {
+    'title_addition': title_addition, 'contact_url':contact_url
+  }))
 
 # endpoint for logging javascript errors to server log
 def log_javascript(request):
   if request.method == 'POST':
     log = ''
-    for k in request.POST:
-      log = log + '\n' + k + ': ' + str(request.POST[k])
+    for key in request.POST:
+      log = log + '\n' + key + ': ' + str(request.POST[key])
     logger.warning(log)
   return http.HttpResponse('success')
-

@@ -9,7 +9,7 @@ from django.utils.encoding import force_unicode
 
 from google.appengine.api import files
 from google.appengine.api.images import get_serving_url, NotImageError
-from google.appengine.ext.blobstore import BlobInfo, BlobKey, delete, BLOB_KEY_HEADER, BLOB_RANGE_HEADER, BlobReader
+from google.appengine.ext.blobstore import BlobInfo, BlobKey, delete, BlobReader
 
 from sjfnw.grants.utils import FindBlobKey
 
@@ -40,12 +40,11 @@ class BlobstoreStorage(Storage):
                                          'application/octet-stream',
                                          _blobinfo_uploaded_filename=name)
 
-      with files.open(file_name, 'a') as f:
+      with files.open(file_name, 'a') as open_file:
         for chunk in content.chunks():
-          f.write(chunk)
+          open_file.write(chunk)
 
       files.finalize(file_name)
-
       data = files.blobstore.get_blob_key(file_name)
 
     else:
@@ -61,7 +60,7 @@ class BlobstoreStorage(Storage):
       if len(name) > 65: #shorten it so extension fits in FileField
         name = name.split(".")[0][:60].rstrip() + u'.' + name.split(".")[1]
         logger.info(name)
-        logger.info('Returning ' + str(data) + name )
+        logger.info('Returning ' + str(data) + name)
       return '%s/%s' % (data, name)
 
     else:
@@ -163,7 +162,7 @@ class BlobstoreUploadedFile(UploadedFile):
   """
 
   def __init__(self, blobinfo, charset):
-    logger.info('BlobstoreUploadedFile.__init__ %s' % blobinfo.content_type)
+    logger.info('BlobstoreUploadedFile.__init__ %s', blobinfo.content_type)
     super(BlobstoreUploadedFile, self).__init__(
       BlobReader(blobinfo.key()), blobinfo.filename,
       blobinfo.content_type, blobinfo.size, charset)

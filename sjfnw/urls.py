@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.views.generic.base import TemplateView
+from django.views.generic.base import RedirectView, TemplateView
 
 from sjfnw.admin import advanced_admin
 from sjfnw.grants.urls import apply_urls, report_urls, grants_urls, root_urls
@@ -40,9 +40,9 @@ urlpatterns = patterns('',
 
   # admin
   (r'^admin/', include(admin.site.urls)),
-  (r'^admin$', 'sjfnw.views.admin_redirect'),
   (r'^admin-advanced/', include(advanced_admin.urls)),
-  (r'^admin-advanced$', 'sjfnw.views.admin_adv_redirect'),
+  (r'^admin$', RedirectView.as_view(url='/admin/')),
+  (r'^admin-advanced$', RedirectView.as_view(url='/admin-advanced/')),
   (r'^admin/grants/grantapplication/(?P<app_id>\d+)/revert', 'sjfnw.grants.views.AppToDraft'),
   (r'^admin-advanced/grants/grantapplication/(?P<app_id>\d+)/revert',
       'sjfnw.grants.views.AppToDraft'),
@@ -69,4 +69,3 @@ urlpatterns = patterns('',
 
 #for dev_appserver
 urlpatterns += staticfiles_urlpatterns()
-

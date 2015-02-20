@@ -1,4 +1,4 @@
-﻿from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from sjfnw.fund.models import GivingProject
@@ -32,10 +32,11 @@ def generate_cycles(self): # 6
     self.stdout.write('>=3 cycles exist, skipping.\n')
     return
   for name in GP_PREFIXES:
-    open = self.now - timedelta(weeks=randint(1, 260))
-    cycle = models.GrantCycle(title = name + ' Grant Cycle', open = open,
-                              close = open + timedelta(weeks=7),
-                              info_page = 'http://www.socialjusticefund.org/grant-app/lgbtq-grant-cycle')
+    open_date = self.now - timedelta(weeks=randint(1, 260))
+    cycle = models.GrantCycle(
+        title=name + ' Grant Cycle', open=open_date,
+        close=open_date + timedelta(weeks=7),
+        info_page='http://www.socialjusticefund.org/grant-app/lgbtq-grant-cycle')
     cycle.save()
   self.stdout.write('Cycles created\n')
 
@@ -70,20 +71,21 @@ def generate_giving_projects(self): # 6
     self.stdout.write('>=3 gps found, skipping.\n')
     return
   for name in GP_PREFIXES:
-    gp = GivingProject(title = name + ' Giving Project',
-                       fundraising_deadline = self.now,
-                       fundraising_training = self.now)
+    gp = GivingProject(title=name + ' Giving Project',
+                       fundraising_deadline=self.now,
+                       fundraising_training=self.now)
     gp.save()
     GPS.append(gp)
   self.stdout.write('Giving Projects created\n')
 
 def generate_applications(self):
-  rl = models.GrantApplication.objects.filter()
-  if not rl:
+  example_app = models.GrantApplication.objects.filter()
+  if not example_app:
     self.stderr.write('Need at least one grant application in the database, '
                       'to steal file fields from\n')
     return
-  rl = rl[0]
+
+  example_app = example_app[0]
   for cycle in models.GrantCycle.objects.all():
     count = 0
     for org in models.Organization.objects.all():
@@ -120,7 +122,13 @@ def generate_applications(self):
         app.narrative5 = random_words(100)
         app.narrative6 = random_words(100)
         #app.cycle_question
-        app.timeline = json.dumps(["Jan", "Chillin", "Not applicable", "Feb", "Petting dogs", "5 dogs", "Mar", "Planting daffodils", "s", "July", "Walking around Greenlake", "9 times", "August", "Reading in the shade", "No sunburns"])
+        app.timeline = json.dumps([
+          "Jan", "Chillin", "Not applicable",
+          "Feb", "Petting dogs", "5 dogs",
+          "Mar", "Planting daffodils", "s",
+          "July", "Walking around Greenlake", "9 times",
+          "August", "Reading in the shade", "No sunburns"
+        ])
 
         app.collab_ref1_name = random_words(25)
         app.collab_ref1_org = random_words(25)
@@ -133,12 +141,12 @@ def generate_applications(self):
 
         #skipping rj refs
 
-        app.budget = rl.budget
-        app.demographics = rl.demographics
-        app.funding_sources = rl.funding_sources
-        app.budget1 = rl.budget1
-        app.budget2 = rl.budget2
-        app.budget3 = rl.budget3
+        app.budget = example_app.budget
+        app.demographics = example_app.demographics
+        app.funding_sources = example_app.funding_sources
+        app.budget1 = example_app.budget1
+        app.budget2 = example_app.budget2
+        app.budget3 = example_app.budget3
 
         app.screening_status = models.GrantApplication.SCREENING_CHOICES[randint(0, 12)][0]
         app.giving_project = models.GivingProject.objects.order_by('?')[0]
@@ -153,15 +161,14 @@ def generate_applications(self):
 
         app.save()
         count += 1
-    self.stdout.write(str(count) + ' applications created for '+
-                      unicode(cycle) + '\n')
+    self.stdout.write(u'%d applications created for %s\n' % (count, cycle))
   self.stdout.write('Application creation complete')
 
 def random_phone():
-  ph = ''
-  for i in range(0, 10):
-    ph += str(randint(1, 9))
-  return ph[:3] + u'-' + ph[3:6] + u'-' + ph[6:]
+  phone = ''
+  for _ in range(0, 10):
+    phone += str(randint(1, 9))
+  return phone[:3] + u'-' + phone[3:6] + u'-' + phone[6:]
 
 def random_url():
   suf = ['.com', 'org', '.net', '.edu']
@@ -174,16 +181,16 @@ def random_email():
 def random_letters(length):
   return random_string(length, False)
 
-def random_words(length, case='sentence'):
+def random_words(length):
   return random_string(length, True)
 
 def random_string(length, spaces):
   chars = string.ascii_lowercase
   if spaces:
     chars += ' '
-  le = len(chars)
-  str = ''
-  for i in range(0, length):
-    str += chars[randint(0, le-1)]
-  return str
+  chars_length = len(chars)
+  result = ''
+  for _ in range(0, length):
+    result += chars[randint(0, chars_length-1)]
+  return result
 
