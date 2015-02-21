@@ -2,8 +2,8 @@
   <a href="https://travis-ci.org/aisapatino/sjfnw">
     <img src="https://travis-ci.org/aisapatino/sjfnw.svg?branch=master">
   </a>
-  <a href="https://coveralls.io/r/aisapatino/sjfnw?branch=master">
-   <img src="https://coveralls.io/repos/aisapatino/sjfnw/badge.svg?branch=master">
+  <a href="https://codecov.io/github/aisapatino/sjfnw?branch=master">
+    <img src="https://codecov.io/github/aisapatino/sjfnw/coverage.svg?branch=master">
   </a>
 </p>
 
