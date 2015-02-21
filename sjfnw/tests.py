@@ -6,14 +6,21 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.simple import DjangoTestSuiteRunner
 
-from unittest import TextTestRunner, TextTestResult
+from unittest import TextTestRunner, TestResult
 from unittest.signals import registerResult
-
 
 # Sets root & sjfnw loggers level. Comment out for less output.
 logging.getLogger().setLevel(0)
 logger = logging.getLogger('sjfnw')
 logger.setLevel(0)
+
+RED = '\033[00;31m'
+GREEN = '\033[00;32m'
+YELLOW = '\033[00;33m'
+BOLD = '\033[1m'
+BOLD_RED = '\033[01;31m'
+RESET = '\033[00m'
+INDENT = '    '
 
 class BaseTestCase(TestCase):
   """ Base test case used by all other tests
@@ -39,12 +46,15 @@ class BaseTestCase(TestCase):
     self.assertEqual(1, len(messages))
     self.assertEqual(str(messages[0]), text)
 
-  class Meta:
+  class Meta: # pylint: disable=old-style-class
     abstract = True
 
 
 # Code below overrides the default test runner to provide colored
 # output in the console
+
+# pylint: disable=too-many-arguments,too-many-branches,too-many-locals,
+# pylint: disable=redefined-builtin,invalid-name,bad-builtin
 
 class ColorTestSuiteRunner(DjangoTestSuiteRunner):
   """ Redirects run_suite to ColorTestRunner """
@@ -53,91 +63,98 @@ class ColorTestSuiteRunner(DjangoTestSuiteRunner):
     return ColorTestRunner(verbosity=2, failfast=self.failfast).run(suite)
 
 
-class ColorTextResult(TextTestResult):
-  """Copied and modified from py2.7
+class ColorTextResult(TestResult):
+  """Copied and modified from py2.7's TextTestResult
 
     A test result class that can print formatted text results to a stream.
-
-    Used by TextTestRunner.  """
+  """
 
   separator1 = '=' * 70
   separator2 = '-' * 70
 
   def __init__(self, stream, descriptions, verbosity):
     super(ColorTextResult, self).__init__(stream, descriptions, verbosity)
+    self.stream = stream
+    self.show_all = verbosity > 1
+    self.dots = verbosity == 1
+    self.descriptions = descriptions
 
-  def getDescription(self, test):
-    """ modified to bold test name """
+  def get_description(self, test):
+    """ modified to bold test name and strip repeat parts (sjfnw, test_) """
     doc_first_line = test.shortDescription()
+    # test.id() is in format module.filename.testclass.testmethod. example:
+    # sjfnw.fund.tests.test_add_mult.AddMultipleDonorsPost.test_post_empty
     name = test.id().replace('sjfnw.', '').replace('tests.', '').replace('.test_', '  ')
     if self.descriptions and doc_first_line:
-      return '\033[1m %s \033[00m %s\n' % (name, doc_first_line)
+      return '\n{}{}{} {}'.format(BOLD, name, RESET, doc_first_line)
     else:
-      return '\033[1m %s \033[00m\n' % name
+      return '\n{}{}{}\n'.format(BOLD, name, RESET)
 
   def startTest(self, test):
     super(ColorTextResult, self).startTest(test)
+    if self.show_all:
+      self.stream.writeln(self.get_description(test))
 
   def addSuccess(self, test):
     super(ColorTextResult, self).addSuccess(test)
-    if self.showAll:
-      self.stream.writeln("    \033[00;32mok\033[00m")
+    if self.show_all:
+      self.stream.writeln(INDENT + GREEN + 'ok' + RESET)
     elif self.dots:
       self.stream.write('.')
       self.stream.flush()
 
   def addError(self, test, err):
     super(ColorTextResult, self).addError(test, err)
-    if self.showAll:
-      self.stream.writeln("    \033[00;31mERROR\033[00m")
+    if self.show_all:
+      self.stream.writeln(INDENT + RED + 'ERROR' + RESET)
     elif self.dots:
       self.stream.write('E')
       self.stream.flush()
 
   def addFailure(self, test, err):
     super(ColorTextResult, self).addFailure(test, err)
-    if self.showAll:
-      self.stream.writeln("    \033[00;31mFAIL\033[00m")
+    if self.show_all:
+      self.stream.writeln(INDENT + RED + 'FAIL' + RESET)
     elif self.dots:
       self.stream.write('F')
       self.stream.flush()
 
   def addSkip(self, test, reason):
     super(ColorTextResult, self).addSkip(test, reason)
-    if self.showAll:
-      self.stream.writeln("    \033[00;33mskipped\033[00m {0!r}".format(reason))
+    if self.show_all:
+      self.stream.writeln('{}{}skipped{} {!r}'.format(INDENT, YELLOW, RESET, reason))
     elif self.dots:
-      self.stream.write("s")
+      self.stream.write('s')
       self.stream.flush()
 
   def addExpectedFailure(self, test, err):
     super(ColorTextResult, self).addExpectedFailure(test, err)
-    if self.showAll:
-      self.stream.writeln("    expected failure")
+    if self.show_all:
+      self.stream.writeln(INDENT + GREEN + 'expected failure' + RESET)
     elif self.dots:
-      self.stream.write("x")
+      self.stream.write('x')
       self.stream.flush()
 
   def addUnexpectedSuccess(self, test):
     super(ColorTextResult, self).addUnexpectedSuccess(test)
-    if self.showAll:
-      self.stream.writeln("    unexpected success")
+    if self.show_all:
+      self.stream.writeln(INDENT + RED + 'unexpected success' + RESET)
     elif self.dots:
-      self.stream.write("u")
+      self.stream.write('u')
       self.stream.flush()
 
-  def printErrors(self):
-    if self.dots or self.showAll:
+  def print_errors(self):
+    if self.dots or self.show_all:
       self.stream.writeln()
-      self.printErrorList('\033[00;31mERROR\033[00m', self.errors)
-      self.printErrorList('\033[00;31mFAIL\033[00m', self.failures)
+    self.print_error_list('ERROR', self.errors)
+    self.print_error_list('FAIL', self.failures)
 
-  def printErrorList(self, flavour, errors):
+  def print_error_list(self, flavour, errors):
     for test, err in errors:
       self.stream.writeln(self.separator1)
-      self.stream.writeln("%s: \033[1m%s\033[00m" % (flavour, str(test)))
+      self.stream.writeln('{}{}{}: {}{}{}'.format(BOLD_RED, flavour, RESET, RED, test, RESET))
       self.stream.writeln(self.separator2)
-      self.stream.writeln("%s" % err)
+      self.stream.writeln(err)
 
 
 class ColorTestRunner(TextTestRunner):
@@ -159,7 +176,7 @@ class ColorTestRunner(TextTestRunner):
     registerResult(result)
     result.failfast = self.failfast
     result.buffer = self.buffer
-    startTime = time.time()
+    start_time = time.time()
     startTestRun = getattr(result, 'startTestRun', None)
     if startTestRun is not None:
       startTestRun()
@@ -169,14 +186,14 @@ class ColorTestRunner(TextTestRunner):
       stopTestRun = getattr(result, 'stopTestRun', None)
       if stopTestRun is not None:
         stopTestRun()
-    stopTime = time.time()
-    timeTaken = stopTime - startTime
+    stop_time = time.time()
+    timeTaken = stop_time - start_time
     result.printErrors()
     if hasattr(result, 'separator2'):
       self.stream.writeln(result.separator1)
     run = result.testsRun
-    self.stream.writeln(" \033[1mRan %d test%s in %.3fs" %
-        (run, run != 1 and "s" or "", timeTaken))
+    self.stream.writeln(' \033[1mRan %d test%s in %.3fs' %
+        (run, run != 1 and 's' or '', timeTaken))
     self.stream.writeln()
 
     expectedFails = unexpectedSuccesses = skipped = 0
@@ -191,22 +208,21 @@ class ColorTestRunner(TextTestRunner):
 
     infos = []
     if not result.wasSuccessful():
-      self.stream.write(" \033[1;31mFAILED\033[00m")
+      self.stream.write(' \033[1;31mFAILED\033[00m')
       failed, errored = map(len, (result.failures, result.errors))
       if failed:
-        infos.append("failures = \033[00;31m%d\033[00m" % failed)
+        infos.append('failures = \033[00;31m%d\033[00m' % failed)
       if errored:
-        infos.append("errors = \033[00;31m%d\033[00m" % errored)
+        infos.append('errors = \033[00;31m%d\033[00m' % errored)
     else:
-      self.stream.write(" \033[1;32mOK\033[00m")
+      self.stream.write(' \033[1;32mOK\033[00m')
     if skipped:
-      infos.append("skipped = \033[00;33m%d\033[00m" % skipped)
+      infos.append('skipped = \033[00;33m%d\033[00m' % skipped)
     if expectedFails:
-      infos.append("expected failures=%d" % expectedFails)
+      infos.append('expected failures=%d' % expectedFails)
     if unexpectedSuccesses:
-      infos.append("unexpected successes=%d" % unexpectedSuccesses)
+      infos.append('unexpected successes=%d' % unexpectedSuccesses)
     if infos:
-      self.stream.writeln(" (%s)" % (", ".join(infos),))
+      self.stream.writeln(' (%s)' % (', '.join(infos),))
     self.stream.write('\n')
     return result
-
