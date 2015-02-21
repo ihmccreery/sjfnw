@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 import logging
 
 from django.core import mail
@@ -240,7 +240,7 @@ class OverdueEmails(BaseFundTestCase):
     self.assertEqual(len(mail.outbox), 1)
 
     membership = models.Membership.objects.get(pk=self.pre_id)
-    assertEqual(membership.emailed.day, timezone().now().date().day)
+    self.assertEqual(membership.emailed.day, datetime.today().day) # stored in UTC
 
   def test_same_member(self):
     """ overdue step in two memberships for same member """
@@ -262,7 +262,7 @@ class OverdueEmails(BaseFundTestCase):
     now = timezone.now()
     step = models.Step(donor_id=self.donor1, date=now-timedelta(days=3), completed=now)
     step.save()
-    step = models.Step(donor_id=self.donor3, date=ow-timedelta(days=9), completed=now)
+    step = models.Step(donor_id=self.donor3, date=now-timedelta(days=9), completed=now)
     step.save()
 
     self.assertEqual(len(mail.outbox), 0)
