@@ -11,8 +11,7 @@ notifications:
 install:
   - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.17.zip
   - unzip -q google_appengine_1.9.17.zip
-  - pip install coverage
-  - pip install python-coveralls
+  - pip install codecov
   # - "pip install pylint"
   # - "pip install pylint-django"
 
@@ -27,4 +26,4 @@ before_script:
 script: ./scripts/coverage.sh skip-html
 
 # send coverage to coveralls if tests passed
-after_success: coveralls
+after_success: codecov
