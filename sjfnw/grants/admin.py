@@ -66,7 +66,8 @@ class LogReadonlyI(admin.TabularInline): #Org, Application
   verbose_name_plural = 'Logs'
 
   def queryset(self, request):
-    return super(LogReadonlyI, self).queryset(request).select_related('staff', 'application', 'application__grant_cycle')
+    return (super(LogReadonlyI, self).queryset(request)
+            .select_related('staff', 'application', 'application__grant_cycle'))
 
   def grantcycle(self, obj):
     if obj.application:
@@ -108,7 +109,9 @@ class LogI(admin.TabularInline): #Org, Application
       # application field
       if db_field.name == 'application':
         org_pk = int(request.path.split('/')[-2])
-        kwargs['queryset'] = models.GrantApplication.objects.filter(organization_id=org_pk).select_related('organization', 'grant_cycle')
+        kwargs['queryset'] = (models.GrantApplication.objects
+            .select_related('organization', 'grant_cycle')
+            .filter(organization_id=org_pk))
 
     return super(LogI, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
@@ -170,7 +173,8 @@ class DraftI(BaseShowInline): #Adv only
   readonly_fields = ('grant_cycle', 'modified', 'overdue', 'extended_deadline', 'adv_viewdraft')
 
   def adv_viewdraft(self, obj): #Link from Draft inline on Org to Draft page
-    return '<a href="/admin-advanced/grants/draftgrantapplication/' + str(obj.pk) + '/" target="_blank">View</a>'
+    return ('<a href="/admin-advanced/grants/draftgrantapplication/' +
+            str(obj.pk) + '/" target="_blank">View</a>')
   adv_viewdraft.allow_tags = True
 
 class ProjectAppI(admin.TabularInline): # GrantApplication
@@ -196,7 +200,9 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
 
   def year_end_report(self, obj):
     if obj.pk:
-      report = models.YearEndReport.objects.select_related('award').filter(award__projectapp_id=obj.pk)
+      report = (models.YearEndReport.objects
+          .select_related('award')
+          .filter(award__projectapp_id=obj.pk))
       if report:
         return mark_safe('<a target="_blank" href="/admin/grants/yearendreport/' +
             str(report[0].pk) + '/">View</a>')
@@ -279,9 +285,10 @@ class GrantApplicationA(admin.ModelAdmin):
                      'fax_number', 'email_address', 'website'),
                    ('status', 'ein'))
     }),
-    ('Administration', {
-        'fields': (('pre_screening_status', 'scoring_bonus_poc', 'scoring_bonus_geo', 'site_visit_report'),
-                   ('revert_grant', 'rollover'))
+    ('Administration', {'fields': (
+        ('pre_screening_status', 'scoring_bonus_poc', 'scoring_bonus_geo', 'site_visit_report'),
+        ('revert_grant', 'rollover')
+      )
     })
   )
   readonly_fields = ('organization_link', 'grant_cycle', 'submission_time',
@@ -428,7 +435,7 @@ class YearEndReportA(admin.ModelAdmin):
   def cycle(self, obj):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
-  
+
 
 # REGISTER
 
