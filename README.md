@@ -25,7 +25,7 @@
 - **[Tools](#tools)**
   - [Issue tracking](#issue-tracking)
   - [Travis CI](#travis-ci)
-  - [Coveralls.io](#coverallsio)
+  - [Codecov.io](#codecov)
 - **[Deploying](#deploying)**
 - **[References](#references)**
 
@@ -214,15 +214,13 @@ Travis runs tests whenever a new commit is pushed to github. The badge at the to
 
 When previewing or creating a pull request, there will be icons next to some commits indicating test success or failure on travis. Click to see details.
 
-#### Coveralls.io
+#### Codecov.io
 
-https://coveralls.io/r/aisapatino/sjfnw
+https://codecov.io/github/aisapatino/sjfnw
 
 Tool for tracking test coverage over time. When Travis runs tests, it reports the coverage results and they're recorded at the link above. You can click on a commit to see a breakdown by file, and click on a file to see line-by-line coverage.
 
-Coveralls is configured to leave a comment on every pull request with the change in code coverage.
-
-_Note: Coveralls is currently very slow to update, so if you see "no data" or your PR status stays at pending, that's probably why._
+Codecov is configured to leave a comment on every pull request with the change in code coverage.
 
 ## Deploying
 
