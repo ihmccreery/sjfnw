@@ -19,8 +19,11 @@ from libs import unicodecsv
 from sjfnw import constants
 from sjfnw.fund.models import Member
 from sjfnw.grants.decorators import registered_org
-from sjfnw.grants.forms import LoginForm, RegisterForm, RolloverForm, AdminRolloverForm, AppReportForm, OrgReportForm, AwardReportForm, LoginAsOrgForm, RolloverYERForm
-from sjfnw.grants.modelforms import GrantApplicationModelForm, OrgProfile, YearEndReportForm
+from sjfnw.grants.forms import (AdminRolloverForm, LoginAsOrgForm, LoginForm,
+   AppReportForm, AwardReportForm, OrgReportForm, RegisterForm,
+   RolloverForm, RolloverYERForm)
+from sjfnw.grants.modelforms import (GrantApplicationModelForm, OrgProfile,
+    YearEndReportForm)
 from sjfnw.grants.utils import local_date_str, ServeBlob, DeleteBlob
 from sjfnw.grants import models
 
@@ -209,7 +212,7 @@ def org_home(request, organization):
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
-def Apply(request, organization, cycle_id): # /apply/[cycle_id]
+def grant_application(request, organization, cycle_id): # /apply/[cycle_id]
   """ Get or submit the whole application form """
 
   #staff override
@@ -222,10 +225,13 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
 
   #check for app already submitted
   if models.GrantApplication.objects.filter(organization=organization, grant_cycle=cycle):
-    return render(request, 'grants/already_applied.html', {'organization': organization, 'cycle': cycle})
+    return render(request, 'grants/already_applied.html', {
+      'organization': organization, 'cycle': cycle
+    })
 
   #get or create draft
-  draft, created = models.DraftGrantApplication.objects.get_or_create(organization=organization, grant_cycle=cycle)
+  draft, created = models.DraftGrantApplication.objects.get_or_create(
+      organization=organization, grant_cycle=cycle)
   profiled = False
 
   #TEMP HACK
@@ -253,17 +259,21 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
       logger.info('========= Application form valid')
 
       #create the GrantApplication
-      new_app = form.save()
+      form.save()
 
       #send email confirmation
-      subject, from_email = 'Grant application submitted', constants.GRANT_EMAIL
-      to = organization.email
-      html_content = render_to_string('grants/email_submitted.html', {'org': organization, 'cycle': cycle})
+      subject = 'Grant application submitted'
+      from_email = constants.GRANT_EMAIL
+      to_email = organization.email
+      html_content = render_to_string('grants/email_submitted.html', {
+        'org': organization, 'cycle': cycle
+      })
       text_content = strip_tags(html_content)
-      msg = EmailMultiAlternatives(subject, text_content, from_email, [to], [constants.SUPPORT_EMAIL])
+      msg = EmailMultiAlternatives(subject, text_content, from_email,
+          [to_email], [constants.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, "text/html")
       msg.send()
-      logger.info("Application created; confirmation email sent to " + to)
+      logger.info("Application created; confirmation email sent to " + to_email)
 
       #delete draft
       draft.delete()
@@ -322,7 +332,9 @@ def Apply(request, organization, cycle_id): # /apply/[cycle_id]
     if url:
       name = getattr(draft, field).name.split('/')[-1]
       #short_name = name[:35] + (name[35:] and '..') #stackoverflow'd truncate
-      file_urls[field] = '<a href="' + url + '" target="_blank" title="' + name + '">' + name + '</a> [<a onclick="fileUploads.removeFile(\'' + field + '\');">remove</a>]'
+      file_urls[field] = ('<a href="' + url + '" target="_blank" title="' +
+          name + '">' + name + '</a> [<a onclick="fileUploads.removeFile(\'' +
+          field + '\');">remove</a>]')
     else:
       file_urls[field] = '<i>no file uploaded</i>'
 
@@ -353,7 +365,8 @@ def autosave_app(request, cycle_id):  # /apply/[cycle_id]/autosave/
 
   #get grant cycle & draft or 404
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
-  draft = get_object_or_404(models.DraftGrantApplication, organization=organization, grant_cycle=cycle)
+  draft = get_object_or_404(models.DraftGrantApplication,
+      organization=organization, grant_cycle=cycle)
 
   if request.method == 'POST':
     curr_user = request.POST.get('user_id')
@@ -388,7 +401,9 @@ def add_file(request, draft_type, draft_id):
     logger.error('Invalid draft_type %s for add_file', draft_type)
     return Http404
 
-  logger.debug([request.body]) #don't remove this without fixing storage to not access body blob_file = False
+  # don't remove this without fixing storage to not access body blob_file = False
+  logger.debug([request.body])
+
   blob_file = False
   for key in request.FILES:
     blob_file = request.FILES[key]
@@ -490,7 +505,8 @@ def year_end_report(request, organization, award_id):
 
   if request.method == 'POST':
     draft_data = json.loads(draft.contents)
-    files_data = model_to_dict(draft, fields=['photo1', 'photo2', 'photo3', 'photo4', 'photo_release'])
+    files_data = model_to_dict(draft, fields=['photo1', 'photo2', 'photo3',
+                                              'photo4', 'photo_release'])
     logger.info(files_data)
     draft_data['award'] = award.pk
     form = YearEndReportForm(draft_data, files_data)
@@ -536,7 +552,9 @@ def year_end_report(request, organization, award_id):
     if url:
       name = getattr(draft, field).name.split('/')[-1]
       #short_name = name[:35] + (name[35:] and '..') #stackoverflow'd truncate
-      file_urls[field] = '<a href="' + url + '" target="_blank" title="' + name + '">' + name + '</a> [<a onclick="fileUploads.removeFile(\'' + field + '\');">remove</a>]'
+      file_urls[field] = ('<a href="' + url + '" target="_blank" title="' +
+          name + '">' + name + '</a> [<a onclick="fileUploads.removeFile(\'' +
+          field + '\');">remove</a>]')
     else:
       file_urls[field] = '<i>no file uploaded</i>'
 
@@ -671,7 +689,8 @@ def rollover_yer(request, organization):
         .exclude(id__in=exclude_awards))
     if not awards:
       if exclude_awards:
-        error_msg = 'You have a submitted or draft year-end report for all of your grants. <a href="/apply">Go back</a>'
+        error_msg = ('You have a submitted or draft year-end report for all '
+                     'of your grants. <a href="/apply">Go back</a>')
       else:
         error_msg = 'You don\'t have any other grants that require a year-end report.'
   else:
@@ -709,15 +728,17 @@ def rollover_yer(request, organization):
       new_draft.photo4 = report.photo4
       new_draft.photo_release = report.photo_release
       new_draft.save()
-      return redirect(reverse('sjfnw.grants.views.year_end_report', kwargs={'award_id': award_id}))
+      return redirect(reverse('sjfnw.grants.views.year_end_report',
+                              kwargs={'award_id': award_id}))
     else: # INVALID FORM
       logger.error('Invalid YER rollover. %s', form.errors)
-      return render(request, 'grants/yer_rollover.html', {'error_msg': 'Invalid selection. Retry or contact an admin for assistance.'})
+      return render(request, 'grants/yer_rollover.html', {
+        'error_msg': 'Invalid selection. Retry or contact an admin for assistance.'
+      })
 
   else: # GET
     form = RolloverYERForm(reports, awards)
     return render(request, 'grants/yer_rollover.html', {'form': form})
-
 
 
 # VIEW APPS/FILES
@@ -981,9 +1002,11 @@ def get_app_results(options):
       'organization', 'grant_cycle')
 
   #filters
-  min_year = datetime.datetime.strptime(options['year_min'] + '-01-01 00:00:01', '%Y-%m-%d %H:%M:%S')
+  min_year = datetime.datetime.strptime(options['year_min'] + '-01-01 00:00:01',
+                                        '%Y-%m-%d %H:%M:%S')
   min_year = timezone.make_aware(min_year, timezone.get_current_timezone())
-  max_year = datetime.datetime.strptime(options['year_max'] + '-12-31 23:59:59', '%Y-%m-%d %H:%M:%S')
+  max_year = datetime.datetime.strptime(options['year_max'] + '-12-31 23:59:59',
+                                        '%Y-%m-%d %H:%M:%S')
   max_year = timezone.make_aware(max_year, timezone.get_current_timezone())
   apps = apps.filter(submission_time__gte=min_year, submission_time__lte=max_year)
 
@@ -1352,18 +1375,19 @@ def send_yer_email(awards, template):
       app = award.projectapp.application
 
       subject = 'Year end report'
-      from_email =  constants.GRANT_EMAIL
-      to = app.organization.email
+      from_email = constants.GRANT_EMAIL
+      to_email = app.organization.email
       html_content = render_to_string(template, {
         'award': award, 'app': app, 'gp': award.projectapp.giving_project,
         'base_url': constants.APP_BASE_URL
       })
       text_content = strip_tags(html_content)
 
-      msg = EmailMultiAlternatives(subject, text_content, from_email, [to], [constants.SUPPORT_EMAIL])
+      msg = EmailMultiAlternatives(subject, text_content, from_email,
+                                   [to_email], [constants.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, "text/html")
       msg.send()
-      logger.info('YER reminder email sent to ' + to + ' for award ' + str(award.pk))
+      logger.info('YER reminder email sent to %d for award %d', to_email, award.pk)
 
   return HttpResponse("success")
 
@@ -1376,7 +1400,8 @@ def GetFileURLs(request, app, printing=False):
       app: one of GrantApplication, DraftGrantApplication, YearEndReport, YERDraft
 
     Returns:
-      a dict of urls for viewing each file, taking into account whether it can be viewed in google doc viewer
+      a dict of urls for viewing each file, taking into account whether it can
+        be viewed in google doc viewer
       keys are the name of the django model fields. i.e. budget, budget1, funding_sources
 
     Raises:
@@ -1418,7 +1443,8 @@ def GetFileURLs(request, app, printing=False):
           if not (ext == 'xls' or ext == 'xlsx'):
             file_urls[field] = 'https://docs.google.com/viewer?url=' + file_urls[field]
         else:
-          file_urls[field] = 'https://docs.google.com/viewer?url=' + file_urls[field] + '&embedded=true'
+          file_urls[field] = ('https://docs.google.com/viewer?url=' +
+                              file_urls[field] + '&embedded=true')
   logger.debug(file_urls)
   return file_urls
 
@@ -1445,4 +1471,3 @@ def update_profile(request, org_id):
     message = 'This org has no applications. Nothing to update'
 
   return HttpResponse(message)
-
