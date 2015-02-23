@@ -16,11 +16,6 @@
         LOGIN<br>
         <form method="post" action="/apply/login/">
           <table id="login_table">
-            {% if login_error %}
-            <tr>
-              <td colspan="2"><ul class="errorlist"><li>{{ login_error }}</li></ul></td>
-            </tr>
-            {% endif %}
             <tr>
               <td colspan="2">{{ form.email.errors }}</td>
             </tr>

@@ -36,7 +36,6 @@ LOGIN_URL = '/apply/login/'
 
 # PUBLIC ORG VIEWS
 def org_login(request):
-  login_error = ''
   if request.method == 'POST':
     form = LoginForm(request.POST)
     if form.is_valid():
@@ -51,13 +50,13 @@ def org_login(request):
           logger.warning('Inactive org account tried to log in, username: ' + email)
           messages.error(request, 'Your account is inactive. Please contact an administrator.')
       else:
-        login_error = "Your password didn't match the one on file. Please try again."
+        messages.error(request, "Your password didn't match the one on file. Please try again.")
   else:
     form = LoginForm()
   register = RegisterForm()
-  logger.info('org_login' + login_error)
-  return render(request, 'grants/org_login_register.html',
-      {'form': form, 'register': register, 'login_error': login_error})
+  return render(request, 'grants/org_login_register.html', {
+      'form': form, 'register': register
+  })
 
 def org_register(request):
   """ Register an organization.
