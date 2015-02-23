@@ -143,7 +143,7 @@ class ColorTextResult(TestResult):
       self.stream.write('u')
       self.stream.flush()
 
-  def print_errors(self):
+  def printErrors(self):
     if self.dots or self.show_all:
       self.stream.writeln()
     self.print_error_list('ERROR', self.errors)
