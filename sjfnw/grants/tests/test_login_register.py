@@ -1,13 +1,63 @@
+import logging
+
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
-import logging
 logger = logging.getLogger('sjfnw')
 
+
+class Login(BaseGrantTestCase):
+
+  url = reverse('sjfnw.grants.views.org_login')
+
+  def setUp(self):
+    super(Login, self).setUp()
+
+  def test_get(self):
+    response = self.client.get(self.url, follow=True)
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/org_login_register.html')
+
+  def test_not_registered(self):
+    form_data = {
+      'email': 'askdhjhakjs@jhasd.com',
+      'password': 'apassworD'
+    }
+
+    response = self.client.post(self.url, form_data, follow=True)
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/org_login_register.html')
+    self.assert_message(response, 'Your password didn\'t match the one on file. Please try again.')
+
+  def test_wrong_pw(self):
+    User.objects.create_user('a@b.com', 'a@b.com', 'abc')
+    org = models.Organization(email='a@b.com', name='ABC')
+    org.save()
+    form_data = {
+      'email': 'a@b.com',
+      'password': 'wrong!'
+    }
+
+    response = self.client.post(self.url, form_data, follow=True)
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/org_login_register.html')
+    self.assert_message(response, 'Your password didn\'t match the one on file. Please try again.')
+
+  def test_valid(self):
+    User.objects.create_user('a@b.com', 'a@b.com', 'abc')
+    org = models.Organization(email='a@b.com', name='ABC')
+    org.save()
+    form_data = {
+      'email': 'a@b.com',
+      'password': 'abc'
+    }
+
+    response = self.client.post(self.url, form_data, follow=True)
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/org_home.html')
 
 class Register(BaseGrantTestCase):
 
@@ -102,7 +152,7 @@ class Register(BaseGrantTestCase):
   def test_admin_entered_match(self):
     """ Org name matches an org that was entered by staff (no login email) """
 
-    org = models.Organization(name = "Ye olde Orge")
+    org = models.Organization(name='Ye olde Orge')
     org.save()
 
     registration = {
@@ -114,7 +164,7 @@ class Register(BaseGrantTestCase):
 
     response = self.client.post(self.url, registration, follow=True)
 
-    org = models.Organization(name = "Ye olde Orge")
+    org = models.Organization(name='Ye olde Orge')
     # org email was updated
     #self.assertEqual(org.email, registration['email'])
     # user was created, is_active = False
@@ -125,5 +175,3 @@ class Register(BaseGrantTestCase):
     self.assert_message(response, ('You have registered successfully but your '
         'account needs administrator approval. Please contact '
         '<a href="mailto:info@socialjusticefund.org">info@socialjusticefund.org</a>'))
-
-
