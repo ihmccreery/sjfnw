@@ -145,29 +145,43 @@ All of this is a work in progress in the current code. Expect a lot of pylint er
 
 - 2 space indents! Python is space/indent sensitive and varying indents will throw errors.
   - An [editorconfig](http://editorconfig.org/#download) plugin may be useful if you use other indentation levels in other projects. Install instructions: [Sublime](https://github.com/sindresorhus/editorconfig-sublime#readme), [vim](https://github.com/editorconfig/editorconfig-vim#readme).
+- Single quotes
 - Generally follow google's [Python style guide](http://google-styleguide.googlecode.com/svn/trunk/pyguide.html)
 
 #### Linters
 
 Project contains configs for [pylint](http://www.pylint.org/) and [eslint](http://eslint.org/docs/), syntax & style checkers for python and javascript.
 
-Installation
+##### Installation
   - pylint:
     - `sudo apt-get install pylint` or `pip install pylint` (details [here](http://www.pylint.org/#install))
     - make sure you have v1.4+ (do `pip list` to see, `pip -U pylint` to upgrade)
     - `pip install pylint-django` - [plugin](https://github.com/landscapeio/pylint-django) that makes pylint more django friendly
-  - eslint:
+  - eslint: _(optional)_
     - You'll need npm first: `sudo apt-get install node` + `sudo apt-get install npm` or see their [docs](https://docs.npmjs.com/getting-started/installing-node) for instructions.
     - `npm install -g eslint` See [this page](https://docs.npmjs.com/getting-started/fixing-npm-permissions) if you get a permissions error.
 
-Usage
-  - There are a lot of lint errors currently, so you'll often want to lint just the file(s) you're currently working on.
-  - Some text editors have plugins to run them from within the editor.
-      - Vim: [syntastic](https://github.com/scrooloose/syntastic)
-      - Sublime3: [SublimeLinter](http://sublimelinter.readthedocs.org/en/latest/) + [SublimeLinter-pylint](https://packagecontrol.io/packages/SublimeLinter-pylint) + [SublimeLinter-eslint](https://github.com/roadhump/SublimeLinter-eslint)
+##### Usage - in text editor
+  - Vim: [syntastic](https://github.com/scrooloose/syntastic)
+    - In your `.vimrc`, include:
+      ```
+      let g:syntastic_python_checkers = ['pylint']
+      let g:syntastic_python_pylint_args = '--load-plugins pylint_django --rcfile=[path to repo]/.pylintrc'
+      ```
+  - Sublime3: [SublimeLinter](http://sublimelinter.readthedocs.org/en/latest/) + [SublimeLinter-pylint](https://packagecontrol.io/packages/SublimeLinter-pylint) + [SublimeLinter-eslint](https://github.com/roadhump/SublimeLinter-eslint)
+    - In your [user settings](http://sublimelinter.readthedocs.org/en/latest/settings.html#settings-sources), under `"linters"`, include:
+      ```json
+      "pylint": {
+        "rcfile": "[path to repo]/.pylintrc",
+        "args": "--load-plugins pylint_django"
+      }
+      ```
+              
+##### Usage - CLI
   - To lint the whole project: `./scripts/lint.sh`
+  - That will output results to the console. If you want to save results to a file, you can do `./scripts/lint.sh > filename.txt`
 
-Configuration
+##### Configuration
   - [.pylintrc](https://github.com/aisapatino/sjfnw/blob/master/.pylintrc) ([docs](http://docs.pylint.org/features.html))
   - [.eslintrc](https://github.com/aisapatino/sjfnw/blob/master/.eslintrc) ([docs](http://eslint.org/docs/rules/))
 
@@ -233,19 +247,25 @@ I recommend 1 because it fits nicely into git workflow and makes it very easy to
 
 ## References
 
-- [Git](http://git-scm.com/docs)
-  - Has links to a good cheatsheet and an interactive intro to git
-- [Django](https://docs.djangoproject.com/en/1.5/)
-  - Note: If you google something you'll often wind up at the most recent docs. Make sure you're looking at the docs version that matches our current Django version (currently 1.5)
-- [Python](https://docs.python.org/2/library/index.html)
+- **[Git](http://git-scm.com/docs)**
+  - Includes a good [cheatsheet](https://training.github.com/kit/downloads/github-git-cheat-sheet.pdf)
+- **[Django](https://docs.djangoproject.com/en/1.5/)**
+  - _Note: If you google something you'll often wind up at the most recent docs. Make sure you're looking at the docs version that matches our current Django version (currently 1.5)_
+  - [Tutorial](https://docs.djangoproject.com/en/1.5/intro/tutorial01/)
+  - [Models](https://docs.djangoproject.com/en/1.5/topics/db/models/)
+  - [Views](https://docs.djangoproject.com/en/1.5/topics/http/views/)
+  - [Forms](https://docs.djangoproject.com/en/1.5/topics/forms/)
+  - [Templates](https://docs.djangoproject.com/en/1.5/topics/templates/)
+  - [Admin site](https://docs.djangoproject.com/en/1.5/ref/contrib/admin/)
+  - [Intro to testing](https://docs.djangoproject.com/en/1.5/intro/tutorial05/) _(See Python's TestCase docs below for more info)_
+- **[Python](https://docs.python.org/2/library/index.html)**
   - [TestCase built-in methods & assertions](https://docs.python.org/2/library/unittest.html#unittest.TestCase)
   - [Regular expressions](http://doc.pyschools.com/html/regex.html)
-- [Google App Engine](https://cloud.google.com/appengine/docs/python/)
-  - Note: Those docs don't apply to this project in many cases since we use Django
+- **[Google App Engine](https://cloud.google.com/appengine/docs/python/)**
+  - _Note: Those docs don't apply to this project in many cases since we use Django_
   - [app.yaml](https://cloud.google.com/appengine/docs/python/config/appconfig) is the GAE app config file
   - The project's [cron tasks](https://cloud.google.com/appengine/docs/python/config/cron) use GAE
-- [MySQL reference/tutorial](http://sqlzoo.net/wiki/Main_Page)
-- [Intro to CSS](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Getting_started)
-- [CSS properties reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
+- [**MySQL** reference/tutorial](http://sqlzoo.net/wiki/Main_Page)
+- CSS: [Intro](https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Getting_started), [Reference](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
 - [HTML guide](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML)
 - [Intro to HTTP and REST](http://code.tutsplus.com/tutorials/a-beginners-guide-to-http-and-rest--net-16340)
