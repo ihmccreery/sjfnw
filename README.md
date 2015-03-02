@@ -163,14 +163,16 @@ Project contains configs for [pylint](http://www.pylint.org/) and [eslint](http:
 
 ##### Usage - in text editor
   - Vim: [syntastic](https://github.com/scrooloose/syntastic)
-    - In your `.vimrc`, include:
+    - In your `.vimrc`, include
+
       ```
       let g:syntastic_python_checkers = ['pylint']
       let g:syntastic_python_pylint_args = '--load-plugins pylint_django --rcfile=[path to repo]/.pylintrc'
       ```
   - Sublime3: [SublimeLinter](http://sublimelinter.readthedocs.org/en/latest/) + [SublimeLinter-pylint](https://packagecontrol.io/packages/SublimeLinter-pylint) + [SublimeLinter-eslint](https://github.com/roadhump/SublimeLinter-eslint)
-    - In your [user settings](http://sublimelinter.readthedocs.org/en/latest/settings.html#settings-sources), under `"linters"`, include:
-      ```json
+    - In your [user settings](http://sublimelinter.readthedocs.org/en/latest/settings.html#settings-sources), under `"linters"`, include
+
+      ```
       "pylint": {
         "rcfile": "[path to repo]/.pylintrc",
         "args": "--load-plugins pylint_django"
