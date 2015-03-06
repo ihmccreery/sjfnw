@@ -236,7 +236,7 @@ def project_page(request):
                                              .select_related('resource')
                                              .order_by('session'))
 
-  return render(request, 'fund/page_project.html', {
+  return render(request, 'fund/project.html', {
     '2active': 'true', 'header': header, 'news': news, 'grants': grants,
     'steps': steps, 'project_progress': progress, 'resources': resources
   })
@@ -255,7 +255,7 @@ def grant_list(request):
   # base
   header = project.title
 
-  return render(request, 'fund/grant_list.html', {
+  return render(request, 'fund/grants.html', {
     '3active': 'true', 'header': header, 'news': news, 'steps': steps,
     'membership': membership, 'grants': grants
   })
@@ -419,7 +419,7 @@ def manage_account(request):
   else: # GET
     form = forms.AddProjectForm()
 
-  return render(request, 'fund/projects.html', {
+  return render(request, 'fund/account_projects.html', {
     'member': member, 'form': form, 'printout': error_msg, 'ships': ships
   })
 
@@ -514,7 +514,7 @@ def project_survey(request, gp_survey_id):
 
   steps, news, grants = _get_block_content(request.membership)
 
-  return render(request, 'fund/fill_gp_survey.html', {
+  return render(request, 'fund/forms/gp_survey.html', {
     'form': form, 'survey': gp_survey.survey, 'news': news,
     'steps': steps, 'grants': grants
   })
@@ -585,7 +585,7 @@ def copy_contacts(request):
     logger.info('Initial data list of ' + str(len(initial_data)))
     formset = copy_formset(initial=initial_data)
 
-  return render(request, 'fund/copy_contacts.html', {'formset': formset})
+  return render(request, 'fund/forms/copy_contacts.html', {'formset': formset})
 
 
 @login_required(login_url='/fund/login/')
@@ -670,7 +670,7 @@ def add_mult(request):
     else: # invalid formset
       logger.info(formset.errors)
 
-    return render(request, 'fund/add_mult_flex.html', {
+    return render(request, 'fund/forms/add_contacts.html', {
       'formset': formset, 'empty_error': empty_error
     })
 
@@ -679,7 +679,7 @@ def add_mult(request):
     steps, news, grants = _get_block_content(membership)
     header = membership.giving_project.title
 
-    return render(request, 'fund/add_mult_flex.html', {
+    return render(request, 'fund/add_contacts.html', {
       '1active': 'true', 'header': header, 'news': news,
       'grants': grants, 'steps': steps, 'formset': formset
     })
@@ -719,7 +719,7 @@ def add_estimates(request):
 
     else: # invalid form
       formset_with_donors = zip(formset, donor_names)
-      return render(request, 'fund/add_estimates.html', {
+      return render(request, 'fund/forms/add_estimates.html', {
         'formset': formset, 'fd': formset_with_donors
       })
 
@@ -733,7 +733,7 @@ def add_estimates(request):
 
     formset_with_donors = zip(formset, donor_names)
 
-    return render(request, 'fund/add_estimates.html', {
+    return render(request, 'fund/forms/add_estimates.html', {
       'news': news, 'grants': grants, 'steps': steps,
       '1active': 'true', 'formset': formset, 'fd': formset_with_donors
     })
@@ -774,7 +774,7 @@ def edit_donor(request, donor_id):
     else:
       form = modelforms.DonorPreForm(instance=donor, auto_id=str(donor.pk) +
                                  '_id_%s')
-  return render(request, 'fund/edit_contact.html',
+  return render(request, 'fund/forms/edit_contact.html',
                 {'form': form, 'pk': donor.pk,
                  'action': '/fund/'+str(donor_id)+'/edit'})
 
@@ -798,7 +798,7 @@ def delete_donor(request, donor_id):
     donor.delete()
     return redirect(home)
 
-  return render(request, 'fund/delete.html', {'action': action})
+  return render(request, 'fund/forms/delete_contact.html', {'action': action})
 
 #-----------------------------------------------------------------------------
 # STEPS
@@ -842,7 +842,7 @@ def add_step(request, donor_id):
   else:
     form = modelforms.StepForm(auto_id=str(donor.pk) + '_id_%s')
 
-  return render(request, 'fund/add_step.html',
+  return render(request, 'fund/forms/add_step.html',
                 {'donor': donor, 'form': form, 'action': action, 'divid': divid,
                  'formid': formid, 'suggested': suggested,
                  'target': str(donor.pk) + '_id_description'})
@@ -886,7 +886,7 @@ def add_mult_step(request):
     logger.info('Multiple steps - loading initial formset, size ' + str(size) +
                  ': ' +str(donor_list))
   formset_with_donors = zip(formset, donor_list)
-  return render(request, 'fund/add_mult_step.html',
+  return render(request, 'fund/forms/add_mult_step.html',
                 {'size': size, 'formset': formset, 'fd': formset_with_donors, 'multi': True,
                  'suggested': suggested})
 
@@ -928,7 +928,7 @@ def edit_step(request, donor_id, step_id):
   else:
     form = modelforms.StepForm(instance=step, auto_id=str(step.pk) + '_id_%s')
 
-  return render(request, 'fund/edit_step.html', {
+  return render(request, 'fund/forms/edit_step.html', {
     'donor': donor, 'form': form, 'action': action, 'divid': divid,
     'formid': formid, 'suggested': suggested,
     'target': str(step.pk) + '_id_description'
@@ -1041,7 +1041,7 @@ def done_step(request, donor_id, step_id):
         initial['promised_amount'] = donor.promised
     form = forms.StepDoneForm(auto_id=str(step.pk) + '_id_%s', initial=initial)
 
-  return render(request, 'fund/done_step.html',
+  return render(request, 'fund/forms/complete_step.html',
                 {'form': form, 'action': action, 'donor': donor,
                  'suggested': suggested,
                  'target': str(step.pk) + '_id_next_step', 'step_id': step_id,
