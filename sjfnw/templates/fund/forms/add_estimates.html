@@ -1,4 +1,4 @@
-{% extends request.is_ajax|yesno:"base_ajax.html,fund/base_personal.html" %}
+{% extends request.is_ajax|yesno:"base_ajax.html,fund/_base_personal.html" %}
 {% block content %}
 <div class="indent" id="estimates">
   <p>Enter a donation amount to ask each contact and the estimated likelihood that the person will say yes to your ask.  Your fundraising goal is automatically calculated based on the amount multiplied by the likelihood.</p>

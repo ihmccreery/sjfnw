@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends '_base.html' %}
 
 {% block title %}- Project Central{% endblock %}
 
@@ -40,7 +40,7 @@
   <div class="content_area">
     {% block content %}{% endblock %}<!-- CONTENT -->
   </div>
-  {% include 'fund/nav.html' %}
+  {% include 'fund/includes/footer.html' %}
   <div class="center footer">
     <a href="http://socialjusticefund.org" target="_blank">socialjusticefund.org</a>
   </div>
