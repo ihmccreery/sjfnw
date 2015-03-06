@@ -20,5 +20,5 @@ class GivingProjectPage(BaseFundTestCase):
 
     response = self.client.get(self.url, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/page_project.html')
+    self.assertTemplateUsed(response, 'fund/project.html')
 

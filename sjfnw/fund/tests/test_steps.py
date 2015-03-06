@@ -24,7 +24,7 @@ class AddStep(BaseFundTestCase):
       'description': u''
     }
     response = self.client.post(self.url, form_data, follow=True)
-    self.assertTemplateUsed(response, 'fund/add_step.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_step.html')
 
 
 class StepComplete(BaseFundTestCase):
@@ -45,7 +45,7 @@ class StepComplete(BaseFundTestCase):
     super(StepComplete, self).setUp()
     logger.info('post super')
     self.use_test_acct()
-    self.url = reverse('sjfnw.fund.views.done_step', kwargs={
+    self.url = reverse('sjfnw.fund.views.complete_step', kwargs={
         'donor_id': self.donor_id, 'step_id': self.step_id
       })
     self.form_data = {
@@ -312,7 +312,7 @@ class StepComplete(BaseFundTestCase):
 
     response = self.client.post(self.url, form_data)
 
-    self.assertTemplateUsed(response, 'fund/done_step.html')
+    self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
     self.assertFormError(response, 'form', 'promised_amount', "Enter an amount.")
     self.assertFormError(response, 'form', 'last_name', "Enter a last name.")
     self.assertFormError(response, 'form', 'phone', "Enter a phone number or email.")
@@ -339,7 +339,7 @@ class StepComplete(BaseFundTestCase):
 
     response = self.client.post(self.url, form_data)
 
-    self.assertTemplateUsed(response, 'fund/done_step.html')
+    self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
     self.assertFormError(response, 'form', 'next_step_date', "Enter a date in mm/dd/yyyy format.")
 
     step1 = models.Step.objects.get(pk=self.step_id)
@@ -354,7 +354,7 @@ class StepComplete(BaseFundTestCase):
         'next_step_date': '2013-01-25'}
 
     response = self.client.post(self.url, form_data)
-    self.assertTemplateUsed(response, 'fund/done_step.html')
+    self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
     self.assertFormError(response, 'form', 'next_step', "Enter a description.")
 
     step1 = models.Step.objects.get(pk=self.step_id)
