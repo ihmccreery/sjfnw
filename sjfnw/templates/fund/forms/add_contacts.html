@@ -1,7 +1,7 @@
 {% extends request.is_ajax|yesno:"base_ajax.html,fund/_base_personal.html" %}
 {% block content %}
 <div id="addmult-wrapper">
-  <form id="addcontacts" method="post" action="" accept-charset="UTF-8">
+  <form id="add-contacts" method="post" action="" accept-charset="UTF-8">
     <table class="form" id="add_form" style="text-align:center">
     <tr>
       <td colspan="4">{{ formset.management_form }}</td>
@@ -30,7 +30,7 @@
   </div>
   <div align="center">
     <img id = "ajax_loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
-    <button onclick="Submit('{{ request.path }}', '#addcontacts', 'addmult-wrapper')">Save</button>
+    <button onclick="Submit('{{ request.path }}', '#add-contacts', 'addmult-wrapper')">Save</button>
     <button onclick="location.href='/fund/'">Cancel</button>
   </div>
 </div>
