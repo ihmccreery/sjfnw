@@ -679,7 +679,7 @@ def add_mult(request):
     steps, news, grants = _get_block_content(membership)
     header = membership.giving_project.title
 
-    return render(request, 'fund/add_contacts.html', {
+    return render(request, 'fund/forms/add_contacts.html', {
       '1active': 'true', 'header': header, 'news': news,
       'grants': grants, 'steps': steps, 'formset': formset
     })
@@ -937,7 +937,7 @@ def edit_step(request, donor_id, step_id):
 
 @login_required(login_url='/fund/login/')
 @approved_membership()
-def done_step(request, donor_id, step_id):
+def complete_step(request, donor_id, step_id):
 
   membership = request.membership
   suggested = membership.giving_project.get_suggested_steps()
@@ -956,7 +956,7 @@ def done_step(request, donor_id, step_id):
                   str(step_id))
     raise Http404
 
-  action = reverse('sjfnw.fund.views.done_step', kwargs={'donor_id': donor_id, 'step_id': step_id})
+  action = reverse('sjfnw.fund.views.complete_step', kwargs={'donor_id': donor_id, 'step_id': step_id})
 
   if request.method == 'POST':
     # update membership activity timestamp

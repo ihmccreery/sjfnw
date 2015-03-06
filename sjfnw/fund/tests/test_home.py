@@ -26,7 +26,7 @@ class Home(BaseFundTestCase):
 
     response = self.client.get(self.url, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
     self.assertEqual(response.context['request'].membership, membership)
     self.assertNotContains(response, 'likelihood')
 
@@ -39,7 +39,7 @@ class Home(BaseFundTestCase):
 
     response = self.client.get(self.url, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
     self.assertEqual(response.context['request'].membership, membership)
     self.assertContains(response, 'likelihood')
 
@@ -59,7 +59,7 @@ class Home(BaseFundTestCase):
 
     # verify estimates form is not shown
     self.assertEqual(response.context['request'].membership, membership)
-    self.assertTemplateNotUsed('fund/add_estimates.html')
+    self.assertTemplateNotUsed('fund/forms/add_estimates.html')
 
     # using post-training membership
     member = membership.member
@@ -77,7 +77,7 @@ class Home(BaseFundTestCase):
     response = self.client.get(self.url, follow=True)
 
     # verify estimates form is shown
-    self.assertTemplateUsed('fund/add_estimates.html')
+    self.assertTemplateUsed('fund/forms/add_estimates.html')
     self.assertEqual(response.context['request'].membership, membership)
 
   def test_estimates_done(self):
@@ -98,7 +98,7 @@ class Home(BaseFundTestCase):
     response = self.client.get(self.url)
 
     # verify estimates form is not shown
-    self.assertTemplateNotUsed('fund/add_estimates.html')
+    self.assertTemplateNotUsed('fund/forms/add_estimates.html')
     self.assertEqual(response.context['request'].membership, membership)
 
   @unittest.skip('Incomplete')

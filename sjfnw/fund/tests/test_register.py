@@ -51,7 +51,7 @@ class Register(BaseFundTestCase):
       'giving_project': u''
       }, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/projects.html')
+    self.assertTemplateUsed(response, 'fund/account_projects.html')
     self.assertEqual(len(response.context['ships']), 0)
 
   def test_post_valid_gp(self):
@@ -85,5 +85,5 @@ class Register(BaseFundTestCase):
       'giving_project': unicode(gp.pk)
       }, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
 

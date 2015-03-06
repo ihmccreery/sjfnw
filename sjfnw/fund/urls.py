@@ -31,7 +31,7 @@ urlpatterns = patterns('sjfnw.fund.views',
   (r'^(?P<donor_id>\d+)/step$','add_step'),
   (r'^stepmult$','add_mult_step'),
   (r'^(?P<donor_id>\d+)/(?P<step_id>\d+)$','edit_step'),
-  (r'^(?P<donor_id>\d+)/(?P<step_id>\d+)/done','done_step'),
+  (r'^(?P<donor_id>\d+)/(?P<step_id>\d+)/done','complete_step'),
 
   #error/help pages
   (r'^not-member/?', 'not_member'),

@@ -13,7 +13,7 @@ class CopyContacts(BaseFundTestCase):
 
   get_url = reverse('sjfnw.fund.views.home')
   post_url = reverse('sjfnw.fund.views.copy_contacts')
-  template = 'fund/copy_contacts.html'
+  template = 'fund/forms/copy_contacts.html'
 
   def setUp(self):
     super(CopyContacts, self).setUp()
