@@ -158,12 +158,12 @@ function askedToggled(asked) {
   var num = asked.id.match(/\d+/);
   var responseSpan = document.getElementById(num + '_response');
   if (asked.checked) {
-    // console.log('askedtoggled checked');
+    console.log('askedtoggled checked');
     responseSpan.style.display = 'inline';
     var response = document.getElementById(num + '_id_response');
     responseSelected(response);
   } else { // hide all following
-    // console.log('askedtoggled un checked');
+    console.log('askedtoggled un checked');
     responseSpan.style.display = 'none';
     var hideSpan = document.getElementById(num + '_promise');
     hideSpan.style.display = 'none';
@@ -174,7 +174,7 @@ function askedToggled(asked) {
 // complete step form
 function completeLoaded(pk, dasked, dpromised, submitted) {
   // hide fields based on what is already in the database for the contact
-  // console.log('completeloaded called, submitted is ' +submitted);
+  console.log('completeloaded called, submitted is ' + submitted);
   var askedSpan = $('#' + pk + '_asked');
   var responseSpan = $('#' + pk + '_response');
   var promisedSpan = $('#' + pk + '_promise');
@@ -305,9 +305,11 @@ $(document).ready(function() {
     var $el = $(el);
     var url = $el.data('url');
     var target = $el.data('target');
+    var asked = $el.data('asked');
+    var pro = $el.data('promised');
     if (url && target) {
       $el.on('click', function() {
-        loadView(url, target);
+        loadView(url, target, asked, pro);
       });
     }
   });

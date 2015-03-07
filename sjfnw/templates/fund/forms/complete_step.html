@@ -7,8 +7,9 @@
       {% if donor.asked %}
       Asked.
       {% endif %}
-      <label id="{{ step_id }}_asked">Asked</label>
-      {{ form.asked }}
+      <label id="{{ step_id }}_asked">
+        Asked {{ form.asked }}
+      </label>
     </div>
 
     <div id="response" class="form-field third">
@@ -17,14 +18,16 @@
       {% elif donor.promised %}
         Promised ${{ donor.promised }}.
       {% endif %}
-      <label id="{{ step_id }}_response">Response</label>
-      {{ form.response }}
+      <label id="{{ step_id }}_response">
+        Response {{ form.response }}
+      </label>
     </div>
     
     <div id="promised-amount" class="form-field third">
       {{ form.promised_amount.errors }}
-      <label id="{{ step_id }}_promise">Promised</label>
-      ${{ form.promised_amount }}
+      <label id="{{ step_id }}_promise">
+        Promised ${{ form.promised_amount }}
+      </label>
     </div>
   </div>
 
