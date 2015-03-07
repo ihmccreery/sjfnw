@@ -913,7 +913,7 @@ def edit_step(request, donor_id, step_id):
     raise Http404
 
   action = '/fund/'+str(donor_id)+'/'+str(step_id)
-  formid = 'editstep-'+donor_id
+  formid = 'edit-step-'+donor_id
   divid = donor_id+'-nextstep'
 
   if request.method == 'POST':

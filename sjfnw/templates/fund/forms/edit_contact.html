@@ -1,12 +1,12 @@
 ﻿<table><tr>
 	<td>
-	<form method="post" action="{{action}}" id="editdonor-{{pk}}">
+	<form method="post" action="{{action}}" id="edit-contact-{{pk}}">
 		<table class="form">
 			{{ form.as_table }}
 		</table>
 	</form>
 	<div align="center"><img id = "ajax_loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
-	<button onclick="Submit('{{action}}', '#editdonor-{{pk}}', 'donor-{{pk}}')">Save</button>
+	<button onclick="Submit('{{action}}', '#edit-contact-{{pk}}', 'donor-{{pk}}')">Save</button>
 	<button onclick="location.href='/fund/'">Cancel</button></div>
 	</td>
 </tr></table>
