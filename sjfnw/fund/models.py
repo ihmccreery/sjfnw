@@ -76,6 +76,11 @@ class GivingProject(models.Model):
     # filter out empty lines, strip whitespace
     return [step.strip() for step in suggested if step and step.strip()]
 
+  def get_first_word(self):
+    suggested = self.suggested_steps.splitlines()
+    return [suggested[0] for step in suggested if step]
+    # [x[0] for x in myList]
+
   def is_pre_approved(self, email):
     """ Check new membership for pre-approval status """
     if self.pre_approved:

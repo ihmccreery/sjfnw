@@ -97,6 +97,7 @@ def home(request):
 
   # suggested steps for step forms
   suggested = membership.giving_project.get_suggested_steps()
+  sugg_word = membership.giving_project.get_first_word()
 
   # parse url params
   step = request.GET.get('step')
