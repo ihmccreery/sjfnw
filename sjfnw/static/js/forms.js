@@ -6,7 +6,7 @@ var formUtils = {};
 
 formUtils.loadingImage = '<img src="/static/images/ajaxloader2.gif" height="16" width="16" alt="Loading...">';
 
-formUtils.statusTexts = { //for ajax error messages
+formUtils.statusTexts = { // for ajax error messages
   400: '400 Bad request',
   401: '401 Unauthorized',
   403: '403 Forbidden',
@@ -36,7 +36,7 @@ formUtils.init = function(urlPrefix, draftId, submitId, userId, staffUser) {
 };
 
 
-formUtils.currentTimeDisplay = function(){
+formUtils.currentTimeDisplay = function() {
   /* returns current time as a string. format = May 12, 2:45p.m. */
   var monthNames = [
       'January', 'February', 'March', 'April', 'May', 'June',
@@ -57,7 +57,7 @@ formUtils.currentTimeDisplay = function(){
 };
 
 
-formUtils.logTime = function (){
+formUtils.logTime = function () {
   /* returns current time as a string for console logs. hh:mm:ss */
   var d = new Date();
   var m = d.getMinutes();
@@ -67,7 +67,8 @@ formUtils.logTime = function (){
 
 
 /** CHARACTER LIMITS **/
-function charLimitDisplay(area, limit){
+
+function charLimitDisplay(area, limit) {
   var counter = document.getElementById(area.name + '_counter');
   var words = area.value.match(/[^ \r\n]+/g) || [];
   var diff = limit - words.length;
@@ -111,7 +112,7 @@ autoSave.pause = function() {
   if ( !window.onfocus ) {
     console.log(formUtils.logTime() + 'autoSave.pause called; setting timer');
     // pause auto save
-    autoSave.pauseTimer = window.setTimeout(function(){
+    autoSave.pauseTimer = window.setTimeout(function() {
        console.log(formUtils.logTime() + 'autoSave.pauseTimer up, pausing autosave');
        window.clearInterval(autoSave.saveTimer);
        autoSave.pauseTimer = false;
@@ -147,9 +148,9 @@ autoSave.resume = function() {
   }
 };
 
-autoSave.save = function (submit, override){
-  if (!override){ override = 'false'; }
-  if (formUtils.staffUser) { //TODO use querystring function
+autoSave.save = function (submit, override) {
+  if (!override) { override = 'false'; }
+  if (formUtils.staffUser) { // TODO use querystring function
     override = '&override=' + override;
   } else {
     override = '?override=' + override;
@@ -159,25 +160,25 @@ autoSave.save = function (submit, override){
     url: autoSave.saveUrl + override,
     type: 'POST',
     data: $('form').serialize() + '&user_id=' + autoSave.userId,
-    success: function(data, textStatus, jqXHR){
+    success: function(data, textStatus, jqXHR) {
       if (jqXHR.status === 200) {
-        if (submit) { //trigger the submit button
+        if (submit) { // trigger the submit button
           var submitAll = document.getElementById('hidden_submit_app');
           submitAll.click();
-        } else { //update 'last saved'
+        } else { // update 'last saved'
           $('.autosaved').html(formUtils.currentTimeDisplay());
         }
-      } else { //unexpected status code
+      } else { // unexpected status code
         $('.autosaved').html('Unknown error<br>If you are seeing errors repeatedly please <a href="/apply/support#contact">contact us</a>');
       }
     },
-    error: function(jqXHR, textStatus){
+    error: function(jqXHR, textStatus) {
       var errortext = '';
-      if (jqXHR.status === 409){ //conflict - pause autosave and confirm override
+      if (jqXHR.status === 409)  { // conflict - pause autosave and confirm override
         window.clearInterval(autoSave.saveTimer);
-        showOverrideWarning(2); // defined in forms.js
+        showOverrideWarning(2); // defined in org_app.html
       } else {
-        if(jqXHR.status === 401){
+        if(jqXHR.status === 401) {
           location.href = jqXHR.responseText + '?next=' + location.href;
         } else if (formUtils.statusTexts[jqXHR.status]) {
           errortext = formUtils.statusTexts[jqXHR.status];
@@ -263,7 +264,7 @@ fileUploads.getUploadURL = function() {
   });
 };
 
-fileUploads.iframeUpdated = function(iframe) { //process response
+fileUploads.iframeUpdated = function(iframe) { // process response
   console.log(formUtils.logTime() + 'iframeUpdated');
   var results = iframe.contentDocument.body.innerHTML;
   console.log('The iframe changed! New contents: ' + results);
