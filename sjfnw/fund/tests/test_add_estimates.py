@@ -49,7 +49,7 @@ class AddEstimates(BaseFundTestCase):
 
     response = self.client.get(self.get_url, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_estimates.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_estimates.html')
     formset = response.context['formset']
     self.assertEqual(len(formset), 2)
 
@@ -57,7 +57,7 @@ class AddEstimates(BaseFundTestCase):
     response = self.client.post(self.post_url, self.base_form_data, follow=True)
 
     # verify same template is used, with errors for both fields
-    self.assertTemplateUsed(response, 'fund/add_estimates.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_estimates.html')
     errors = response.context['formset'].errors
     for i in range(0, 2):
       self.assertEqual(errors[i]['amount'], [u'This field is required.'])
@@ -72,7 +72,7 @@ class AddEstimates(BaseFundTestCase):
     response = self.client.post(self.post_url, form_data, follow=True)
 
     # verify same template used, with errors for empty form
-    self.assertTemplateUsed(response, 'fund/add_estimates.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_estimates.html')
     errors = response.context['formset'].errors
     self.assertEqual(errors[0], {})
     self.assertEqual(errors[1]['amount'], [u'This field is required.'])
@@ -115,7 +115,7 @@ class AddEstimates(BaseFundTestCase):
     response = self.client.post(self.post_url, form_data, follow=True)
 
     # verify same template used, with errors for empty form
-    self.assertTemplateUsed(response, 'fund/add_estimates.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_estimates.html')
 
     # verify expected errors
     errors = response.context['formset'].errors

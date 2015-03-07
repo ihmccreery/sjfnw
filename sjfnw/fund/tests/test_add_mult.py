@@ -25,12 +25,12 @@ class AddMultipleDonorsPre(BaseFundTestCase):
     # note: get via home is covered in home tests
     response = self.client.get(self.url, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
 
   def test_post_empty(self):
     response = self.client.post(self.url, self.form_data, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
     error = response.context['empty_error']
     self.assertRegexpMatches(error, 'enter at least one contact')
 
@@ -73,7 +73,7 @@ class AddMultipleDonorsPre(BaseFundTestCase):
 
     response = self.client.post(self.url, self.form_data, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
 
     errors = response.context['formset'].errors
     self.assertRegexpMatches(errors[0]['firstname'][0], 'required')
@@ -112,12 +112,12 @@ class AddMultipleDonorsPost(BaseFundTestCase):
     # note: get via home is covered in home tests
     response = self.client.get(self.url, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
 
   def test_post_empty(self):
     response = self.client.post(self.url, self.form_data, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
     error = response.context['empty_error']
     self.assertRegexpMatches(error, 'enter at least one contact')
 
@@ -129,7 +129,7 @@ class AddMultipleDonorsPost(BaseFundTestCase):
 
     response = self.client.post(self.url, self.form_data, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
 
     errors = response.context['formset'].errors
     self.assertRegexpMatches(errors[0]['amount'][0], 'required')
@@ -179,7 +179,7 @@ class AddMultipleDonorsPost(BaseFundTestCase):
 
     response = self.client.post(self.url, self.form_data, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/add_mult_flex.html')
+    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
 
     errors = response.context['formset'].errors
 

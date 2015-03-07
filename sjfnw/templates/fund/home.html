@@ -1,149 +1,59 @@
-{% extends 'fund/base_personal.html' %}
+{% extends 'fund/_base_personal.html' %}
 
 {% block script %}
-{{ block.super }}
-<script type="text/javascript" src="/static/js/libs/modernizr.custom.js"></script>
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript">
-  var text_progress = false;
-  if (Modernizr.inlinesvg) {
-
-    var options = {chartArea: {left:0, top:8, width:'100%', height:'85%'},
-                    legend: {alignment:'center', textStyle: {fontSize:11}},
-                    tooltip: {showColorCode: false, textStyle: {fontSize:14}},
-                    slices: [{color: '#8B0E04'}, {color:'#D18316'}, {color: 'green'}],
-                    pieSliceText: 'none',
-                    pieSliceTextStyle: {fontSize:14},
-                    reverseCategories: true,
-                    sliceVisibilityThreshold:0
-                  };
-
-    function drawChart() {
-			chart_div = document.getElementById('chart_div');
-			if (chart_div) {
-				// Create the data table.
-				var data = new google.visualization.DataTable();
-				data.addColumn('string', 'Status');
-				data.addColumn('number', 'Contacts');
-				data.addRows([
-					["Haven't contacted", {{ progress.contactsremaining }}],
-					["Talked to", {{ progress.talked }}],
-					['Asked', {{ progress.asked }}]
-				]);
-
-				// Instantiate and draw our chart, passing in some options.
-				var chart = new google.visualization.PieChart(chart_div);
-				chart.draw(data, options);
-				if ({{ progress.estimated }} > 0) {
-					drawChart2();
-				}
-			} else {
-				console.log('no chart div, not running drawchart');
-			}
-    }
-
-    function drawChart2() {
-
-      // Create the data table.
-      var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Status');
-      data.addColumn('number', 'Amount');
-      data.addRows([
-        ['Remaining', {{ progress.togo|default:'0'}}],
-        ["Promised", {{ progress.promised }}],
-        ['Received', {{ progress.received }}]
-      ]);
-
-      // Instantiate and draw our chart, passing in some options.
-      var chart = new google.visualization.PieChart(document.getElementById('chart_div2'));
-      chart.draw(data, options);
-    }
-
-    // Load the Visualization API and the piechart package.
-    google.load('visualization', '1.0', {'packages':['corechart']});
-
-    // Set a callback to run when the Google Visualization API is loaded.
-    google.setOnLoadCallback(drawChart);
-
-  } else { //browser cannot support charts
-    console.log('Browser does not support charts; text_progress = true');
-    text_progress = true;
-  }
-
-  function textProgress() {
-    console.log('textProgress');
-    chart = document.getElementById('chart_div');
-		if (chart) {
-			chart.innerHTML = "<br><br>Haven't contacted: {{ progress.contactsremaining }}<br>Talked to: {{ progress.talked }}<br>Asked: {{ progress.asked }}";
-			if ({{ progress.estimated }} > 0) {
-				document.getElementById('chart_div2').innerHTML = "<br><br>Remaining: ${{ progress.togo|default:'0'}}<br>Promised: ${{ progress.promised }}<br>Received: ${{ progress.received }}";
-			}
-		} else {
-			console.log('no chart div, not running textprogress');
-		}
-  }
-</script>
-<script type="text/javascript">
-  $(document).ready(function() {
-    var load = '{{ load }}';
-    var loadto = '{{ loadto }}';
-    if (load) {
-      loadView(load, loadto);
-    }
-    if (text_progress) {
-      textProgress();
-    }
-  });
-</script>
+  {{ block.super }}
+  <script type="text/javascript" src="/static/js/libs/modernizr.custom.js"></script>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  {% include 'scripts/home_charts.html' %}
 {% endblock %}
 
 {% block content %}
-<div id="form_saved"></div>
+  <div id="form_saved"></div> {# TODO what is this #}
 
-{% if notif %}<div id="notifications">{{ notif|safe }}</div>{% endif %}
+  {% if notif %}<div id="notifications">{{ notif|safe }}</div>{% endif %}
 
-{% if donor_list.0 %}
-<span class="header">YOUR PROGRESS</span>
-<table style="width:90%;margin-left:8%;margin-top:10px;margin-bottom:15px;text-align:center;">
-  <tr>
-    <td>
-      <div align="center">{{ progress.contacts }} contacts</div>
-      <div align="center" id ="chart_div" style="width:240px;height:110px;margin-left:auto;margin-right:auto;"></div>
-    </td>
-    {% if progress.estimated > 0 %}
-    <td>
-      <div align="center" title="Personal fundraising goal of ${{ progress.estimated }} calculated based on your ask amount and estimated likelihood for each contact">{{ progress.header }}</div>
-      <div align="center" id="chart_div2" style="width:260px;height:110px;margin-left:25px;"></div>
-    </td>
-    {% endif %}
-  </tr>
-</table>
-{% endif %}
-
-<span class="header" id="your-contacts">YOUR CONTACTS &amp; NEXT STEPS</span>
-
-{% if donor_list.0 %}
-  {% if not load %} {# add contacts link only if mass add won't be showing #}
-  <div class="edit_done">
-    [<a onclick="loadView('{% url 'sjfnw.fund.views.add_mult' %}', 'addmult')">add contacts</a>]
-  </div>
+  {% if donor_list.0 %}
+  <span class="header">YOUR PROGRESS</span>
+  <table style="width:90%;margin-left:8%;margin-top:10px;margin-bottom:15px;text-align:center;">
+    <tr>
+      <td>
+        <div align="center">{{ progress.contacts }} contacts</div>
+        <div align="center" id ="chart_div" style="width:240px;height:110px;margin-left:auto;margin-right:auto;"></div>
+      </td>
+      {% if progress.estimated > 0 %}
+      <td>
+        <div align="center" title="Personal fundraising goal of ${{ progress.estimated }} calculated based on your ask amount and estimated likelihood for each contact">{{ progress.header }}</div>
+        <div align="center" id="chart_div2" style="width:260px;height:110px;margin-left:25px;"></div>
+      </td>
+      {% endif %}
+    </tr>
+  </table>
   {% endif %}
-  {# this div is where form to add multiple donors is placed #}
-  <div class="donor indent" id="addmult"></div>
-{% endif %}
 
+  <span class="header" id="your-contacts">YOUR CONTACTS &amp; NEXT STEPS</span>
 
-{% for d in donor_list %}
-  {% include 'fund/_donor.html' %}
-{% empty %}{# no contacts yet #}
-  {% if fd %}{# add estimates #}
-    {% include 'fund/add_estimates.html' %}
-  {% else %}{# add contacts #}
-    <div class="donor indent" id="addmult">
-      <p>You don't have any contacts yet!  Get started by adding some.  You'll be able to add, change or remove contacts at any time.</p>
-      {% include mult_template %}
+  {% if donor_list.0 %}
+    {% if not load %} {# add contacts link only if mass add won't be showing #}
+    <div class="edit_done">
+      [<a onclick="loadView('{% url 'sjfnw.fund.views.add_mult' %}', 'addmult')">add contacts</a>]
     </div>
+    {% endif %}
+    {# this div is where form to add multiple donors is placed #}
+    <div class="donor indent" id="addmult"></div>
   {% endif %}
-{% endfor %}
+
+
+  {% for d in donor_list %}
+    {% include 'fund/includes/donor_details.html' %}
+  {% empty %}{# no contacts yet #}
+    {% if fd %}{# add estimates #}
+      {% include 'fund/forms/add_estimates.html' %}
+    {% else %}{# add contacts #}
+      <div class="donor indent" id="addmult">
+        <p>You don't have any contacts yet!  Get started by adding some.  You'll be able to add, change or remove contacts at any time.</p>
+        {% include mult_template %}
+      </div>
+    {% endif %}
+  {% endfor %}
 
 {% endblock content %}

@@ -13,7 +13,7 @@ class GPSurveys(BaseFundTestCase):
   """ Test GP eval surveys creation, display, responses """
 
   url = reverse('sjfnw.fund.views.home')
-  template = 'fund/fill_gp_survey.html'
+  template = 'fund/forms/gp_survey.html'
 
   def setUp(self):
     super(GPSurveys, self).setUp()
