@@ -139,7 +139,8 @@ class StepDoneForm(forms.Form):
   notes = forms.CharField(max_length=255, required=False,
                           widget=forms.Textarea(attrs={'rows':3, 'cols':20}))
 
-  next_step = forms.CharField(max_length=100, required=False)
+  next_step = forms.CharField(max_length=255, required=False,
+                              widget=forms.TextInput(attrs={'size':'40'}))
   next_step_date = forms.DateField(
       required=False,
       widget=forms.DateInput(format='%m/%d/%Y', attrs={'class':'datePicker',
