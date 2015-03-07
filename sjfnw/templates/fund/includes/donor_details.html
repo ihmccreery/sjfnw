@@ -36,7 +36,9 @@
       </span> |
       <span class="load"
             data-url="{% url 'sjfnw.fund.views.complete_step' donor_id=pk step_id=d.next_step.pk %}"
-            data-target="{{ pk }}-step">
+            data-target="{{ pk }}-step"
+            data-asked="{{ d.donor.asked }}"
+            data-promised="{{ d.donor.promised }}">
         complete
       </span>]
     </div>
@@ -99,9 +101,9 @@
     {# delete/edit links #}
     <div class="donor_delete" id="delete-{{ pk }}">
       [<span class="load" data-url="{% url 'sjfnw.fund.views.edit_contact' donor_id=pk %}"
-             data-target="donor-{{ pk }}">edit contact</a>]&nbsp;
+             data-target="donor-{{ pk }}">edit contact</span>]&nbsp;
       [<span class="load" data-url="{% url 'sjfnw.fund.views.delete_contact' donor_id=pk %}"
-             data-target="delete-{{ pk }}">remove contact</a>]
+             data-target="delete-{{ pk }}">remove contact</span>]
     </div>
   </div>
 </div>
