@@ -1,4 +1,4 @@
-<form id = "{{ step_id }}_done_step" method="post" action="{{ action }}">
+<form id = "{{ step_id }}-complete-step" method="post" action="{{ action }}">
   <table class="form" style="width:98%;">
     <tr>
       <td style="width:32%;"></td>
@@ -95,6 +95,6 @@
 </form>
 <div align="center">
 	<img id = "ajax_loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
-	<button onclick="Submit('{{ action }}', '#{{ step_id }}_done_step', '{{ donor.pk }}-nextstep', 'date', '{{ donor.asked }}', '{{ donor.promised }}')">Save</button>
+	<button onclick="Submit('{{ action }}', '#{{ step_id }}-complete-step', '{{ donor.pk }}-nextstep', 'date', '{{ donor.asked }}', '{{ donor.promised }}')">Save</button>
 	<button onclick="location.href='/fund/'">Cancel</button>
 </div>
