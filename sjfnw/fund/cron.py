@@ -33,7 +33,7 @@ def email_overdue(request):
       if count > 0 and step:
         logger.info(user.email + ' has overdue step(s), emailing.')
         to_emails = [user.email]
-        html_content = render_to_string('fund/email_overdue.html', {
+        html_content = render_to_string('fund/emails/overdue_steps.html', {
           'login_url': c.APP_BASE_URL+'fund/login', 'ship': ship, 'num': count,
           'step': step, 'base_url': c.APP_BASE_URL
         })
@@ -65,7 +65,7 @@ def new_accounts(request):
       leaders = memberships.filter(leader=True)
       to_emails = [leader.member.email for leader in leaders]
       if to_emails:
-        html_content = render_to_string('fund/email_new_accounts.html', {
+        html_content = render_to_string('fund/emails/accounts_need_approval.html', {
           'admin_url': c.APP_BASE_URL + 'admin/fund/membership/',
           'count': need_approval,
           'giving_project': unicode(gp),
@@ -119,7 +119,7 @@ def gift_notify(request):
   bcc = [c.SUPPORT_EMAIL]
   for ship in memberships:
     to_emails = [ship.member.email]
-    html_content = render_to_string('fund/email_gift.html', {'login_url': login_url})
+    html_content = render_to_string('fund/emails/gift_received.html', {'login_url': login_url})
     text_content = strip_tags(html_content)
     msg = EmailMultiAlternatives(subject, text_content, from_email, to_emails, bcc)
     msg.attach_alternative(html_content, "text/html")

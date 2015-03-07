@@ -1,4 +1,4 @@
-﻿<form id = "{{ step_id }}_done_step" method="post" action="{{ action }}">
+<form id = "{{ step_id }}_done_step" method="post" action="{{ action }}">
   <table class="form" style="width:98%;">
     <tr>
       <td style="width:32%;"></td>
@@ -79,7 +79,7 @@
         {{ form.next_step_date }}
       </td>
       <td colspan="2" rowspan="5" style="vertical-align:bottom;">
-        {% include 'fund/suggested_steps.html' %}
+        {% include 'fund/includes/suggested_steps.html' %}
       </td>
     </tr>
     <tr>
