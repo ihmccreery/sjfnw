@@ -298,7 +298,7 @@ class Donor(models.Model):
   # contact info only required if promise is entered
   phone = models.CharField(max_length=15, blank=True)
   email = models.EmailField(max_length=100, blank=True)
-  notes = models.TextField(blank=True)
+  notes = models.TextField(blank=True, )
 
   class Meta:
     ordering = ['firstname', 'lastname']

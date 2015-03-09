@@ -3,10 +3,10 @@
   Plan a step for each contact.  You'll be able to add or change steps at any time.<br><br>
   <div align="center">
     <form method="post" id="step_mult" accept-charset="UTF-8">
-    <table class="form" style="width:460px;">
-      <tr align="center">
-        <td></td>
-        <td>Step</td>
+    <table class="form" style="width:540px;">
+      <tr align="left">
+        <td width="32%"></td>
+        <td>Select a step or write your own description.</td>
         <td>Date</td>
       </tr>
       {{ formset.management_form }}
@@ -16,6 +16,7 @@
           <td>{{form.description.errors}}</td>
           <td>{{form.date.errors}}</td>
         </tr>
+        <br>
         <tr align="center">
           <td>{{form.donor}}{{d}}</td>
           <td>{{form.description}}</td>
@@ -23,7 +24,8 @@
         </tr>
         {% if multi %}
         <tr align="center">
-          <td colspan="3">
+          <td width="32%"></td>
+          <td colspan="1">
             <div id="suggest_{{forloop.counter0}}" style="display:none;">
               {% include 'fund/includes/suggested_steps.html' with target=form.description.auto_id %}
             </div>
