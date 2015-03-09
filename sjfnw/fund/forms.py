@@ -88,7 +88,7 @@ class MassStep(forms.Form):
       error_messages={'invalid':'Please enter a date in mm/dd/yyyy format.'})
   description = forms.CharField(
       max_length=255, required=False,
-      widget=forms.TextInput(attrs={'onfocus':'showSuggestions(this.id)'}))
+      widget=forms.TextInput(attrs={'onfocus':'showSuggestions(this.id)', 'size':'34'}))
   donor = forms.ModelChoiceField(queryset=models.Donor.objects.all(),
                                  widget=forms.HiddenInput())
 
@@ -137,7 +137,7 @@ class StepDoneForm(forms.Form):
   email = forms.EmailField(required=False)
 
   notes = forms.CharField(max_length=255, required=False,
-                          widget=forms.Textarea(attrs={'rows':3, 'cols':20}))
+                          widget=forms.Textarea(attrs={'rows':3, 'cols':40}))
 
   next_step = forms.CharField(max_length=255, required=False,
                               widget=forms.TextInput(attrs={'size':'40'}))
