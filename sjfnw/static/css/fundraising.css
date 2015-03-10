@@ -6,16 +6,16 @@ body {
 }
 
 div.content_area {
-	border-style: solid;
-	border-width: 2px;
-	border-radius: 8px;
-	border-color: #C07205;
-	padding: 15px;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 8px;
+  border-color: #C07205;
+  padding: 15px;
   margin-bottom: .5em;
 }
 
 .content_area .header { /* TODO use h element */
-	text-transform: uppercase;
+  text-transform: uppercase;
   font-weight: bold;
   font-size: inherit;
 }
@@ -35,49 +35,49 @@ div.content_area {
 #header-text {
   display: inline-block;
   width: 450px;
-	font-size: 2em;
-	font-weight: bold;
+  font-size: 2em;
+  font-weight: bold;
 }
 
 /** BLOCKS **/
 
 #block_container {
-	width: 640px;
-	height: 184px;
-	color: white;
+  width: 640px;
+  height: 184px;
+  color: white;
 }
 
 .top_block {
-	width: 200px;
-	height: 180px;
-	background-color: #444;
-	border-radius: 8px;
-	border-style: solid;
-	border-width: 2px;
-	border-color: #333;
-	float: left;
-	padding: 0;
-	cursor: pointer;
+  width: 200px;
+  height: 180px;
+  background-color: #444;
+  border-radius: 8px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #333;
+  float: left;
+  padding: 0;
+  cursor: pointer;
   position: relative;
 }
 
 .top_block: hover {
-	opacity: 0.9;
+  opacity: 0.9;
   position: relative;
 }
 
 .active_block {
-	background-color: #D18316;
-	border-color: #C07205;
+  background-color: #D18316;
+  border-color: #C07205;
 }
 
 .block_header {
-	font-weight: bold;
-	text-align: center;
+  font-weight: bold;
+  text-align: center;
 }
 
 .block-step {
-	margin: 10px;
+  margin: 10px;
   height: 30px;
   white-space: nowrap;
   overflow: hidden;
@@ -85,7 +85,7 @@ div.content_area {
 }
 
 .block-item {
-	margin: 10px;
+  margin: 10px;
   max-height: 45px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -98,9 +98,9 @@ div.content_area {
 }
 
 #blockline_container {
-	width: 640px;
-	height: 15px;
-	color: white;
+  width: 640px;
+  height: 15px;
+  color: white;
 }
 
 .active_line {
@@ -121,24 +121,24 @@ div.content_area {
 }
 
 form {
-	display: inline;
+  display: inline;
 }
 
 table.form {
-	margin-top: 10px;
-	margin-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 table.form th {
-	font-weight: normal;
-	text-align: right;
-	padding-right: 5px;
+  font-weight: normal;
+  text-align: right;
+  padding-right: 5px;
   padding-bottom: 5px;
-	vertical-align: bottom;
+  vertical-align: bottom;
 }
 
 table.form button {
-	align: center;
+  align: center;
 }
 
 /* notifications */
@@ -170,42 +170,42 @@ table.form button {
 
 .donor-border {
   border: 1px solid #555;
-	border-radius: 8px;
+  border-radius: 8px;
 }
 
 .donor_delete {
-	text-align: center;
+  text-align: center;
 }
 
 .edit_done {
-	float: right;
+  float: right;
 }
 
 a.edit_done {
-	margin-left: 2px;
-	margin-right: 2px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 
 .overdue_step {
-	color: red;
-	font-weight: bold;
+  color: red;
+  font-weight: bold;
 }
 
 /* datepicker */
 
 .ui-datepicker {
-	background-color: #FFF;
-	border: 1px solid;
-	border-color: #aaa;
-	display: none;
+  background-color: #FFF;
+  border: 1px solid;
+  border-color: #aaa;
+  display: none;
 }
 
 .ui-datepicker-title {
-	text-align: center;
+  text-align: center;
 }
 
 .ui-datepicker-next {
-	float: right;
+  float: right;
 }
 
 .suggested-steps {
@@ -213,17 +213,17 @@ a.edit_done {
 }
 
 .suggested_step {
-	padding: 4px;
-	margin: 4px;
-	background-color: #EEE;
-	border: 1px solid;
-	border-color: #333;
-	cursor: pointer;
-	display: inline-block;
+  padding: 4px;
+  margin: 4px;
+  background-color: #EEE;
+  border: 1px solid;
+  border-color: #333;
+  cursor: pointer;
+  display: inline-block;
 }
 
 .suggested_step: hover {
-	border-color: black;
+  border-color: black;
 }
 
 .promise-followup {
@@ -246,7 +246,6 @@ a.edit_done {
 }
 
 .complete-step h3 {
-  /*padding-top: 10px;*/
   border-bottom: 1px solid #ccc;
   font-size: 1.2em;
   color: #000;
@@ -262,12 +261,12 @@ a.edit_done {
 }
 
 #stepmult {
-	margin-top: 15px;
+  margin-top: 15px;
 }
 
 #stepmult input {
-	margin-left: auto;
-	margin-right: auto;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /** copy contacts **/
@@ -306,13 +305,13 @@ input[readonly="True"] {
 /** ERROR/ACCESS PAGES **/
 
 .error_message {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 /** nav  **/
 .nav {
-	width: 640px;
-	padding: 0 .5em;
+  width: 640px;
+  padding: 0 .5em;
 }
 
 .nav td {
