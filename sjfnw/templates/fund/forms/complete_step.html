@@ -41,19 +41,19 @@
     <div class="form-row">
       <div class="form-field third">
         {{ form.last_name.errors }}
-        <label>Last name</label>
+        {{ form.last_name.label_tag }}
         {{ form.last_name }}
       </div>
 
       <div class="form-field third">
         {{ form.phone.errors }}
-        <label>Phone number</label>
+        {{ form.phone.label_tag }}
         {{ form.phone }}
       </div>
 
       <div class="form-field third">
         {{ form.email.errors }}
-        <label>Email address</label>
+        {{ form.email.label_tag }}
         {{ form.email }}
       </div>
     </div>
@@ -62,12 +62,12 @@
     
       <div class="form-field two-thirds multiple-choice">
         {{ form.promise_reason.errors }}
-        {{ form.promise_reason.label }}
+        {{ form.promise_reason.label_tag }}
         {{ form.promise_reason }}
       </div>
       <div class="form-field third">
-        {{  form.likely_to_join.errors }}
-        {{ form.likely_to_join.label }}
+        {{ form.likely_to_join.errors }}
+        {{ form.likely_to_join.label_tag }}
         {{ form.likely_to_join }}
       </div>
     </div>
@@ -75,18 +75,20 @@
 
   <h3>2) Update your notes for this contact <i>(optional)</i></h3>
   <div class="form-field">
-    <label>Notes:</label>
-    {{ form.notes }}
     {{ form.notes.errors }}
+    {{ form.notes.label_tag }}<br>
+    {{ form.notes }}
   </div>
 
   <h3>3) Plan a next step <i>(optional)</i></h3>
 
   <div class="form-row">
     <div class="form-field third">
-      Date: {{ form.next_step_date.errors }}
+      {{ form.next_step_date.errors }}
+      {{ form.next_step_date.label_tag }}
       {{ form.next_step_date }}
-      Description: {{ form.next_step.errors }}
+      {{ form.next_step.errors }}
+      {{ form.next_step.label_tag }}
       {{ form.next_step }}
     </div>
 
@@ -94,7 +96,6 @@
       {% include 'fund/includes/suggested_steps.html' %}
     </div>
   </div>
-
 </form>
 <div class="form-row text-center">
   <img class="loading" src="/static/images/ajaxloader.gif" alt="Loading...">
