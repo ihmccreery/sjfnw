@@ -238,6 +238,11 @@ a.edit_done {
 
 .form-field {
   display: inline-block;
+  vertical-align: top;
+}
+
+.form-field input {
+  max-width: 95%;
 }
 
 .complete-step h3 {
