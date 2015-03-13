@@ -741,7 +741,7 @@ def add_estimates(request):
 
 @login_required(login_url='/fund/login/')
 @approved_membership()
-def edit_donor(request, donor_id):
+def edit_contact(request, donor_id):
 
   try:
     donor = models.Donor.objects.get(pk=donor_id, membership=request.membership)
@@ -781,7 +781,7 @@ def edit_donor(request, donor_id):
 
 @login_required(login_url='/fund/login/')
 @approved_membership()
-def delete_donor(request, donor_id):
+def delete_contact(request, donor_id):
 
   try:
     donor = models.Donor.objects.get(pk=donor_id, membership=request.membership)

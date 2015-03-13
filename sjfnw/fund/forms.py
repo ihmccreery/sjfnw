@@ -64,7 +64,7 @@ class MassDonorPre(forms.Form):
 class MassDonor(MassDonorPre):
   amount = IntegerCommaField(label='*Estimated donation ($)',
                              min_value=0,
-                             widget=forms.TextInput(attrs={'class':'tq'}))
+                             widget=forms.TextInput(attrs={'class':'width-75'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
                                   min_value=0, max_value=100,
                                   widget=forms.TextInput(attrs={'class':'half'}))
@@ -75,7 +75,7 @@ class DonorEstimates(forms.Form):
                                  widget=forms.HiddenInput())
   amount = IntegerCommaField(label='*Estimated donation ($)',
                              min_value=0,
-                             widget=forms.TextInput(attrs={'class':'tq'}))
+                             widget=forms.TextInput(attrs={'class':'width-75'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
                                   min_value=0, max_value=100,
                                   widget=forms.TextInput(attrs={'class':'half'}))
@@ -84,7 +84,7 @@ class DonorEstimates(forms.Form):
 class MassStep(forms.Form):
   date = forms.DateField(
       required=False,
-      widget=forms.DateInput(attrs={'class':'datePicker'}, format = '%m/%d/%Y'),
+      widget=forms.DateInput(attrs={'class':'datePicker'}, format='%m/%d/%Y'),
       error_messages={'invalid':'Please enter a date in mm/dd/yyyy format.'})
   description = forms.CharField(
       max_length=255, required=False,
