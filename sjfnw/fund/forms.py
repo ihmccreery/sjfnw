@@ -88,7 +88,7 @@ class MassStep(forms.Form):
       error_messages={'invalid':'Please enter a date in mm/dd/yyyy format.'})
   description = forms.CharField(
       max_length=255, required=False,
-      widget=forms.TextInput(attrs={'onfocus':'showSuggestions(this.id)'}))
+      widget=forms.TextInput(attrs={'onfocus':'showSuggestions(this.id)', 'size':'34'}))
   donor = forms.ModelChoiceField(queryset=models.Donor.objects.all(),
                                  widget=forms.HiddenInput())
 
@@ -137,11 +137,13 @@ class StepDoneForm(forms.Form):
   email = forms.EmailField(required=False)
 
   notes = forms.CharField(max_length=255, required=False,
-                          widget=forms.Textarea(attrs={'rows':3, 'cols':20}))
+                          widget=forms.Textarea(attrs={'rows':3, 'cols':40}))
 
-  next_step = forms.CharField(max_length=100, required=False)
+  next_step = forms.CharField(max_length=255, required=False,
+                              label='Select a step or write your own description',
+                              widget=forms.TextInput(attrs={'size':'40'}))
   next_step_date = forms.DateField(
-      required=False,
+      required=False, label='Date',
       widget=forms.DateInput(format='%m/%d/%Y', attrs={'class':'datePicker',
           'input_formats':"['%m/%d/%Y', '%m-%d-%Y', '%n/%j/%Y', '%n-%j-%Y']"}),
       error_messages={'invalid':'Please enter a date in mm/dd/yyyy format.'})
