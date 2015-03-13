@@ -20,6 +20,18 @@ div.content_area {
   font-size: inherit;
 }
 
+.center {
+  margin-left:auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.left {
+  margin-left:auto;
+  margin-right: auto;
+  text-align: left;
+}
+
 /** HEADER **/
 
 #logo {
