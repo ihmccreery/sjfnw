@@ -246,6 +246,7 @@ a.edit_done {
 
 .form-row {
   padding: 10px 0;
+  width: 100%;
 }
 
 .form-field {
@@ -261,6 +262,11 @@ a.edit_done {
   border-bottom: 1px solid #ccc;
   font-size: 1.2em;
   color: #000;
+  font-weight: normal;
+}
+
+.form-field>label {
+  font-weight: bold;
 }
 
 .form-field .errorlist {

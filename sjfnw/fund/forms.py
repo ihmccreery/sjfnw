@@ -140,9 +140,10 @@ class StepDoneForm(forms.Form):
                           widget=forms.Textarea(attrs={'rows':3, 'cols':40}))
 
   next_step = forms.CharField(max_length=255, required=False,
+                              label='Select a step or write your own description',
                               widget=forms.TextInput(attrs={'size':'40'}))
   next_step_date = forms.DateField(
-      required=False,
+      required=False, label='Date',
       widget=forms.DateInput(format='%m/%d/%Y', attrs={'class':'datePicker',
           'input_formats':"['%m/%d/%Y', '%m-%d-%Y', '%n/%j/%Y', '%n-%j-%Y']"}),
       error_messages={'invalid':'Please enter a date in mm/dd/yyyy format.'})
