@@ -22,7 +22,7 @@
         Response {{ form.response }}
       </label>
     </div>
-    
+
     <div id="promised-amount" class="form-field third">
       {{ form.promised_amount.errors }}
       <label id="{{ step_id }}_promise">
@@ -37,6 +37,19 @@
 
     <p>Congratulations on a successful ask!</p>
     <p>Please provide some more information so that Social Justice Fund can follow up on the promise as needed.</p>
+
+    <div class="form-row">
+      <div class="form-field third">
+        {{ form.match_expected.errors }}
+        {{ form.match_expected.label}} <br>
+        {{ form.match_expected }} %
+      </div>
+      <div class="form-field third">
+        {{ form.match_company.errors }}
+        {{ form.match_company.label}} <br>
+        {{ form.match_company }}
+      </div>
+    </div>
 
     <div class="form-row">
       <div class="form-field third">
@@ -68,7 +81,7 @@
       {{ form.likely_to_join.label_tag }}<br>
       {{ form.likely_to_join }}
     </div>
-  </div> 
+  </div>
 
   <h3>2) Update your notes for this contact <i>(optional)</i></h3>
   <div class="form-row">
