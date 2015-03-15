@@ -20,7 +20,7 @@ class RegisterForm(forms.Form):
   email = forms.EmailField(max_length=255)
   password = forms.CharField(widget=forms.PasswordInput())
   passwordtwo = forms.CharField(widget=forms.PasswordInput(),
-                                label="Re-enter password")
+                                label='Re-enter password')
   organization = forms.CharField()
 
   def clean(self):
@@ -45,8 +45,8 @@ class RegisterForm(forms.Form):
         raise ValidationError('That email is registered with Project Central.'
                               ' Please register using a different email.')
       # make sure passwords match
-      password = cleaned_data.get("password")
-      passwordtwo = cleaned_data.get("passwordtwo")
+      password = cleaned_data.get('password')
+      passwordtwo = cleaned_data.get('passwordtwo')
       if password and passwordtwo and password != passwordtwo:
         raise ValidationError('Passwords did not match.')
     return cleaned_data
@@ -109,21 +109,21 @@ class RolloverForm(forms.Form): #used by org
     application = cleaned_data.get('application')
     draft = cleaned_data.get('draft')
     if not cycle:
-      self._errors["cycle"] = self.error_class(["Required."])
+      self._errors['cycle'] = self.error_class(['Required.'])
     else: #check cycle is still open
       try:
         cycle_obj = GrantCycle.objects.get(pk=int(cycle))
       except GrantCycle.DoesNotExist:
-        logger.error("RolloverForm submitted cycle does not exist")
-        self._errors["cycle"] = self.error_class(
-            ["Internal error, please try again."])
+        logger.error('RolloverForm submitted cycle does not exist')
+        self._errors['cycle'] = self.error_class(
+            ['Internal error, please try again.'])
       if not cycle_obj.is_open:
-        self._errors["cycle"] = self.error_class(
-            ["That cycle has closed.  Select a different one."])
+        self._errors['cycle'] = self.error_class(
+            ['That cycle has closed.  Select a different one.'])
     if not draft and not application:
-      self._errors["draft"] = self.error_class(["Select one."])
+      self._errors['draft'] = self.error_class(['Select one.'])
     elif draft and application:
-      self._errors["draft"] = self.error_class(["Select only one."])
+      self._errors['draft'] = self.error_class(['Select only one.'])
     return cleaned_data
 
 class AdminRolloverForm(forms.Form):
