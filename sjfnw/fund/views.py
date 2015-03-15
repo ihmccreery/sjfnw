@@ -105,7 +105,7 @@ def home(request):
   load_form = request.GET.get('load')
   if step and donor and form_type:
     load = '/fund/'+donor+'/'+step
-    if form_type == "complete":
+    if form_type == 'complete':
       load += '/done'
     loadto = donor + '-nextstep'
   elif load_form == 'stepmult':
@@ -278,9 +278,9 @@ def fund_login(request):
           return redirect(home)
         else:
           error_msg = 'Your account is not active.  Contact an administrator.'
-          logger.warning("Inactive account tried to log in. Username: "+username)
+          logger.warning('Inactive account tried to log in. Username: '+username)
       else:
-        error_msg = "Your login and password didn't match."
+        error_msg = 'Your login and password didn\'t match.'
       logger.info(error_msg)
   else:
     form = forms.LoginForm()
@@ -537,7 +537,7 @@ def copy_contacts(request):
       logger.info('User skipping copy contacts')
       request.membership.copied_contacts = True
       request.membership.save()
-      return HttpResponse("success")
+      return HttpResponse('success')
 
     else:
       formset = copy_formset(request.POST)
@@ -552,7 +552,7 @@ def copy_contacts(request):
             logger.debug('Contact created')
         request.membership.copied_contacts = True
         request.membership.save()
-        return HttpResponse("success")
+        return HttpResponse('success')
       else: # invalid
         logger.warning('Copy formset somehow invalid?! ' + str(request.POST))
         logger.warning(formset.errors)
