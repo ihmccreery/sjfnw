@@ -198,7 +198,8 @@ class StepDoneForm(forms.Form):
     elif next_step_date and not next_step: #next step - desc missing
       self._errors["next_step"] = self.error_class(["Enter a description."])
       del cleaned_data["next_step_date"]
-      return cleaned_data
+
+    return cleaned_data
 
 
 class MembershipInlineFormset(forms.models.BaseInlineFormSet):
