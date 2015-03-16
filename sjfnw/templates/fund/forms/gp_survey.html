@@ -9,7 +9,7 @@
       {% endfor %}
   </form>
   <div align="center">
-    <img id = "ajax_loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
+    <img class="ajax-loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
     <button onclick="Submit('{{ request.path }}', '#gp-survey', 'gp-survey-wrapper')">Save</button>
   </div>
 </div>
