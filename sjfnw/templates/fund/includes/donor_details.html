@@ -17,7 +17,7 @@
   </div>
 
   {# line 2: next step or link to add one #}
-  <div id="{{ pk }}-step">
+  <div id="{{ pk }}-nextstep">
   {% if d.next_step %}
     {# next step summary #}
     {% if d.overdue %}
@@ -31,12 +31,12 @@
     <div class="edit_done">
       [<span class="load"
              data-url="{% url 'sjfnw.fund.views.edit_step' donor_id=pk step_id=d.next_step.pk %}"
-             data-target="{{ pk }}-step">
+             data-target="{{ pk }}-nextstep">
         edit
       </span> |
       <span class="load"
             data-url="{% url 'sjfnw.fund.views.complete_step' donor_id=pk step_id=d.next_step.pk %}"
-            data-target="{{ pk }}-step"
+            data-target="{{ pk }}-nextstep"
             data-asked="{{ d.donor.asked }}"
             data-promised="{{ d.donor.promised }}">
         complete
@@ -46,7 +46,7 @@
   {% else %}{# no next step #}
     {% if d.donor.promised == None and d.donor.received == 0 %}
     No next step. <span class="load" data-url="{% url 'sjfnw.fund.views.add_step' donor_id=pk %}"
-                        data-target="{{ pk }}-step"> Add one.</span>
+                        data-target="{{ pk }}-nextstep"> Add one.</span>
     {% endif %}
   {% endif %}
   </div>
