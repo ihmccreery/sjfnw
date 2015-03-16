@@ -1,4 +1,5 @@
-/** GENERAL **/
+/** GENERAL **/     
+
 
 body {
   width: 640px;
@@ -249,7 +250,6 @@ a.edit_done {
 
 .form-field {
   display: inline-block;
-  vertical-align: top;
 }
 
 .form-field input {
@@ -269,6 +269,7 @@ a.edit_done {
 
 .form-field .errorlist {
   display: block;
+  margin: 0;
 }
 
 #add_form {
