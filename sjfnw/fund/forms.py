@@ -182,13 +182,23 @@ class StepDoneForm(forms.Form):
         logger.info('likely to join missing')
         self._errors['likely_to_join'] = self.error_class(['Select one.'])
 
+      # if one match field has data, then makes sure that other field has data
+      match_expected = cleaned_data.get('match_expected')
+      match_company = cleaned_data.get('match_company')
+      if match_expected: # checks if match_expected int > 0 or exists
+        if not match_company:
+          self._errors['match_expected'] = self.error_class(['Enter a company name'])
+      if match_company: # checks if match_company length > 0 or exists
+        if not match_expected:
+          self._errors['match_company'] = self.error_class(['Enter the percent matched'])
+
     if next_step and not next_step_date: #next step - date missing
       self._errors["next_step_date"] = self.error_class(["Enter a date in mm/dd/yyyy format."])
       del cleaned_data["next_step"] #TODO is this necessary?
     elif next_step_date and not next_step: #next step - desc missing
       self._errors["next_step"] = self.error_class(["Enter a description."])
       del cleaned_data["next_step_date"]
-    return cleaned_data
+      return cleaned_data
 
 
 class MembershipInlineFormset(forms.models.BaseInlineFormSet):
