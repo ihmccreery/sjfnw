@@ -288,9 +288,9 @@ class Donor(models.Model):
   received_afternext = models.PositiveIntegerField(default=0,
       verbose_name='Received - year after next')
   gift_notified = models.BooleanField(default=False)
-  match_expected = models.PositiveIntegerField(blank=True, default=0, null=True)
-  match_company = models.TextField(blank=True, null=True)
-  match_received = models.PositiveIntegerField(blank=True, null=True)
+  match_expected = models.PositiveIntegerField(blank=True, default=0)
+  match_company = models.TextField(blank=True)
+  match_received = models.PositiveIntegerField(blank=True, default=0)
 
   # contact info only required if promise is entered
   phone = models.CharField(max_length=15, blank=True)
