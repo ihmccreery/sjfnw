@@ -6,7 +6,7 @@
     <table class="form" style="width:540px;">
       <tr>
         <td></td>
-        <td>Select a step or write your own description.</td>
+        <td align="center">Select a step or write your own description.</td>
         <td>Date</td>
       </tr>
       {{ formset.management_form }}
@@ -22,7 +22,7 @@
           <td>{{form.date}}</td>
         </tr>
         {% if multi %}
-        <tr>
+        <tr align="center">
           <td></td>
           <td>
             <div id="suggest_{{forloop.counter0}}" style="display:none;">
