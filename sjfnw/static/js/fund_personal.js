@@ -25,20 +25,17 @@ function datepicker() {
 
 // ajax - general
 var requestProcessing = false;
-function startProcessing() {
+function startProcessing(containerId) {
   requestProcessing = true;
-  var loader = document.getElementById('ajax_loading');
+  var loader = $('#' + containerId).find('.ajax-loading');
   if (loader) {
-    loader.style.display = '';
+    loader.show();
   }
 }
 
 function endProcessing() {
   requestProcessing = false;
-  var loader = document.getElementById('ajax_loading');
-  if (loader) {
-    loader.style.display = 'none';
-  }
+  $('.ajax-loading').hide();
 }
 
 // analytics events
@@ -266,7 +263,7 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
     console.log('Request processing; submit denied');
     return false;
   }
-  startProcessing();
+  startProcessing(divId);
   console.log('Submission to ' + subUrl + ' requested');
   $.ajax({
     url: subUrl,
