@@ -825,8 +825,8 @@ def add_step(request, donor_id):
     raise Http404 # TODO better error
 
   action = '/fund/' + donor_id + '/step'
-  formid = 'addstep-'+donor_id
-  divid = donor_id+'-addstep'
+  formid = 'nextstep-'+donor_id
+  divid = donor_id+'-nextstep'
 
   if request.method == 'POST':
     membership.last_activity = timezone.now()
@@ -842,10 +842,11 @@ def add_step(request, donor_id):
   else:
     form = modelforms.StepForm(auto_id=str(donor.pk) + '_id_%s')
 
-  return render(request, 'fund/forms/add_step.html',
-                {'donor': donor, 'form': form, 'action': action, 'divid': divid,
-                 'formid': formid, 'suggested': suggested,
-                 'target': str(donor.pk) + '_id_description'})
+  return render(request, 'fund/forms/add_step.html', {
+    'donor': donor, 'form': form, 'action': action, 'divid': divid,
+    'formid': formid, 'suggested': suggested,
+    'target': str(donor.pk) + '_id_description' # for suggested steps
+  })
 
 
 @login_required(login_url='/fund/login/')
@@ -886,9 +887,10 @@ def add_mult_step(request):
     logger.info('Multiple steps - loading initial formset, size ' + str(size) +
                  ': ' +str(donor_list))
   formset_with_donors = zip(formset, donor_list)
-  return render(request, 'fund/forms/add_mult_step.html',
-                {'size': size, 'formset': formset, 'fd': formset_with_donors, 'multi': True,
-                 'suggested': suggested})
+  return render(request, 'fund/forms/add_mult_step.html', {
+    'size': size, 'formset': formset, 'fd': formset_with_donors,
+    'multi': True, 'suggested': suggested
+  })
 
 
 @login_required(login_url='/fund/login/')
@@ -1044,7 +1046,8 @@ def complete_step(request, donor_id, step_id):
   return render(request, 'fund/forms/complete_step.html',
                 {'form': form, 'action': action, 'donor': donor,
                  'suggested': suggested,
-                 'target': str(step.pk) + '_id_next_step', 'step_id': step_id,
+                 'target': str(step.pk) + '_id_next_step', # for suggested steps
+                 'step_id': step_id,
                  'step': step})
 
 #-----------------------------------------------------------------------------
