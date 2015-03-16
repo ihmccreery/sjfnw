@@ -12,8 +12,8 @@ var STATUS_TEXTS = { // for ajax error messages
   504: '504 Gateway timeout'
 };
 
-// general display
-function datepicker() { // date input fields
+// date input fields
+function datepicker() {
   $.datepicker.setDefaults({
     dateFormat: 'mm/dd/yy',
     minDate: 0,
@@ -27,29 +27,25 @@ function datepicker() { // date input fields
 var requestProcessing = false;
 function startProcessing() {
   requestProcessing = true;
-  // console.log('Request processing');
   var loader = document.getElementById('ajax_loading');
   if (loader) {
     loader.style.display = '';
   }
 }
 
-
 function endProcessing() {
   requestProcessing = false;
-  // console.log('Request complete');
   var loader = document.getElementById('ajax_loading');
   if (loader) {
     loader.style.display = 'none';
   }
 }
+
 // analytics events
-function trackEvents(url, divId, reqType) { // analytics events
-  // console.log('trackEvents', url, divId, reqType);
+function trackEvents(url, divId, reqType) {
   var category;
   var action;
   if (divId.search('addmult') > -1) {
-    // console.log('addmult');
     if (reqType === 'POST') {
       action = 'Add multiple - submit';
     } else {
@@ -61,7 +57,6 @@ function trackEvents(url, divId, reqType) { // analytics events
       category = 'Steps';
     }
   } else if (divId.search('nextstep') > -1) {
-    // console.log('nextstep');
     category = 'Steps';
     if (url.search(/\d+$/) > -1 && reqType === 'POST') {
       action = 'Edit';
@@ -73,7 +68,6 @@ function trackEvents(url, divId, reqType) { // analytics events
       }
     }
   } else if (reqType === 'POST') {
-    // console.log('POST');
     if (url.search(/step$/) > -1) {
       category = 'Steps';
       action = 'Add';
@@ -91,17 +85,25 @@ function trackEvents(url, divId, reqType) { // analytics events
     }
 }
 
-/* Used in MassStep form to show suggested for currently focused step */
+/* Display suggested steps for currently focused input field
+ * @param {string} inputId - id of currently focused step description input field
+ * Used in MassStep form to show only one set of suggested steps at a time */
 var suggestionsDiv;
-function showSuggestions(inp) { // eslint-disable-line no-unused-vars
-  if (suggestionsDiv) { suggestionsDiv.style.display = 'none'; } // hides prior set
+function showSuggestions(inputId) { // eslint-disable-line no-unused-vars
+  if (suggestionsDiv) {
+    // hide prior set
+    suggestionsDiv.style.display = 'none';
+  }
   var patt = new RegExp('\\d+');
-  var num = patt.exec(inp);
+  var num = patt.exec(inputId);
   suggestionsDiv = document.getElementById('suggest_' + num);
   suggestionsDiv.style.display = 'block';
 }
 
-/* Fills in the description field when a suggestion is clicked */
+/* Fills in the description field when a suggestion is clicked
+ * @param {Element} source - selected suggested step
+ * @param {string} target - id of the field to fill in
+ */
 function suggestFill(source, target) { // eslint-disable-line no-unused-vars
   var text = source.innerHTML;
   if (target) {
@@ -111,21 +113,22 @@ function suggestFill(source, target) { // eslint-disable-line no-unused-vars
   }
 }
 
-/* Show/hide donor details */
-function toggle(a, b) { // eslint-disable-line no-unused-vars
-  // toggles a, border on b if a is shown
-  var e = $('#' + a);
-  var f = $('#' + b);
-  if (e.length === 0) {
+/* Show/hide donor details. Border around donor when shown. */
+function toggle(detailsId, donorId) { // eslint-disable-line no-unused-vars
+  var details = $('#' + detailsId);
+  var donor = $('#' + donorId);
+  if (details.length === 0) {
     return;
   }
-  e.toggle();
-  f.toggleClass('donor-border');
+  details.toggle();
+  donor.toggleClass('donor-border');
 }
 
-/* step complete form - promise input changed */
+/* Show or hide promise & followup fields if 'promise' response is selected
+ * @param {string} donorId - donor.pk as string
+ * @param {boolean} show - true to show, otherwise hide
+ */
 function promised(donorId, show) {
-  // show or hide the last name & contact info fields
   var followupClass = '#' + donorId + '_promise_follow';
   var promiseAmount = '#' + donorId + '_promise';
   if (show) {
@@ -137,33 +140,32 @@ function promised(donorId, show) {
   }
 }
 
+/* Show or hide the promise field based on response value
+ * @param {Element} response - responce select element
+ * Called by onchange of response field or on load/submit of form
+ */
 function responseSelected(response) {
-  // show or hide the promised field
-  // called when step complete form - response input changed
   var donorId = response.id.match(/\d+/);
-  // var promisedSpan = document.getElementById(donorId + '_promise');
-  console.log(typeof response.value);
   if (response.value === '1') { // 1 = promised, 2 = unsure, 3 = dec
-    console.log('in respselected, calling promise entered');
     promised(donorId, true);
   } else {
-    console.log('in respselected, calling promise entered hide');
     promised(donorId, false);
   }
 }
 
+/* Show or hide response & promise fields based on whether asked is checked
+ * @param {Element} asked - the asked checkbox
+ * Called by onclick of asked checkbox, or when form is loaded/reloaded
+ */
 function askedToggled(asked) {
-  // show or hide the response field
-  // called by step complete form - asked input changed
   var num = asked.id.match(/\d+/);
+  console.log(asked);
   var responseSpan = document.getElementById(num + '_response');
   if (asked.checked) {
-    console.log('askedtoggled checked');
     responseSpan.style.display = 'inline';
     var response = document.getElementById(num + '_id_response');
     responseSelected(response);
   } else { // hide all following
-    console.log('askedtoggled un checked');
     responseSpan.style.display = 'none';
     var hideSpan = document.getElementById(num + '_promise');
     hideSpan.style.display = 'none';
@@ -171,10 +173,13 @@ function askedToggled(asked) {
   }
 }
 
-// complete step form
+/* Initiate show/hide of appropriate sections after compete step form is loaded
+ * @param {number} pk - donor.pk
+ * @param {boolean} dasked - donor.asked (from the saved model, not form)
+ * @param {boolean} dpromised - donor.promised (from the saved model, not form)
+ * @param {string} [submitted] - 'True' if this is a form reload after POST, else undefined
+ */
 function completeLoaded(pk, dasked, dpromised, submitted) {
-  // hide fields based on what is already in the database for the contact
-  console.log('completeloaded called, submitted is ' + submitted);
   var askedSpan = $('#' + pk + '_asked');
   var responseSpan = $('#' + pk + '_response');
   var promisedSpan = $('#' + pk + '_promise');
@@ -195,12 +200,17 @@ function completeLoaded(pk, dasked, dpromised, submitted) {
       askedToggled(asked);
     }
   }
-  // follow up is hidden by defalt, don't need to hide it
 }
 
+/* Load a form into the page via ajax request
+ * @param {string} getUrl - url to fetch
+ * @param {string} divId - id of the element to load the received content into
+ * @param {boolean} [dasked] - donor.asked (from saved model)
+ * @param {boolean} [dpromised] - donor.promised (from saved model)
+ * dasked and dpromised are only provided when loading a complete step form.
+ */
 function loadView(getUrl, divId, dasked, dpromised) {
   if (requestProcessing) {
-    console.log('Request processing; load view denied');
     return false;
   }
   console.log(getUrl + ' load requested');
@@ -242,7 +252,15 @@ function loadView(getUrl, divId, dasked, dpromised) {
   });
 }
 
-/* Submits form data, displays errors or redirects if successful */
+/* Submit form data via ajax request.
+ * Redirects on success, otherwise displays form with errors
+ * @param {string} subUrl - url to send the POST request to
+ * @param {string} formId - id of the form element
+ * @param {string} divId - id of the element to load the form with errors into
+ * @param {boolean} [date] - true if form contains date elements
+ * @param {boolean} [dasked] - donor.asked (from saved model)
+ * @param {boolean} [dpromised] - donor.promised (from saved model)
+ */
 function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disable-line no-unused-vars
   if (requestProcessing) {
     console.log('Request processing; submit denied');
@@ -269,7 +287,7 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
           }, 200);
         }
       } else { // errors
-        console.log('Submission to ' + subUrl + ' returned text');
+        console.log('Submission to ' + subUrl + ' returned text (errors)');
         document.getElementById(divId).innerHTML = jqXHR.responseText;
         if (subUrl.match('done')) {
           var pks = subUrl.match(/\d+/g);
@@ -300,6 +318,7 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
   });
 }
 
+/* Set up click handlers for loadView */
 $(document).ready(function() {
   $('.load').each(function(i, el) {
     var $el = $(el);
