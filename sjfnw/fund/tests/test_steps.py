@@ -16,7 +16,7 @@ class AddStep(BaseFundTestCase):
     self.use_new_acct()
     donor =models.Donor(firstname='user', lastname='', membership_id=self.pre_id)
     donor.save()
-    self.url=reverse('sjfnw.fund.views.add_step', kwargs={"donor_id": donor.pk})
+    self.url=reverse('sjfnw.fund.views.add_step', kwargs={'donor_id': donor.pk})
 
   def test_blank(self):
     form_data ={
@@ -46,19 +46,22 @@ class StepComplete(BaseFundTestCase):
     logger.info('post super')
     self.use_test_acct()
     self.url = reverse('sjfnw.fund.views.complete_step', kwargs={
-        'donor_id': self.donor_id, 'step_id': self.step_id
-      })
+      'donor_id': self.donor_id, 'step_id': self.step_id
+    })
     self.form_data = {
-        'asked': 'on',
-        'response': 2,
-        'promised_amount': '',
-        'last_name': '',
-        'email': '',
-        'phone': '',
-        'notes': '',
-        'next_step': '',
-        'next_step_date': '',
-        'likely_to_join': ''}
+      'asked': 'on',
+      'response': 2,
+      'promised_amount': '',
+      'last_name': '',
+      'email': '',
+      'phone': '',
+      'notes': '',
+      'next_step': '',
+      'next_step_date': '',
+      'likely_to_join': '',
+      'match_expected': '',
+      'match_company': ''
+    }
 
     # 'asked': 'on', 'promise_reason': ['GP topic', 'Social justice']
 
@@ -79,7 +82,7 @@ class StepComplete(BaseFundTestCase):
     self.assertIsNone(step.completed)
 
     response = self.client.post(self.url, self.form_data)
-    self.assertEqual(response.content, "success")
+    self.assertEqual(response.content, 'success')
 
     step = models.Step.objects.get(pk=self.step_id)
     self.assertIsNotNone(step.completed)
@@ -98,7 +101,7 @@ class StepComplete(BaseFundTestCase):
     self.form_data['asked'] = 'on'
 
     response = self.client.post(self.url, self.form_data)
-    self.assertEqual(response.content, "success")
+    self.assertEqual(response.content, 'success')
 
     step = models.Step.objects.get(pk=self.step_id)
     donor = models.Donor.objects.get(pk=self.donor_id)
@@ -130,7 +133,7 @@ class StepComplete(BaseFundTestCase):
     pre_count = models.Step.objects.count()
 
     response = self.client.post(self.url, form_data)
-    self.assertEqual(response.content, "success")
+    self.assertEqual(response.content, 'success')
 
     old_step = models.Step.objects.get(pk=self.step_id)
     self.assertIsNotNone(old_step.completed)
@@ -165,7 +168,7 @@ class StepComplete(BaseFundTestCase):
     pre_donor = models.Donor.objects.get(pk=self.donor_id)
 
     response = self.client.post(self.url, form_data)
-    self.assertEqual(response.content, "success")
+    self.assertEqual(response.content, 'success')
 
     promised = form_data['promised_amount']
     if promised == '5,000': #hacky workaround
@@ -313,9 +316,9 @@ class StepComplete(BaseFundTestCase):
     response = self.client.post(self.url, form_data)
 
     self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
-    self.assertFormError(response, 'form', 'promised_amount', "Enter an amount.")
-    self.assertFormError(response, 'form', 'last_name', "Enter a last name.")
-    self.assertFormError(response, 'form', 'phone', "Enter a phone number or email.")
+    self.assertFormError(response, 'form', 'promised_amount', 'Enter an amount.')
+    self.assertFormError(response, 'form', 'last_name', 'Enter a last name.')
+    self.assertFormError(response, 'form', 'phone', 'Enter a phone number or email.')
 
     step1 = models.Step.objects.get(pk=self.step_id)
     donor1 = models.Donor.objects.get(pk=self.donor_id)
@@ -340,7 +343,7 @@ class StepComplete(BaseFundTestCase):
     response = self.client.post(self.url, form_data)
 
     self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
-    self.assertFormError(response, 'form', 'next_step_date', "Enter a date in mm/dd/yyyy format.")
+    self.assertFormError(response, 'form', 'next_step_date', 'Enter a date in mm/dd/yyyy format.')
 
     step1 = models.Step.objects.get(pk=self.step_id)
     self.assertIsNone(step1.completed)
@@ -355,7 +358,7 @@ class StepComplete(BaseFundTestCase):
 
     response = self.client.post(self.url, form_data)
     self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
-    self.assertFormError(response, 'form', 'next_step', "Enter a description.")
+    self.assertFormError(response, 'form', 'next_step', 'Enter a description.')
 
     step1 = models.Step.objects.get(pk=self.step_id)
     self.assertIsNone(step1.completed)
