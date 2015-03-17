@@ -1,5 +1,5 @@
 from django.contrib.humanize.templatetags.humanize import intcomma
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -288,8 +288,10 @@ class Donor(models.Model):
   received_afternext = models.PositiveIntegerField(default=0,
       verbose_name='Received - year after next')
   gift_notified = models.BooleanField(default=False)
-  match_expected = models.PositiveIntegerField(blank=True, default=0,
-      verbose_name='Match expected ($)') # total $ amount matched by employer
+  match_expected = models.PositiveIntegerField(
+      blank=True, default=0,
+      verbose_name='Match expected ($)', # total $ amount matched by employer
+      validators=[MinValueValidator(0)])
   match_company = models.CharField(max_length=255, blank=True, verbose_name='Employer name' )#  employer name
   match_received = models.PositiveIntegerField(blank=True, default=0,
       verbose_name='Match received ($)')# total $ amount of match received
