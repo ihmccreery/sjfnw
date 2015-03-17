@@ -72,7 +72,8 @@ class StepComplete(BaseFundTestCase):
     self.form_data['email'] = 'blah@gmail.com'
     self.form_data['promise_reason'] = ['Social justice']
     self.form_data['likely_to_join'] = 1
-
+    self.form_data['match_expected'] = 100
+    self.form_data['match_company'] = 'Company X'
 
   def test_minimal_completion(self):
     """ Verify that step can be completed without any additional input """
@@ -363,3 +364,23 @@ class StepComplete(BaseFundTestCase):
     step1 = models.Step.objects.get(pk=self.step_id)
     self.assertIsNone(step1.completed)
 
+  def test_both_match_fields_entered(self):
+
+    """ Both or neither match_expected and match_company must have data entered.
+        If only one field has data entered, error is shown
+    """
+
+    self.form_data['asked'] = 'on'
+    self.form_data['response'] = 1
+    self.form_data['promised_amount'] = 50
+    self.form_data['match_expected'] = 100,
+    self.form_data['match_company'] = 'Company X'
+    self.add_followup()
+
+    # self.valid_followup(self.form_data)
+
+    response = self.client.post(self.url, self.form_data)
+
+    # self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
+    self.assertFormError(response, 'form', 'match_company', 'Enter the percent matched.')
+    self.assertFormError(response, 'form', 'match_expected', 'Enter the employer\'s name.')
