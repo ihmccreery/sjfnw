@@ -1,5 +1,3 @@
-from __future__ import division
-
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -984,9 +982,6 @@ def complete_step(request, donor_id, step_id):
       match_expected = form.cleaned_data['match_expected']
       match_company = form.cleaned_data['match_company']
 
-      match_ratio = match_expected/100
-      match_received = promised * match_ratio
-
       # process ask-related input
       if asked:
         if not donor.asked: # asked this step
@@ -1012,9 +1007,10 @@ def complete_step(request, donor_id, step_id):
             donor.phone = phone
           if email:
             donor.email = email
-          donor.match_expected = match_expected
-          donor.match_company = match_company
-          donor.match_received = match_received
+          if match_expected:
+            match_expected = match_expected//100
+            donor.match_expected = match_expected
+            donor.match_company = match_company
 
       # save donor & completed step
       step.save()
