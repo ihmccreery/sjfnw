@@ -1,3 +1,5 @@
+from __future__ import division
+
 from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
@@ -153,6 +155,8 @@ def _compile_membership_progress(donors):
       progress['promised'] += donor.promised
       donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
       donor_data[donor.pk]['summary'] += ' Promised $%s.' % intcomma(donor.promised)
+      donor_data[donor.pk]['summary'] += ' Matched $%s.' % intcomma(donor.match_received)
+      donor_data[donor.pk]['summary'] += ' Total $%s.' % intcomma(donor.match_received + donor.promised)
     elif donor.asked:
       if donor.promised == 0:
         donor_data[donor.pk]['summary'] += ' Declined to donate.'
@@ -977,6 +981,11 @@ def complete_step(request, donor_id, step_id):
       asked = form.cleaned_data['asked']
       response = form.cleaned_data['response']
       promised = form.cleaned_data['promised_amount']
+      match_expected = form.cleaned_data['match_expected']
+      match_company = form.cleaned_data['match_company']
+
+      match_ratio = match_expected/100
+      match_received = promised * match_ratio
 
       # process ask-related input
       if asked:
@@ -1003,6 +1012,9 @@ def complete_step(request, donor_id, step_id):
             donor.phone = phone
           if email:
             donor.email = email
+          donor.match_expected = match_expected
+          donor.match_company = match_company
+          donor.match_received = match_received
 
       # save donor & completed step
       step.save()
