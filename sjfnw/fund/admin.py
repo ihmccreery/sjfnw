@@ -149,7 +149,7 @@ class DonorInline(admin.TabularInline): #membership
   max_num = 0
   can_delete = False
   readonly_fields = ('firstname', 'lastname', 'amount', 'talked', 'asked',
-                     'promised')
+                     'promised', 'match_expected', 'match_received')
   fields = ('firstname', 'lastname', 'amount', 'talked', 'asked', 'promised', 'match_expected', 'match_received')
 
 class ProjectAppInline(admin.TabularInline):
