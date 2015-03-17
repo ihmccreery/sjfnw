@@ -150,7 +150,7 @@ class DonorInline(admin.TabularInline): #membership
   can_delete = False
   readonly_fields = ('firstname', 'lastname', 'amount', 'talked', 'asked',
                      'promised')
-  fields = ('firstname', 'lastname', 'amount', 'talked', 'asked', 'promised')
+  fields = ('firstname', 'lastname', 'amount', 'talked', 'asked', 'promised', 'match_expected', 'match_received')
 
 class ProjectAppInline(admin.TabularInline):
   model = ProjectApp
@@ -247,8 +247,9 @@ class MembershipA(admin.ModelAdmin):
 
 
 class DonorA(admin.ModelAdmin):
-  list_display = ('firstname', 'lastname', 'membership', 'amount', 'talked', 'asked',
-                  'promised', 'received_this', 'received_next', 'received_afternext')
+  list_display = ('firstname', 'lastname', 'membership', 'amount', 'talked',
+                  'asked', 'promised', 'received_this', 'received_next',
+                  'received_afternext','match_expected', 'match_received')
   list_filter = ('membership__giving_project', 'asked', PromisedBooleanFilter,
                  ReceivedBooleanFilter)
   list_editable = ('received_this', 'received_next', 'received_afternext')
@@ -262,6 +263,7 @@ class DonorA(admin.ModelAdmin):
             ('amount', 'likelihood'),
             ('talked', 'asked', 'promised', 'promise_reason_display', 'likely_to_join'),
             ('received_this', 'received_next', 'received_afternext'),
+            ('match_expected', 'match_company', 'match_received'),
             'notes')
 
   readonly_fields = ('promise_reason_display', 'likely_to_join')
