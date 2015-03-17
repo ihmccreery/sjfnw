@@ -288,16 +288,16 @@ class Donor(models.Model):
   received_afternext = models.PositiveIntegerField(default=0,
       verbose_name='Received - year after next')
   gift_notified = models.BooleanField(default=False)
-  match_expected = models.PositiveIntegerField(max_length=3, blank=True, default=0,
-      verbose_name='Percent matched (%)') # percent of promise matched by employer
+  match_expected = models.PositiveIntegerField(blank=True, default=0,
+      verbose_name='Match expected ($)') # total $ amount matched by employer
   match_company = models.CharField(max_length=255, blank=True, verbose_name='Employer name' )#  employer name
   match_received = models.PositiveIntegerField(blank=True, default=0,
-      verbose_name='Amount matched ($)')# total $ amount of match received
+      verbose_name='Match received ($)')# total $ amount of match received
 
   # contact info only required if promise is entered
   phone = models.CharField(max_length=15, blank=True)
   email = models.EmailField(max_length=100, blank=True)
-  notes = models.CharField(max_length=100, blank=True)
+  notes = models.TextField(blank=True)
 
   class Meta:
     ordering = ['firstname', 'lastname']
