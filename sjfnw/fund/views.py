@@ -153,8 +153,8 @@ def _compile_membership_progress(donors):
       progress['promised'] += donor.promised
       donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
       donor_data[donor.pk]['summary'] += ' Promised $%s.' % intcomma(donor.promised)
-      donor_data[donor.pk]['summary'] += ' Matched $%s.' % intcomma(donor.match_received)
-      donor_data[donor.pk]['summary'] += ' Total $%s.' % intcomma(donor.match_received + donor.promised)
+      donor_data[donor.pk]['summary'] += ' Expected Matched $%s.' % intcomma(donor.match_expected)
+      donor_data[donor.pk]['summary'] += ' Total Promise$%s.' % intcomma(donor.match_expected + donor.promised)
     elif donor.asked:
       if donor.promised == 0:
         donor_data[donor.pk]['summary'] += ' Declined to donate.'
