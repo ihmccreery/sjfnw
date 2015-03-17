@@ -125,10 +125,9 @@ class StepDoneForm(forms.Form):
       error_messages={'min_value': 'Promise amounts cannot be negative'},
       widget=forms.TextInput(attrs={'size':10}))
   match_expected = forms.IntegerField(required=False, label='Percent matched',
-                                      widget=forms.TextInput(attrs={'size':'5'}))
+                                      widget=forms.TextInput(attrs={'size':'1'}))
   match_company = forms.CharField(max_length=255, required=False,
-                                  label='Employer',
-                                  widget=forms.TextInput(attrs={'size':'150'}))
+                                  label='Employer')
   promise_reason = forms.MultipleChoiceField(required=False,
       label='Why did this person give? Check all that apply.',
       choices=PROMISE_REASON_CHOICES,
@@ -190,10 +189,10 @@ class StepDoneForm(forms.Form):
       match_company = cleaned_data.get('match_company')
       if match_expected: # checks if match_expected int > 0 or exists
         if not match_company:
-          self._errors['match_expected'] = self.error_class(['Enter a company name'])
+          self._errors['match_expected'] = self.error_class(['Enter the employer\'s name.'])
       if match_company: # checks if match_company length > 0 or exists
         if not match_expected:
-          self._errors['match_company'] = self.error_class(['Enter the percent matched'])
+          self._errors['match_company'] = self.error_class(['Enter the percent matched.'])
 
     if next_step and not next_step_date: #next step - date missing
       self._errors["next_step_date"] = self.error_class(["Enter a date in mm/dd/yyyy format."])
