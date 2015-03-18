@@ -160,7 +160,8 @@ class Membership(models.Model):
       'promised': 0,
       'received_this': 0,
       'received_next': 0,
-      'received_afternext': 0
+      'received_afternext': 0,
+      'match_expected' : 0
     }
     donors = self.donor_set.all()
 
@@ -168,6 +169,8 @@ class Membership(models.Model):
       progress['estimated'] += donor.estimated()
       if donor.promised:
         progress['promised'] += donor.promised
+        if donor.match_expected:
+          progress['match_expected'] += donor.match_expected
       progress['received_this'] = donor.received_this
       progress['received_next'] = donor.received_next
       progress['received_afternext'] = donor.received_afternext
