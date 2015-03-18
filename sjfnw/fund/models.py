@@ -160,8 +160,7 @@ class Membership(models.Model):
       'promised': 0,
       'received_this': 0,
       'received_next': 0,
-      'received_afternext': 0,
-      'match_expected' : 0
+      'received_afternext': 0
     }
     donors = self.donor_set.all()
 
