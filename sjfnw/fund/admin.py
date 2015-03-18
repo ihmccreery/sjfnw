@@ -149,7 +149,7 @@ class DonorInline(admin.TabularInline): #membership
   max_num = 0
   can_delete = False
   readonly_fields = ('firstname', 'lastname', 'amount', 'talked', 'asked',
-                     'promised')
+                     'promised', 'total_promised')
   fields = ('firstname', 'lastname', 'amount', 'talked', 'asked', 'promised',
             'match_expected', 'match_received')
 
@@ -249,7 +249,7 @@ class MembershipA(admin.ModelAdmin):
 
 class DonorA(admin.ModelAdmin):
   list_display = ('firstname', 'lastname', 'membership', 'amount', 'talked',
-                  'asked', 'promised', 'received_this', 'received_next',
+                  'asked', 'total_promised', 'received_this', 'received_next',
                   'received_afternext','match_expected', 'match_received')
   list_filter = ('membership__giving_project', 'asked', PromisedBooleanFilter,
                  ReceivedBooleanFilter)
@@ -291,7 +291,8 @@ class DonorA(admin.ModelAdmin):
                 year, donor.received_this, year+1, donor.received_next, year+2,
                 donor.received_afternext, donor.notes,
                 donor.get_likely_to_join_display(),
-                donor.promise_reason_display()]
+                donor.promise_reason_display(), donor.total_promised(),
+                donor.match_expected, donor.match_received, donor.match_company]
       writer.writerow(fields)
       count += 1
     logger.info(str(count) + ' donors exported')
