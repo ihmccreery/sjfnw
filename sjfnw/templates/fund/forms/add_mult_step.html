@@ -1,34 +1,32 @@
 {% if size > 0 %}
 <div id="stepmult">
   <p>Plan a step for each contact.  You'll be able to add or change steps at any time.</p>
-  <div align="center">
+  <div align="left">
     <form method="post" id="step_mult" accept-charset="UTF-8">
     <table class="form" style="width:540px;">
       <tr>
         <td></td>
-        <td align="center">Select a step or write your own description.</td>
+        <td align="left">Select a step or write your own description.</td>
         <td>Date</td>
       </tr>
       {{ formset.management_form }}
       {% for form, d in fd%}
-        <tr align="center">
+        <tr align="left">
           <td>{{form.donor.errors}}</td>
           <td>{{form.description.errors}}</td>
           <td>{{form.date.errors}}</td>
         </tr>
-        <tr align="center">
+        <tr align="left">
           <td>{{form.donor}}{{d}}</td>
           <td>{{form.description}}</td>
           <td>{{form.date}}</td>
         </tr>
         {% if multi %}
         <tr align="center">
-          <td></td>
-          <td>
+        <td></td>
             <div id="suggest_{{forloop.counter0}}" style="display:none;">
               {% include 'fund/includes/suggested_steps.html' with target=form.description.auto_id %}
             </div>
-          </td>
         </tr>
         {% endif %}
     {% endfor %}
