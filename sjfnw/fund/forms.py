@@ -124,6 +124,10 @@ class StepDoneForm(forms.Form):
       required=False, min_value=0,
       error_messages={'min_value': 'Promise amounts cannot be negative'},
       widget=forms.TextInput(attrs={'size':10}))
+  match_expected = forms.IntegerField(required=False, label='Amount matched',
+                                      min_value=0, widget=forms.TextInput(attrs={'size':'10'}))
+  match_company = forms.CharField(max_length=255, required=False,
+                                  label='Employer')
   promise_reason = forms.MultipleChoiceField(required=False,
       label='Why did this person give? Check all that apply.',
       choices=PROMISE_REASON_CHOICES,
@@ -180,12 +184,21 @@ class StepDoneForm(forms.Form):
         logger.info('likely to join missing')
         self._errors['likely_to_join'] = self.error_class(['Select one.'])
 
+      # if one match field has data, then makes sure that other field has data
+      match_expected = cleaned_data.get('match_expected')
+      match_company = cleaned_data.get('match_company')
+      if match_expected and not match_company:
+        self._errors['match_company'] = self.error_class(['Enter the employer\'s name.'])
+      if match_company and not match_expected:
+        self._errors['match_expected'] = self.error_class(['Enter the amount matched.'])
+
     if next_step and not next_step_date: #next step - date missing
       self._errors["next_step_date"] = self.error_class(["Enter a date in mm/dd/yyyy format."])
       del cleaned_data["next_step"] #TODO is this necessary?
     elif next_step_date and not next_step: #next step - desc missing
       self._errors["next_step"] = self.error_class(["Enter a description."])
       del cleaned_data["next_step_date"]
+
     return cleaned_data
 
 

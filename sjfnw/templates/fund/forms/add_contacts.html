@@ -1,28 +1,5 @@
 {% extends request.is_ajax|yesno:"base_ajax.html,fund/_base_personal.html" %}
 {% block content %}
-<script type="text/javascript">
-  /* clones last row of form
-   * does not include error row, but that's included with error response from server */
-  function addRow() {
-    var newElement = $('#add-contacts tr:last').clone(true);
-    var total = $('#id_form-TOTAL_FORMS').val();
-    var oldTotalString = '-' + (total - 1) + '-';
-    var newTotalString = '-' + total + '-';
-
-    newElement.find(':input').each(function() {
-      var name = $(this).attr('name').replace(oldTotalString, newTotalString);
-      var id = 'id_' + name;
-      $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
-    });
-    newElement.find('label').each(function() {
-      var newFor = $(this).attr('for').replace(oldTotalString, newTotalString);
-      $(this).attr('for', newFor);
-    });
-    total++;
-    $('#id_form-TOTAL_FORMS').val(total);
-    $(selector).after(newElement);
-  }
-</script>
 <div id="addmult-wrapper">
   <form id="add-contacts" method="post" action="" accept-charset="UTF-8">
     <table class="form" id="add_form" style="text-align:center">
@@ -49,7 +26,7 @@
     </table>
   </form>
   <div align="right" style="margin-right:40px;">
-    <a onclick="addRow('#add_form tr:last', 'form')">Add more contacts</a>
+    <a onclick="addRow()">Add more contacts</a>
   </div>
   <div align="center">
     <img class="ajax-loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>

@@ -150,9 +150,9 @@ def _compile_membership_progress(donors):
       donor_data[donor.pk]['next_date'] = datetime.date(2800, 1, 1)
       donor_data[donor.pk]['summary'] += ' $%s received by SJF.' % intcomma(donor.received())
     elif donor.promised:
-      progress['promised'] += donor.promised
+      progress['promised'] += donor.total_promised()
       donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
-      donor_data[donor.pk]['summary'] += ' Promised $%s.' % intcomma(donor.promised)
+      donor_data[donor.pk]['summary'] += ' Total Promised $%s.' % intcomma(donor.total_promised())
     elif donor.asked:
       if donor.promised == 0:
         donor_data[donor.pk]['summary'] += ' Declined to donate.'
@@ -173,8 +173,9 @@ def _compile_membership_chart_data(progress):
     if progress['togo'] < 0:
       # met or exceeded goal - override goal header with total fundraised
       progress['togo'] = 0
-      progress['header'] = ('$' + intcomma(progress['promised'] + progress['received']) +
-                        ' raised')
+      progress['header'] = ('$' + intcomma(progress['promised'] +
+                            progress['received'])
+                            + ' raised')
   return progress
 
 def _compile_steps(donor_data, steps):
@@ -224,7 +225,7 @@ def project_page(request):
     if donor.received() > 0:
       progress['received'] += donor.received()
     elif donor.promised:
-      progress['promised'] += donor.promised
+      progress['promised'] += donor.total_promised()
 
   progress['contactsremaining'] = progress['contacts'] - progress['talked'] -  progress['asked']
   progress['togo'] = project.fund_goal - progress['promised'] -  progress['received']
@@ -977,6 +978,8 @@ def complete_step(request, donor_id, step_id):
       asked = form.cleaned_data['asked']
       response = form.cleaned_data['response']
       promised = form.cleaned_data['promised_amount']
+      match_expected = form.cleaned_data['match_expected']
+      match_company = form.cleaned_data['match_company']
 
       # process ask-related input
       if asked:
@@ -1003,6 +1006,9 @@ def complete_step(request, donor_id, step_id):
             donor.phone = phone
           if email:
             donor.email = email
+          if match_expected:
+            donor.match_expected = match_expected
+            donor.match_company = match_company
 
       # save donor & completed step
       step.save()
