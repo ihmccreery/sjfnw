@@ -317,7 +317,11 @@ class Donor(models.Model):
       return 0
 
   def received(self):
-    return self.received_this + self.received_next + self.received_afternext + self.match_received
+    if self.match_received:
+      return self.received_this + self.received_next + self.received_afternext + self.match_received
+    else:
+      return self.received_this + self.received_next + self.received_afternext
+
 
   def get_steps(self): #used in expanded view
     return Step.objects.filter(donor=self).filter(completed__isnull=False).order_by('date')
