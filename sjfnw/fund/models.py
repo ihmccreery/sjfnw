@@ -342,7 +342,10 @@ class Donor(models.Model):
     return ', '.join(json.loads(self.promise_reason))
 
   def total_promised(self):
-    return self.promised + self.match_expected
+    if self.match_expected:
+      return self.promised + self.match_expected
+    else:
+      return self.promised
 
 class Step(models.Model):
   created = models.DateTimeField(default=timezone.now())
