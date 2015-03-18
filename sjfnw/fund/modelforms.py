@@ -37,8 +37,8 @@ class DonorForm(ModelForm):
 
   class Meta:
     model = Donor
-    fields = ('firstname', 'lastname', 'amount', 'likelihood', 'promised',
-              'match_expected','phone','email', 'notes')
+    fields = ('firstname', 'lastname', 'amount', 'likelihood', 'match_expected',
+              'phone','email', 'notes')
     widgets = {'notes': widgets.Textarea(attrs={'cols': 25, 'rows': 4})}
 
 
