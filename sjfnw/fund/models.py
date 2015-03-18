@@ -167,9 +167,7 @@ class Membership(models.Model):
     for donor in donors:
       progress['estimated'] += donor.estimated()
       if donor.promised:
-        progress['promised'] += donor.promised
-        if donor.match_expected:
-          progress['match_expected'] += donor.match_expected
+        progress['promised'] += donor.total_promised()
       progress['received_this'] = donor.received_this
       progress['received_next'] = donor.received_next
       progress['received_afternext'] = donor.received_afternext

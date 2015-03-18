@@ -38,7 +38,7 @@ def ship_progress(obj):
           str(p['received_total']) + '</td><td style="width:25%;padding:1px">' +
           str(p['received_this']) + ', ' + str(p['received_next']) +
           ', ' + str(p['received_afternext']) + '</td></tr></table>')
-ship_progress.short_description = 'Estimated, promised, received, rec. by year'
+ship_progress.short_description = 'Estimated, total promised, received, rec. by year'
 ship_progress.allow_tags = True
 
 
