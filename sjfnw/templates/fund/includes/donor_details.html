@@ -63,11 +63,9 @@
       {% elif d.donor.promised != None %}
         <p>
           {% if d.donor.promised > 0 %}
-            Promised by contact: ${{ d.donor.promised|intcomma }}
+            Promised by contact: ${{ d.donor.promised|intcomma }} <br>
               {% if d.donor.match_expected > 0 %} {# if gift match expected #}
-                <br>
-                  Expected employer match: ${{ d.donor.match_expected|intcomma }}
-                <br>
+                  Expected employer match: ${{ d.donor.match_expected|intcomma }} <br>
               {% endif %}
             <strong>Total Promised: ${{ d.donor.total_promised|intcomma }}</strong>
           {% else %}
