@@ -253,7 +253,7 @@ class DonorA(admin.ModelAdmin):
                   'received_afternext','match_expected', 'match_received')
   list_filter = ('membership__giving_project', 'asked', PromisedBooleanFilter,
                  ReceivedBooleanFilter)
-  list_editable = ('received_this', 'received_next', 'received_afternext')
+  list_editable = ('received_this', 'received_next', 'received_afternext', 'match_expected', 'match_received')
   search_fields = ['firstname', 'lastname', 'membership__member__first_name',
                    'membership__member__last_name']
   actions = ['export_donors']
