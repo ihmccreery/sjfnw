@@ -319,11 +319,20 @@ class StepComplete(BaseFundTestCase):
     step1 = models.Step.objects.get(pk=self.step_id)
     self.assertIsNone(step1.completed)
 
-  def test_both_match_fields_entered(self):
+  def test_no_match_info(self):
+    """ Success if match fields are left blank """
+    pass
 
-    """ Both or neither match_expected and match_company must have data entered.
-        If only one field has data entered, error is shown
-    """
+  def test_match_entered(self):
+    """ Match company is required if expected is given """
+    pass
+
+  def test_match_company(self):
+    """ Match expected is required if company is given """
+    pass
+
+  def test_both_match_fields(self):
+    """ Success and match info saved if both fields are entered """
 
     self.form_data['asked'] = 'on'
     self.form_data['response'] = 1
