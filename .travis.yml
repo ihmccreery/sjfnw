@@ -9,8 +9,8 @@ notifications:
     on_failure: change
 
 install:
-  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.17.zip
-  - unzip -q google_appengine_1.9.17.zip
+  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.18.zip
+  - unzip -q google_appengine_1.9.18.zip
   - pip install codecov
   # - "pip install pylint"
   # - "pip install pylint-django"
