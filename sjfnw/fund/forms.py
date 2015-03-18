@@ -187,12 +187,10 @@ class StepDoneForm(forms.Form):
       # if one match field has data, then makes sure that other field has data
       match_expected = cleaned_data.get('match_expected')
       match_company = cleaned_data.get('match_company')
-      if match_expected: # checks if match_expected int > 0 or exists
-        if not match_company:
-          self._errors['match_expected'] = self.error_class(['Enter the employer\'s name.'])
-      if match_company: # checks if match_company length > 0 or exists
-        if not match_expected:
-          self._errors['match_company'] = self.error_class(['Enter the amount matched.'])
+      if match_expected and not match_company:
+        self._errors['match_company'] = self.error_class(['Enter the employer\'s name.'])
+      if match_company and not match_expected:
+        self._errors['match_expected'] = self.error_class(['Enter the amount matched.'])
 
     if next_step and not next_step_date: #next step - date missing
       self._errors["next_step_date"] = self.error_class(["Enter a date in mm/dd/yyyy format."])
