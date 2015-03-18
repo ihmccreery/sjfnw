@@ -150,11 +150,10 @@ def _compile_membership_progress(donors):
       donor_data[donor.pk]['next_date'] = datetime.date(2800, 1, 1)
       donor_data[donor.pk]['summary'] += ' $%s received by SJF.' % intcomma(donor.received())
     elif donor.promised:
-      progress['promised'] += donor.promised
+      progress['promised'] += donor.total_promised()
       donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
-      donor_data[donor.pk]['summary'] += ' Promised $%s.' % intcomma(donor.promised)
-      donor_data[donor.pk]['summary'] += ' Expected Match $%s.' % intcomma(donor.match_expected)
-      donor_data[donor.pk]['summary'] += ' Total Promised $%s.' % intcomma(donor.match_expected + donor.promised)
+      donor_data[donor.pk]['summary'] += ' Promised $%s' % intcomma(donor.total_promised())
+      donor_data[donor.pk]['summary'] += ' (includes expected match of $%s.)' % intcomma(donor.match_expected)
     elif donor.asked:
       if donor.promised == 0:
         donor_data[donor.pk]['summary'] += ' Declined to donate.'
@@ -175,8 +174,9 @@ def _compile_membership_chart_data(progress):
     if progress['togo'] < 0:
       # met or exceeded goal - override goal header with total fundraised
       progress['togo'] = 0
-      progress['header'] = ('$' + intcomma(progress['promised'] + progress['received']) +
-                        ' raised')
+      progress['header'] = ('$' + intcomma(progress['promised'] +
+                            progress['received'])
+                            + ' raised')
   return progress
 
 def _compile_steps(donor_data, steps):
@@ -1008,7 +1008,6 @@ def complete_step(request, donor_id, step_id):
           if email:
             donor.email = email
           if match_expected:
-            match_expected = match_expected / float(100) * promised
             donor.match_expected = match_expected
             donor.match_company = match_company
 

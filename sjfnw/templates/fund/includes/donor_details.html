@@ -63,13 +63,12 @@
       {% elif d.donor.promised != None %}
         <p>
           {% if d.donor.promised > 0 %}
-            Promised: ${{ d.donor.promised|intcomma }}
+            Promised: ${{ d.donor.total_promised|intcomma }}
           {% else %}
             Declined to donate.
           {% endif %}
         </p>
         <p>Original estimation: ${{ d.donor.estimated|intcomma }}</p>
-
       {# no promise, but asked #}
       {% elif d.donor.asked %}
         <p>Asked; awaiting response.</p>
