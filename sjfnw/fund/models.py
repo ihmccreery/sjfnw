@@ -1,5 +1,5 @@
 from django.contrib.humanize.templatetags.humanize import intcomma
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
@@ -167,7 +167,7 @@ class Membership(models.Model):
     for donor in donors:
       progress['estimated'] += donor.estimated()
       if donor.promised:
-        progress['promised'] += donor.promised
+        progress['promised'] += donor.total_promised()
       progress['received_this'] = donor.received_this
       progress['received_next'] = donor.received_next
       progress['received_afternext'] = donor.received_afternext
@@ -288,11 +288,18 @@ class Donor(models.Model):
   received_afternext = models.PositiveIntegerField(default=0,
       verbose_name='Received - year after next')
   gift_notified = models.BooleanField(default=False)
+  match_expected = models.PositiveIntegerField(
+      blank=True, default=0,
+      verbose_name='Match expected ($)', # total $ amount matched by employer
+      validators=[MinValueValidator(0)])
+  match_company = models.CharField(max_length=255, blank=True, verbose_name='Employer name' )#  employer name
+  match_received = models.PositiveIntegerField(blank=True, default=0,
+      verbose_name='Match received ($)')# total $ amount of match received
 
   # contact info only required if promise is entered
   phone = models.CharField(max_length=15, blank=True)
   email = models.EmailField(max_length=100, blank=True)
-  notes = models.TextField(blank=True, )
+  notes = models.TextField(blank=True)
 
   class Meta:
     ordering = ['firstname', 'lastname']
@@ -310,7 +317,11 @@ class Donor(models.Model):
       return 0
 
   def received(self):
-    return self.received_this + self.received_next + self.received_afternext
+    if self.match_received:
+      return self.received_this + self.received_next + self.received_afternext + self.match_received
+    else:
+      return self.received_this + self.received_next + self.received_afternext
+
 
   def get_steps(self): #used in expanded view
     return Step.objects.filter(donor=self).filter(completed__isnull=False).order_by('date')
@@ -331,6 +342,12 @@ class Donor(models.Model):
 
   def promise_reason_display(self):
     return ', '.join(json.loads(self.promise_reason))
+
+  def total_promised(self):
+    if self.match_expected:
+      return self.promised + self.match_expected
+    else:
+      return self.promised
 
 class Step(models.Model):
   created = models.DateTimeField(default=timezone.now())
