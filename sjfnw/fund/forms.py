@@ -125,7 +125,7 @@ class StepDoneForm(forms.Form):
       error_messages={'min_value': 'Promise amounts cannot be negative'},
       widget=forms.TextInput(attrs={'size':10}))
   match_expected = forms.IntegerField(required=False, label='Amount matched',
-                                      widget=forms.TextInput(attrs={'size':'1'}))
+                                      min_value=0, widget=forms.TextInput(attrs={'size':'1'}))
   match_company = forms.CharField(max_length=255, required=False,
                                   label='Employer')
   promise_reason = forms.MultipleChoiceField(required=False,
