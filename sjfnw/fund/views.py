@@ -1008,7 +1008,7 @@ def complete_step(request, donor_id, step_id):
           if email:
             donor.email = email
           if match_expected:
-            match_expected = match_expected // 100 * promised
+            match_expected = match_expected / float(100) * promised
             donor.match_expected = match_expected
             donor.match_company = match_company
 
