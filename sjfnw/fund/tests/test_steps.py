@@ -165,14 +165,14 @@ class StepComplete(BaseFundTestCase):
         self.assertEqual(donor.match_company, '')
     else:
       if form_data['response'] == 3: # declined
-        self.assertEqual(donor1.promised, 0)
-        self.assertEqual(step1.promised, 0)
+        self.assertEqual(donor.promised, 0)
+        self.assertEqual(step.promised, 0)
       else:
-        self.assertEqual(donor1.promised, pre_donor.promised)
-        self.assertIsNone(step1.promised)
-      self.assertEqual(donor1.lastname, pre_donor.lastname)
-      self.assertEqual(donor1.phone, pre_donor.phone)
-      self.assertEqual(donor1.email, pre_donor.email)
+        self.assertEqual(donor.promised, pre_donor.promised)
+        self.assertIsNone(step.promised)
+      self.assertEqual(donor.lastname, pre_donor.lastname)
+      self.assertEqual(donor.phone, pre_donor.phone)
+      self.assertEqual(donor.email, pre_donor.email)
 
 
   def test_valid_followup(self):
@@ -314,17 +314,33 @@ class StepComplete(BaseFundTestCase):
     step1 = models.Step.objects.get(pk=self.step_id)
     self.assertIsNone(step1.completed)
 
-  def test_no_match_info(self):
-    """ Success if match fields are left blank """
-    pass
-
   def test_match_entered(self):
     """ Match company is required if expected is given """
-    pass
+
+    self.form_data['asked'] = 'on'
+    self.form_data['response'] = 1
+    self.form_data['promised_amount'] = 50
+    self.add_followup()
+    self.form_data['match_expected'] = 100
+
+    response = self.client.post(self.url, self.form_data, follow=True)
+
+    self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
+    self.assertFormError(response, 'form', 'match_company', 'Enter the employer\'s name.')
 
   def test_match_company(self):
     """ Match expected is required if company is given """
-    pass
+
+    self.form_data['asked'] = 'on'
+    self.form_data['response'] = 1
+    self.form_data['promised_amount'] = 50
+    self.add_followup()
+    self.form_data['match_company'] = 'Company X'
+
+    response = self.client.post(self.url, self.form_data, follow=True)
+
+    self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
+    self.assertFormError(response, 'form', 'match_expected', 'Enter the amount matched.')
 
   def test_both_match_fields(self):
     """ Success and match info saved if both fields are entered """
@@ -332,14 +348,9 @@ class StepComplete(BaseFundTestCase):
     self.form_data['asked'] = 'on'
     self.form_data['response'] = 1
     self.form_data['promised_amount'] = 50
-    self.form_data['match_expected'] = 100,
-    self.form_data['match_company'] = 'Company X'
     self.add_followup()
+    self.form_data['match_expected'] = 100
+    self.form_data['match_company'] = 'Company X'
 
-    # self.valid_followup(self.form_data)
+    self.post_and_verify_followup_saved(self.form_data)
 
-    response = self.client.post(self.url, self.form_data)
-
-    # self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
-    self.assertFormError(response, 'form', 'match_company', 'Enter the percent matched.')
-    self.assertFormError(response, 'form', 'match_expected', 'Enter the employer\'s name.')
