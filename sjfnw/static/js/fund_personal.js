@@ -189,7 +189,7 @@ function completeLoaded(pk, dasked, dpromised, submitted) {
       responseSpan.hide();
       promisedSpan.hide();
     } else { // check response field
-      var response = $('#' + pk + '_id_response');
+      var response = document.getElementById(pk + '_id_response');
       responseSelected(response);
     }
   } else { // haven't asked yet, hide 2&3
