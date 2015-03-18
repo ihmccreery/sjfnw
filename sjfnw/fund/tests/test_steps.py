@@ -2,7 +2,6 @@ import logging
 import unittest
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
@@ -14,12 +13,12 @@ class AddStep(BaseFundTestCase):
   def setUp(self):
     super(AddStep, self).setUp()
     self.use_new_acct()
-    donor =models.Donor(firstname='user', lastname='', membership_id=self.pre_id)
+    donor = models.Donor(firstname='user', lastname='', membership_id=self.pre_id)
     donor.save()
-    self.url=reverse('sjfnw.fund.views.add_step', kwargs={'donor_id': donor.pk})
+    self.url = reverse('sjfnw.fund.views.add_step', kwargs={'donor_id': donor.pk})
 
   def test_blank(self):
-    form_data ={
+    form_data = {
       'date': u'',
       'description': u''
     }
@@ -28,26 +27,15 @@ class AddStep(BaseFundTestCase):
 
 
 class StepComplete(BaseFundTestCase):
-  """ Tests various scenarios of step completion
-  1) completion
-    a) minimal step complete - verify step & donor updated
-    b) when different stages have already been reached (asked, responded, promised)
-       verify display and submission handling
-    c) for each additional step, try minimal (no additional data), contradictory/invalid if
-       applicable, and full valid
-  2) contact notes
-  3) next step
-    a) validation
-    b) creation """
+  """ Tests various scenarios of step completion """
 
   def setUp(self):
-    logger.info('BaseFundTestCase setUp')
     super(StepComplete, self).setUp()
-    logger.info('post super')
     self.use_test_acct()
     self.url = reverse('sjfnw.fund.views.complete_step', kwargs={
       'donor_id': self.donor_id, 'step_id': self.step_id
     })
+    # start with blank/defaults form
     self.form_data = {
       'asked': 'on',
       'response': 2,
@@ -63,10 +51,8 @@ class StepComplete(BaseFundTestCase):
       'match_company': ''
     }
 
-    # 'asked': 'on', 'promise_reason': ['GP topic', 'Social justice']
-
-  # helper function used by >1 test
   def add_followup(self):
+    """ Add valid promise followup data to self.form_data (helper, not a test) """
 
     self.form_data['last_name'] = 'Sozzity'
     self.form_data['email'] = 'blah@gmail.com'
@@ -112,24 +98,17 @@ class StepComplete(BaseFundTestCase):
     self.assertTrue(donor.asked)
 
   def test_minimal_next(self):
-    """ Verify success of blank form with a next step
+    """ Verify success of blank form with a next step """
 
-    Setup:
-      Only form info is next step and next step date
-
-    Asserts:
-      Success response
-      Step completed
-      New step added to DB
-    """
-
-    form_data = {'asked': '',
+    form_data = {
+        'asked': '',
         'response': 2,
         'promised_amount': '',
         'last_name': '',
         'notes': '',
         'next_step': 'A BRAND NEW STEP',
-        'next_step_date': '2013-01-25'}
+        'next_step_date': '2013-01-25'
+    }
 
     pre_count = models.Step.objects.count()
 
@@ -202,15 +181,7 @@ class StepComplete(BaseFundTestCase):
 
 
   def test_valid_followup(self):
-    """ Verify success of promise with amount, last name and email
-
-    Setup:
-      Form contains asked, response = promised, amount = 50,
-        includes last name and email
-
-    Asserts:
-      See valid_followup
-    """
+    """ Success with promise amount, last name and email """
 
     self.form_data['asked'] = 'on'
     self.form_data['response'] = 1
@@ -220,14 +191,10 @@ class StepComplete(BaseFundTestCase):
     self.valid_followup(self.form_data)
 
   def test_valid_followup_comma(self):
-    """ Verify success of promise when amount has comma in it
-        (Test whether IntegerCommaField works)
+    """ Success when promise amount has comma in it
 
-    Setup:
-      Form = followup2 except amount = '5,000'
-
-    Asserts:
-      See valid_followup
+      Test whether IntegerCommaField works
+      Same as test_valid_followup except except amount = '5,000'
     """
 
     self.form_data['asked'] = 'on'
@@ -238,9 +205,7 @@ class StepComplete(BaseFundTestCase):
     self.valid_followup(self.form_data)
 
   def test_valid_hiddendata1(self):
-
-    """ promise amt + follow up + undecided
-      amt & follow up info should not be saved """
+    """ Promise data not saved if response is undecided """
 
     self.form_data['asked'] = 'on'
     self.form_data['response'] = 2
@@ -251,12 +216,13 @@ class StepComplete(BaseFundTestCase):
     self.valid_followup(self.form_data)
 
   def test_valid_hiddendata2(self):
+    """ Promise followup not saved if response is declined
 
-    """ declined + promise amt + follow up
-      amt & follow up info should not be saved
-      step.promised & donor.promised = 0 """
+      step.promised and donor.promised are set to 0
+    """
 
-    form_data = {'asked': 'on',
+    form_data = {
+      'asked': 'on',
       'response': 3,
       'promised_amount': 50,
       'last_name': 'Sozzity',
@@ -264,15 +230,13 @@ class StepComplete(BaseFundTestCase):
       'email': '',
       'notes': '',
       'next_step': '',
-      'next_step_date': ''}
+      'next_step_date': ''
+    }
 
     self.valid_followup(form_data)
 
   def test_valid_hiddendata3(self):
-
-    """ promise amt + follow up + undecided
-      allow without followup
-      don't save promise on donor or step """
+    """ Followup not required if promise amount is entered but response is undecided """
 
     form_data = {'asked': 'on',
       'response': 2,
@@ -287,16 +251,7 @@ class StepComplete(BaseFundTestCase):
     self.valid_followup(form_data)
 
   def test_invalid_promise(self):
-    """ Verify that additional info is required when a promise is entered
-
-    Setup:
-      Complete a step with response promised, but no amount, phone or email
-
-    Asserts:
-      Form template used (not successful)
-      Form errors on promised_amount, last_name, phone
-      Step and donor not modified
-    """
+    """ Additional info is required when a promise is entered """
 
     form_data = {
         'asked': 'on',
@@ -329,9 +284,7 @@ class StepComplete(BaseFundTestCase):
     self.assertFalse(donor1.asked)
 
   def test_invalid_next(self):
-
-    """ missing date
-        missing desc """
+    """ Form is not saved, errors are shown if next step is missing date or desc """
 
     form_data = {'asked': '',
         'response': 2,
@@ -349,13 +302,15 @@ class StepComplete(BaseFundTestCase):
     step1 = models.Step.objects.get(pk=self.step_id)
     self.assertIsNone(step1.completed)
 
-    form_data = {'asked': '',
-        'response': 2,
-        'promised_amount': '',
-        'last_name': '',
-        'notes': '',
-        'next_step': '',
-        'next_step_date': '2013-01-25'}
+    form_data = {
+      'asked': '',
+      'response': 2,
+      'promised_amount': '',
+      'last_name': '',
+      'notes': '',
+      'next_step': '',
+      'next_step_date': '2013-01-25'
+    }
 
     response = self.client.post(self.url, form_data)
     self.assertTemplateUsed(response, 'fund/forms/complete_step.html')
