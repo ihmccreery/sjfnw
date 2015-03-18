@@ -124,7 +124,7 @@ class StepDoneForm(forms.Form):
       required=False, min_value=0,
       error_messages={'min_value': 'Promise amounts cannot be negative'},
       widget=forms.TextInput(attrs={'size':10}))
-  match_expected = forms.IntegerField(required=False, label='Percent matched',
+  match_expected = forms.IntegerField(required=False, label='Amount matched',
                                       widget=forms.TextInput(attrs={'size':'1'}))
   match_company = forms.CharField(max_length=255, required=False,
                                   label='Employer')
@@ -192,7 +192,7 @@ class StepDoneForm(forms.Form):
           self._errors['match_expected'] = self.error_class(['Enter the employer\'s name.'])
       if match_company: # checks if match_company length > 0 or exists
         if not match_expected:
-          self._errors['match_company'] = self.error_class(['Enter the percent matched.'])
+          self._errors['match_company'] = self.error_class(['Enter the amount matched.'])
 
     if next_step and not next_step_date: #next step - date missing
       self._errors["next_step_date"] = self.error_class(["Enter a date in mm/dd/yyyy format."])
