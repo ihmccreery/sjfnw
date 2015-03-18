@@ -152,8 +152,7 @@ def _compile_membership_progress(donors):
     elif donor.promised:
       progress['promised'] += donor.total_promised()
       donor_data[donor.pk]['next_date'] = datetime.date(2700, 1, 1)
-      donor_data[donor.pk]['summary'] += ' Promised $%s' % intcomma(donor.total_promised())
-      donor_data[donor.pk]['summary'] += ' (includes expected match of $%s.)' % intcomma(donor.match_expected)
+      donor_data[donor.pk]['summary'] += ' Total Promised: $%s' % intcomma(donor.total_promised())
     elif donor.asked:
       if donor.promised == 0:
         donor_data[donor.pk]['summary'] += ' Declined to donate.'
@@ -226,7 +225,7 @@ def project_page(request):
     if donor.received() > 0:
       progress['received'] += donor.received()
     elif donor.promised:
-      progress['promised'] += donor.promised
+      progress['promised'] += donor.total_promised()
 
   progress['contactsremaining'] = progress['contacts'] - progress['talked'] -  progress['asked']
   progress['togo'] = project.fund_goal - progress['promised'] -  progress['received']
