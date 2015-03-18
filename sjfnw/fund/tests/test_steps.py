@@ -58,8 +58,6 @@ class StepComplete(BaseFundTestCase):
     self.form_data['email'] = 'blah@gmail.com'
     self.form_data['promise_reason'] = ['Social justice']
     self.form_data['likely_to_join'] = 1
-    self.form_data['match_expected'] = 100
-    self.form_data['match_company'] = 'Company X'
 
   def test_minimal_completion(self):
     """ Verify that step can be completed without any additional input """
@@ -128,21 +126,10 @@ class StepComplete(BaseFundTestCase):
     make sure step.asked stays false """
     pass
 
-  def valid_followup(self, form_data):
-    """ Not a test in itself - used by valid follow up tests
+  def post_and_verify_followup_saved(self, form_data):
+    """ Posts the form and verifies success without follow up info saved appropriately
 
-    Asserts:
-      Success response
-      if response is 1 (promised)
-        Donor last name and/or email match form input
-        Step & donor promised=form amount
-      if response is 3 (declined)
-        donor and step promised = 0
-      if response is 2 or 3
-        last name, email, promised amount are not updated
-      Donor asked=True
-      Step completed
-      Step asked=True
+      Not a test in itself - used by valid follow up tests
     """
 
     pre_donor = models.Donor.objects.get(pk=self.donor_id)
@@ -154,22 +141,30 @@ class StepComplete(BaseFundTestCase):
     if promised == '5,000': #hacky workaround
       promised = 5000
 
+    # get donor and step after the POST
+    donor = models.Donor.objects.get(pk=self.donor_id)
+    step = models.Step.objects.get(pk=self.step_id)
+
     # step completion, asked update
-    donor1 = models.Donor.objects.get(pk=self.donor_id)
-    step1 = models.Step.objects.get(pk=self.step_id)
-    self.assertTrue(donor1.asked)
-    self.assertTrue(step1.asked)
-    self.assertIsNotNone(step1.completed)
+    self.assertTrue(donor.asked)
+    self.assertTrue(step.asked)
+    self.assertIsNotNone(step.completed)
 
     # follow up info
     if form_data['response'] == 1:
-      self.assertEqual(donor1.lastname, form_data['last_name'])
-      self.assertEqual(donor1.email, form_data['email'])
-      self.assertEqual(donor1.phone, form_data['phone'])
-      self.assertEqual(donor1.promised, promised)
-      self.assertEqual(step1.promised, promised)
+      self.assertEqual(donor.lastname, form_data['last_name'])
+      self.assertEqual(donor.email, form_data['email'])
+      self.assertEqual(donor.phone, form_data['phone'])
+      self.assertEqual(donor.promised, promised)
+      self.assertEqual(step.promised, promised)
+      if form_data['match_expected'] or form_data['match_company']:
+        self.assertEqual(donor.match_expected, form_data['match_expected'])
+        self.assertEqual(donor.match_company, form_data['match_company'])
+      else:
+        self.assertEqual(donor.match_expected, 0)
+        self.assertEqual(donor.match_company, '')
     else:
-      if form_data['response'] == 3: #declined
+      if form_data['response'] == 3: # declined
         self.assertEqual(donor1.promised, 0)
         self.assertEqual(step1.promised, 0)
       else:
@@ -188,7 +183,7 @@ class StepComplete(BaseFundTestCase):
     self.form_data['promised_amount'] = 50
     self.add_followup()
 
-    self.valid_followup(self.form_data)
+    self.post_and_verify_followup_saved(self.form_data)
 
   def test_valid_followup_comma(self):
     """ Success when promise amount has comma in it
@@ -202,7 +197,7 @@ class StepComplete(BaseFundTestCase):
     self.form_data['promised_amount'] = '5,000'
     self.add_followup()
 
-    self.valid_followup(self.form_data)
+    self.post_and_verify_followup_saved(self.form_data)
 
   def test_valid_hiddendata1(self):
     """ Promise data not saved if response is undecided """
@@ -213,7 +208,7 @@ class StepComplete(BaseFundTestCase):
     self.form_data['last_name'] = 'Sozzity'
     self.form_data['phone'] = '206-555-5898'
 
-    self.valid_followup(self.form_data)
+    self.post_and_verify_followup_saved(self.form_data)
 
   def test_valid_hiddendata2(self):
     """ Promise followup not saved if response is declined
@@ -233,7 +228,7 @@ class StepComplete(BaseFundTestCase):
       'next_step_date': ''
     }
 
-    self.valid_followup(form_data)
+    self.post_and_verify_followup_saved(form_data)
 
   def test_valid_hiddendata3(self):
     """ Followup not required if promise amount is entered but response is undecided """
@@ -248,7 +243,7 @@ class StepComplete(BaseFundTestCase):
       'next_step': '',
       'next_step_date': ''}
 
-    self.valid_followup(form_data)
+    self.post_and_verify_followup_saved(form_data)
 
   def test_invalid_promise(self):
     """ Additional info is required when a promise is entered """
