@@ -341,6 +341,9 @@ class Donor(models.Model):
   def promise_reason_display(self):
     return ', '.join(json.loads(self.promise_reason))
 
+  def total_promised(self):
+    return self.promised + self.match_expected
+
 class Step(models.Model):
   created = models.DateTimeField(default=timezone.now())
   date = models.DateField(verbose_name='Date')
