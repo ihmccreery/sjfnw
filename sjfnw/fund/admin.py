@@ -38,7 +38,7 @@ def ship_progress(obj):
           str(p['received_total']) + '</td><td style="width:25%;padding:1px">' +
           str(p['received_this']) + ', ' + str(p['received_next']) +
           ', ' + str(p['received_afternext']) + '</td></tr></table>')
-ship_progress.short_description = 'Estimated, promised, received, rec. by year'
+ship_progress.short_description = 'Estimated, total promised, received, rec. by year'
 ship_progress.allow_tags = True
 
 
@@ -149,7 +149,7 @@ class DonorInline(admin.TabularInline): #membership
   max_num = 0
   can_delete = False
   readonly_fields = ('firstname', 'lastname', 'amount', 'talked', 'asked',
-                     'promised')
+                     'promised', 'total_promised')
   fields = ('firstname', 'lastname', 'amount', 'talked', 'asked', 'promised')
 
 class ProjectAppInline(admin.TabularInline):
@@ -247,11 +247,12 @@ class MembershipA(admin.ModelAdmin):
 
 
 class DonorA(admin.ModelAdmin):
-  list_display = ('firstname', 'lastname', 'membership', 'amount', 'talked', 'asked',
-                  'promised', 'received_this', 'received_next', 'received_afternext')
+  list_display = ('firstname', 'lastname', 'membership', 'amount', 'talked',
+                  'asked', 'total_promised', 'received_this', 'received_next',
+                  'received_afternext','match_expected', 'match_received')
   list_filter = ('membership__giving_project', 'asked', PromisedBooleanFilter,
                  ReceivedBooleanFilter)
-  list_editable = ('received_this', 'received_next', 'received_afternext')
+  list_editable = ('received_this', 'received_next', 'received_afternext', 'match_expected', 'match_received')
   search_fields = ['firstname', 'lastname', 'membership__member__first_name',
                    'membership__member__last_name']
   actions = ['export_donors']
@@ -262,6 +263,7 @@ class DonorA(admin.ModelAdmin):
             ('amount', 'likelihood'),
             ('talked', 'asked', 'promised', 'promise_reason_display', 'likely_to_join'),
             ('received_this', 'received_next', 'received_afternext'),
+            ('match_expected', 'match_company', 'match_received'),
             'notes')
 
   readonly_fields = ('promise_reason_display', 'likely_to_join')
@@ -288,7 +290,8 @@ class DonorA(admin.ModelAdmin):
                 year, donor.received_this, year+1, donor.received_next, year+2,
                 donor.received_afternext, donor.notes,
                 donor.get_likely_to_join_display(),
-                donor.promise_reason_display()]
+                donor.promise_reason_display(), donor.total_promised(),
+                donor.match_expected, donor.match_received, donor.match_company]
       writer.writerow(fields)
       count += 1
     logger.info(str(count) + ' donors exported')

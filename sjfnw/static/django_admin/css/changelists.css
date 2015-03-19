@@ -52,7 +52,7 @@
 
 #changelist table thead th {
     padding: 0;
-    white-space: nowrap;
+    /*white-space: nowrap;*/
     vertical-align: middle;
 }
 

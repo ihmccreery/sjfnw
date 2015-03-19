@@ -22,7 +22,7 @@
         Response {{ form.response }}
       </label>
     </div>
-    
+
     <div id="promised-amount" class="form-field third">
       {{ form.promised_amount.errors }}
       <label id="{{ step_id }}_promise">
@@ -36,7 +36,8 @@
   <div id="{{ step_id }}_promise_follow" class="promise-followup">
 
     <p>Congratulations on a successful ask!</p>
-    <p>Please provide some more information so that Social Justice Fund can follow up on the promise as needed.</p>
+    <p>Please provide some more information so that Social Justice Fund can
+        follow up on the promise as needed.</p>
 
     <div class="form-row">
       <div class="form-field third">
@@ -67,8 +68,24 @@
       {{ form.likely_to_join.errors }}
       {{ form.likely_to_join.label_tag }}<br>
       {{ form.likely_to_join }}
+    </div><br><br>
+
+    <i><strong>*If this promise will be employer matched, please complete the
+    following:</strong></i>
+    <div class="form-row">
+      <div class="form-field third">
+        {{ form.match_company.errors }}
+        <i> {{ form.match_expected.label}} </i><br>
+        ${{ form.match_expected }}
+      </div>
+      <div class="form-field third">
+        {{ form.match_expected.errors }}
+        <i> {{ form.match_company.label}} </i><br>
+        {{ form.match_company }}
+      </div>
     </div>
-  </div> 
+    <p><i>Let us know if we need to follow up with the employer in the notes section below</i></p>
+  </div>
 
   <h3>2) Update your notes for this contact <i>(optional)</i></h3>
   <div class="form-row">
