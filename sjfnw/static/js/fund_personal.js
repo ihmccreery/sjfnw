@@ -186,7 +186,7 @@ function completeLoaded(pk, dasked, dpromised, submitted) {
       responseSpan.hide();
       promisedSpan.hide();
     } else { // check response field
-      var response = $('#' + pk + '_id_response');
+      var response = document.getElementById(pk + '_id_response');
       responseSelected(response);
     }
   } else { // haven't asked yet, hide 2&3
@@ -313,6 +313,30 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
       }
     }
   });
+}
+
+/* Add a row to the add contacts form by cloning the last row
+ * Update form management fields
+ */
+function addRow() { // eslint-disable-line no-unused-vars
+  var selector = '#add-contacts tr:last';
+  var newElement = $(selector).clone(true);
+  var total = $('#id_form-TOTAL_FORMS').val();
+  var oldTotalString = '-' + (total - 1) + '-';
+  var newTotalString = '-' + total + '-';
+
+  newElement.find(':input').each(function() {
+    var name = $(this).attr('name').replace(oldTotalString, newTotalString);
+    var id = 'id_' + name;
+    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+  });
+  newElement.find('label').each(function() {
+    var newFor = $(this).attr('for').replace(oldTotalString, newTotalString);
+    $(this).attr('for', newFor);
+  });
+  total++;
+  $('#id_form-TOTAL_FORMS').val(total);
+  $(selector).after(newElement);
 }
 
 /* Set up click handlers for loadView */
