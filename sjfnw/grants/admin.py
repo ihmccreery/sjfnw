@@ -1,17 +1,15 @@
+import logging
+
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.db import connection
 from django.utils.safestring import mark_safe
 
-from sjfnw.utils import log_queries
 from sjfnw.admin import advanced_admin, YearFilter
 from sjfnw.grants import models
 from sjfnw.grants.modelforms import DraftAdminForm
 
-import logging
 logger = logging.getLogger('sjfnw')
-
 
 # CUSTOM FILTERS
 
@@ -26,7 +24,8 @@ class CycleTypeFilter(admin.SimpleListFilter):
   parameter_name = 'cycle_type'
 
   def lookups(self, request, model_admin):
-    titles = models.GrantCycle.objects.order_by('title').values_list('title', flat=True).distinct()
+    titles = (models.GrantCycle.objects.values_list('title', flat=True)
+                                       .distinct().order_by('title'))
     # group cycles into "types" - criminal justice, economic justice, etc.
     types = []
     for title in titles:
@@ -35,7 +34,7 @@ class CycleTypeFilter(admin.SimpleListFilter):
         cycle_type = title[:pos]
         if not cycle_type in types:
           types.append(cycle_type)
-      else: #Grant Cycle not found - just use whole
+      else: # Grant Cycle not found - just use whole
         if not title in types:
           types.append(title)
     return [(t, t) for t in types]
@@ -49,6 +48,7 @@ class CycleTypeFilter(admin.SimpleListFilter):
 # INLINES
 
 class BaseShowInline(admin.TabularInline):
+  """ Base inline for read only items """
   extra = 0
   max_num = 0
   can_delete = False
@@ -56,7 +56,10 @@ class BaseShowInline(admin.TabularInline):
   class Meta:
     abstract = True
 
-class LogReadonlyI(admin.TabularInline): #Org, Application
+
+class LogReadonlyI(admin.TabularInline):
+  """ Show existing logs as an inline. Can be deleted but not edited.
+      Used by Org, Application """
   model = models.GrantApplicationLog
   extra = 0
   max_num = 0
@@ -66,46 +69,47 @@ class LogReadonlyI(admin.TabularInline): #Org, Application
   verbose_name_plural = 'Logs'
 
   def queryset(self, request):
-    return (super(LogReadonlyI, self).queryset(request)
-            .select_related('staff', 'application', 'application__grant_cycle'))
+    qs = super(LogReadonlyI, self).queryset(request)
+    return qs.select_related('staff', 'application', 'application__grant_cycle')
 
   def grantcycle(self, obj):
     if obj.application:
       return obj.application.grant_cycle
     else:
       return ''
-  grantcycle.short_description = 'Application'
+  grantcycle.short_description = 'Application' # app is identified by grant cycle in this case
 
 
-class LogI(admin.TabularInline): #Org, Application
+class LogI(admin.TabularInline):
   """ Inline for adding a log to an org or application
-  Shows one blank row.  Autofills org or app depending on current page """
+      Shows one blank row. Autofills org or app depending on current page """
   model = models.GrantApplicationLog
   extra = 1
   max_num = 1
-  exclude = ('date',)
   can_delete = False
+  exclude = ('date',) # auto-populated
   verbose_name_plural = 'Add a log entry'
 
   def queryset(self, request):
     return models.GrantApplicationLog.objects.none()
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
-    """ give initial values for staff and/or org """
-    if '/add' in request.path:
-      logger.info('LogI.formfield_for_foreignkey called on add view')
-    else:
-      # staff field
+    """ Give initial values for staff and/or org.
+        This is called once on every foreign key field """
+    if not '/add' in request.path: # skip when creating new org/app
+      # autofill staff field
       if db_field.name == 'staff':
         kwargs['initial'] = request.user.id
         kwargs['queryset'] = User.objects.filter(is_staff=True)
         return db_field.formfield(**kwargs)
+
       # organization field on app page
       elif 'grantapplication' in request.path and db_field.name == 'organization':
         app_id = int(request.path.split('/')[-2])
         app = models.GrantApplication.objects.get(pk=app_id)
         kwargs['initial'] = app.organization_id
         return db_field.formfield(**kwargs)
+
       # application field
       if db_field.name == 'application':
         org_pk = int(request.path.split('/')[-2])
@@ -115,29 +119,16 @@ class LogI(admin.TabularInline): #Org, Application
 
     return super(LogI, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-class AwardI(BaseShowInline): # NOT IN USE CURRENTLY
-  model = models.GivingProjectGrant
-  fields = ('amount', 'check_mailed', 'agreement_mailed', 'edit_award')
-  readonly_fields = fields
-  template = 'admin/grants/givingprojectgrant/tabular_inline.html'
 
-  def queryset(self, request):
-    return super(AwardI, self).queryset(request).select_related()
-
-  def edit_award(self, obj):
-    if obj.pk:
-      return ('<a href="/admin/grants/givingprojectgrant/' + str(obj.pk) +
-            '/" target="_blank">Edit</a>')
-    else:
-      return ''
-  edit_award.allow_tags = True
-
-class AppCycleI(BaseShowInline): #Cycle
+class AppCycleI(BaseShowInline):
+  """ List related applications on a cycle page """
   model = models.GrantApplication
   readonly_fields = ('organization', 'submission_time', 'pre_screening_status')
   fields = ('organization', 'submission_time', 'pre_screening_status')
 
-class GrantApplicationI(BaseShowInline): #Org
+
+class GrantApplicationI(BaseShowInline):
+  """ List grant applications on organization page """
   model = models.GrantApplication
   readonly_fields = ('submission_time', 'grant_cycle', 'pre_screening_status',
                      'edit_application', 'view_link')
@@ -147,13 +138,15 @@ class GrantApplicationI(BaseShowInline): #Org
   def queryset(self, request):
     return super(GrantApplicationI, self).queryset(request).select_related('grant_cycle')
 
-
-  def edit_application(self, obj): #GrantApplication fieldset
+  def edit_application(self, obj):
+    """ Link to grant application change page """
     return ('<a href="/admin/grants/grantapplication/' + str(obj.pk) +
             '/" target="_blank">Edit</a>')
   edit_application.allow_tags = True
 
-class SponsoredProgramI(BaseShowInline): # Org
+
+class SponsoredProgramI(BaseShowInline):
+  """ List sponsored program grants on organization page """
   model = models.SponsoredProgramGrant
   fields = ('amount', 'check_mailed', 'approved', 'edit')
   readonly_fields = fields
@@ -167,17 +160,9 @@ class SponsoredProgramI(BaseShowInline): # Org
       return ''
   edit.allow_tags = True
 
-class DraftI(BaseShowInline): #Adv only
-  model = models.DraftGrantApplication
-  fields = ('grant_cycle', 'modified', 'overdue', 'extended_deadline', 'adv_viewdraft')
-  readonly_fields = ('grant_cycle', 'modified', 'overdue', 'extended_deadline', 'adv_viewdraft')
-
-  def adv_viewdraft(self, obj): #Link from Draft inline on Org to Draft page
-    return ('<a href="/admin-advanced/grants/draftgrantapplication/' +
-            str(obj.pk) + '/" target="_blank">View</a>')
-  adv_viewdraft.allow_tags = True
-
 class ProjectAppI(admin.TabularInline): # GrantApplication
+  """ Display giving projects assigned to this app, and related objects
+      (screening status, awards, YER) """
   model = models.ProjectApp
   extra = 1
   fields = ('giving_project', 'screening_status', 'granted', 'year_end_report')
@@ -200,50 +185,47 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
 
   def year_end_report(self, obj):
     if obj.pk:
-      report = (models.YearEndReport.objects
-          .select_related('award')
-          .filter(award__projectapp_id=obj.pk))
+      report = (models.YearEndReport.objects.select_related('award')
+                                            .filter(award__projectapp_id=obj.pk))
       if report:
         return mark_safe('<a target="_blank" href="/admin/grants/yearendreport/' +
             str(report[0].pk) + '/">View</a>')
     return ''
 
-
-# MODELADMIN
+# MODEL ADMIN
 
 class GrantCycleA(admin.ModelAdmin):
   list_display = ('title', 'open', 'close')
   fields = (
     ('title', 'open', 'close'),
     ('info_page', 'email_signature'),
-    'private',
-    'extra_question',
-    'conflicts',
+    'private', 'extra_question', 'conflicts',
   )
   inlines = (AppCycleI,)
 
+
 class OrganizationA(admin.ModelAdmin):
-  list_display = ('name', 'email',)
+  list_display = ('name', 'email')
   fieldsets = (
     ('', {
-      'fields':(('name', 'email'),)
+      'fields': (('name', 'email'),)
     }),
     ('Staff-entered contact info', {
        'fields': (('staff_contact_person', 'staff_contact_person_title',
                    'staff_contact_phone', 'staff_contact_email'),)
     }),
     ('Contact info from most recent application', {
-      'fields':(('address', 'city', 'state', 'zip'),
-                ('contact_person', 'contact_person_title', 'telephone_number',
-                 'email_address'),
-                ('fax_number', 'website'))
+      'fields':(
+        ('address', 'city', 'state', 'zip'),
+        ('contact_person', 'contact_person_title', 'telephone_number', 'email_address'),
+        ('fax_number', 'website'))
     }),
     ('Organization info from most recent application', {
-      'fields':(('founded', 'status', 'ein', 'mission'),)
+      'fields': (('founded', 'status', 'ein', 'mission'),)
     }),
     ('Fiscal sponsor info from most recent application', {
-      'classes':('collapse',),
-      'fields':(('fiscal_org', 'fiscal_person'),
+      'classes': ('collapse',),
+      'fields': (('fiscal_org', 'fiscal_person'),
                 ('fiscal_telephone', 'fiscal_address', 'fiscal_email'))
     })
   )
@@ -251,7 +233,6 @@ class OrganizationA(admin.ModelAdmin):
   inlines = ()
 
   def change_view(self, request, object_id, form_url='', extra_context=None):
-    logger.info('OrganizationA.change_view()')
     self.inlines = (GrantApplicationI, SponsoredProgramI, LogReadonlyI, LogI)
     self.readonly_fields = ('address', 'city', 'state', 'zip', 'telephone_number',
         'fax_number', 'email_address', 'website', 'status', 'ein', 'founded',
@@ -260,9 +241,6 @@ class OrganizationA(admin.ModelAdmin):
         'contact_person_title')
     return super(OrganizationA, self).change_view(request, object_id)
 
-class OrganizationAdvA(OrganizationA):
-  inlines = [GrantApplicationI, DraftI, LogReadonlyI,
-             LogI]
 
 class GrantApplicationA(admin.ModelAdmin):
   list_display = ('organization', 'grant_cycle', 'submission_time', 'view_link')
@@ -281,7 +259,7 @@ class GrantApplicationA(admin.ModelAdmin):
               'You may edit this as needed.  Note that the contact information '
               'you see on the organization page is always from the most recent '
               'application, whether that is this or a different one.'),
-          'fields': (('address', 'city', 'state', 'zip', 'telephone_number',
+        'fields': (('address', 'city', 'state', 'zip', 'telephone_number',
                      'fax_number', 'email_address', 'website'),
                    ('status', 'ein'))
     }),
@@ -312,24 +290,21 @@ class GrantApplicationA(admin.ModelAdmin):
   organization_link.allow_tags = True
   organization_link.short_description = 'Organization'
 
+
 class DraftGrantApplicationA(admin.ModelAdmin):
   list_display = ('organization', 'grant_cycle', 'modified', 'overdue',
                   'extended_deadline')
-  list_filter = ('grant_cycle',) #extended
+  list_filter = ('grant_cycle',)
   fields = (('organization', 'grant_cycle', 'modified'), ('extended_deadline'))
   readonly_fields = ('modified',)
   form = DraftAdminForm
   search_fields = ('organization__name',)
 
   def get_readonly_fields(self, request, obj=None):
-    if obj is not None: #editing - lock org & cycle
+    if obj is not None: # editing - lock org & cycle
       return self.readonly_fields + ('organization', 'grant_cycle')
     return self.readonly_fields
 
-class DraftAdv(admin.ModelAdmin): #Advanced
-  list_display = ('organization', 'grant_cycle', 'modified', 'overdue',
-                  'extended_deadline')
-  list_filter = ('grant_cycle',) #extended
 
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
@@ -346,7 +321,6 @@ class GivingProjectGrantA(admin.ModelAdmin):
     )
   readonly_fields = ['year_end_report_due', 'grant_cycle',
                      'organization_name', 'giving_project']
-
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     if db_field.name == 'projectapp':
@@ -371,20 +345,13 @@ class GivingProjectGrantA(admin.ModelAdmin):
     return unicode(obj.projectapp.giving_project)
 
   def get_readonly_fields(self, request, obj=None):
-    logger.info(obj)
-    if obj is not None: #editing - lock org & cycle
+    if obj is not None: # editing - lock org & cycle
       self.readonly_fields.append('projectapp')
-      return self.readonly_fields
     return self.readonly_fields
 
   def change_view(self, request, object_id, form_url='', extra_context=None):
-    logger.info(connection.queries)
-    prior = len(connection.queries)
-    view = super(GivingProjectGrantA, self).change_view(request, object_id, form_url,
-                                                 extra_context=extra_context)
-    logger.info('Post view')
-    log_queries(connection.queries)
-    logger.info(str(len(connection.queries) - prior) + ' TOTAL QUERIES')
+    view = super(GivingProjectGrantA, self).change_view(
+        request, object_id, form_url, extra_context=extra_context)
     return view
 
 
@@ -397,7 +364,7 @@ class SponsoredProgramGrantA(admin.ModelAdmin):
     ('check_number', 'check_mailed', 'approved'),
     'description'
   )
-  #readonly_fields = ()
+
 
 class YearEndReportA(admin.ModelAdmin):
   list_display = ('org', 'award', 'cycle', 'submitted', 'visible', 'view_link')
@@ -424,8 +391,7 @@ class YearEndReportA(admin.ModelAdmin):
   def view_link(self, obj):
     if obj.pk:
       url = reverse('sjfnw.grants.views.view_yer', kwargs={'report_id': obj.pk})
-      link = '<a href="%s" target="_blank">View report</a>' % url
-      return link
+      return '<a href="%s" target="_blank">View report</a>' % url
   view_link.allow_tags = True
 
   def org(self, obj):
@@ -435,6 +401,13 @@ class YearEndReportA(admin.ModelAdmin):
   def cycle(self, obj):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
+
+
+class DraftAdv(admin.ModelAdmin):
+  """ Only used in admin-advanced """
+  list_display = ('organization', 'grant_cycle', 'modified', 'overdue',
+                  'extended_deadline')
+  list_filter = ('grant_cycle',)
 
 
 # REGISTER
@@ -448,9 +421,8 @@ admin.site.register(models.SponsoredProgramGrant, SponsoredProgramGrantA)
 admin.site.register(models.YearEndReport, YearEndReportA)
 
 advanced_admin.register(models.GrantCycle, GrantCycleA)
-advanced_admin.register(models.Organization, OrganizationAdvA)
+advanced_admin.register(models.Organization, OrganizationA)
 advanced_admin.register(models.GrantApplication, GrantApplicationA)
 advanced_admin.register(models.DraftGrantApplication, DraftAdv)
 advanced_admin.register(models.GivingProjectGrant, GivingProjectGrantA)
 advanced_admin.register(models.SponsoredProgramGrant, SponsoredProgramGrantA)
-
