@@ -22,7 +22,7 @@ output-format=colorized
 [BASIC]
 
 bad-functions=map,filter,input,print
-good-names=i,_,pk,gp
+good-names=i,_,pk,gp,qs
 
 # allow setUp as an exception since it's built in
 method-rgx=setUp|([a-z_][a-z0-9_]{2,30})$
