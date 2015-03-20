@@ -20,5 +20,5 @@ cron:
   schedule: every day 09:11
 
 - description: daily exception report
-  url: /_ereporter?sender=sjfnwads@gmail.com&to=aisapatino@gmail.com
+  url: /_ereporter?sender=sjfnwads@gmail.com&to=[aisapatino@gmail.com,tarhata.joy@gmail.com]
   schedule: every day 09:13
