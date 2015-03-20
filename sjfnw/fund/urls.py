@@ -43,7 +43,7 @@ urlpatterns = patterns('sjfnw.fund.views',
 urlpatterns += patterns('',
   # password reset
   (r'^reset/?$', 'django.contrib.auth.views.password_reset', {
-    'template_name':'fund/reset.html',
+    'template_name':'fund/reset_password.html',
     'from_email': constants.FUND_EMAIL,
     'email_template_name':'fund/password_reset_email.html',
     'subject_template_name':'registration/password_reset_subject.txt'
