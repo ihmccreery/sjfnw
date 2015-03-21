@@ -15,7 +15,7 @@ from sjfnw import constants as c
 logger = logging.getLogger('sjfnw')
 
 
-#used by org & app
+# choices used by org & app
 
 STATE_CHOICES = [(state, state) for state in c.US_STATES]
 
@@ -48,14 +48,15 @@ SCREENING = (
 )
 
 class Organization(models.Model):
-  #registration fields
   name = models.CharField(max_length=255, unique=True, error_messages={
     'unique': ('An organization with this name is already in the system. '
     'To add a separate org with the same name, add/alter the name to '
     'differentiate the two.')})
+  # email corresponds to User.username
   email = models.EmailField(max_length=100, verbose_name='Login',
-                            blank=True, unique=True) #django username
+                            blank=True, unique=True)
 
+  # staff entered fields
   staff_contact_person = models.CharField(max_length=250, blank=True,
       verbose_name='Staff-entered contact person')
   staff_contact_person_title = models.CharField(max_length=100, blank=True,
@@ -65,7 +66,10 @@ class Organization(models.Model):
   staff_contact_phone = models.CharField(verbose_name='Phone number',
       max_length=20, blank=True)
 
-  #org contact info
+  # fields below are autopopulated from the most recent grant application
+  # see GrantApplication.save
+
+  # contact info
   address = models.CharField(max_length=100, blank=True)
   city = models.CharField(max_length=50, blank=True)
   state = models.CharField(max_length=2, choices=STATE_CHOICES, blank=True)
@@ -81,11 +85,10 @@ class Organization(models.Model):
 
   #org info
   status = models.CharField(max_length=50, choices=STATUS_CHOICES, blank=True)
-  ein = models.CharField(max_length=50,
-                         verbose_name="Organization's or Fiscal Sponsor Organization's EIN",
-                         blank=True)
-  founded = models.PositiveIntegerField(verbose_name='Year founded',
-                                        null=True, blank=True)
+  ein = models.CharField(max_length=50, blank=True,
+      verbose_name="Organization's or Fiscal Sponsor Organization's EIN")
+  founded = models.PositiveIntegerField(null=True, blank=True,
+                                        verbose_name='Year founded')
   mission = models.TextField(blank=True)
 
   #fiscal sponsor info (if applicable)
@@ -112,6 +115,7 @@ class Organization(models.Model):
   class Meta:
     ordering = ('name',)
 
+
 class GrantCycle(models.Model):
   title = models.CharField(max_length=100)
   open = models.DateTimeField()
@@ -123,8 +127,8 @@ class GrantCycle(models.Model):
       help_text='Track any conflicts of interest (automatic & personally '
       'declared) that occurred  during this cycle.')
   private = models.BooleanField(default=False, verbose_name=
-      ('Private (will not be displayed to orgs, but can be accessed by '
-       'anyone who has the direct link)'))
+      'Private (will not be displayed to orgs, but can be accessed by '
+       'anyone who has the direct link)')
 
   class Meta:
     ordering = ['-close', 'title']
@@ -153,23 +157,22 @@ class DraftGrantApplication(models.Model):
   modified = models.DateTimeField(blank=True, default=timezone.now)
   modified_by = models.CharField(blank=True, max_length=100)
 
-  contents = models.TextField(default='{}')
+  contents = models.TextField(default='{}') # json'd dictionary of form contents
 
   demographics = models.FileField(upload_to='/', max_length=255)
   funding_sources = models.FileField(upload_to='/', max_length=255)
   budget1 = models.FileField(upload_to='/', max_length=255,
                              verbose_name='Annual statement')
-  budget2 = models.FileField(
-      upload_to='/', max_length=255, verbose_name='Annual operating budget')
-  budget3 = models.FileField(
-      upload_to='/', max_length=255, verbose_name='Balance sheet')
-  project_budget_file = models.FileField(
-      upload_to='/', max_length=255, verbose_name='Project budget')
+  budget2 = models.FileField(upload_to='/', max_length=255,
+                             verbose_name='Annual operating budget')
+  budget3 = models.FileField(upload_to='/', max_length=255,
+                             verbose_name='Balance sheet')
+  project_budget_file = models.FileField(upload_to='/', max_length=255,
+                                         verbose_name='Project budget')
   fiscal_letter = models.FileField(upload_to='/', max_length=255)
 
   extended_deadline = models.DateTimeField(blank=True, null=True,
       help_text='Allows this draft to be edited/submitted past the grant cycle close.')
-
 
   class Meta:
     unique_together = ('organization', 'grant_cycle')
@@ -184,8 +187,8 @@ class DraftGrantApplication(models.Model):
     deadline = self.grant_cycle.close
     logger.debug('deadline is ' + str(self.grant_cycle.close))
     now = timezone.now()
-    if self.grant_cycle.open < now and (deadline > now or
-        (self.extended_deadline and self.extended_deadline > now)):
+    if (self.grant_cycle.open < now and
+        deadline > now or (self.extended_deadline and self.extended_deadline > now)):
       return True
     else:
       return False
@@ -194,14 +197,19 @@ class DraftGrantApplication(models.Model):
   def file_fields(cls):
     return [f.name for f in cls._meta.fields if isinstance(f, models.FileField)]
 
+
 class WordLimitValidator(BaseValidator):
+  """ Custom validator that checks number of words in a string """
   compare = lambda self, a, b: a > b
   clean = lambda self, x: len(re.findall(r'[^ \n\r]+', x))
   message = (u'Ensure this value has at most %(limit_value)d words '
              '(it has %(show_value)d).')
   code = 'max_words'
 
+
 def validate_file_extension(value):
+  """ Method to validate extension of uploaded files
+      (Before I knew how to create a validator like the one above) """
   if not value.name.lower().split(".")[-1] in c.ALLOWED_FILE_TYPES:
     raise ValidationError(u'That file type is not supported.')
 
@@ -494,12 +502,11 @@ class GrantApplication(models.Model):
     else:
       logger.info('App updated, updating org profile')
       org = self.organization
-
+      #TODO less hacky way
       for field in Organization._meta.get_all_field_names():
         if field != 'id' and hasattr(self, field):
           setattr(org, field, getattr(self, field))
       org.save()
-
       logger.info('Org profile updated')
 
   def view_link(self):
@@ -546,8 +553,7 @@ class ProjectApp(models.Model):
   giving_project = models.ForeignKey(GivingProject)
   application = models.ForeignKey(GrantApplication)
 
-  screening_status = models.IntegerField(choices=SCREENING, blank=True,
-                                         null=True)
+  screening_status = models.IntegerField(choices=SCREENING, blank=True, null=True)
 
   class Meta:
     unique_together = ('giving_project', 'application')
@@ -615,7 +621,6 @@ class SponsoredProgramGrant(models.Model):
   check_mailed = models.DateField(null=True, blank=True)
   approved = models.DateField(verbose_name='Date approved by the ED',
                               null=True, blank=True)
-
   description = models.TextField(blank=True)
 
   class Meta:
@@ -625,7 +630,10 @@ class SponsoredProgramGrant(models.Model):
     return 'Sponsored program grant to {}, {:%m/%d/%Y}'.format(
         self.organization, self.approved)
 
+
 def validate_photo_file_extension(value):
+  """ Method to validate file extension of uploaded photos.
+      (Should probably be custom validator) """
   if not value.name.lower().split('.')[-1] in c.PHOTO_FILE_TYPES:
     raise ValidationError(u'That file type is not supported. Please upload an '
         'image with one of these extensions: %s' % ', '.join(c.PHOTO_FILE_TYPES))
@@ -638,10 +646,10 @@ class YearEndReport(models.Model):
   submitted = models.DateTimeField(default=timezone.now())
 
   # user-entered
-  contact_person = models.TextField() # Name, title
+  contact_person = models.TextField() # Name, title (has custom widget)
   email = models.EmailField(max_length=255)
   phone = models.CharField(max_length=20)
-  website = models.CharField(max_length=255) #autofill based on app
+  website = models.CharField(max_length=255) # autofill based on app
 
   summarize_last_year = models.TextField(
       verbose_name=
@@ -689,7 +697,6 @@ class YearEndReport(models.Model):
   other_comments = models.TextField(verbose_name=
       ('12. Other comments or information? Do you have any suggestions for how '
         'SJF can improve its grantmaking programs?'), blank=True) #json dict - see modelforms
-
 
   photo1 = models.FileField(validators=[validate_photo_file_extension],
       upload_to='/', max_length=255,
