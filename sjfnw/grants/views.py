@@ -1,3 +1,8 @@
+import datetime
+import json
+import logging
+import urllib2
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
@@ -27,14 +32,14 @@ from sjfnw.grants.modelforms import (GrantApplicationModelForm, OrgProfile,
 from sjfnw.grants.utils import local_date_str, ServeBlob, DeleteBlob
 from sjfnw.grants import models
 
-import urllib2
-import datetime, logging, json
 logger = logging.getLogger('sjfnw')
 
 # CONSTANTS
+
 LOGIN_URL = '/apply/login/'
 
 # PUBLIC ORG VIEWS
+
 def org_login(request):
   if request.method == 'POST':
     form = LoginForm(request.POST)
@@ -50,7 +55,7 @@ def org_login(request):
           logger.warning('Inactive org account tried to log in, username: ' + email)
           messages.error(request, 'Your account is inactive. Please contact an administrator.')
       else:
-        messages.error(request, "Your password didn't match the one on file. Please try again.")
+        messages.error(request, 'Your password didn\'t match the one on file. Please try again.')
   else:
     form = LoginForm()
   register = RegisterForm()
@@ -59,22 +64,6 @@ def org_login(request):
   })
 
 def org_register(request):
-  """ Register an organization.
-
-  RegisterForm.is_valid returns false if:
-    - Organization with given email already exists
-    - Organization with given name and non-blank email exists
-    - User with given email already exists
-    - Passwords do not match
-
-  View handles further POST logic:
-    - Register the new User
-    - If an Org with name exists, it must have blank email, so:
-       - Set email
-       - Set User to inactive and tell user to contact admin (needs manual approval)
-    - Otherwise, create Organization
-    - Try to log in
-  """
 
   if request.method == 'POST':
     register = RegisterForm(request.POST)
@@ -93,11 +82,11 @@ def org_register(request):
       try: # if matching org with no email exists
         org = models.Organization.objects.get(name=org)
         org.email = username_email
-        logger.info("matching org name found. setting email")
+        logger.info('matching org name found. setting email')
         org.save()
         created.is_active = False
       except models.Organization.DoesNotExist: # if not, create new
-        logger.info("Creating new org")
+        logger.info('Creating new org')
         new_org = models.Organization(name=org, email=username_email)
         new_org.save()
       created.save()
@@ -123,14 +112,18 @@ def org_register(request):
     register = RegisterForm()
   form = LoginForm()
 
-  return render(request, 'grants/org_login_register.html', {'form': form, 'register': register})
+  return render(request, 'grants/org_login_register.html', {
+    'form': form, 'register': register
+  })
 
 def org_support(request):
   return render(request, 'grants/org_support.html', {
-  'support_email': constants.SUPPORT_EMAIL,
-  'support_form': constants.GRANT_SUPPORT_FORM})
+    'support_email': constants.SUPPORT_EMAIL,
+    'support_form': constants.GRANT_SUPPORT_FORM
+  })
 
 def cycle_info(request, cycle_id):
+  """ Fetches cycle info page from external URL and embeds it """
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
   error_display = ('<h4 class="center">Sorry, the cycle information page could '
       'not be loaded.<br>Try visiting it directly: <a href="' +
@@ -156,29 +149,29 @@ def cycle_info(request, cycle_id):
     else:
       logger.info('Received info page content from ' + cycle.info_page)
   finally:
-    return render(request, 'grants/cycle_info.html',
-        {'cycle': cycle, 'content': content or error_display})
+    return render(request, 'grants/cycle_info.html', {
+      'cycle': cycle, 'content': content or error_display
+    })
 
 # REGISTERED ORG VIEWS
+
 @login_required(login_url=LOGIN_URL)
 @registered_org()
 def org_home(request, organization):
 
-  saved = (models.DraftGrantApplication.objects
-      .select_related('grant_cycle')
-      .filter(organization=organization))
-  submitted = (models.GrantApplication.objects
-      .select_related('giving_projects')
-      .filter(organization=organization)
-      .order_by('-submission_time'))
+  saved = (models.DraftGrantApplication.objects.filter(organization=organization)
+                                               .select_related('grant_cycle'))
+  submitted = (models.GrantApplication.objects.filter(organization=organization)
+                                              .select_related('giving_projects')
+                                              .order_by('-submission_time'))
   cycles = (models.GrantCycle.objects
       .exclude(private=True)
       .filter(close__gt=timezone.now()-datetime.timedelta(days=180))
       .order_by('open'))
   submitted_cycles = submitted.values_list('grant_cycle', flat=True)
   yer_drafts = (models.YERDraft.objects
-      .select_related()
-      .filter(award__projectapp__application__organization_id=organization.pk))
+      .filter(award__projectapp__application__organization_id=organization.pk)
+      .select_related())
 
   closed, current, applied, upcoming = [], [], [], []
   for cycle in cycles:
@@ -193,6 +186,7 @@ def org_home(request, organization):
     elif status == 'upcoming':
       upcoming.append(cycle)
 
+  # staff override
   user_override = request.GET.get('user')
   if user_override:
     user_override = '?user=' + user_override
@@ -207,60 +201,53 @@ def org_home(request, organization):
     'upcoming': upcoming,
     'applied': applied,
     'ydrafts': yer_drafts,
-    'user_override': user_override})
+    'user_override': user_override
+  })
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
-def grant_application(request, organization, cycle_id): # /apply/[cycle_id]
+def grant_application(request, organization, cycle_id):
   """ Get or submit the whole application form """
 
-  #staff override
+  # staff override
   user_override = request.GET.get('user')
   if user_override:
     user_override = '?user=' + user_override
 
-  #check cycle exists
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
 
-  #check for app already submitted
+  # check for app already submitted
   if models.GrantApplication.objects.filter(organization=organization, grant_cycle=cycle):
     return render(request, 'grants/already_applied.html', {
       'organization': organization, 'cycle': cycle
     })
 
-  #get or create draft
   draft, created = models.DraftGrantApplication.objects.get_or_create(
       organization=organization, grant_cycle=cycle)
   profiled = False
 
-  #TEMP HACK
-  flag = False
+  #TODO TEMP HACK
+  recently_edited = False
 
-  if request.method == 'POST': #POST
-    #check if draft can be submitted
+  if request.method == 'POST':
     if not draft.editable():
       return render(request, 'grants/submitted_closed.html', {'cycle': cycle})
 
     #get fields & files from draft
     draft_data = json.loads(draft.contents)
-    #logger.debug('draft data: ' + str(draft_data))
     files_data = model_to_dict(draft, fields=draft.file_fields())
-    #logger.debug('Files data from draft: ' + str(files_data))
 
     #add automated fields
     draft_data['organization'] = organization.pk
     draft_data['grant_cycle'] = cycle.pk
 
-    #create & submit modelform
     form = GrantApplicationModelForm(cycle, draft_data, files_data)
 
-    if form.is_valid(): #VALID SUBMISSION
+    if form.is_valid():
       logger.info('========= Application form valid')
 
-      #create the GrantApplication
       form.save()
 
-      #send email confirmation
       subject = 'Grant application submitted'
       from_email = constants.GRANT_EMAIL
       to_email = organization.email
@@ -270,52 +257,50 @@ def grant_application(request, organization, cycle_id): # /apply/[cycle_id]
       text_content = strip_tags(html_content)
       msg = EmailMultiAlternatives(subject, text_content, from_email,
           [to_email], [constants.SUPPORT_EMAIL])
-      msg.attach_alternative(html_content, "text/html")
+      msg.attach_alternative(html_content, 'text/html')
       msg.send()
-      logger.info("Application created; confirmation email sent to " + to_email)
+      logger.info('Application created; confirmation email sent to ' + to_email)
 
-      #delete draft
       draft.delete()
 
-      #success page
       return redirect('/apply/submitted')
 
     else: #INVALID SUBMISSION
-      logger.info("Application form invalid")
+      logger.info('Application form invalid')
       logger.info(form.errors)
 
-  else: #GET
+  else: # GET
 
-    #check for recent autosave - may indicate multiple editors
-    flag = draft.modified + datetime.timedelta(seconds=35) > timezone.now()
+    # check for recent autosave - may indicate multiple editors
+    recently_edited = draft.modified + datetime.timedelta(seconds=35) > timezone.now()
 
-    #get initial data
-    if created or draft.contents == '{}': #load profile
+    if created or draft.contents == '{}':
+      # new/blank draft; load profile
       org_dict = model_to_dict(organization, exclude=['fiscal_letter'])
       draft.fiscal_letter = organization.fiscal_letter
       draft.contents = json.dumps(org_dict)
       draft.save()
       logger.debug('Created new draft')
-      if cycle.info_page: #redirect to instructions first
+      if cycle.info_page: # redirect to instructions first
         return render(request, 'grants/cycle_info.html', {'cycle': cycle})
 
-    else: #load a draft
+    else: # load the draft
       org_dict = json.loads(draft.contents)
       timeline = []
-      for i in range(15): #covering both timeline formats
+      for i in range(15): # covering both timeline formats
         if 'timeline_' + str(i) in org_dict:
           timeline.append(org_dict['timeline_' + str(i)])
       org_dict['timeline'] = json.dumps(timeline)
-      logger.debug('Loading draft')
+      logger.debug('Loaded draft')
 
-    #check if draft can be submitted
+    # check if draft can be submitted
     if not draft.editable():
       return render(request, 'grants/closed.html', {'cycle': cycle})
 
-    #try to determine initial load - cheaty way
+    # try to determine initial load - hacky way
     # 1) if referer, make sure it wasn't from copy
     # 2) check for mission from profile
-    # 3) make sure grant request is not there (since it's not in prof)
+    # 3) make sure grant request is not there (since it's not in profile)
     referer = request.META.get('HTTP_REFERER')
     if (not (referer and referer.find('copy') != -1) and
         organization.mission and
@@ -327,10 +312,13 @@ def grant_application(request, organization, cycle_id): # /apply/[cycle_id]
 
   #get draft files
   file_urls = GetFileURLs(request, draft)
+  #TODO test this replacement
+  #link_template = ('<a href="{0}" target="_blank" title="">{1}</a>{1}'
+  #                '[<a onclick="fileUploads.removeFile(\'{2}\');">remove</a>]')
+  #file_urls[field] = link_template.format(url, name, field)
   for field, url in file_urls.iteritems():
     if url:
       name = getattr(draft, field).name.split('/')[-1]
-      #short_name = name[:35] + (name[35:] and '..') #stackoverflow'd truncate
       file_urls[field] = ('<a href="' + url + '" target="_blank" title="' +
           name + '">' + name + '</a> [<a onclick="fileUploads.removeFile(\'' +
           field + '\');">remove</a>]')
@@ -341,28 +329,29 @@ def grant_application(request, organization, cycle_id): # /apply/[cycle_id]
       'form': form, 'cycle': cycle, 'file_urls': file_urls,
       'limits': models.GrantApplication.NARRATIVE_CHAR_LIMITS,
       'draft': draft, 'profiled': profiled, 'org': organization,
-      'user_override': user_override, 'flag': flag
+      'user_override': user_override, 'flag': recently_edited
   })
 
-def autosave_app(request, cycle_id):  # /apply/[cycle_id]/autosave/
+def autosave_app(request, cycle_id):
   """ Save non-file fields to a draft """
 
+  # don't return actual redirect since this is an ajax request
   if not request.user.is_authenticated():
     return HttpResponse(LOGIN_URL, status=401)
+
   username = request.user.username
-  #check for staff impersonating an org - override username
+
+  # check for staff impersonating an org - override username
   if request.user.is_staff and request.GET.get('user'):
     username = request.GET.get('user')
-    logger.info('Staff override - ' + request.user.username + ' logging in as ' + username)
+    logger.info('Staff override - %s logging in as %s', request.user.username, username)
 
-  #try to get org from user email
   try:
     organization = models.Organization.objects.get(email=username)
     logger.info(organization)
   except models.Organization.DoesNotExist:
     return HttpResponse('/apply/nr', status=401)
 
-  #get grant cycle & draft or 404
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
   draft = get_object_or_404(models.DraftGrantApplication,
       organization=organization, grant_cycle=cycle)
@@ -371,20 +360,22 @@ def autosave_app(request, cycle_id):  # /apply/[cycle_id]/autosave/
     curr_user = request.POST.get('user_id')
 
     #check for simultaneous editing
-    if request.GET.get('override') != 'true': #override skips this check
-      if draft.modified + datetime.timedelta(seconds=35) > timezone.now(): #edited recently
-        if draft.modified_by and draft.modified_by != curr_user: #last save wasn't this userid
+    #TODO call this force to distinguish from staff override
+    if request.GET.get('override') != 'true':
+      # check if edited recently TODO reusable method
+      if draft.modified + datetime.timedelta(seconds=35) > timezone.now():
+        if draft.modified_by and draft.modified_by != curr_user: # last save wasn't this userid
           logger.info('Requiring confirmation')
-          return HttpResponse("confirm override", status=409)
+          return HttpResponse('confirm override', status=409)
     else:
       logger.info('Override skipped check')
-    #get or create saved json, update it
-    logger.debug("Autosaving")
+
+    logger.debug('Autosaving')
     draft.contents = json.dumps(request.POST)
     draft.modified = timezone.now()
     draft.modified_by = curr_user
     draft.save()
-    return HttpResponse("success")
+    return HttpResponse('success')
 
 def add_file(request, draft_type, draft_id):
   """ Upload a file to a draft
@@ -392,10 +383,12 @@ def add_file(request, draft_type, draft_id):
 
   if draft_type == 'apply':
     draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
-    logger.debug(unicode(draft.organization) + u' adding a file')
+    logger.debug(u'%s adding a file', draft.organization)
+
   elif draft_type == 'report':
     draft = get_object_or_404(models.YERDraft, pk=draft_id)
     logger.debug('Adding a file to YER draft %s', draft_id)
+
   else:
     logger.error('Invalid draft_type %s for add_file', draft_type)
     return Http404
@@ -408,11 +401,6 @@ def add_file(request, draft_type, draft_id):
     blob_file = request.FILES[key]
     if blob_file:
       if hasattr(draft, key):
-        """ delete previous file
-        old = getattr(draft, key)
-        if old:
-        deferred.defer(DeleteBlob, old) """
-        # set new file
         setattr(draft, key, blob_file)
         field_name = key
         break
@@ -422,18 +410,28 @@ def add_file(request, draft_type, draft_id):
   draft.save()
 
   if not (blob_file and field_name):
-    return HttpResponse("ERRORRRRRR")
+    return HttpResponse('ERROR') #TODO use status code
 
   file_urls = GetFileURLs(request, draft)
+  # TODO test this replacement:
+  #content = (u'{0} ~~<a href="{1}" target="_blank" title="{2}">{2}</a> '
+  #    '[<a onclick="fileUploads.removeFile(\'{0}\');">remove</a>]').format(
+  #        field_name, file_urls[field_name], blob_file)
   content = (field_name + u'~~<a href="' + file_urls[field_name] +
              u'" target="_blank" title="' + unicode(blob_file) + u'">' +
              unicode(blob_file) + u'</a> [<a onclick="fileUploads.removeFile(\'' +
              field_name + u'\');">remove</a>]')
-  logger.info(u"add_file returning: " + content)
+  logger.info(u'add_file returning: ' + content)
   return HttpResponse(content)
 
 def remove_file(request, draft_type, draft_id, file_field):
+  """ Remove file from draft by setting that field to empty string
+
+      Note: does not delete file from Blobstore, since it could be used 
+        in other drafts/apps
+  """
   draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
+
   if hasattr(draft, file_field):
     old = getattr(draft, file_field)
     deferred.defer(DeleteBlob, old)
@@ -444,10 +442,11 @@ def remove_file(request, draft_type, draft_id, file_field):
     logger.error('Tried to remove non-existent field: ' + file_field)
   return HttpResponse('success')
 
+
 def RefreshUploadUrl(request):
   """ Get a blobstore url for uploading a file """
 
-  #staff override
+  # staff override
   user_override = request.GET.get('user')
   if user_override:
     user_override = '?user=' + user_override
@@ -455,15 +454,14 @@ def RefreshUploadUrl(request):
     user_override = ''
 
   draft_id = int(request.GET.get('id'))
-  logger.info(draft_id)
   prefix = request.GET.get('type')
-  logger.info(prefix)
 
   upload_url = blobstore.create_upload_url('/%s/%d/add-file' % (prefix, draft_id) + user_override)
   return HttpResponse(upload_url)
 
 
 def autosave_yer(request, award_id):
+  """ Autosave a YERDraft """
 
   if not request.user.is_authenticated():
     return HttpResponse(LOGIN_URL, status=401)
@@ -475,7 +473,7 @@ def autosave_yer(request, award_id):
     logger.info(draft.contents)
     draft.modified = timezone.now()
     draft.save()
-    return HttpResponse("success")
+    return HttpResponse('success')
 
 
 @login_required(login_url=LOGIN_URL)
@@ -523,11 +521,11 @@ def year_end_report(request, organization, award_id):
                                     constants.GRANT_EMAIL, #from
                                     [yer.email], #to
                                     [constants.SUPPORT_EMAIL]) #bcc
-      msg.attach_alternative(html_content, "text/html")
+      msg.attach_alternative(html_content, 'text/html')
       msg.send()
-      logger.info('Message sent!?')
-
+      logger.info('YER submission confirmation email send to %s', yer.email)
       return redirect('/report/submitted')
+
     else:
       logger.info(form.errors)
 
@@ -543,14 +541,12 @@ def year_end_report(request, organization, award_id):
       initial_data['contact_person'] = (initial_data.get('contact_person_0', '') +
           ', ' + initial_data.get('contact_person_1', ''))
 
-
     form = YearEndReportForm(initial=initial_data)
 
   file_urls = GetFileURLs(request, draft)
   for field, url in file_urls.iteritems():
     if url:
       name = getattr(draft, field).name.split('/')[-1]
-      #short_name = name[:35] + (name[35:] and '..') #stackoverflow'd truncate
       file_urls[field] = ('<a href="' + url + '" target="_blank" title="' +
           name + '">' + name + '</a> [<a onclick="fileUploads.removeFile(\'' +
           field + '\');">remove</a>]')
@@ -588,7 +584,7 @@ def CopyApp(request, organization):
       new_draft, created = models.DraftGrantApplication.objects.get_or_create(
           organization=organization, grant_cycle=cycle)
       if not created:
-        logger.error("CopyApp the combo already exists!?")
+        logger.error('CopyApp the combo already exists!?')
         return render(request, 'grants/copy_app_error.html')
 
       #get app/draft and its contents (json format for draft)
@@ -621,7 +617,7 @@ def CopyApp(request, organization):
         except models.DraftGrantApplication.DoesNotExist:
           logger.error('CopyApp - draft ' + app + ' not found')
       else:
-        logger.error("CopyApp no draft or app...")
+        logger.error('CopyApp no draft or app...')
         return render(request, 'grants/copy_app_error.html')
 
       #set contents & files
@@ -629,7 +625,7 @@ def CopyApp(request, organization):
       for field in application.file_fields():
         setattr(new_draft, field, getattr(application, field))
       new_draft.save()
-      logger.info("CopyApp -- content and files set")
+      logger.info('CopyApp -- content and files set')
 
       return redirect('/apply/' + new_cycle + user_override)
 
@@ -1347,9 +1343,9 @@ def DraftWarning(request):
       text_content = strip_tags(html_content)
       msg = EmailMultiAlternatives(subject, text_content, from_email, [to],
                                    [constants.SUPPORT_EMAIL])
-      msg.attach_alternative(html_content, "text/html")
+      msg.attach_alternative(html_content, 'text/html')
       msg.send()
-      logger.info("Email sent to " + to + "regarding draft application soon to expire")
+      logger.info('Email sent to ' + to + 'regarding draft application soon to expire')
   return HttpResponse("")
 
 def yer_reminder_email(request):
@@ -1384,11 +1380,11 @@ def send_yer_email(awards, template):
 
       msg = EmailMultiAlternatives(subject, text_content, from_email,
                                    [to_email], [constants.SUPPORT_EMAIL])
-      msg.attach_alternative(html_content, "text/html")
+      msg.attach_alternative(html_content, 'text/html')
       msg.send()
       logger.info('YER reminder email sent to %d for award %d', to_email, award.pk)
 
-  return HttpResponse("success")
+  return HttpResponse('success')
 
 # UTILS
 # (in views because it caused import problems when in utils.py)
@@ -1428,14 +1424,14 @@ def GetFileURLs(request, app, printing=False):
     file_urls = report_urls
     base_url += 'grants/rdraft-file/'
   else:
-    logger.error("GetFileURLs received invalid object")
+    logger.error('GetFileURLs received invalid object')
     return {}
 
   #check file fields, compile links
   for field in file_urls:
     value = getattr(app, field)
     if value:
-      ext = value.name.lower().split(".")[-1]
+      ext = value.name.lower().split('.')[-1]
       file_urls[field] += base_url + str(app.pk) + u'-' + field + u'.' + ext
       if not settings.DEBUG and ext in constants.VIEWER_FORMATS: #doc viewer
         if printing:
