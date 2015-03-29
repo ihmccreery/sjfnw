@@ -371,13 +371,19 @@ class NewsItem(models.Model):
   def __unicode__(self):
     return unicode(self.summary)
 
+
 class Resource(models.Model):
+  created = models.DateTimeField(null=True, blank=True, default=timezone.now())
   title = models.CharField(max_length=255)
   summary = models.TextField(blank=True)
   link = models.URLField()
 
+  class Meta:
+    ordering = ['title']
+
   def __unicode__(self):
     return self.title
+
 
 class ProjectResource(models.Model): #ties resource to project
   giving_project = models.ForeignKey(GivingProject)
