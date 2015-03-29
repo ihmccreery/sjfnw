@@ -89,12 +89,12 @@ class GPYearFilter(SimpleListFilter):
 # Inlines
 # -----------------------------------------------------------------------------
 
-class MembershipInline(admin.TabularInline): #GP
+class MembershipInline(admin.TabularInline):
   model = Membership
   formset = forms.MembershipInlineFormset
   extra = 0
   can_delete = False
-  fields = ('member', 'giving_project', 'approved', 'leader',)
+  fields = ['member', 'giving_project', 'approved', 'leader']
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
@@ -122,21 +122,21 @@ class MembershipInline(admin.TabularInline): #GP
           db_field, request, **kwargs)
 
 
-class ProjectResourcesInline(admin.TabularInline): #GP
+class ProjectResourcesInline(admin.TabularInline):
   model = ProjectResource
   extra = 0
   template = 'admin/fund/tabular_projectresource.html'
-  fields = ('resource', 'session',)
+  fields = ['resource', 'session']
 
 
-class DonorInline(admin.TabularInline): #membership
+class DonorInline(admin.TabularInline):
   model = Donor
   extra = 0
   max_num = 0
   can_delete = False
-  readonly_fields = ('firstname', 'lastname', 'amount', 'talked', 'asked',
-                     'promised', 'total_promised')
-  fields = ('firstname', 'lastname', 'amount', 'talked', 'asked', 'promised')
+  readonly_fields = ['firstname', 'lastname', 'amount', 'talked', 'asked',
+                     'promised', 'total_promised']
+  fields = ['firstname', 'lastname', 'amount', 'talked', 'asked', 'promised']
 
 
 class ProjectAppInline(admin.TabularInline):
@@ -144,11 +144,7 @@ class ProjectAppInline(admin.TabularInline):
   extra = 1
   verbose_name = 'Grant application'
   verbose_name_plural = 'Grant applications'
-  raw_id_fields = ('giving_project',)
-
-  #def get_queryset(self, request):
-  #  qs = super(ProjectAppInline, self).get_queryset(request)
-  #  return qs.select_related('application')
+  raw_id_fields = ['giving_project']
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
@@ -198,12 +194,14 @@ class SurveyI(admin.TabularInline):
 # -----------------------------------------------------------------------------
 
 class GivingProjectA(admin.ModelAdmin):
-  list_display = ('title', 'gp_year', 'estimated')
-  list_filter = (GPYearFilter,)
-  fields = (('title', 'public'),
-            ('fundraising_training', 'fundraising_deadline'),
-            'fund_goal', 'site_visits', 'calendar', 'suggested_steps', 'pre_approved')
-  readonly_fields = ('estimated',)
+  list_display = ['title', 'gp_year', 'estimated']
+  list_filter = [GPYearFilter]
+  fields = [
+    ('title', 'public'),
+    ('fundraising_training', 'fundraising_deadline'),
+    'fund_goal', 'site_visits', 'calendar', 'suggested_steps', 'pre_approved'
+  ]
+  readonly_fields = ['estimated']
   form = modelforms.GivingProjectAdminForm
   inlines = [SurveyI, ProjectResourcesInline, MembershipInline, ProjectAppInline]
 
@@ -219,7 +217,7 @@ class GivingProjectA(admin.ModelAdmin):
 
 
 class MemberAdvanced(admin.ModelAdmin):
-  list_display = ('first_name', 'last_name', 'email')
+  list_display = ['first_name', 'last_name', 'email']
   search_fields = ['first_name', 'last_name', 'email']
 
 
@@ -227,18 +225,18 @@ class MembershipA(admin.ModelAdmin):
   actions = ['approve']
   search_fields = ['member__first_name', 'member__last_name']
 
-  list_display = ('member', 'giving_project', ship_progress, 'overdue_steps',
-                  'last_activity', 'approved', 'leader')
-  list_filter = ('approved', 'leader', 'giving_project')
-  readonly_list = (ship_progress, 'overdue_steps',)
+  list_display = ['member', 'giving_project', 'ship_progress', 'overdue_steps',
+                  'last_activity', 'approved', 'leader']
+  list_filter = ['approved', 'leader', 'giving_project']
+  readonly_list = ['ship_progress', 'overdue_steps']
 
-  fields = (
+  fields = [
     ('member', 'giving_project', 'approved'),
     ('leader', 'last_activity', 'emailed'),
     ('ship_progress'),
     'notifications'
-  )
-  readonly_fields = ('last_activity', 'emailed', ship_progress)
+  ]
+  readonly_fields = ['last_activity', 'emailed', 'ship_progress']
   inlines = [DonorInline]
 
   def approve(self, _, queryset):
@@ -259,27 +257,28 @@ class MembershipA(admin.ModelAdmin):
 
 
 class DonorA(admin.ModelAdmin):
-  list_display = ('firstname', 'lastname', 'membership', 'amount', 'talked',
+  list_display = ['firstname', 'lastname', 'membership', 'amount', 'talked',
                   'asked', 'total_promised', 'received_this', 'received_next',
-                  'received_afternext', 'match_expected', 'match_received')
-  list_filter = ('membership__giving_project', 'asked', PromisedBooleanFilter,
-                 ReceivedBooleanFilter)
-  list_editable = ('received_this', 'received_next', 'received_afternext',
-                   'match_expected', 'match_received')
+                  'received_afternext', 'match_expected', 'match_received']
+  list_filter = ['membership__giving_project', 'asked', PromisedBooleanFilter,
+                 ReceivedBooleanFilter]
+  list_editable = ['received_this', 'received_next', 'received_afternext',
+                   'match_expected', 'match_received']
   search_fields = ['firstname', 'lastname', 'membership__member__first_name',
                    'membership__member__last_name']
   actions = ['export_donors']
 
-  fields = ('membership',
-            ('firstname', 'lastname'),
-            ('phone', 'email'),
-            ('amount', 'likelihood'),
-            ('talked', 'asked', 'promised', 'promise_reason_display', 'likely_to_join'),
-            ('received_this', 'received_next', 'received_afternext'),
-            ('match_expected', 'match_company', 'match_received'),
-            'notes')
-
-  readonly_fields = ('promise_reason_display', 'likely_to_join')
+  fields = [
+    'membership',
+    ('firstname', 'lastname'),
+    ('phone', 'email'),
+    ('amount', 'likelihood'),
+    ('talked', 'asked', 'promised', 'promise_reason_display', 'likely_to_join'),
+    ('received_this', 'received_next', 'received_afternext'),
+    ('match_expected', 'match_company', 'match_received'),
+    'notes'
+  ]
+  readonly_fields = ['promise_reason_display', 'likely_to_join']
 
   def export_donors(self, request, queryset):
     logger.info('Export donors called by ' + request.user.email)
@@ -312,25 +311,25 @@ class DonorA(admin.ModelAdmin):
 
 
 class NewsA(admin.ModelAdmin):
-  list_display = ('summary', 'date', 'membership')
-  list_filter = ('membership__giving_project',)
+  list_display = ['summary', 'date', 'membership']
+  list_filter = ['membership__giving_project']
 
 
-class StepAdv(admin.ModelAdmin): #adv only
-  list_display = ('description', 'donor', 'step_membership', 'date',
-                  'completed', 'promised')
-  list_filter = ('donor__membership', PromisedBooleanFilter,
-                 ReceivedBooleanFilter)
+class StepAdv(admin.ModelAdmin):
+  list_display = ['description', 'donor', 'step_membership', 'date',
+                  'completed', 'promised']
+  list_filter = ['donor__membership', PromisedBooleanFilter,
+                 ReceivedBooleanFilter]
 
   def step_membership(self, obj):
     return obj.donor.membership
 
 
 class SurveyA(admin.ModelAdmin):
-  list_display = ('title', 'updated')
-  readonly_fields = ('updated',)
+  list_display = ['title', 'updated']
   form = modelforms.CreateSurvey
-  fields = ('title', 'intro', 'questions')
+  fields = ['title', 'intro', 'questions']
+  readonly_fields = ['updated']
 
   def save_model(self, request, obj, form, change):
     obj.updated = timezone.now()
@@ -339,10 +338,10 @@ class SurveyA(admin.ModelAdmin):
 
 
 class SurveyResponseA(admin.ModelAdmin):
-  list_display = ('gp_survey', 'date')
-  list_filter = ('gp_survey__giving_project',)
-  fields = ('gp_survey', 'date', 'display_responses')
-  readonly_fields = ('gp_survey', 'date', 'display_responses')
+  list_display = ['gp_survey', 'date']
+  list_filter = ['gp_survey__giving_project']
+  fields = ['gp_survey', 'date', 'display_responses']
+  readonly_fields = ['gp_survey', 'date', 'display_responses']
   actions = ['export_responses']
 
   def display_responses(self, obj):
