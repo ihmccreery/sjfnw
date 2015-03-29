@@ -9,47 +9,26 @@ from django.utils.safestring import mark_safe
 from libs import unicodecsv
 
 from sjfnw.admin import advanced_admin
-from sjfnw.fund.models import *
+from sjfnw.fund.models import (GivingProject, Member, Membership, Survey,
+    GPSurvey, Resource, ProjectResource, Donor, Step, NewsItem, SurveyResponse)
 from sjfnw.fund import forms, utils, modelforms
 from sjfnw.grants.models import ProjectApp, GrantApplication
 
 logger = logging.getLogger('sjfnw')
 
-# display methods
-def step_membership(obj): #Step list_display
-  return obj.donor.membership
-
-def gp_year(obj): #GP list_display
-  year = obj.fundraising_deadline.year
-  if year == timezone.now().year:
-    return '<b>%d</b>' % year
-  else:
-    return year
-gp_year.short_description = 'Year'
-gp_year.allow_tags = True
-
-
-def ship_progress(obj):
-  p = obj.get_progress()
-  # TODO use string formatting with dict
-  return ('<table><tr><td style="width:25%;padding:1px;">$' +
-          str(p['estimated']) + '</td><td style="width:25%;padding:1px;">$' +
-          str(p['promised']) + '</td><td style="width:25%;padding:1px;">$' +
-          str(p['received_total']) + '</td><td style="width:25%;padding:1px">' +
-          str(p['received_this']) + ', ' + str(p['received_next']) +
-          ', ' + str(p['received_afternext']) + '</td></tr></table>')
-ship_progress.short_description = 'Estimated, total promised, received, rec. by year'
-ship_progress.allow_tags = True
-
-
+# -----------------------------------------------------------------------------
 # Filters
-class PromisedBooleanFilter(SimpleListFilter): #donors & steps
+# -----------------------------------------------------------------------------
+
+class PromisedBooleanFilter(SimpleListFilter):
+  """ Filter by promised field """
   title = 'promised'
   parameter_name = 'promised_tf'
 
   def lookups(self, request, model_admin):
-    return (('True', 'Promised'), ('False', 'Declined'),
-              ('None', 'None entered'))
+    return (('True', 'Promised'),
+            ('False', 'Declined'),
+            ('None', 'None entered'))
 
   def queryset(self, request, queryset):
     if self.value() == 'True':
@@ -59,7 +38,9 @@ class PromisedBooleanFilter(SimpleListFilter): #donors & steps
     elif self.value() == 'None':
       return queryset.filter(promised__isnull=True)
 
-class ReceivedBooleanFilter(SimpleListFilter): #donors & steps
+
+class ReceivedBooleanFilter(SimpleListFilter):
+  """ Filter by received (any of received_this, _next, _afternext) """
   title = 'received'
   parameter_name = 'received_tf'
 
@@ -81,16 +62,14 @@ class GPYearFilter(SimpleListFilter):
   parameter_name = 'year'
 
   def lookups(self, request, model_admin):
-    deadlines = GivingProject.objects.values_list(
-        'fundraising_deadline', flat=True
-        ).order_by('-fundraising_deadline')
+    deadlines = (GivingProject.objects.values_list('fundraising_deadline', flat=True)
+                                      .order_by('-fundraising_deadline'))
     prev = None
     years = []
     for deadline in deadlines:
       if deadline.year != prev:
         years.append((deadline.year, deadline.year))
         prev = deadline.year
-    logger.info(years)
     return years
 
   def queryset(self, request, queryset):
@@ -99,15 +78,17 @@ class GPYearFilter(SimpleListFilter):
       return queryset
     try:
       year = int(val)
-    except:
+    except ValueError:
       logger.error('GPYearFilter received invalid value %s', val)
       messages.error(request,
           'Error loading filter. Contact techsupport@socialjusticefund.org')
       return queryset
     return queryset.filter(fundraising_deadline__year=year)
 
-
+# -----------------------------------------------------------------------------
 # Inlines
+# -----------------------------------------------------------------------------
+
 class MembershipInline(admin.TabularInline): #GP
   model = Membership
   formset = forms.MembershipInlineFormset
@@ -123,25 +104,30 @@ class MembershipInline(admin.TabularInline): #GP
       cached_choices = getattr(request, 'cached_members', None)
       if cached_choices:
         logger.debug('Using cached choices for membership inline')
-        formfield = super(MembershipInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        formfield = super(MembershipInline, self).formfield_for_foreignkey(
+            db_field, request, **kwargs)
         formfield.choices = cached_choices
 
       else:
         members = Member.objects.all()
-        formfield = super(MembershipInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        formfield = super(MembershipInline, self).formfield_for_foreignkey(
+            db_field, request, **kwargs)
         formfield.choices = [(member.pk, unicode(member)) for member in members]
         request.cached_members = formfield.choices
 
       return formfield
 
     else: # different field
-      return super(MembershipInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+      return super(MembershipInline, self).formfield_for_foreignkey(
+          db_field, request, **kwargs)
+
 
 class ProjectResourcesInline(admin.TabularInline): #GP
   model = ProjectResource
   extra = 0
   template = 'admin/fund/tabular_projectresource.html'
   fields = ('resource', 'session',)
+
 
 class DonorInline(admin.TabularInline): #membership
   model = Donor
@@ -151,6 +137,7 @@ class DonorInline(admin.TabularInline): #membership
   readonly_fields = ('firstname', 'lastname', 'amount', 'talked', 'asked',
                      'promised', 'total_promised')
   fields = ('firstname', 'lastname', 'amount', 'talked', 'asked', 'promised')
+
 
 class ProjectAppInline(admin.TabularInline):
   model = ProjectApp
@@ -171,21 +158,23 @@ class ProjectAppInline(admin.TabularInline):
       cached_choices = getattr(request, 'cached_projectapps', None)
       if cached_choices:
         logger.debug('Using cached choices for projectapp inline')
-        formfield = super(ProjectAppInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        formfield = super(ProjectAppInline, self).formfield_for_foreignkey(
+            db_field, request, **kwargs)
         formfield.choices = cached_choices
 
       else:
         apps = GrantApplication.objects.select_related('grant_cycle', 'organization')
         try:
           gp_id = int(request.path.split('/')[-2])
-        except:
+        except ValueError:
           logger.info('Could not parse gp id, not limiting app choices')
         else:
           gp = GivingProject.objects.get(pk=gp_id)
           year = gp.fundraising_deadline - datetime.timedelta(weeks=52)
           apps = apps.filter(submission_time__gte=year)
         finally:
-          formfield = super(ProjectAppInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+          formfield = super(ProjectAppInline, self).formfield_for_foreignkey(
+              db_field, request, **kwargs)
           # create choices from queryset (doing manually results in less queries)
           formfield.choices = [('', '---------')] + [(app.pk, unicode(app)) for app in apps]
           request.cached_projectapps = formfield.choices
@@ -194,65 +183,89 @@ class ProjectAppInline(admin.TabularInline):
       return formfield
 
     else: #other field
-      return super(ProjectAppInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+      return super(ProjectAppInline, self).formfield_for_foreignkey(
+          db_field, request, **kwargs)
 
 
 class SurveyI(admin.TabularInline):
-
   model = GPSurvey
   extra = 1
   verbose_name = 'Survey'
   verbose_name_plural = 'Surveys'
 
+# -----------------------------------------------------------------------------
 # ModelAdmin
+# -----------------------------------------------------------------------------
+
 class GivingProjectA(admin.ModelAdmin):
-  list_display = ('title', gp_year, 'estimated')
+  list_display = ('title', 'gp_year', 'estimated')
   list_filter = (GPYearFilter,)
-  readonly_fields = ('estimated',)
   fields = (('title', 'public'),
             ('fundraising_training', 'fundraising_deadline'),
             'fund_goal', 'site_visits', 'calendar', 'suggested_steps', 'pre_approved')
+  readonly_fields = ('estimated',)
   form = modelforms.GivingProjectAdminForm
   inlines = [SurveyI, ProjectResourcesInline, MembershipInline, ProjectAppInline]
 
-class MemberAdvanced(admin.ModelAdmin): #advanced only
+  def gp_year(self, obj):
+    year = obj.fundraising_deadline.year
+    if year == timezone.now().year:
+      return '<b>%d</b>' % year
+    else:
+      return year
+  gp_year.short_description = 'Year'
+  gp_year.allow_tags = True
+
+
+
+class MemberAdvanced(admin.ModelAdmin):
   list_display = ('first_name', 'last_name', 'email')
   search_fields = ['first_name', 'last_name', 'email']
 
-class MembershipA(admin.ModelAdmin):
 
-  #list_select_related = True
+class MembershipA(admin.ModelAdmin):
   actions = ['approve']
+  search_fields = ['member__first_name', 'member__last_name']
+
   list_display = ('member', 'giving_project', ship_progress, 'overdue_steps',
                   'last_activity', 'approved', 'leader')
-  list_filter = ('approved', 'leader', 'giving_project') #add overdue steps
-  search_fields = ['member__first_name', 'member__last_name']
+  list_filter = ('approved', 'leader', 'giving_project')
   readonly_list = (ship_progress, 'overdue_steps',)
 
-  fields = (('member', 'giving_project', 'approved'),
-      ('leader', 'last_activity', 'emailed'),
-      (ship_progress),
-      'notifications'
+  fields = (
+    ('member', 'giving_project', 'approved'),
+    ('leader', 'last_activity', 'emailed'),
+    ('ship_progress'),
+    'notifications'
   )
   readonly_fields = ('last_activity', 'emailed', ship_progress)
   inlines = [DonorInline]
 
-  def approve(self, request, queryset): #Membership action
-    logger.info('Approval button pressed; looking through queryset')
+  def approve(self, _, queryset):
     for memship in queryset:
       if memship.approved == False:
         utils.NotifyApproval(memship)
     queryset.update(approved=True)
-    logger.info('Approval queryset updated')
+
+  def ship_progress(self, obj):
+    progress = obj.get_progress()
+    return ('<table><tr><td style="width:25%;padding:1px;">${estimated}</td>'
+            '<td style="width:25%;padding:1px;">${promised}</td>'
+            '<td style="width:25%;padding:1px;">${received_total}</td>'
+            '<td style="width:25%;padding:1px">{received_this}, {received_next}, '
+            '{received_afternext}</td></tr></table>').format(**progress)
+  ship_progress.short_description = 'Estimated, total promised, received, rec. by year'
+  ship_progress.allow_tags = True
 
 
 class DonorA(admin.ModelAdmin):
   list_display = ('firstname', 'lastname', 'membership', 'amount', 'talked',
                   'asked', 'total_promised', 'received_this', 'received_next',
-                  'received_afternext','match_expected', 'match_received')
+                  'received_afternext', 'match_expected', 'match_received')
   list_filter = ('membership__giving_project', 'asked', PromisedBooleanFilter,
                  ReceivedBooleanFilter)
-  list_editable = ('received_this', 'received_next', 'received_afternext', 'match_expected', 'match_received')
+  list_editable = ('received_this', 'received_next', 'received_afternext',
+                   'match_expected', 'match_received')
   search_fields = ['firstname', 'lastname', 'membership__member__first_name',
                    'membership__member__last_name']
   actions = ['export_donors']
@@ -302,11 +315,16 @@ class NewsA(admin.ModelAdmin):
   list_display = ('summary', 'date', 'membership')
   list_filter = ('membership__giving_project',)
 
+
 class StepAdv(admin.ModelAdmin): #adv only
-  list_display = ('description', 'donor', step_membership, 'date', 'completed',
-                  'promised')
+  list_display = ('description', 'donor', 'step_membership', 'date',
+                  'completed', 'promised')
   list_filter = ('donor__membership', PromisedBooleanFilter,
                  ReceivedBooleanFilter)
+
+  def step_membership(self, obj):
+    return obj.donor.membership
+
 
 class SurveyA(admin.ModelAdmin):
   list_display = ('title', 'updated')
@@ -318,6 +336,7 @@ class SurveyA(admin.ModelAdmin):
     obj.updated = timezone.now()
     obj.updated_by = request.user.username
     obj.save()
+
 
 class SurveyResponseA(admin.ModelAdmin):
   list_display = ('gp_survey', 'date')
@@ -341,7 +360,8 @@ class SurveyResponseA(admin.ModelAdmin):
 
     logger.info('Export survey responses called by ' + request.user.email)
     response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=survey_responses %s.csv' % (timezone.now().strftime('%Y-%m-%d'),)
+    response['Content-Disposition'] = ('attachment; filename=survey_responses %s.csv'
+        % timezone.now().strftime('%Y-%m-%d'))
     writer = unicodecsv.writer(response)
 
     header = ['Date', 'Survey ID', 'Giving Project', 'Survey'] # base
@@ -369,6 +389,10 @@ class SurveyResponseA(admin.ModelAdmin):
 
     return response
 
+#------------------------------------------------------------------------------
+# Register
+#------------------------------------------------------------------------------
+
 admin.site.register(GivingProject, GivingProjectA)
 admin.site.register(Membership, MembershipA)
 admin.site.register(NewsItem, NewsA)
@@ -385,4 +409,3 @@ advanced_admin.register(NewsItem, NewsA)
 advanced_admin.register(Step, StepAdv)
 advanced_admin.register(ProjectResource)
 advanced_admin.register(Resource)
-
