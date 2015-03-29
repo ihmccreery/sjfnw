@@ -215,6 +215,10 @@ class GivingProjectA(admin.ModelAdmin):
   gp_year.allow_tags = True
 
 
+class ResourceA(admin.ModelAdmin):
+  list_display = ['title', 'created']
+  fields = ['title', 'summary', 'link']
+
 
 class MemberAdvanced(admin.ModelAdmin):
   list_display = ['first_name', 'last_name', 'email']
@@ -396,7 +400,7 @@ admin.site.register(GivingProject, GivingProjectA)
 admin.site.register(Membership, MembershipA)
 admin.site.register(NewsItem, NewsA)
 admin.site.register(Donor, DonorA)
-admin.site.register(Resource)
+admin.site.register(Resource, ResourceA)
 admin.site.register(Survey, SurveyA)
 admin.site.register(SurveyResponse, SurveyResponseA)
 
@@ -407,4 +411,4 @@ advanced_admin.register(GivingProject, GivingProjectA)
 advanced_admin.register(NewsItem, NewsA)
 advanced_admin.register(Step, StepAdv)
 advanced_admin.register(ProjectResource)
-advanced_admin.register(Resource)
+advanced_admin.register(Resource, ResourceA)
