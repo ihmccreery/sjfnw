@@ -1,6 +1,7 @@
 # pylint: disable=wildcard-import,relative-import
 from test_add_estimates import *
 from test_add_mult import *
+from test_admin_basic import *
 from test_copy_contacts import *
 from test_cron import *
 from test_login import *
