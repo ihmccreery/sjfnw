@@ -1382,7 +1382,7 @@ def send_yer_email(awards, template):
                                    [to_email], [constants.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
-      logger.info('YER reminder email sent to %d for award %d', to_email, award.pk)
+      logger.info('YER reminder email sent to %s for award %d', to_email, award.pk)
 
   return HttpResponse('success')
 
