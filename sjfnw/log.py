@@ -1,4 +1,4 @@
-import logging, os, sys
+import logging, os
 
 def configure_logging():
   datefmt = '%Y-%m-%d %H:%M:%S'
@@ -9,12 +9,10 @@ def configure_logging():
 
   handlers = logging.getLogger().handlers
   if handlers:
-    sys.stdout.write('setting formatter')
     handlers[0].setFormatter(logging.Formatter(fmt=log_format, datefmt=datefmt))
   else:
-    sys.stdout.write('basicconfig')
     logging.basicConfig(format=log_format, datefmt=datefmt)
 
 # log errors
-def log_exception(*args, **kwds):
+def log_exception(*args, **kwargs):
   logging.exception('Exception in request:')
