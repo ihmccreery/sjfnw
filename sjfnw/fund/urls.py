@@ -43,23 +43,23 @@ urlpatterns = patterns('sjfnw.fund.views',
 urlpatterns += patterns('',
   # password reset
   (r'^reset/?$', 'django.contrib.auth.views.password_reset', {
-    'template_name':'fund/reset_password.html',
+    'template_name': 'fund/reset_password_start.html',
     'from_email': constants.FUND_EMAIL,
-    'email_template_name':'fund/password_reset_email.html',
-    'subject_template_name':'registration/password_reset_subject.txt'
+    'email_template_name': 'fund/emails/reset_password.html',
+    'subject_template_name': 'registration/password_reset_subject.txt',
+    'post_reset_redirect': '/fund/reset-sent'
   }),
   (r'^reset-sent/?$', 'django.contrib.auth.views.password_reset_done', {
-    'template_name':'fund/password_reset_done.html'
+    'template_name': 'fund/reset_password_sent.html'
   }),
   (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/?$',
     'django.contrib.auth.views.password_reset_confirm', {
-      'template_name':'fund/password_reset_confirm.html',
+      'template_name': 'fund/reset_password.html',
       'post_reset_redirect': '/fund/reset-complete'
     },
     'fund-reset'
   ),
   (r'^reset-complete/?$', 'django.contrib.auth.views.password_reset_complete', {
-    'template_name':'fund/password_reset_complete.html'
+    'template_name': 'fund/reset_password_complete.html'
   }),
 )
-
