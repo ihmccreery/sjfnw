@@ -14,3 +14,4 @@ from test_register import *
 from test_steps import *
 from test_surveys import *
 from test_view_helpers import *
+from test_edit_contact import *
