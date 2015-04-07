@@ -11,7 +11,8 @@ logger = logging.getLogger('sjfnw')
 
 
 def custom_integer_field(field, **kwargs):
-  if field.verbose_name == '*Amount to ask ($)':
+  if field.name == 'amount':
+    kwargs['min_value'] = 0
     return IntegerCommaField(**kwargs)
   else:
     return field.formfield()
@@ -37,9 +38,8 @@ class DonorForm(ModelForm):
 
   class Meta:
     model = Donor
-    fields = ('firstname', 'lastname', 'amount', 'likelihood','phone','email', 'notes')
+    fields = ('firstname', 'lastname', 'amount', 'likelihood', 'phone', 'email', 'notes')
     widgets = {'notes': widgets.Textarea(attrs={'cols': 25, 'rows': 4})}
-
 
 class DonorPreForm(ModelForm):
   """ For editing a contact prior to fund training """
