@@ -509,10 +509,6 @@ class GrantApplication(models.Model):
       org.save()
       logger.info('Org profile updated')
 
-  def view_link(self):
-    return '<a href="/grants/view/' + str(self.pk) + '" target="_blank">View application</a>'
-  view_link.allow_tags = True
-
   def timeline_display(self): #TODO move to modelform?
     logger.info(type(self.timeline))
     timeline = json.loads(self.timeline)

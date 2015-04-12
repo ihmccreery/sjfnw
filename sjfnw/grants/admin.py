@@ -135,18 +135,22 @@ class GrantApplicationI(BaseShowInline):
   """ List grant applications on organization page """
   model = models.GrantApplication
   readonly_fields = ('submission_time', 'grant_cycle', 'pre_screening_status',
-                     'edit_application', 'view_link')
+                     'view_or_edit', 'read')
   fields = ('submission_time', 'grant_cycle', 'pre_screening_status',
-            'edit_application', 'view_link')
+            'view_or_edit', 'read')
 
   def queryset(self, request):
     return super(GrantApplicationI, self).queryset(request).select_related('grant_cycle')
 
-  def edit_application(self, obj):
+  def view_or_edit(self, obj):
     """ Link to grant application change page """
     return ('<a href="/admin/grants/grantapplication/' + str(obj.pk) +
-            '/" target="_blank">Edit</a>')
-  edit_application.allow_tags = True
+            '/" target="_blank">View details/Edit</a>')
+  view_or_edit.allow_tags = True
+
+  def read(self, obj):
+    return '<a href="/grants/view/' + str(obj.pk) + '" target="_blank">Read application</a>'
+  read.allow_tags = True
 
 
 class SponsoredProgramI(BaseShowInline):
@@ -252,14 +256,14 @@ class OrganizationA(admin.ModelAdmin):
 
 
 class GrantApplicationA(admin.ModelAdmin):
-  list_display = ['organization', 'grant_cycle', 'submission_time', 'view_link']
+  list_display = ['organization', 'grant_cycle', 'submission_time', 'read']
   list_filter = ['grant_cycle']
   search_fields = ['organization__name']
 
   fieldsets = [
     ('Application', {
         'fields': (('organization_link', 'grant_cycle', 'submission_time',
-                   'view_link'),)
+                   'read'),)
     }),
     ('Application contact info', {
         'classes': ('collapse',),
@@ -280,7 +284,7 @@ class GrantApplicationA(admin.ModelAdmin):
     })
   ]
   readonly_fields = ['organization_link', 'grant_cycle', 'submission_time',
-                     'view_link', 'revert_grant', 'rollover']
+                     'read', 'revert_grant', 'rollover']
   inlines = [ProjectAppI, LogReadonlyI, LogI]
 
   def has_add_permission(self, request):
@@ -299,6 +303,10 @@ class GrantApplicationA(admin.ModelAdmin):
             + '/" target="_blank">' + unicode(obj.organization) + '</a>')
   organization_link.allow_tags = True
   organization_link.short_description = 'Organization'
+
+  def read(self, obj):
+    return '<a href="/grants/view/' + str(obj.pk) + '" target="_blank">Read application</a>'
+  read.allow_tags = True
 
 
 class DraftGrantApplicationA(admin.ModelAdmin):
