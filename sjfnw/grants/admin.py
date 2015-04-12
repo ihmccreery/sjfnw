@@ -184,7 +184,7 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
         link = link + '{}/">{}</a>'
         return mark_safe(link.format(award.pk, award.amount))
       else:
-        link = link + '/add/?projectapp={}">Enter an award</a>'
+        link = link + 'add/?projectapp={}">Enter an award</a>'
         return mark_safe(link.format(obj.pk))
     return ''
 
