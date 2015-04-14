@@ -273,7 +273,7 @@ class AppReportForm(BaseOrgAppReport):
     self.fields['giving_projects'].choices = choices
 
     #get cycles
-    choices = GrantCycle.objects.values_list('title', flat=True).order_by('title')
+    choices = GrantCycle.objects.values_list('title', flat=True)
     choices = sorted(set(choices))
     choices = [(g, g) for g in choices]
     self.fields['grant_cycle'].choices = choices
