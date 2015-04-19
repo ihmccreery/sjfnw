@@ -134,13 +134,37 @@ class AppCycleI(BaseShowInline):
 class GrantApplicationI(BaseShowInline):
   """ List grant applications on organization page """
   model = models.GrantApplication
-  readonly_fields = ('submission_time', 'grant_cycle', 'pre_screening_status',
-                     'view_or_edit', 'read')
-  fields = ('submission_time', 'grant_cycle', 'pre_screening_status',
-            'view_or_edit', 'read')
+  readonly_fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
+  fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
 
   def queryset(self, request):
     return super(GrantApplicationI, self).queryset(request).select_related('grant_cycle')
+
+  def summary(self, obj):
+    """Displays summary of screening status and awards granted"""
+
+    pre_status = obj.pre_screening_status
+    convert = dict(models.PRE_SCREENING)
+    summary = convert[pre_status]
+
+    #check if screened-in
+    if pre_status == 50:
+      projectapp = models.ProjectApp.objects.get(application_id=obj.pk)
+      screening_status = projectapp.screening_status
+      gp = str(projectapp.giving_project)
+
+      #convert screening_status code to actual choice
+      convert = dict(models.SCREENING)
+      screening_status = convert[screening_status]
+
+      summary = gp + ": " + screening_status
+
+      #if grant awarded, append to summary
+      gp_awarded = projectapp.givingprojectgrant
+      if gp_awarded:
+        summary += ", ${:,.2f}".format(gp_awarded.amount) #add comma to amount if >= $1,000
+
+    return summary
 
   def view_or_edit(self, obj):
     """ Link to grant application change page """
