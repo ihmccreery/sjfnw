@@ -141,28 +141,29 @@ class GrantApplicationI(BaseShowInline):
     return super(GrantApplicationI, self).queryset(request).select_related('grant_cycle')
 
   def summary(self, obj):
-    """Displays summary of screening status and awards granted"""
+    """Displays a summary of the organization's grant application"""
 
-    pre_status = obj.pre_screening_status
-    convert = dict(models.PRE_SCREENING)
-    summary = convert[pre_status]
+    summary = ""
 
-    #check if screened-in
-    if pre_status == 50:
-      projectapp = models.ProjectApp.objects.get(application_id=obj.pk)
-      screening_status = projectapp.screening_status
-      gp = str(projectapp.giving_project)
+    if obj.pk: #get grant applications associated with each unique grant cycle
+      summary += obj.get_pre_screening_status_display() + ". "
+      projectapp = models.ProjectApp.objects.filter(application_id=obj.pk)
 
-      #convert screening_status code to actual choice
-      convert = dict(models.SCREENING)
-      screening_status = convert[screening_status]
+      #get each project application from projectapp queryset
+      if len(projectapp) > 0:
+        for papp in projectapp:
+          gp = str(papp.giving_project)
+          summary += gp
 
-      summary = gp + ": " + screening_status
+          if papp.get_screening_status_display() is not None:
+            screening_status = str(papp.get_screening_status_display())
+            summary += ". " + screening_status
 
-      #if grant awarded, append to summary
-      gp_awarded = projectapp.givingprojectgrant
-      if gp_awarded:
-        summary += ", ${:,.2f}".format(gp_awarded.amount) #add comma to amount if >= $1,000
+          if hasattr(papp, 'givingprojectgrant'):
+            amount = int(papp.givingprojectgrant.amount) #remove decimal
+            summary += ": ${:,}".format(amount) #add comma to amount if >= $1,000
+
+          summary += ".\n"
 
     return summary
 
