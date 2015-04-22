@@ -134,13 +134,35 @@ class AppCycleI(BaseShowInline):
 class GrantApplicationI(BaseShowInline):
   """ List grant applications on organization page """
   model = models.GrantApplication
-  readonly_fields = ('submission_time', 'grant_cycle', 'pre_screening_status',
-                     'view_or_edit', 'read')
-  fields = ('submission_time', 'grant_cycle', 'pre_screening_status',
-            'view_or_edit', 'read')
+  readonly_fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
+  fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
 
   def queryset(self, request):
     return super(GrantApplicationI, self).queryset(request).select_related('grant_cycle')
+
+  def summary(self, obj):
+    """Displays a summary of grant application screening status, giving projects, and awards"""
+
+    summary = ""
+
+    if obj.pk: #get grant applications associated with each unique grant cycle
+      summary += obj.get_pre_screening_status_display() + ". "
+      projectapps = models.ProjectApp.objects.filter(application_id=obj.pk)
+
+      #get each project application from projectapp queryset
+      for papp in projectapps:
+        summary += unicode(papp.giving_project)
+
+        if papp.get_screening_status_display():
+          summary += ". " + papp.get_screening_status_display()
+
+        if hasattr(papp, 'givingprojectgrant'):
+          amount = int(papp.givingprojectgrant.amount) #remove decimal
+          summary += ": ${:,}".format(amount) #add comma to amount if >= $1,000
+
+        summary += ".\n"
+
+    return summary
 
   def view_or_edit(self, obj):
     """ Link to grant application change page """
