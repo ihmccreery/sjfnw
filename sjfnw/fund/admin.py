@@ -144,7 +144,25 @@ class ProjectAppInline(admin.TabularInline):
   extra = 1
   verbose_name = 'Grant application'
   verbose_name_plural = 'Grant applications'
-  raw_id_fields = ['giving_project']
+  fields = ['application', 'app_link', 'screening_status', 'grant_link']
+  readonly_fields = ['app_link', 'grant_link']
+
+  def app_link(self, obj):
+    if obj and hasattr(obj, 'application'):
+      return ('<a href="/admin/grants/grantapplication/{}/">View application</a>'
+                .format(obj.application.pk))
+    return ''
+  app_link.allow_tags = True
+
+  def grant_link(self, obj):
+    if obj and hasattr(obj, 'projectapp_id'):
+      return ('<a href="/admin/grants/givingprojectgrant/{}/">View grant</a>'
+              .format(obj.projectapp_id))
+    if obj and hasattr(obj, 'screening_status') and obj.screening_status > 80:
+      return ('<a href="/admin/grants/givingprojectgrant/add/?projectapp={}">Add grant</a>'
+              .format(obj.pk))
+    return ''
+  grant_link.allow_tags = True
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
@@ -163,7 +181,7 @@ class ProjectAppInline(admin.TabularInline):
         try:
           gp_id = int(request.path.split('/')[-2])
         except ValueError:
-          logger.info('Could not parse gp id, not limiting app choices')
+          logger.warning('Could not parse gp id, not limiting app choices')
         else:
           gp = GivingProject.objects.get(pk=gp_id)
           year = gp.fundraising_deadline - datetime.timedelta(weeks=52)
