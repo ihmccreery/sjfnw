@@ -370,6 +370,7 @@ class GivingProjectGrantA(admin.ModelAdmin):
         kwargs['queryset'] = (models.ProjectApp.objects
             .select_related('application', 'application__organization', 'giving_project')
             .filter(pk=p_app))
+        logger.info('grant page loaded with projectapp specified ' + p_app)
     return super(GivingProjectGrantA, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
