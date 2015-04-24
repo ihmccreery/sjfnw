@@ -1,7 +1,7 @@
 import logging
-import unittest
 
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
 from sjfnw.fund import models
 from sjfnw.fund.views import _compile_membership_progress
@@ -9,12 +9,12 @@ from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
 
-class Home(BaseFundTestCase):
+class AddContacts(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.home')
 
   def setUp(self):
-    super(Home, self).setUp()
+    super(AddContacts, self).setUp()
     self.use_new_acct()
 
   def test_new(self):
@@ -80,6 +80,14 @@ class Home(BaseFundTestCase):
     self.assertTemplateUsed('fund/forms/add_estimates.html')
     self.assertEqual(response.context['request'].membership, membership)
 
+class AddEstimates(BaseFundTestCase):
+
+  url = reverse('sjfnw.fund.views.home')
+
+  def setUp(self):
+    super(AddEstimates, self).setUp()
+    self.use_new_acct()
+
   def test_estimates_done(self):
     """ Verify add estimates form is not shown if contacts have estimates """
 
@@ -101,24 +109,6 @@ class Home(BaseFundTestCase):
     self.assertTemplateNotUsed('fund/forms/add_estimates.html')
     self.assertEqual(response.context['request'].membership, membership)
 
-  @unittest.skip('Incomplete')
-  def test_contacts_list(self):
-    """ Verify correct display of a long contact list with steps, history
-
-    Setup:
-      Use membership 96 (test & gp 10) which has 29 contacts
-
-    Asserts:
-      ASSERTIONS
-    """
-
-    self.log_in_testy()
-    member = models.Member.objects.get(pk=1)
-    member.current = 96
-    member.save()
-
-    response = self.client.get(self.url)
-
 
 class HomeSurveys(BaseFundTestCase):
 
@@ -127,14 +117,33 @@ class HomeSurveys(BaseFundTestCase):
   def setUp(self):
     super(HomeSurveys, self).setUp()
     self.use_test_acct()
+    survey = models.Survey(title='First Meeting')
+    survey.save()
+    self.survey_id = survey.pk
+    gp = models.GivingProject.objects.get(title='Post training')
+    gpsurvey = models.GPSurvey(survey_id=survey.pk, giving_project=gp,
+                               date=timezone.now())
+    gpsurvey.save()
 
-  @unittest.skip('Incomplete')
   def test_survey_shown(self):
-    pass
+    membership = models.Membership.objects.get(pk=self.ship_id)
+    self.assertEqual(membership.completed_surveys, '[]')
 
-  @unittest.skip('Incomplete')
+    response = self.client.get(self.url, follow=True)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'fund/forms/gp_survey.html')
+
   def test_surveys_complete(self):
-    pass
+    membership = models.Membership.objects.get(pk=self.ship_id)
+    membership.completed_surveys = '[{}]'.format(self.survey_id)
+    membership.save()
+
+    response = self.client.get(self.url, follow=True)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateNotUsed(response, 'fund/forms/gp_survey.html')
+
 
 class CompileMembershipProgress(BaseFundTestCase):
   """ Test _compile_membership_progress method used by home view """
@@ -156,33 +165,8 @@ class CompileMembershipProgress(BaseFundTestCase):
 
     donor_data, progress = _compile_membership_progress(donors)
 
-    # TODO detailed assertions
-    self.assertIsNotNone(donor_data[self.donor_id])
-    self.assertIsNotNone(progress)
-
-  def test_several(self):
-    self.use_test_acct()
-    membership = models.Membership.objects.get(pk=self.ship_id)
-    donors = models.Donor.objects.filter(membership_id=self.ship_id)
-    donors = list(donors)
-    donor = models.Donor(membership=membership, firstname='Al', lastname='Bautista')
-    donor.save()
-    donors.append(donor)
-    donor = models.Donor(membership=membership, firstname='Alx',
-                         lastname='Zereskh', talked=True)
-    donor.save()
-    donors.append(donor)
-    donor = models.Donor(membership=membership, firstname='Irene',
-                         lastname='Uadfhaf', talked=True, amount=500, likelihood=40)
-    donor.save()
-    donors.append(donor)
-    donor = models.Donor(membership=membership, firstname='Velcro',
-                         lastname='The Cat', talked=True, amount=3,
-                         likelihood=1, asked=True)
-    donor.save()
-    donors.append(donor)
-
-    donor_data, progress = _compile_membership_progress(donors)
-    logger.info(donor_data)
-    logger.info(progress)
-    # TODO finish this test
+    for donor in donors:
+      data = donor_data[donor.pk]
+      self.assertIsInstance(data, dict)
+    self.assertIsInstance(progress, dict)
+    self.assertEqual(progress['contacts'], len(donors))
