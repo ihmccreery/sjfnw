@@ -141,26 +141,21 @@ class GrantApplicationI(BaseShowInline):
     return super(GrantApplicationI, self).queryset(request).select_related('grant_cycle')
 
   def summary(self, obj):
-    """Displays a summary of grant application screening status, giving projects, and awards"""
+    """ Display a summary of screening status, giving projects, and awards """
 
-    summary = ""
+    summary = ''
 
-    if obj.pk: #get grant applications associated with each unique grant cycle
-      summary += obj.get_pre_screening_status_display() + ". "
-      projectapps = models.ProjectApp.objects.filter(application_id=obj.pk)
+    if obj.pk:
+      summary += obj.get_pre_screening_status_display() + '. '
 
-      #get each project application from projectapp queryset
+      projectapps = obj.projectapp_set.all().select_related('giving_project', 'givingprojectgrant')
       for papp in projectapps:
         summary += unicode(papp.giving_project)
-
         if papp.get_screening_status_display():
-          summary += ". " + papp.get_screening_status_display()
-
+          summary += '. ' + papp.get_screening_status_display()
         if hasattr(papp, 'givingprojectgrant'):
-          amount = int(papp.givingprojectgrant.amount) #remove decimal
-          summary += ": ${:,}".format(amount) #add comma to amount if >= $1,000
-
-        summary += ".\n"
+          summary += ': ${:,}'.format(int(papp.givingprojectgrant.amount))
+        summary += '.\n'
 
     return summary
 
