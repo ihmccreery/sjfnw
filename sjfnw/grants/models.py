@@ -197,6 +197,8 @@ class DraftGrantApplication(models.Model):
   def file_fields(cls):
     return [f.name for f in cls._meta.fields if isinstance(f, models.FileField)]
 
+  def recently_edited(self):
+    return timezone.now() < self.modified + timedelta(seconds=35)
 
 class WordLimitValidator(BaseValidator):
   """ Custom validator that checks number of words in a string """

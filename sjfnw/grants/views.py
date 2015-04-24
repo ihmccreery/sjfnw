@@ -226,9 +226,6 @@ def grant_application(request, organization, cycle_id):
       organization=organization, grant_cycle=cycle)
   profiled = False
 
-  #TODO TEMP HACK
-  recently_edited = False
-
   if request.method == 'POST':
     if not draft.editable():
       return render(request, 'grants/submitted_closed.html', {'cycle': cycle})
@@ -270,9 +267,6 @@ def grant_application(request, organization, cycle_id):
       logger.info(form.errors)
 
   else: # GET
-
-    # check for recent autosave - may indicate multiple editors
-    recently_edited = draft.modified + datetime.timedelta(seconds=35) > timezone.now()
 
     if created or draft.contents == '{}':
       # new/blank draft; load profile
@@ -329,7 +323,7 @@ def grant_application(request, organization, cycle_id):
       'form': form, 'cycle': cycle, 'file_urls': file_urls,
       'limits': models.GrantApplication.NARRATIVE_CHAR_LIMITS,
       'draft': draft, 'profiled': profiled, 'org': organization,
-      'user_override': user_override, 'flag': recently_edited
+      'user_override': user_override, 'flag': draft.recently_edited() and draft.modified_by
   })
 
 def autosave_app(request, cycle_id):
@@ -360,15 +354,14 @@ def autosave_app(request, cycle_id):
     curr_user = request.POST.get('user_id')
 
     #check for simultaneous editing
-    #TODO call this force to distinguish from staff override
-    if request.GET.get('override') != 'true':
+    if request.GET.get('force') != 'true':
       # check if edited recently TODO reusable method
-      if draft.modified + datetime.timedelta(seconds=35) > timezone.now():
+      if draft.recently_edited():
         if draft.modified_by and draft.modified_by != curr_user: # last save wasn't this userid
           logger.info('Requiring confirmation')
-          return HttpResponse('confirm override', status=409)
+          return HttpResponse('confirm force', status=409)
     else:
-      logger.info('Override skipped check')
+      logger.info('Force - skipped check')
 
     logger.debug('Autosaving')
     draft.contents = json.dumps(request.POST)
