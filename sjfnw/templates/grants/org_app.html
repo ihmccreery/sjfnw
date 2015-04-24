@@ -6,7 +6,6 @@
 <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 <script type="text/javascript">
 
-/** user id and override **/
 var user_id = '';
 
 function setUserID() {
@@ -20,29 +19,37 @@ function setUserID() {
   return user_id;
 }
 
-function showOverrideWarning(ver){
+/**
+ * Show modal with conflict warning.
+ *
+ * @param {number} ver - version of the dialog to display. see html below
+ */
+function showConflictWarning(ver){
   window.scrollTo(0, 0);
   console.log('scrolled to top, showing override');
   $('#override_dialog'+ver).dialog({
     title: 'Warning: simultaneous editing',
     modal: true,
-    buttons:
-       [{
-          text:'Proceed anyway',
-          click: function(){
-            console.log('override!');
-            $('#override_dialog'+ver).dialog("close");
-            autoSave.save(false, true);
-            autoSave.resume();
-            }
-        },{
-          text:'Cancel',
-          click: function(){ location.href = '/apply/'; }
-        }],
+    buttons: [
+      {
+        text:'Proceed anyway',
+        click: function(){
+          console.log('override!');
+          $('#override_dialog'+ver).dialog("close");
+          autoSave.save(false, true);
+          autoSave.resume();
+        }
+      },{
+        text:'Cancel',
+        click: function(){
+          location.href = '/apply/';
+        }
+      }
+    ],
     closeOnEscape: false,
     resizable: false,
     position: {my: 'top', at: 'top', of: '#org_wrapper'},
-    width:400
+    width: 400
   });
 }
 
@@ -181,7 +188,7 @@ $(document).ready(function() {
 				<td>{{ form.email_address.label_tag }}{{ form.email_address }}</td>
 				<td>{{ form.website.label_tag }}{{ form.website }}</td>
 			</tr>
-      
+
       <tr><!--- Organization information -->
 				<td colspan="2">{{ form.status.label_tag }}{{ form.status }}{{ form.status.errors }}</td>
 			</tr>
@@ -207,7 +214,7 @@ $(document).ready(function() {
 			</tr><tr>
 				<td colspan="2">{{ form.previous_grants.label_tag }}{{ form.previous_grants }}</td>
 			</tr>
-      
+
       <tr><!--- Budget information -->
 				<td>{{ form.start_year.label_tag }}{{ form.start_year }}</td>
 				<td>{{ form.start_year.errors }}</td>
@@ -220,7 +227,7 @@ $(document).ready(function() {
 			</tr><tr>
 				<td colspan="2" style="height:28px;">* Upload budget files at the bottom of the form.</td>
 			</tr>
-      
+
       <tr><!--- Grant information -->
 				<td colspan="2">{{ form.grant_period.label_tag }}{{ form.grant_period }}{{ form.grant_period.errors }}</td>
 			</tr><tr>
@@ -238,7 +245,7 @@ $(document).ready(function() {
 				<td colspan="2"><div class="vertical_cushion">{{ form.grant_request.label_tag }}{{ form.grant_request.errors }}<span class="char_counter" id="grant_request_counter">100</span></div>
 				{{ form.grant_request }}</td>
 			</tr>
-      
+
       <tr>
 				<td><br><u>Fiscal sponsor information (if applicable)</u></td><!--- Fiscal sponsor info -->
 			</tr><tr>
@@ -384,7 +391,7 @@ $(document).ready(function() {
   <a href="/apply/info/{{ cycle.pk }}" target="_blank">Download templates here.</a>
   <br>
   <br>
-  Templates for budgets, funding sources and diversity chart can be downloaded above. 
+  Templates for budgets, funding sources and diversity chart can be downloaded above.
   For budget documents, you may use your own format if preferred.</p>
 
   <table id="file-uploads" style="width:100%;">
@@ -400,7 +407,7 @@ $(document).ready(function() {
         {{ form.budget1.errors }}
       </td>
       <td>
-        <form class="files_form" id="budget1_form" action="" target="upload_frame" method="POST" 
+        <form class="files_form" id="budget1_form" action="" target="upload_frame" method="POST"
               enctype="multipart/form-data" accept-charset="UTF-8">
           <span class="file_wrapper">
             <span class="default-file-input">{{ form.budget1 }}</span>

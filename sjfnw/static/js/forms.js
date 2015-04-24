@@ -20,8 +20,8 @@ formUtils.statusTexts = { // for ajax error messages
 
 /**
  * @param {string} urlPrefix - beginning of path (i.e. 'apply'). no slashes
- * @param {number} draftId - pk of draft object
- * @param {number} submitId - pk of object used in post TODO is this just cycle?
+ * @param {number} draftId - pk of draft object (draft app or draft yer)
+ * @param {number} submitId - pk of object used in post (cycle or award)
  * @param {string.alphanum} userId - randomly generated user id for mult edit warning
  * @param {string} staffUser - querystring for user override (empty string if n/a)
  */
@@ -36,11 +36,12 @@ formUtils.init = function(urlPrefix, draftId, submitId, userId, staffUser) {
 };
 
 
+/**
+ * Return current time as a string for display. Format: May 12, 2:45p.m.
+ */
 formUtils.currentTimeDisplay = function() {
-  /* returns current time as a string. format = May 12, 2:45p.m. */
-  var monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'];
+  var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'];
   var d = new Date();
   var h = d.getHours();
   var m = d.getMinutes();
@@ -49,16 +50,16 @@ formUtils.currentTimeDisplay = function() {
     h = h - 12;
     dd = 'p.m.';
   }
-  if (h === 0) {
-    h = 12;
-  }
+  h = h === 0 ? 12 : h;
   m = m < 10 ? '0' + m : m;
   return monthNames[d.getMonth()] + ' ' + d.getDate() + ', ' + h + ':' + m + dd;
 };
 
 
+/**
+ * Return current time as a string for console logs. Format: hh:mm:ss
+ */
 formUtils.logTime = function () {
-  /* returns current time as a string for console logs. hh:mm:ss */
   var d = new Date();
   var m = d.getMinutes();
   m = m < 10 ? '0' + m : m;
@@ -66,8 +67,12 @@ formUtils.logTime = function () {
 };
 
 
-/** CHARACTER LIMITS **/
-
+/**
+ * Update word limit indicator for text field. TODO rename
+ *
+ * @param {HTMLElement} area - textarea element
+ * @param {number} limit - word limit for that field
+ */
 function charLimitDisplay(area, limit) {
   var counter = document.getElementById(area.name + '_counter');
   var words = area.value.match(/[^ \r\n]+/g) || [];
@@ -148,16 +153,16 @@ autoSave.resume = function() {
   }
 };
 
-autoSave.save = function (submit, override) {
-  if (!override) { override = 'false'; }
+autoSave.save = function (submit, force) {
+  if (!force) { force = 'false'; }
   if (formUtils.staffUser) { // TODO use querystring function
-    override = '&override=' + override;
+    force = '&force=' + force;
   } else {
-    override = '?override=' + override;
+    force = '?force=' + force;
   }
   console.log(formUtils.logTime() + 'autosaving');
   $.ajax({
-    url: autoSave.saveUrl + override,
+    url: autoSave.saveUrl + force,
     type: 'POST',
     data: $('form').serialize() + '&user_id=' + autoSave.userId,
     success: function(data, textStatus, jqXHR) {
@@ -174,9 +179,9 @@ autoSave.save = function (submit, override) {
     },
     error: function(jqXHR, textStatus) {
       var errortext = '';
-      if (jqXHR.status === 409)  { // conflict - pause autosave and confirm override
+      if (jqXHR.status === 409)  { // conflict - pause autosave and confirm force
         window.clearInterval(autoSave.saveTimer);
-        showOverrideWarning(2); // defined in org_app.html
+        showConflictWarning(2); // defined in org_app.html
       } else {
         if(jqXHR.status === 401) {
           location.href = jqXHR.responseText + '?next=' + location.href;
