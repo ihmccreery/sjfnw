@@ -319,7 +319,7 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
  * Update form management fields
  */
 function addRow() { // eslint-disable-line no-unused-vars
-  var selector = '#add-contacts tr:last';
+  var selector = '#input-fields';
   var newElement = $(selector).clone(true);
   var total = $('#id_form-TOTAL_FORMS').val();
   var oldTotalString = '-' + (total - 1) + '-';
@@ -336,10 +336,16 @@ function addRow() { // eslint-disable-line no-unused-vars
   });
   total++;
   $('#id_form-TOTAL_FORMS').val(total);
-  $(selector).after(newElement);
+
+  $(document).ready(function(){
+    $("#add-row").on('click', function() {
+    $(selector).after(newElement);
+    });
+  });
 }
 
 /* Set up click handlers for loadView */
+console.log("loadview entered")
 $(document).ready(function() {
   $('.load').each(function(i, el) {
     var $el = $(el);

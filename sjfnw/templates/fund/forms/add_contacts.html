@@ -1,31 +1,46 @@
 {% extends request.is_ajax|yesno:"base_ajax.html,fund/_base_personal.html" %}
 {% block content %}
+
 <div id="addmult-wrapper">
   <form id="add-contacts" method="post" action="" accept-charset="UTF-8">
     <table class="form" id="add_form" style="text-align:center">
-    <tr>
-      <td colspan="4">{{ formset.management_form }}</td>
-    </tr>
-    {% for form in formset %}
-    {% if forloop.counter == 1 %}
-    <tr>
-      {% for field in form %}
-      <td>{% if field.name != 'confirm' %}{{ field.label }}{% endif %}</td>
+    {{ formset.management_form }}
+
+      {% for form in formset %}
+
+      {# print field labels #}
+      {% if forloop.counter == 1 %}
+      <div id="field-labels">
+        {% for field in form %}
+        {% if forloop.counter < 3 %}
+          <div class="form-field third">
+          {{ field.label}} </div>
+        {% elif field.name != 'confirm' %}
+          <div class="form-field sixth">
+          {{ field.label }} </div>
+        {% endif %}
+        {% endfor %}
+        {{ empty_error|safe }}
+      {% endif %}
+      </div>
+
+      {# print input fields #}
+      <div id="input-fields" style="align:center">
+        {% for field in form %}
+        {% if forloop.counter < 3 %}
+          <div class="form-field third">
+          {{ field.errors }}{{ field }} </div>
+        {% elif field.name != 'confirm' %}
+          <div class="form-field sixth">
+          {{ field.errors }}{{ field }}</div>
+        {% endif %}
+        {% endfor %}
+      </div>
       {% endfor %}
-    </tr>
-    <tr>
-      <td colspan="4">{{ empty_error|safe }}</td>
-    </tr>
-    {% endif %}
-    <tr>
-      {% for field in form %}
-      <td>{{ field.errors }}{{ field }}</td>
-      {% endfor %}
-    </tr>
-    {% endfor %}
     </table>
   </form>
-  <div align="right" style="margin-right:40px;">
+
+  <div id= "add-row" align="right" style="margin-right:40px;">
     <a onclick="addRow()">Add more contacts</a>
   </div>
   <div align="center">
