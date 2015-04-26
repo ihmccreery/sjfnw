@@ -323,27 +323,26 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
 function addRow() { // eslint-disable-line no-unused-vars
   var formCount = $('#id_form-TOTAL_FORMS').val();
 
-  // clone the last row
   var lastRow = $('.form-row:last');
   var newElement = lastRow.clone(true);
 
+  // reset field values, increment form number
   newElement.find(':input').each(function() {
     var input = $(this);
-
-    // reset field - text and checked state
     input.val('').removeAttr('checked');
-
-    // increment form number in name and id
     var name = input.attr('name').replace(/-\d+-/, '-' + formCount + '-');
     input.attr({'name': name, 'id': 'id_' + name});
   });
+
+  // update labels to point to correct inputs
   newElement.find('label').each(function() {
     var label = $(this);
-   
-    // update label to point to correct input
     var newFor = label.attr('for').replace(/-\d+-/, '-' + formCount + '-');
     label.attr('for', newFor);
   });
+
+  // remove any cloned errors
+  newElement.find('.errorlist').remove();
 
   $('#id_form-TOTAL_FORMS').val(++formCount);
   lastRow.after(newElement);
