@@ -315,37 +315,41 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
   });
 }
 
-/* Add a row to the add contacts form by cloning the last row
- * Update form management fields
+/**
+ * Add a row to the add contacts form
+ *
+ * Clones the last row, increments its form id, updates the formset management form
  */
 function addRow() { // eslint-disable-line no-unused-vars
-  var selector = '#input-fields';
-  var newElement = $(selector).clone(true);
-  var total = $('#id_form-TOTAL_FORMS').val();
-  var oldTotalString = '-' + (total - 1) + '-';
-  var newTotalString = '-' + total + '-';
+  var formCount = $('#id_form-TOTAL_FORMS').val();
+
+  // clone the last row
+  var lastRow = $('.form-row:last');
+  var newElement = lastRow.clone(true);
 
   newElement.find(':input').each(function() {
-    var name = $(this).attr('name').replace(oldTotalString, newTotalString);
-    var id = 'id_' + name;
-    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+    var input = $(this);
+
+    // reset field - text and checked state
+    input.val('').removeAttr('checked');
+
+    // increment form number in name and id
+    var name = input.attr('name').replace(/-\d+-/, '-' + formCount + '-');
+    input.attr({'name': name, 'id': 'id_' + name});
   });
   newElement.find('label').each(function() {
-    var newFor = $(this).attr('for').replace(oldTotalString, newTotalString);
-    $(this).attr('for', newFor);
+    var label = $(this);
+   
+    // update label to point to correct input
+    var newFor = label.attr('for').replace(/-\d+-/, '-' + formCount + '-');
+    label.attr('for', newFor);
   });
-  total++;
-  $('#id_form-TOTAL_FORMS').val(total);
 
-  $(document).ready(function(){
-    $("#add-row").on('click', function() {
-    $(selector).after(newElement);
-    });
-  });
+  $('#id_form-TOTAL_FORMS').val(++formCount);
+  lastRow.after(newElement);
 }
 
 /* Set up click handlers for loadView */
-console.log("loadview entered")
 $(document).ready(function() {
   $('.load').each(function(i, el) {
     var $el = $(el);
