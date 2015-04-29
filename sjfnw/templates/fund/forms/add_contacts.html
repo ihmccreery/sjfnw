@@ -8,39 +8,29 @@
 
       {% for form in formset %}
 
-      {# print field labels #}
+      {# show form labels #}
       {% if forloop.counter == 1 %}
-      <div id="field-labels">
+      <div class="form-labels">
         {% for field in form %}
-        {% if forloop.counter < 3 %}
-          <div class="form-field third">
-          {{ field.label}} </div>
-        {% elif field.name != 'confirm' %}
-          <div class="form-field sixth">
-          {{ field.label }} </div>
-        {% endif %}
+          <div class="form-field>label {% if forloop.counter < 3 %}third{% elif field.name == 'confirm' %}hidden{% else %}sixth{% endif %}"> {{ field.label }}
+          </div>
         {% endfor %}
         {{ empty_error|safe }}
-      {% endif %}
       </div>
+      {% endif %}
 
-      {# print input fields #}
+      {# show input fields #}
       <div class="form-row">
         {% for field in form %}
-        {% if forloop.counter < 3 %}
-          <div class="form-field third">
-          {{ field.errors }}{{ field }} </div>
-        {% elif field.name != 'confirm' %}
-          <div class="form-field sixth">
-          {{ field.errors }}{{ field }}</div>
-        {% endif %}
+          <div class="form-field {% if forloop.counter < 3 %}third{% elif field.name == 'confirm' %}hidden{% else %}sixth{% endif %}"> {{ field.errors }}{{ field }}
+          </div>
         {% endfor %}
       </div>
       {% endfor %}
     </table>
   </form>
 
-  <div id= "add-row" align="right" style="margin-right:40px;">
+  <div id= "add-row">
     <a onclick="addRow()">Add more contacts</a>
   </div>
   <div align="center">
