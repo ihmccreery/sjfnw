@@ -152,6 +152,11 @@ table.form button {
   align: center;
 }
 
+#add-row {
+  float: right;
+  margin-right: 40px;
+}
+
 /* notifications */
 
 #notifications {
@@ -244,7 +249,7 @@ a.edit_done {
 }
 
 .form-row {
-  padding: 10px 0;
+  padding: 5px 0;
   width: 100%;
 }
 
@@ -253,7 +258,7 @@ a.edit_done {
 }
 
 .form-field input {
-  max-width: 95%;
+  max-width: 90%;
 }
 
 .complete-step h3 {

@@ -329,6 +329,7 @@ function addRow() { // eslint-disable-line no-unused-vars
   // reset field values, increment form number
   newElement.find(':input').each(function() {
     var input = $(this);
+    console.log(input.attr("name"))
     input.val('').removeAttr('checked');
     var name = input.attr('name').replace(/-\d+-/, '-' + formCount + '-');
     input.attr({'name': name, 'id': 'id_' + name});
