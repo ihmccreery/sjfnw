@@ -106,10 +106,7 @@ def gift_notify(request):
       if donor.lastname:
         gift_str += ' ' + donor.lastname
       gift_str += '!<br>'
-    ship.notifications = ('<table><tr><td>' + gift_str +
-                         '</td><td><img src="/static/images/odo2.png"' +
-                         'height=86 width=176 alt="Odo flying">' +
-                         '</td></tr></table>')
+    ship.notifications = gift_str
     ship.save(skip=True)
     logger.info('Gift notification set for %s', unicode(ship))
 
@@ -119,7 +116,8 @@ def gift_notify(request):
   bcc = [c.SUPPORT_EMAIL]
   for ship in memberships:
     to_emails = [ship.member.email]
-    html_content = render_to_string('fund/emails/gift_received.html', {'login_url': login_url})
+    html_content = render_to_string('fund/emails/gift_received.html', {'login_url': login_url,
+                                    'gift_str': gift_str})
     text_content = strip_tags(html_content)
     msg = EmailMultiAlternatives(subject, text_content, from_email, to_emails, bcc)
     msg.attach_alternative(html_content, "text/html")

@@ -115,6 +115,21 @@ div.content_area {
   content: url('/static/images/check.png');
 }
 
+#progress {
+  width:90%;
+  margin-left:8%;
+  margin-top:10px;
+  margin-bottom:15px;
+  text-align:center;
+}
+
+.chart {
+  width:240px;
+  height:110px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
 /* forms */
 
 .loading {
@@ -135,13 +150,8 @@ form {
 #notifications {
   width: 80%;
   margin: 10px auto 25px auto;
-}
-
-#notifications table {
-  width: 98%;
-  text-align: center;
-  vertical-align: middle;
-  line-height: 1.5em;
+  padding: 15px;
+  border: 4px dotted green;
 }
 
 .odo_float_right {
@@ -151,6 +161,9 @@ form {
   margin-left: 8px;
 }
 
+.odo_float_left {
+  float: left;
+}
 
 /* contacts list */
 .donor {
