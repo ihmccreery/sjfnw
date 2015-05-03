@@ -12,7 +12,7 @@
       {% if forloop.counter == 1 %}
       <div class="form-labels">
         {% for field in form %}
-          <div class="form-field>label {% if forloop.counter < 3 %}third{% elif field.name == 'confirm' %}hidden{% else %}sixth{% endif %}"> {{ field.label }}
+          <div class="form-label {% if forloop.counter < 3 %}third{% elif field.name == 'confirm' %}hidden{% else %}sixth{% endif %}"> {{ field.label }}
           </div>
         {% endfor %}
         {{ empty_error|safe }}
