@@ -315,28 +315,37 @@ function Submit(subUrl, formId, divId, date, dasked, dpromised) { // eslint-disa
   });
 }
 
-/* Add a row to the add contacts form by cloning the last row
- * Update form management fields
+/**
+ * Add a row to the add contacts form
+ *
+ * Clones the last row, increments its form id, updates the formset management form
  */
 function addRow() { // eslint-disable-line no-unused-vars
-  var selector = '#add-contacts tr:last';
-  var newElement = $(selector).clone(true);
-  var total = $('#id_form-TOTAL_FORMS').val();
-  var oldTotalString = '-' + (total - 1) + '-';
-  var newTotalString = '-' + total + '-';
+  var formCount = $('#id_form-TOTAL_FORMS').val();
 
+  var lastRow = $('.form-row:last');
+  var newElement = lastRow.clone(true);
+
+  // reset field values, increment form number
   newElement.find(':input').each(function() {
-    var name = $(this).attr('name').replace(oldTotalString, newTotalString);
-    var id = 'id_' + name;
-    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+    var input = $(this);
+    input.val('').removeAttr('checked');
+    var name = input.attr('name').replace(/-\d+-/, '-' + formCount + '-');
+    input.attr({'name': name, 'id': 'id_' + name});
   });
+
+  // update labels to point to correct inputs
   newElement.find('label').each(function() {
-    var newFor = $(this).attr('for').replace(oldTotalString, newTotalString);
-    $(this).attr('for', newFor);
+    var label = $(this);
+    var newFor = label.attr('for').replace(/-\d+-/, '-' + formCount + '-');
+    label.attr('for', newFor);
   });
-  total++;
-  $('#id_form-TOTAL_FORMS').val(total);
-  $(selector).after(newElement);
+
+  // remove any cloned errors
+  newElement.find('.errorlist').remove();
+
+  $('#id_form-TOTAL_FORMS').val(++formCount);
+  lastRow.after(newElement);
 }
 
 /* Set up click handlers for loadView */
