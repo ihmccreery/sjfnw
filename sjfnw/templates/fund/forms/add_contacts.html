@@ -1,37 +1,33 @@
 {% extends request.is_ajax|yesno:"base_ajax.html,fund/_base_personal.html" %}
 {% block content %}
-<div id="addmult-wrapper">
+<div id="addmult-wrapper" class="text-center">
   <form id="add-contacts" method="post" action="" accept-charset="UTF-8">
-    <table class="form" id="add_form" style="text-align:center">
-    <tr>
-      <td colspan="4">{{ formset.management_form }}</td>
-    </tr>
+    {{ formset.management_form }}
     {% for form in formset %}
-    {% if forloop.counter == 1 %}
-    <tr>
-      {% for field in form %}
-      <td>{% if field.name != 'confirm' %}{{ field.label }}{% endif %}</td>
-      {% endfor %}
-    </tr>
-    <tr>
-      <td colspan="4">{{ empty_error|safe }}</td>
-    </tr>
-    {% endif %}
-    <tr>
-      {% for field in form %}
-      <td>{{ field.errors }}{{ field }}</td>
-      {% endfor %}
-    </tr>
+
+      {# show form labels #}
+      {% if forloop.counter == 1 %}
+        {% for field in form %}
+          <div class="{% if forloop.counter < 3 %}third{% elif field.name == 'confirm' %}hidden{% else %}sixth{% endif %}">
+            {{ field.label }}
+          </div>
+        {% endfor %}
+        {{ empty_error|safe }}
+      {% endif %}
+
+      {# show input fields #}
+      <div class="form-row">
+        {% for field in form %}
+          <div class="form-field {% if forloop.counter < 3 %}third{% elif field.name == 'confirm' %}hidden{% else %}sixth{% endif %}">
+            {{ field.errors }}{{ field }}
+          </div>
+        {% endfor %}
+      </div>
     {% endfor %}
-    </table>
   </form>
-  <div align="right" style="margin-right:40px;">
-    <a onclick="addRow()">Add more contacts</a>
-  </div>
-  <div align="center">
-    <img class="ajax-loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
-    <button onclick="Submit('{{ request.path }}', '#add-contacts', 'addmult-wrapper')">Save</button>
-    <button onclick="location.href='/fund/'">Cancel</button>
-  </div>
+  <div class="text-right"><a onclick="addRow()">Add more contacts</a></div>
+  <img class="ajax-loading" src="/static/images/ajaxloader.gif" style="display:none;" alt="Loading..."><br>
+  <button onclick="Submit('{{ request.path }}', '#add-contacts', 'addmult-wrapper')">Save</button>
+  <button onclick="location.href='/fund/'">Cancel</button>
 </div>
-{% endblock %}
+{% endblock content %}

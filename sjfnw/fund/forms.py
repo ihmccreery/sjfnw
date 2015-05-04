@@ -67,7 +67,7 @@ class MassDonor(MassDonorPre):
                              widget=forms.TextInput(attrs={'class':'width-75'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
                                   min_value=0, max_value=100,
-                                  widget=forms.TextInput(attrs={'class':'half'}))
+                                  widget=forms.TextInput(attrs={'class':'width-75'}))
 
 
 class DonorEstimates(forms.Form):
@@ -78,7 +78,7 @@ class DonorEstimates(forms.Form):
                              widget=forms.TextInput(attrs={'class':'width-75'}))
   likelihood = forms.IntegerField(label='*Estimated likelihood (%)',
                                   min_value=0, max_value=100,
-                                  widget=forms.TextInput(attrs={'class':'half'}))
+                                  widget=forms.TextInput(attrs={'class':'width-75'}))
 
 
 class MassStep(forms.Form):
