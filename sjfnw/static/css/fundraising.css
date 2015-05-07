@@ -115,7 +115,7 @@ div.content_area {
   content: url('/static/images/check.png');
 }
 
-#progress {
+.progress {
   width:90%;
   margin-left:8%;
   margin-top:10px;
@@ -154,15 +154,11 @@ form {
   border: 4px dotted green;
 }
 
-.odo_float_right {
+.odo-float-right {
   float: right;
   margin-top: 8px;
   margin-right: 15px;
   margin-left: 8px;
-}
-
-.odo_float_left {
-  float: left;
 }
 
 /* contacts list */
