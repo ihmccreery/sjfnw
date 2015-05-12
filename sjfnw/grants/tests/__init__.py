@@ -6,3 +6,4 @@ from test_home import *
 from test_login_register import *
 from test_reading import *
 from test_yearendreport import *
+from test_givingprojectgrants import *

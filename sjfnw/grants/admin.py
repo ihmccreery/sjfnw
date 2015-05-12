@@ -154,7 +154,7 @@ class GrantApplicationI(BaseShowInline):
         if papp.get_screening_status_display():
           summary += '. ' + papp.get_screening_status_display()
         if hasattr(papp, 'givingprojectgrant'):
-          summary += ': ${:,}'.format(int(papp.givingprojectgrant.amount))
+          summary += ': ${:,}'.format(int(papp.givingprojectgrant.total_amount()))
         summary += '.\n'
 
     return summary
@@ -345,18 +345,26 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
   list_display = ['organization_name', 'grant_cycle', 'giving_project',
-      'amount', 'check_mailed', 'year_end_report_due']
+      'total_amount', 'fully_paid', 'check_mailed', 'next_year_end_report_due']
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
   exclude = ['created']
-  fields = [
-    ('projectapp', 'amount'),
-    ('check_number', 'check_mailed'),
-    ('agreement_mailed', 'agreement_returned'),
-    'approved',
-    'year_end_report_due',
-  ]
-  readonly_fields = ['year_end_report_due', 'grant_cycle',
-                     'organization_name', 'giving_project']
+
+  readonly_fields = ['next_year_end_report_due', 'grant_cycle',
+                     'organization_name', 'giving_project', 'total_amount']
+  fieldsets = (
+    (None, {
+      'fields': (('projectapp', 'total_amount'), ('amount', 'check_number', 'check_mailed'))
+     }),
+
+    ('Multi-Year Grant', {
+      'fields': (('second_amount', 'second_check_number', 'second_check_mailed'),)
+    }),
+
+    (None, {
+      'fields': (('agreement_mailed', 'agreement_returned'), ('approved'),
+               ('next_year_end_report_due'))
+    }),
+  )
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     if db_field.name == 'projectapp':
@@ -369,7 +377,20 @@ class GivingProjectGrantA(admin.ModelAdmin):
     return super(GivingProjectGrantA, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
-  def year_end_report_due(self, obj):
+  def fully_paid(self, obj):
+    if obj.second_amount and not obj.second_check_mailed:
+      return False
+    elif not obj.check_mailed:
+      return False
+    else:
+      return True
+
+  fully_paid.boolean = True
+
+  def total_amount(self, obj):
+    return '${:,}'.format(int(obj.total_amount()))
+
+  def next_year_end_report_due(self, obj):
     return obj.yearend_due()
 
   def organization_name(self, obj):
