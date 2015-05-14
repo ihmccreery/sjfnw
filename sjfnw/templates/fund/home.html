@@ -10,28 +10,27 @@
 {% block content %}
   <div id="form_saved"></div> {# TODO what is this #}
 
-  {% if notif %}<div id="notifications">{{ notif|safe }}</div>{% endif %}
-
-  {% if donor_list.0 %}
-  <span class="header">YOUR PROGRESS</span>
-  <table style="width:90%;margin-left:8%;margin-top:10px;margin-bottom:15px;text-align:center;">
-    <tr>
-      <td>
-        <div align="center">{{ progress.contacts }} contacts</div>
-        <div align="center" id ="chart_div" style="width:240px;height:110px;margin-left:auto;margin-right:auto;"></div>
-      </td>
-      {% if progress.estimated > 0 %}
-      <td>
-        <div align="center" title="Personal fundraising goal of ${{ progress.estimated }} calculated based on your ask amount and estimated likelihood for each contact">{{ progress.header }}</div>
-        <div align="center" id="chart_div2" style="width:260px;height:110px;margin-left:25px;"></div>
-      </td>
-      {% endif %}
-    </tr>
-  </table>
+  {% if notif %}
+  <div id="notifications" class="center">{{ notif|safe }}</div>
   {% endif %}
 
-  <span class="header" id="your-contacts">YOUR CONTACTS &amp; NEXT STEPS</span>
+  {% if donor_list.0 %}
+  <div class="header">YOUR PROGRESS</div>
+  <div class="progress">
+    <div class="half">
+        <div id="contacts">{{ progress.contacts }} contacts</div>
+        <div id="chart_div" class="chart"></div>
+    </div>
+    {% if progress.estimated > 0 %}
+    <div class="half">
+        <div id="fund-goal" title="Personal fundraising goal of ${{ progress.estimated }} calculated based on your ask amount and estimated likelihood for each contact">{{ progress.header }}</div>
+        <div id="chart_div2" class="chart"></div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
 
+  <div class="header" id="your-contacts">YOUR CONTACTS &amp; NEXT STEPS</div>
   {% if donor_list.0 %}
     {% if not load %} {# add contacts link only if mass add won't be showing #}
     <div class="edit_done">

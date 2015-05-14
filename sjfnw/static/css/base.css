@@ -76,6 +76,7 @@ a: hover, a: focus {
 }
 
 .half {
+  display:inline-block;
   width: 49%;
 }
 
