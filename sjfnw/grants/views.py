@@ -420,7 +420,7 @@ def add_file(request, draft_type, draft_id):
 def remove_file(request, draft_type, draft_id, file_field):
   """ Remove file from draft by setting that field to empty string
 
-      Note: does not delete file from Blobstore, since it could be used 
+      Note: does not delete file from Blobstore, since it could be used
         in other drafts/apps
   """
   draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
@@ -481,18 +481,20 @@ def year_end_report(request, organization, award_id):
   # get award, make sure org matches
   award = get_object_or_404(models.GivingProjectGrant, pk=award_id)
   app = award.projectapp.application
+
+  grantlength = award.grant_length()
+  yers = models.YearEndReport.objects.filter(award=award)
   if app.organization_id != organization.pk:
     logger.warning('Trying to edit someone else\'s YER')
     return redirect(org_home)
 
   # check if already submitted
-  if models.YearEndReport.objects.filter(award=award):
+  if yers.count() == award.grant_length():
     logger.warning('YER already exists')
     return redirect(org_home)
 
   # get or create draft
   draft, created = models.YERDraft.objects.get_or_create(award=award)
-
   if request.method == 'POST':
     draft_data = json.loads(draft.contents)
     files_data = model_to_dict(draft, fields=['photo1', 'photo2', 'photo3',
@@ -548,7 +550,7 @@ def year_end_report(request, organization, award_id):
 
   return render(request, 'grants/yer_form.html', {
       'form': form, 'org': organization, 'draft': draft, 'award': award,
-      'file_urls': file_urls, 'user_override': user_override
+      'file_urls': file_urls, 'user_override': user_override, 'yers': yers
   })
 
 
@@ -1091,7 +1093,7 @@ def get_app_results(options):
               award = papp.givingprojectgrant
               if award_col != '':
                 award_col += ', '
-              award_col += '%s %s ' % (award.amount, papp.giving_project.title)
+              award_col += '%s %s ' % (award.total_amount(), papp.giving_project.title)
             except models.GivingProjectGrant.DoesNotExist:
               pass
           if get_gp_ss:
@@ -1190,6 +1192,8 @@ def get_award_results(options):
         row.append(award.yearend_due())
       elif field == 'id':
         row.append('') # only for sponsored
+      elif field == 'amount':
+        row.append(award.total_amount())
       else:
         row.append(getattr(award, field, ''))
     for field in org_fields:
@@ -1297,7 +1301,7 @@ def get_org_results(options):
                 timestamp = timestamp.strftime('%m/%d/%Y')
               else:
                 timestamp = 'No timestamp'
-              awards_str += '$%s %s %s' % (award.amount, award.projectapp.giving_project.title, timestamp)
+              awards_str += '$%s %s %s' % (award.total_amount(), award.projectapp.giving_project.title, timestamp)
               awards_str += linebreak
             except models.GivingProjectGrant.DoesNotExist:
               pass

@@ -662,7 +662,7 @@ def validate_photo_file_extension(value):
 class YearEndReport(models.Model):
 
   # automatic
-  award = models.OneToOneField(GivingProjectGrant)
+  award = models.ForeignKey(GivingProjectGrant)
   submitted = models.DateTimeField(default=timezone.now())
 
   # user-entered
@@ -755,7 +755,7 @@ class YearEndReport(models.Model):
 
 class YERDraft(models.Model):
 
-  award = models.OneToOneField(GivingProjectGrant)
+  award = models.ForeignKey(GivingProjectGrant)
   modified = models.DateTimeField(default=timezone.now())
   contents = models.TextField(default='{}')
 

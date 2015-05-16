@@ -203,7 +203,7 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
       if hasattr(obj, 'givingprojectgrant'):
         award = obj.givingprojectgrant
         link = link + '{}/">{}</a>'
-        return mark_safe(link.format(award.pk, award.amount))
+        return mark_safe(link.format(award.pk, award.total_amount()))
       else:
         link = link + 'add/?projectapp={}">Enter an award</a>'
         return mark_safe(link.format(obj.pk))
@@ -211,11 +211,16 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
 
   def year_end_report(self, obj):
     if obj.pk:
-      report = (models.YearEndReport.objects.select_related('award')
+      reports = (models.YearEndReport.objects.select_related('award')
                                             .filter(award__projectapp_id=obj.pk))
-      if report:
-        return mark_safe('<a target="_blank" href="/admin/grants/yearendreport/' +
-            str(report[0].pk) + '/">View</a>')
+      if reports:
+        yer_link = ""
+        for report in range(reports.count()):
+          if report > 0:
+            yer_link += " | "
+          yer_link += mark_safe('<a target="_blank" href="/admin/grants/yearendreport/' +
+            str(reports[report].pk) + '/">Year ' + str(report + 1) + '</a>')
+        return mark_safe(yer_link)
     return ''
 
 #------------------------------------------------------------------------------
@@ -368,12 +373,13 @@ class GivingProjectGrantA(admin.ModelAdmin):
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     if db_field.name == 'projectapp':
-      p_app = request.GET.get('projectapp')
-      if p_app:
-        kwargs['queryset'] = (models.ProjectApp.objects
-            .select_related('application', 'application__organization', 'giving_project')
-            .filter(pk=p_app))
-        logger.info('grant page loaded with projectapp specified ' + p_app)
+      if request.method == 'GET' and 'projectapp' in request.GET:
+        p_app = request.GET['projectapp']
+        if p_app:
+          kwargs['queryset'] = (models.ProjectApp.objects
+              .select_related('application', 'application__organization', 'giving_project')
+              .filter(pk=p_app))
+          logger.info('grant page loaded with projectapp specified ' + p_app)
     return super(GivingProjectGrantA, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
@@ -384,7 +390,6 @@ class GivingProjectGrantA(admin.ModelAdmin):
       return False
     else:
       return True
-
   fully_paid.boolean = True
 
   def total_amount(self, obj):
@@ -458,7 +463,6 @@ class YearEndReportA(admin.ModelAdmin):
   def cycle(self, obj):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
-
 
 class DraftAdv(admin.ModelAdmin):
   """ Only used in admin-advanced """
