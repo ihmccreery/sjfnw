@@ -1,20 +1,22 @@
 [MESSAGES CONTROL]
 
-disable=C0111,C0330,R0201,R0901,R0903,W0105,W0142,W0201,W0232
-
 # see http://docs.pylint.org/features.html for list of codes
+#
+disable=C0111,C1001,C0330,R0201,R0901,R0903,W0105,W0142,W0201,W0232
+
 # pylint-django plugin takes care of many of the django incompatibilities
 
 # disabled:
-# C0111 missing-docstring
-# C0330 bad-continuation
-# R0201 no-self-use
-# R0901 too-many-ancestors
-# R0903 too-few-public-methods
-# W0105 pointless-string-statement
-# W0142 star-args
-# W0201 attribute-defined-outside-init
-# W0232 no-init
+#   C0111 missing-docstring
+#   C1001 old-style-class
+#   C0330 bad-continuation
+#   R0201 no-self-use
+#   R0901 too-many-ancestors
+#   R0903 too-few-public-methods
+#   W0105 pointless-string-statement
+#   W0142 star-args
+#   W0201 attribute-defined-outside-init
+#   W0232 no-init
 
 [REPORTS]
 
