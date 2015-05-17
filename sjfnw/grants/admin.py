@@ -345,9 +345,9 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
   list_display = ['organization_name', 'grant_cycle', 'giving_project',
-      'amount', 'check_mailed', 'year_end_report_due']
+                  'amount', 'check_mailed', 'year_end_report_due']
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
-  exclude = ['created']
+
   fields = [
     ('projectapp', 'amount'),
     ('check_number', 'check_mailed'),
@@ -355,10 +355,10 @@ class GivingProjectGrantA(admin.ModelAdmin):
     'approved',
     'year_end_report_due',
   ]
-  readonly_fields = ['year_end_report_due', 'grant_cycle',
-                     'organization_name', 'giving_project']
+  readonly_fields = ['year_end_report_due']
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    logger.info('gpg page formfield_for_foreignkey')
     if db_field.name == 'projectapp':
       p_app = request.GET.get('projectapp')
       if p_app:
@@ -369,8 +369,14 @@ class GivingProjectGrantA(admin.ModelAdmin):
     return super(GivingProjectGrantA, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
+  def get_readonly_fields(self, request, obj=None):
+    if obj is not None:
+      self.readonly_fields.append('projectapp')
+    return self.readonly_fields
+
   def year_end_report_due(self, obj):
-    return obj.yearend_due()
+    logger.info('gpg page year_end_report_due')
+    return obj.yearend_due() or 'N/A'
 
   def organization_name(self, obj):
     return obj.projectapp.application.organization.name
@@ -381,16 +387,6 @@ class GivingProjectGrantA(admin.ModelAdmin):
 
   def giving_project(self, obj):
     return unicode(obj.projectapp.giving_project)
-
-  def get_readonly_fields(self, request, obj=None):
-    if obj is not None: # editing - lock org & cycle
-      self.readonly_fields.append('projectapp')
-    return self.readonly_fields
-
-  def change_view(self, request, object_id, form_url='', extra_context=None):
-    view = super(GivingProjectGrantA, self).change_view(
-        request, object_id, form_url, extra_context=extra_context)
-    return view
 
 
 class SponsoredProgramGrantA(admin.ModelAdmin):
