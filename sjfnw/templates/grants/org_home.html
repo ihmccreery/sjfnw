@@ -100,24 +100,34 @@
         {% if award %}
           {% if award.agreement_mailed and award.agreement_mailed|timesince > 0 %}
           <ul>
-            <li>${{ award.total_amount|intcomma }} awarded.</li>
+            <li>${{ award.total_amount|intcomma }} awarded for a {{ award.grant_length }}-year grant</li>
             <li>Agreement mailed {{ award.agreement_mailed|date:"n/j/y" }},
             {% if award.agreement_returned %}
               returned {{ award.agreement_returned|date:"n/j/y" }}.</li>
             {% else %}
               due {{ award.agreement_due|date:"n/j/y" }}.</li>
             {% endif %}{# agreement_returned #}
-            {% for yer in award.yearendreport_set.all %}
-            <li>
-              <a href="{% url 'grants.views.view_yer' report_id=yer.pk %}">
-              Year end report</a> completed.
-            </li>
-            {% endfor %}
-            {% if award.yearendreport_set.all.count != award.grant_length and award.second_check_mailed %}
-            <li>
-              <a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ award.yearend_due|date:"n/j/y" }}.
-            </li>
-          {% endif %}{# award.yearendreport #}
+            {% with total_yers=award.yearendreport_set.all.count %}
+            {% if total_yers == 0 %} {# check if 1st yer due #}
+              <li>
+                <a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ award.yearend_due|date:"n/j/y" }}.
+              </li>
+            {% else %}
+              {% with yers=award.yearendreport_set.all %}
+              {% for yer in yers %}
+              <li>
+                <a href="{% url 'grants.views.view_yer' report_id=yer.pk %}">
+                Year end report</a> completed.
+              </li>
+              {% endfor %}
+              {% endwith %}
+              {% if total_yers == 1 and award.second_check_mailed %} {# check if year end report due for 2-year grant #}
+                <li>
+                  <a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Second year end report</a> due {{ award.yearend_due|date:"n/j/y" }}.
+                </li>
+              {% endif %}
+            {% endif %}{# check if 1st yer due#}
+            {% endwith %}
           {% endif %}{# agreement_mailed #}
           {% endif %}{# award #}
         {% endwith %}
