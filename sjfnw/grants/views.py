@@ -482,14 +482,13 @@ def year_end_report(request, organization, award_id):
   award = get_object_or_404(models.GivingProjectGrant, pk=award_id)
   app = award.projectapp.application
 
-  grantlength = award.grant_length()
-  yers = models.YearEndReport.objects.filter(award=award)
   if app.organization_id != organization.pk:
     logger.warning('Trying to edit someone else\'s YER')
     return redirect(org_home)
 
+  total_yers = models.YearEndReport.objects.filter(award=award).count()
   # check if already submitted
-  if yers.count() == award.grant_length():
+  if total_yers == award.grant_length():
     logger.warning('YER already exists')
     return redirect(org_home)
 
@@ -550,7 +549,7 @@ def year_end_report(request, organization, award_id):
 
   return render(request, 'grants/yer_form.html', {
       'form': form, 'org': organization, 'draft': draft, 'award': award,
-      'file_urls': file_urls, 'user_override': user_override, 'yers': yers
+      'file_urls': file_urls, 'user_override': user_override
   })
 
 
@@ -1353,17 +1352,24 @@ def yer_reminder_email(request):
   # get awards due in 7 or 30 days by agreement_returned date
   year_ago = timezone.now().date().replace(year=timezone.now().year - 1)
   award_dates = [year_ago + datetime.timedelta(days=30), year_ago + datetime.timedelta(days=7)]
-  awards = (models.GivingProjectGrant.objects.select_related()
-                                             .prefetch_related('yearendreport')
+  awards = list(models.GivingProjectGrant.objects.all()
                                              .filter(agreement_mailed__in=award_dates))
 
-  return send_yer_email(awards, 'grants/email_yer_due.html')
+  # for multiyear grants, get awards due in 7 or 30 days of second year end report due date
+  two_years_ago = timezone.now().date().replace(year=timezone.now().year - 2)
+  second_award_dates = [two_years_ago + datetime.timedelta(days=30), two_years_ago + datetime.timedelta(days=7)]
+  second_awards = list(models.GivingProjectGrant.objects.all()
+                                           .filter(agreement_mailed__in=second_award_dates,
+                                                   second_check_mailed__isnull=False))
+  total_awards = awards + second_awards
+
+  return send_yer_email(total_awards, 'grants/email_yer_due.html')
 
 
 def send_yer_email(awards, template):
 
   for award in awards:
-    if not hasattr(award, 'yearendreport'):
+    if award.yearendreport_set.all().count() < award.grant_length():
       app = award.projectapp.application
 
       subject = 'Year end report'
