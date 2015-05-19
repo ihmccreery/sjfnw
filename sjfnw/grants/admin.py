@@ -213,14 +213,13 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
     if obj.pk:
       reports = (models.YearEndReport.objects.select_related('award')
                                             .filter(award__projectapp_id=obj.pk))
-      if reports:
-        yer_link = ""
-        for report in range(reports.count()):
-          if report > 0:
-            yer_link += " | "
-          yer_link += mark_safe('<a target="_blank" href="/admin/grants/yearendreport/' +
-            str(reports[report].pk) + '/">Year ' + str(report + 1) + '</a>')
-        return mark_safe(yer_link)
+      yer_link = ""
+      for i, report in enumerate(reports):
+        if i > 0:
+          yer_link += " | "
+        yer_link += ('<a target="_blank" href="/admin/grants/yearendreport/' +
+          str(report.pk) + '/">Year ' + str(i + 1) + '</a>')
+      return mark_safe(yer_link)
     return ''
 
 #------------------------------------------------------------------------------
@@ -372,14 +371,14 @@ class GivingProjectGrantA(admin.ModelAdmin):
   )
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    logger.info('gpg page formfield_for_foreignkey')
     if db_field.name == 'projectapp':
-      if request.method == 'GET' and 'projectapp' in request.GET:
-        p_app = request.GET['projectapp']
-        if p_app:
-          kwargs['queryset'] = (models.ProjectApp.objects
-              .select_related('application', 'application__organization', 'giving_project')
-              .filter(pk=p_app))
-          logger.info('grant page loaded with projectapp specified ' + p_app)
+      p_app = request.GET.get('projectapp')
+      if p_app:
+        kwargs['queryset'] = (models.ProjectApp.objects
+            .select_related('application', 'application__organization', 'giving_project')
+            .filter(pk=p_app))
+        logger.info('grant page loaded with projectapp specified ' + p_app)
     return super(GivingProjectGrantA, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
