@@ -26,10 +26,18 @@ class GiftNotifications(BaseFundTestCase):
     self.assertTemplateUsed(response, 'fund/home.html')
     self.assertNotContains(response, 'gift or pledge received')
 
-  def test_gift_notification(self):
+  def test_gift_notifications(self):
     # enter gift received from donor
-    donor = models.Donor.objects.get(pk=self.donor_id)
-    donor.received_this = 100
+    test_donor = models.Donor.objects.get(pk=self.donor_id)
+    test_donor.received_this = 100
+    test_donor.save()
+
+    member = models.Member(email='abcd@gmail.com')
+    member.save()
+    membership = models.Membership(member=member, giving_project_id=1)
+    membership.save()
+    donor = models.Donor(membership=membership, firstname='Greta',
+                         lastname='Polkis', received_next=55)
     donor.save()
 
     # run cron task
@@ -41,6 +49,7 @@ class GiftNotifications(BaseFundTestCase):
 
     self.assertTemplateUsed(response, 'fund/home.html')
     self.assertContains(response, 'gift or pledge received')
+    self.assertContains(response, unicode(test_donor))
 
     # verify notification doesn't show on reload
     response = self.client.get(self.url, follow=True)
@@ -48,8 +57,31 @@ class GiftNotifications(BaseFundTestCase):
     self.assertTemplateUsed(response, 'fund/home.html')
     self.assertNotContains(response, 'gift or pledge received')
 
+    # verify emails sent
+    self.assertEqual(len(mail.outbox), 2)
+    test_member = models.Member.objects.get(pk=self.member_id)
+    testacct_emailed = False
+    abcd_emailed = False
+    for email in mail.outbox:
+      self.assertIn('gift or pledge received', email.body)
+      if email.to == [member.email]:
+        self.assertFalse(abcd_emailed)
+        self.assertIn(unicode(donor), email.body)
+        self.assertNotIn(unicode(test_donor), email.body)
+        abcd_emailed = True
+      elif email.to == [test_member.email]:
+        self.assertFalse(testacct_emailed)
+        self.assertIn(unicode(test_donor), email.body)
+        self.assertNotIn(unicode(donor), email.body)
+        testacct_emailed = True
+      else:
+        self.fail('Unexpected gift notification email recipient: ' + email.to)
+
+    self.assertTrue(abcd_emailed)
+    self.assertTrue(testacct_emailed)
+
   def test_gift_notification_next(self):
-    # enter gift received from donor for next year
+    # enter gift received for next year
     donor = models.Donor.objects.get(pk=self.donor_id)
     donor.received_next = 100
     donor.save()
