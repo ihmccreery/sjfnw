@@ -94,11 +94,18 @@ function showAttachment(){
     <p><b>Awards:</b></p>
       {% for gp, award in awards.iteritems %}
       <br>
-      {{ gp }} - ${{ award.total_amount }}
-      {% if award.yearendreport %}{% if award.yearendreport.visible or perm > 1 %}
-      (<a href="{% url 'grants.views.view_yer' report_id=award.yearendreport.pk %}?embedded=true"
-          target="reading_frame">year end report</a>)
-        {% endif %}{% endif %}
+      {{ gp }} - ${{ award.total_amount }}<br>
+      {% for yer in award.yearendreport_set.all %}
+        {% if yer.visible or perm > 1 %}
+          <a href="{% url 'grants.views.view_yer' report_id=yer.pk %}?embedded=true"
+            target="reading_frame">year end report
+          {% if award.grant_length > 1 %}
+            #{{ forloop.counter }}</a><br>
+          {% else %}
+          </a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
       <br>
     {% endfor %}
     {% endif %}
