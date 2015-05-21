@@ -349,15 +349,15 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
   list_display = ['organization_name', 'grant_cycle', 'giving_project',
-      'total_amount', 'fully_paid', 'check_mailed', 'next_year_end_report_due']
+      'total_grant', 'fully_paid', 'check_mailed', 'next_year_end_report_due']
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
   exclude = ['created']
 
   readonly_fields = ['next_year_end_report_due', 'grant_cycle',
-                     'organization_name', 'giving_project', 'total_amount']
+                     'organization_name', 'giving_project', 'total_grant']
   fieldsets = (
     (None, {
-      'fields': (('projectapp', 'total_amount'), ('amount', 'check_number', 'check_mailed'))
+      'fields': (('projectapp', 'total_grant'), ('amount', 'check_number', 'check_mailed'))
      }),
 
     ('Multi-Year Grant', {
@@ -391,7 +391,7 @@ class GivingProjectGrantA(admin.ModelAdmin):
       return True
   fully_paid.boolean = True
 
-  def total_amount(self, obj):
+  def total_grant(self, obj):
     return '${:,}'.format(int(obj.total_amount()))
 
   def next_year_end_report_due(self, obj):
