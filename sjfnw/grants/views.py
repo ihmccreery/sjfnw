@@ -732,7 +732,7 @@ def rollover_yer(request, organization):
 
 # VIEW APPS/FILES
 
-def view_permission(user, application):
+def _view_permission(user, application):
   """ Return a number indicating viewing permission for a submitted app.
 
       Args:
@@ -740,8 +740,8 @@ def view_permission(user, application):
         application: GrantApplication
 
       Returns:
-        0 - anon viewer
-        1 - member with perm
+        0 - anon viewer or member without permission to view
+        1 - member with permission to view
         2 - staff
         3 - app creator
   """
@@ -765,7 +765,7 @@ def view_application(request, app_id):
   if not request.user.is_authenticated():
     perm = 0
   else:
-    perm = view_permission(request.user, app)
+    perm = _view_permission(request.user, app)
   logger.info('perm is ' + str(perm))
 
   form = GrantApplicationModelForm(app.grant_cycle)
@@ -804,7 +804,6 @@ def ViewDraftFile(request, draft_id, field_name):
   return ServeBlob(application, field_name)
 
 def view_yer(request, report_id):
-  logger.info('view_yer')
 
   report = get_object_or_404(models.YearEndReport.objects.select_related(), pk=report_id)
 
@@ -813,7 +812,7 @@ def view_yer(request, report_id):
   if not request.user.is_authenticated():
     perm = 0
   else:
-    perm = view_permission(request.user, projectapp.application)
+    perm = _view_permission(request.user, projectapp.application)
 
   if not report.visible and perm < 2:
     return render(request, 'grants/blocked.html', {})
