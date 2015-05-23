@@ -18,7 +18,6 @@ class NewGivingProjectGrant(BaseGrantTestCase):
     super(NewGivingProjectGrant, self).setUp()
 
   def test_minimum_grant_information(self):
-    """ Verify that only minimum information input """
 
     award = models.GivingProjectGrant(projectapp_id=1, amount=5000)
     award.save()

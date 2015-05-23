@@ -155,12 +155,13 @@ class ProjectAppInline(admin.TabularInline):
   app_link.allow_tags = True
 
   def grant_link(self, obj):
-    if obj and hasattr(obj, 'projectapp_id'):
-      return ('<a href="/admin/grants/givingprojectgrant/{}/">View grant</a>'
-              .format(obj.projectapp_id))
-    if obj and hasattr(obj, 'screening_status') and obj.screening_status > 80:
-      return ('<a href="/admin/grants/givingprojectgrant/add/?projectapp={}">Add grant</a>'
-              .format(obj.pk))
+    if obj:
+      if hasattr(obj, 'givingprojectgrant'):
+        return ('<a href="/admin/grants/givingprojectgrant/{}/">View grant</a>'
+                .format(obj.givingprojectgrant.pk))
+      if hasattr(obj, 'screening_status') and obj.screening_status > 80:
+        return ('<a href="/admin/grants/givingprojectgrant/add/?projectapp={}">Add grant</a>'
+                .format(obj.pk))
     return ''
   grant_link.allow_tags = True
 

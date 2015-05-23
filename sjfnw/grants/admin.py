@@ -203,7 +203,7 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
       if hasattr(obj, 'givingprojectgrant'):
         award = obj.givingprojectgrant
         link = link + '{}/">{}</a>'
-        return mark_safe(link.format(award.pk, award.amount))
+        return mark_safe(link.format(award.pk, award.total_amount()))
       else:
         link = link + 'add/?projectapp={}">Enter an award</a>'
         return mark_safe(link.format(obj.pk))
@@ -211,11 +211,15 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
 
   def year_end_report(self, obj):
     if obj.pk:
-      report = (models.YearEndReport.objects.select_related('award')
+      reports = (models.YearEndReport.objects.select_related('award')
                                             .filter(award__projectapp_id=obj.pk))
-      if report:
-        return mark_safe('<a target="_blank" href="/admin/grants/yearendreport/' +
-            str(report[0].pk) + '/">View</a>')
+      yer_link = ""
+      for i, report in enumerate(reports):
+        if i > 0:
+          yer_link += " | "
+        yer_link += ('<a target="_blank" href="/admin/grants/yearendreport/' +
+          str(report.pk) + '/">Year ' + str(i + 1) + '</a>')
+      return mark_safe(yer_link)
     return ''
 
 #------------------------------------------------------------------------------
@@ -344,16 +348,15 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
-  list_display = ['organization_name', 'grant_cycle', 'giving_project',
-      'total_amount', 'fully_paid', 'check_mailed', 'next_year_end_report_due']
+  list_display = [
+    'organization_name', 'grant_cycle', 'giving_project',
+    'total_grant', 'fully_paid', 'check_mailed', 'next_year_end_report_due'
+  ]
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
-  exclude = ['created']
 
-  readonly_fields = ['next_year_end_report_due', 'grant_cycle',
-                     'organization_name', 'giving_project', 'total_amount']
   fieldsets = (
     (None, {
-      'fields': (('projectapp', 'total_amount'), ('amount', 'check_number', 'check_mailed'))
+      'fields': (('projectapp', 'total_grant'), ('amount', 'check_number', 'check_mailed'))
      }),
 
     ('Multi-Year Grant', {
@@ -366,7 +369,10 @@ class GivingProjectGrantA(admin.ModelAdmin):
     }),
   )
 
+  readonly_fields = ['next_year_end_report_due', 'total_grant']
+
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    logger.info('gpg page formfield_for_foreignkey')
     if db_field.name == 'projectapp':
       p_app = request.GET.get('projectapp')
       if p_app:
@@ -384,14 +390,18 @@ class GivingProjectGrantA(admin.ModelAdmin):
       return False
     else:
       return True
-
   fully_paid.boolean = True
 
-  def total_amount(self, obj):
+  def total_grant(self, obj):
     return '${:,}'.format(int(obj.total_amount()))
 
   def next_year_end_report_due(self, obj):
     return obj.yearend_due()
+
+  def get_readonly_fields(self, request, obj=None):
+    if obj is not None:
+      self.readonly_fields.append('projectapp')
+    return self.readonly_fields
 
   def organization_name(self, obj):
     return obj.projectapp.application.organization.name
@@ -402,16 +412,6 @@ class GivingProjectGrantA(admin.ModelAdmin):
 
   def giving_project(self, obj):
     return unicode(obj.projectapp.giving_project)
-
-  def get_readonly_fields(self, request, obj=None):
-    if obj is not None: # editing - lock org & cycle
-      self.readonly_fields.append('projectapp')
-    return self.readonly_fields
-
-  def change_view(self, request, object_id, form_url='', extra_context=None):
-    view = super(GivingProjectGrantA, self).change_view(
-        request, object_id, form_url, extra_context=extra_context)
-    return view
 
 
 class SponsoredProgramGrantA(admin.ModelAdmin):
@@ -458,7 +458,6 @@ class YearEndReportA(admin.ModelAdmin):
   def cycle(self, obj):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
-
 
 class DraftAdv(admin.ModelAdmin):
   """ Only used in admin-advanced """

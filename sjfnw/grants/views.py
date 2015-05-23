@@ -420,7 +420,7 @@ def add_file(request, draft_type, draft_id):
 def remove_file(request, draft_type, draft_id, file_field):
   """ Remove file from draft by setting that field to empty string
 
-      Note: does not delete file from Blobstore, since it could be used 
+      Note: does not delete file from Blobstore, since it could be used
         in other drafts/apps
   """
   draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
@@ -481,18 +481,19 @@ def year_end_report(request, organization, award_id):
   # get award, make sure org matches
   award = get_object_or_404(models.GivingProjectGrant, pk=award_id)
   app = award.projectapp.application
+
   if app.organization_id != organization.pk:
     logger.warning('Trying to edit someone else\'s YER')
     return redirect(org_home)
 
+  total_yers = models.YearEndReport.objects.filter(award=award).count()
   # check if already submitted
-  if models.YearEndReport.objects.filter(award=award):
+  if total_yers == award.grant_length():
     logger.warning('YER already exists')
     return redirect(org_home)
 
   # get or create draft
   draft, created = models.YERDraft.objects.get_or_create(award=award)
-
   if request.method == 'POST':
     draft_data = json.loads(draft.contents)
     files_data = model_to_dict(draft, fields=['photo1', 'photo2', 'photo3',
@@ -1091,7 +1092,7 @@ def get_app_results(options):
               award = papp.givingprojectgrant
               if award_col != '':
                 award_col += ', '
-              award_col += '%s %s ' % (award.amount, papp.giving_project.title)
+              award_col += '%s %s ' % (award.total_amount(), papp.giving_project.title)
             except models.GivingProjectGrant.DoesNotExist:
               pass
           if get_gp_ss:
@@ -1190,6 +1191,8 @@ def get_award_results(options):
         row.append(award.yearend_due())
       elif field == 'id':
         row.append('') # only for sponsored
+      elif field == 'amount':
+        row.append(award.total_amount())
       else:
         row.append(getattr(award, field, ''))
     for field in org_fields:
@@ -1297,7 +1300,7 @@ def get_org_results(options):
                 timestamp = timestamp.strftime('%m/%d/%Y')
               else:
                 timestamp = 'No timestamp'
-              awards_str += '$%s %s %s' % (award.amount, award.projectapp.giving_project.title, timestamp)
+              awards_str += '$%s %s %s' % (award.total_amount(), award.projectapp.giving_project.title, timestamp)
               awards_str += linebreak
             except models.GivingProjectGrant.DoesNotExist:
               pass
@@ -1349,17 +1352,24 @@ def yer_reminder_email(request):
   # get awards due in 7 or 30 days by agreement_returned date
   year_ago = timezone.now().date().replace(year=timezone.now().year - 1)
   award_dates = [year_ago + datetime.timedelta(days=30), year_ago + datetime.timedelta(days=7)]
-  awards = (models.GivingProjectGrant.objects.select_related()
-                                             .prefetch_related('yearendreport')
+  awards = list(models.GivingProjectGrant.objects.all()
                                              .filter(agreement_mailed__in=award_dates))
 
-  return send_yer_email(awards, 'grants/email_yer_due.html')
+  # for multiyear grants, get awards due in 7 or 30 days of second year end report due date
+  two_years_ago = timezone.now().date().replace(year=timezone.now().year - 2)
+  second_award_dates = [two_years_ago + datetime.timedelta(days=30), two_years_ago + datetime.timedelta(days=7)]
+  second_awards = list(models.GivingProjectGrant.objects.all()
+                                           .filter(agreement_mailed__in=second_award_dates,
+                                                   second_check_mailed__isnull=False))
+  total_awards = awards + second_awards
+
+  return send_yer_email(total_awards, 'grants/email_yer_due.html')
 
 
 def send_yer_email(awards, template):
 
   for award in awards:
-    if not hasattr(award, 'yearendreport'):
+    if award.yearendreport_set.all().count() < award.grant_length():
       app = award.projectapp.application
 
       subject = 'Year end report'

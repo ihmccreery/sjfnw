@@ -87,14 +87,14 @@ class CopyContacts(BaseFundTestCase):
     member = models.Member.objects.get(email='testacct@gmail.com')
     unique_donors = models.Donor.objects.filter(membership__member=member).count()
 
-    copy = models.Donor(membership_id=1, firstname="Lynielle", lastname="Long",
+    copy = models.Donor(membership_id=1, firstname="Lyn", lastname="Long",
                         notes="An alliterative fellow.")
     copy.save()
-    copy = models.Donor(membership_id=1, firstname="Natalie",
-                        email="nat78blan@yahoo.com")
+    copy = models.Donor(membership_id=1, firstname="Nate",
+                        email="nat@yahoo.com")
     copy.save()
-    copy = models.Donor(membership_id=1, firstname="Patrice", lastname="Attison",
-                        phone="206-568-8956")
+    copy = models.Donor(membership_id=1, firstname="Patice", lastname="Attison",
+                        phone="555-555-8956")
     copy.save()
 
     response = self.client.get(self.get_url, follow=True)
