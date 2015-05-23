@@ -89,6 +89,7 @@
       </li>
 		</ol>
   </div>
+
   {% if app.site_visit_report %}
     {% if perm == 1 or perm == 2 %}
       <a href="{{app.site_visit_report}}" target="reading_frame">Site visit report</a>
@@ -98,14 +99,15 @@
     {% endif %}
   {% endif %}
 
+  {% load humanize %}
   {% if awards %}
     <p><b>Awards:</b></p>
       {% for gp, award in awards.iteritems %}
-      <br>{{ gp }} - ${{ award.total_amount }}<br>
+        <p>{{ gp }} - ${{ award.total_amount|intcomma }}</p>
         {% for yer in award.yearendreport_set.all %}
-          {% if yer.visible or perm > 1 %}
+          {% if perm > 1 or yer.visible and perm == 1 %}
             <a href="{% url 'grants.views.view_yer' report_id=yer.pk %}?embedded=true"
-               target="reading_frame">year end report
+               target="reading_frame">View year end report
             {% if award.grant_length > 1 %}
               #{{ forloop.counter }}</a><br>
             {% else %}
