@@ -39,7 +39,7 @@ def email_overdue(request):
         })
         text_content = strip_tags(html_content)
         msg = EmailMultiAlternatives(subject, text_content, from_email, to_emails, bcc)
-        msg.attach_alternative(html_content, "text/html")
+        msg.attach_alternative(html_content, 'text/html')
         msg.send()
         ship.emailed = today
         ship.save(skip=True)
@@ -81,11 +81,8 @@ def new_accounts(request):
   return HttpResponse('')
 
 def gift_notify(request):
-  """ Send an email to members letting them know gifts have been received
-
-    Mark donors as notified
-    Put details in membership notif
-  """
+  """ Set gift received notifications on membership object and send an email
+      Marks donors as notified """
 
   donors = (models.Donor.objects
       .select_related('membership__member')
@@ -93,39 +90,32 @@ def gift_notify(request):
       .exclude(received_this=0, received_next=0, received_afternext=0))
 
   memberships = {}
-  for donor in donors: # group donors by membership
+  for donor in donors:
     if not donor.membership in memberships:
       memberships[donor.membership] = []
     memberships[donor.membership].append(donor)
-
-  for ship, donor_list in memberships.iteritems():
-    gift_str = ''
-    for donor in donor_list:
-      gift_str += ('$' + str(donor.received()) + ' gift or pledge received from ' +
-                  donor.firstname)
-      if donor.lastname:
-        gift_str += ' ' + donor.lastname
-      gift_str += '!<br>'
-    ship.notifications = ('<table><tr><td>' + gift_str +
-                         '</td><td><img src="/static/images/odo2.png"' +
-                         'height=86 width=176 alt="Odo flying">' +
-                         '</td></tr></table>')
-    ship.save(skip=True)
-    logger.info('Gift notification set for %s', unicode(ship))
 
   login_url = c.APP_BASE_URL + 'fund/'
   subject = 'Gift or pledge received'
   from_email = c.FUND_EMAIL
   bcc = [c.SUPPORT_EMAIL]
-  for ship in memberships:
-    to_emails = [ship.member.email]
-    html_content = render_to_string('fund/emails/gift_received.html', {'login_url': login_url})
+
+  for ship, donor_list in memberships.iteritems():
+    gift_str = ''
+    for donor in donor_list:
+      gift_str += u'${}  gift or pledge received from {}! '.format(donor.received(), donor)
+    ship.notifications = gift_str
+    ship.save(skip=True)
+
+    to_email = [ship.member.email]
+    html_content = render_to_string('fund/emails/gift_received.html', {
+      'login_url': login_url, 'gift_str': ship.notifications
+    })
     text_content = strip_tags(html_content)
-    msg = EmailMultiAlternatives(subject, text_content, from_email, to_emails, bcc)
-    msg.attach_alternative(html_content, "text/html")
+    msg = EmailMultiAlternatives(subject, text_content, from_email, to_email, bcc)
+    msg.attach_alternative(html_content, 'text/html')
     msg.send()
-    logger.info('Emailed gift notification to %s' + ship.member.email)
+    logger.info('Set gift notification and sent email to %s', ship.member.email)
 
   donors.update(gift_notified=True)
   return HttpResponse('')
-

@@ -348,13 +348,12 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
-  list_display = ['organization_name', 'grant_cycle', 'giving_project',
-      'total_grant', 'fully_paid', 'check_mailed', 'next_year_end_report_due']
+  list_display = [
+    'organization_name', 'grant_cycle', 'giving_project',
+    'total_grant', 'fully_paid', 'check_mailed', 'next_year_end_report_due'
+  ]
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
-  exclude = ['created']
 
-  readonly_fields = ['next_year_end_report_due', 'grant_cycle',
-                     'organization_name', 'giving_project', 'total_grant']
   fieldsets = (
     (None, {
       'fields': (('projectapp', 'total_grant'), ('amount', 'check_number', 'check_mailed'))
@@ -369,6 +368,8 @@ class GivingProjectGrantA(admin.ModelAdmin):
                ('next_year_end_report_due'))
     }),
   )
+
+  readonly_fields = ['next_year_end_report_due', 'total_grant']
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     logger.info('gpg page formfield_for_foreignkey')
@@ -397,6 +398,11 @@ class GivingProjectGrantA(admin.ModelAdmin):
   def next_year_end_report_due(self, obj):
     return obj.yearend_due()
 
+  def get_readonly_fields(self, request, obj=None):
+    if obj is not None:
+      self.readonly_fields.append('projectapp')
+    return self.readonly_fields
+
   def organization_name(self, obj):
     return obj.projectapp.application.organization.name
 
@@ -406,16 +412,6 @@ class GivingProjectGrantA(admin.ModelAdmin):
 
   def giving_project(self, obj):
     return unicode(obj.projectapp.giving_project)
-
-  def get_readonly_fields(self, request, obj=None):
-    if obj is not None: # editing - lock org & cycle
-      self.readonly_fields.append('projectapp')
-    return self.readonly_fields
-
-  def change_view(self, request, object_id, form_url='', extra_context=None):
-    view = super(GivingProjectGrantA, self).change_view(
-        request, object_id, form_url, extra_context=extra_context)
-    return view
 
 
 class SponsoredProgramGrantA(admin.ModelAdmin):

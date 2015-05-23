@@ -157,9 +157,8 @@ class ProjectAppInline(admin.TabularInline):
   def grant_link(self, obj):
     if obj:
       if hasattr(obj, 'givingprojectgrant'):
-        award = obj.givingprojectgrant
         return ('<a href="/admin/grants/givingprojectgrant/{}/">View grant</a>'
-                .format(award.pk))
+                .format(obj.givingprojectgrant.pk))
       if hasattr(obj, 'screening_status') and obj.screening_status > 80:
         return ('<a href="/admin/grants/givingprojectgrant/add/?projectapp={}">Add grant</a>'
                 .format(obj.pk))
