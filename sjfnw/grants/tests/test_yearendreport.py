@@ -278,7 +278,62 @@ class YearEndReportReminders(BaseGrantTestCase):
     yer.save()
 
     # verify that yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
+    self.assertEqual(award .yearend_due(), today.date() + timedelta(days=7))
+
+    # verify that email is not sent
+    self.assertEqual(len(mail.outbox), 0)
+    response = self.client.get(self.url)
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(mail.outbox), 0)
+
+  def test_second_yer_reminder(self):
+    """ Verify that reminder email is sent if second year end report due"""
+
+    today = timezone.now()
+    mailed = today.date().replace(year=today.year - 2) + timedelta(days=7)
+    award = models.GivingProjectGrant(
+          projectapp_id=1, amount=5000, second_amount=5000, agreement_mailed=mailed,
+          agreement_returned=mailed + timedelta(days=3), second_check_mailed=today
+    )
+    award.save()
+
+    firstyear_end = today.date().replace(year=today.year - 1) + timedelta(days=7)
+    yer = models.YearEndReport(award=award, total_size=10,
+                               submitted=firstyear_end, donations_count=50)
+    yer.save()
+
+    # verify that yer is due in 7 days
+    self.assertEqual(award .yearend_due(), today.date() + timedelta(days=7))
+
+    # verify that email is not sent
+    self.assertEqual(len(mail.outbox), 0)
+    response = self.client.get(self.url)
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(mail.outbox), 1)
+
+  def test_second_yer_complete(self):
+    """ Verify that reminder email is not sent if second year end report completed"""
+
+    today = timezone.now()
+    mailed = today.date().replace(year=today.year - 2) + timedelta(days=7)
+    award = models.GivingProjectGrant(
+          projectapp_id=1, amount=5000, second_amount=5000, agreement_mailed=mailed,
+          agreement_returned=mailed + timedelta(days=3), second_check_mailed=today
+    )
+    award.save()
+
+    firstyear_end = today.date().replace(year=today.year - 1) + timedelta(days=7)
+    yer = models.YearEndReport(award=award, total_size=10,
+                               submitted=firstyear_end, donations_count=50)
+    yer.save()
+
+    second_yer = models.YearEndReport(award=award, total_size=10,
+                                      submitted=firstyear_end.replace(year=firstyear_end.year + 1),
+                                      donations_count=50)
+    second_yer.save()
+
+    # verify that yer is due in 7 days
+    self.assertEqual(award .yearend_due(), today.date() + timedelta(days=7))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)

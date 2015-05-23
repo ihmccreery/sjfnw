@@ -33,7 +33,7 @@ class GrantReading(BaseGrantTestCase):
 
     self.assertTemplateUsed(response, 'grants/reading.html')
     self.assertEqual(3, response.context['perm'])
-    self.assertContains(response, 'year end report')
+    self.assertNotContains(response, 'year end report')
 
   def test_other_org(self):
     self.log_in_new_org()
@@ -51,7 +51,7 @@ class GrantReading(BaseGrantTestCase):
 
     self.assertTemplateUsed(response, 'grants/reading.html')
     self.assertEqual(2, response.context['perm'])
-    self.assertContains(response, 'year end report')
+    self.assertNotContains(response, 'year end report')
 
   def test_valid_member(self):
     self.log_in_newbie()

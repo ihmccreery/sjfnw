@@ -84,21 +84,28 @@ function showAttachment(){
         <a href="{{print_urls.demographics}}" target="_blank"><img class="print" title="Open in new tab for printing" src="/static/images/print.png"></a>
       </li>
 		</ol>
-  </div> 
+  </div>
     {% if app.site_visit_report %}{% if perm == 1 or perm == 2 %}
     <a href="{{app.site_visit_report}}" target="reading_frame">Site visit report</a>
     <a href="{{app.site_visit_report}}" target="_blank"><img class="print" title="Open in new tab for printing" src="/static/images/print.png"></a>
     {% endif %}{% endif %}
-    
+
     {% if awards %}
     <p><b>Awards:</b></p>
       {% for gp, award in awards.iteritems %}
       <br>
-      {{ gp }} - ${{ award.amount }}
-      {% if award.yearendreport %}{% if award.yearendreport.visible or perm > 1 %}
-      (<a href="{% url 'grants.views.view_yer' report_id=award.yearendreport.pk %}?embedded=true"
-          target="reading_frame">year end report</a>)
-        {% endif %}{% endif %}
+      {{ gp }} - ${{ award.total_amount }}<br>
+      {% for yer in award.yearendreport_set.all %}
+        {% if yer.visible or perm > 1 %}
+          <a href="{% url 'grants.views.view_yer' report_id=yer.pk %}?embedded=true"
+            target="reading_frame">year end report
+          {% if award.grant_length > 1 %}
+            #{{ forloop.counter }}</a><br>
+          {% else %}
+          </a>
+          {% endif %}
+        {% endif %}
+      {% endfor %}
       <br>
     {% endfor %}
     {% endif %}
