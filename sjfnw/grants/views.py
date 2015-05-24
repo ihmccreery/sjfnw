@@ -488,8 +488,8 @@ def year_end_report(request, organization, award_id):
 
   total_yers = models.YearEndReport.objects.filter(award=award).count()
   # check if already submitted
-  if total_yers == award.grant_length():
-    logger.warning('YER already exists')
+  if total_yers >= award.grant_length():
+    logger.warning('Required YER(s) already submitted for this award')
     return redirect(org_home)
 
   # get or create draft
@@ -498,7 +498,6 @@ def year_end_report(request, organization, award_id):
     draft_data = json.loads(draft.contents)
     files_data = model_to_dict(draft, fields=['photo1', 'photo2', 'photo3',
                                               'photo4', 'photo_release'])
-    logger.info(files_data)
     draft_data['award'] = award.pk
     form = YearEndReportForm(draft_data, files_data)
     if form.is_valid():
@@ -510,7 +509,7 @@ def year_end_report(request, organization, award_id):
       # send confirmation email
       html_content = render_to_string('grants/email_yer_submitted.html')
       text_content = strip_tags(html_content)
-      msg = EmailMultiAlternatives('Year-end report submitted', #subject
+      msg = EmailMultiAlternatives('Year end report submitted', #subject
                                     text_content,
                                     constants.GRANT_EMAIL, #from
                                     [yer.email], #to
@@ -521,7 +520,8 @@ def year_end_report(request, organization, award_id):
       return redirect('/report/submitted')
 
     else:
-      logger.info(form.errors)
+      logger.info('Invalid YER:')
+      logger.info(form.errors.items())
 
   else: # GET
     if created:
