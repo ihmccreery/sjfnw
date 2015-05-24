@@ -355,18 +355,17 @@ class GivingProjectGrantA(admin.ModelAdmin):
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
 
   fieldsets = (
-    (None, {
-      'fields': (('projectapp', 'total_grant'), ('amount', 'check_number', 'check_mailed'))
-     }),
-
+    ('', {
+      'fields': (
+        ('projectapp', 'total_grant'),
+        ('amount', 'check_number', 'check_mailed'),
+        ('agreement_mailed', 'agreement_returned', 'next_year_end_report_due'),
+        'approved'
+        )
+    }),
     ('Multi-Year Grant', {
       'fields': (('second_amount', 'second_check_number', 'second_check_mailed'),)
-    }),
-
-    (None, {
-      'fields': (('agreement_mailed', 'agreement_returned'), ('approved'),
-               ('next_year_end_report_due'))
-    }),
+    })
   )
 
   readonly_fields = ['next_year_end_report_due', 'total_grant']
