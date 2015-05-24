@@ -4,18 +4,27 @@ import logging
 
 from django.core import mail
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 from django.utils import timezone
 
 from sjfnw.grants import models
 from sjfnw.grants.tests.base import BaseGrantTestCase
+from sjfnw.grants.tests.test_apply import BaseGrantFilesTestCase
 
 logger = logging.getLogger('sjfnw')
 
+def _get_autosave_url(award_id):
+  return reverse('sjfnw.grants.views.autosave_yer',
+                 kwargs={'award_id': award_id})
 
-class YearEndReportForm(BaseGrantTestCase):
-  """ Test functionality related to the YER form:
-      Views that handle autosave, file upload, submission
-      Form validation with YER modelform """
+def _get_yer_url(award_id):
+  return reverse('sjfnw.grants.views.year_end_report',
+                 kwargs={'award_id': award_id})
+
+@override_settings(MEDIA_ROOT='sjfnw/grants/tests/media/',
+    DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage',
+    FILE_UPLOAD_HANDLERS=('django.core.files.uploadhandler.MemoryFileUploadHandler',))
+class YearEndReportForm(BaseGrantFilesTestCase):
 
   def setUp(self):
     super(YearEndReportForm, self).setUp()
@@ -28,69 +37,60 @@ class YearEndReportForm(BaseGrantTestCase):
     award.save()
     self.award_id = award.pk
 
-  def create_draft(self):
-    # create the initial draft by visiting report page
-    response = self.client.get('/report/%d' % self.award_id)
-    self.assertEqual(response.status_code, 200)
-    self.assertEqual(1, models.YERDraft.objects.filter(award_id=self.award_id).count())
-
   def test_home_link(self):
-    """ Load home page, verify it links to report """
-
     response = self.client.get('/apply/')
 
     self.assertTemplateUsed('grants/org_home.html')
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
-    self.assertContains(response, '<a href="/report/%d">' % award.pk)
+    self.assertContains(response, '<a href="/report/%d">' % self.award_id)
 
   def test_home_link_early(self):
-    """ Verify link to report isn't shown if agreement hasn't been mailed """
+    """ Link to report isn't shown if agreement hasn't been mailed """
 
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
     award.agreement_mailed = None
     award.save()
 
     response = self.client.get('/apply/')
 
     self.assertTemplateUsed('grants/org_home.html')
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
-    self.assertNotContains(response, '<a href="/report/%d">' % award.pk)
+    self.assertNotContains(response, '<a href="/report/%d">' % self.award_id)
 
   def test_late_home_link(self):
-    """ Load home page, verify it links to report even if report is overdue """
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
+    """ Link to report is shown even if due date has passed """
+
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
     award.agreement_mailed = timezone.now() - timedelta(days=400)
     award.save()
 
     response = self.client.get('/apply/')
 
     self.assertTemplateUsed('grants/org_home.html')
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
-    self.assertContains(response, '<a href="/report/%d">' % award.pk)
+    self.assertContains(response, '<a href="/report/%d">' % self.award_id)
 
   def test_start_report(self):
-    """ Load report for first time """
-
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
-    # no draft yet
-    self.assertEqual(0, models.YERDraft.objects.filter(award_id=award.pk).count())
-
-    response = self.client.get('/report/%d' % award.pk)
+    response = self.client.get(_get_yer_url(self.award_id))
 
     self.assertTemplateUsed(response, 'grants/yer_form.html')
-    # assert draft created
-    self.assertEqual(1, models.YERDraft.objects.filter(award_id=award.pk).count())
 
     form = response.context['form']
-    application = award.projectapp.application
+    application = models.GrantApplication.objects.get(pk=1) # fixture
+
     # assert website autofilled from app
     self.assertEqual(form['website'].value(), application.website)
+    # TODO other pre-fill fields
+
+  def _create_draft(self):
+    """ Not a test. Used by other tests to set up a draft """
+
+    self.assertEqual(0, models.YERDraft.objects.filter(award_id=self.award_id).count())
+    response = self.client.get(_get_yer_url(self.award_id))
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/yer_form.html')
+    self.assertEqual(1, models.YERDraft.objects.filter(award_id=self.award_id).count())
 
   def test_autosave(self):
+    self._create_draft()
 
-    self.create_draft()
-
-    # send additional content to autosave
     post_data = {
       'summarize_last_year': 'We did soooooo much stuff last year!!',
       'goal_progress': 'What are goals?',
@@ -98,14 +98,13 @@ class YearEndReportForm(BaseGrantTestCase):
       'other_comments': 'All my single ladies'
     }
 
-    response = self.client.post('/report/%d/autosave/' % self.award_id, post_data)
+    response = self.client.post(_get_autosave_url(self.award_id), post_data)
     self.assertEqual(200, response.status_code)
     draft = models.YERDraft.objects.get(award_id=self.award_id)
     self.assertEqual(json.loads(draft.contents), post_data)
 
   def test_valid_stay_informed(self):
-
-    self.create_draft()
+    self._create_draft()
 
     post_data = {
       'other_comments': 'Some comments',
@@ -113,46 +112,65 @@ class YearEndReportForm(BaseGrantTestCase):
       'award': '55',
       'quantitative_measures': 'Measures',
       'major_changes': 'Changes',
-      'twitter': '',
-      'listserve': 'Yes this',
       'summarize_last_year': 'It was all right.',
-      'newsletter': '',
       'other': '',
+      'evaluation': 'abc',
       'donations_count': '503',
+      'donations_count_prev': '50',
+      'collaboration': 'der',
       'user_id': '',
       'phone': '208-861-8907',
       'goal_progress': 'We haven\'t made much progress sorry.',
       'contact_person_1': 'Executive Board Co-Chair',
-      'contact_person_0': 'Krista Perry',
+      'contact_person_0': 'Kria Pry',
       'new_funding': 'None! UGH.',
-      'email': 'Idahossc@gmail.com',
+      'email': 'Idahoc@gmail.com',
       'facebook': '',
-      'website': 'www.idahossc.org',
-      'achieved': 'Achievement awards.'
+      'website': 'www.idossc.org',
+      'achieved': 'Achievement awards.',
+      'listserve': 'yes yes',
+      'stay_informed': '{}'
     }
 
-    # autosave the post_data (mimic page js which does that prior to submitting)
-    response = self.client.post(reverse('sjfnw.grants.views.autosave_yer',
-                                        kwargs={'award_id': self.award_id}),
-                                post_data)
+    # autosave the post_data (page js does that prior to submitting)
+    response = self.client.post(_get_autosave_url(self.award_id), post_data)
     self.assertEqual(200, response.status_code)
+
     # confirm draft updated
     draft = models.YERDraft.objects.get(award_id=self.award_id)
     self.assertEqual(json.loads(draft.contents), post_data)
+
     # add files to draft
-    draft.photo1 = 'cats.jpg'
-    draft.photo2 = 'fiscal.png'
+    draft.photo1 = 'budget3.png'
+    draft.photo2 = 'budget3.png'
     draft.photo_release = 'budget1.docx'
     draft.save()
 
-    # post
-    response = self.client.post('report/%d' % self.award_id)
+    # submit
+    response = self.client.post(_get_yer_url(self.award_id))
 
     self.assertTemplateUsed('grants/yer_submitted.html')
 
+    # verify report matches draft
+    yer = models.YearEndReport.objects.filter(award_id=self.award_id)
+
+    self.assertEqual(len(yer), 1)
+    yer = yer[0]
+
+    self.assertEqual(yer.photo1, draft.photo1)
+    self.assertEqual(yer.photo2, draft.photo2)
+    self.assertEqual(yer.photo_release, draft.photo_release)
+
+    self.assertEqual(len(mail.outbox), 1)
+    email = mail.outbox[0]
+    self.assertEqual(email.subject, 'Year end report submitted')
+    self.assertEqual(email.to, [yer.email])
+
+
   def test_valid_late(self):
     """ Run the valid test but with a YER that is overdue """
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
+
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
     award.agreement_mailed = timezone.now() - timedelta(days=400)
     award.save()
 
@@ -160,7 +178,7 @@ class YearEndReportForm(BaseGrantTestCase):
 
   def test_start_late(self):
     """ Run the start draft test but with a YER that is overdue """
-    award = models.GivingProjectGrant.objects.get(projectapp_id=1)
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
     award.agreement_mailed = timezone.now() - timedelta(days=400)
     award.save()
 
