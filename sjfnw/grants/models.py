@@ -599,7 +599,11 @@ class GivingProjectGrant(models.Model):
     ordering = ['-created']
 
   def __unicode__(self):
-    return '$%d grant from %s' % (self.total_amount(), self.projectapp.giving_project)
+    summary = '${:,} '
+    if self.grant_length() == 2:
+      summary += 'two-year '
+    summary += 'grant from {}'
+    return summary.format(self.total_amount(), self.projectapp.giving_project)
 
   def agreement_due(self):
     if self.agreement_mailed:
