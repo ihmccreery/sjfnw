@@ -547,9 +547,12 @@ def year_end_report(request, organization, award_id):
     else:
       file_urls[field] = '<i>no file uploaded</i>'
 
+  yer_due = award.yearend_due()
+  yer_period = '{:%b %d, %Y} - {:%b %d, %Y}'.format(yer_due.replace(year=yer_due.year-1), yer_due)
+
   return render(request, 'grants/yer_form.html', {
       'form': form, 'org': organization, 'draft': draft, 'award': award,
-      'file_urls': file_urls, 'user_override': user_override
+      'file_urls': file_urls, 'user_override': user_override, 'yer_period': yer_period
   })
 
 
