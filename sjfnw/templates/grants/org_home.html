@@ -1,4 +1,4 @@
-﻿{% extends 'grants/base.html' %}
+{% extends 'grants/base.html' %}
 
 {% block title %}Home | {{ block.super }}{% endblock %}
 
@@ -100,7 +100,7 @@
         {% if award %}
           {% if award.agreement_mailed and award.agreement_mailed|timesince > 0 %}
           <ul>
-            <li>${{ award.total_amount|intcomma }} awarded for a {{ award.grant_length }}-year grant</li>
+            <li>{{ award.grant_length }}-year grant of ${{ award.total_amount|intcomma }}</li>
             <li>Agreement mailed {{ award.agreement_mailed|date:"n/j/y" }},
             {% if award.agreement_returned %}
               returned {{ award.agreement_returned|date:"n/j/y" }}.</li>
