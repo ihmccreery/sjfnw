@@ -20,8 +20,6 @@ class OrgHomeAwards(BaseGrantTestCase):
     super(OrgHomeAwards, self).setUp()
     self.log_in_test_org()
 
-  #TODO test mult awards per app
-
   def test_none(self):
     """ org has no awards. verify no award info is shown """
 
