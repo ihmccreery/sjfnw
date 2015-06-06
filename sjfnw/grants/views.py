@@ -157,21 +157,19 @@ def cycle_info(request, cycle_id):
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
-def org_home(request, organization):
+def org_home(request, org):
 
-  saved = (models.DraftGrantApplication.objects.filter(organization=organization)
-                                               .select_related('grant_cycle'))
-  submitted = (models.GrantApplication.objects.filter(organization=organization)
-                                              .select_related('giving_projects')
-                                              .order_by('-submission_time'))
+  # get submitted & draft grant applications
+  submitted = org.grantapplication_set.order_by('-submission_time')
+  submitted_cycles = submitted.values_list('grant_cycle', flat=True)
+  submitted_ids = submitted.values_list('id', flat=True)
+  drafts = org.draftgrantapplication_set.select_related('grant_cycle')
+
+  # get grant cycles and group by status
   cycles = (models.GrantCycle.objects
       .exclude(private=True)
       .filter(close__gt=timezone.now()-datetime.timedelta(days=180))
       .order_by('open'))
-  submitted_cycles = submitted.values_list('grant_cycle', flat=True)
-  yer_drafts = (models.YERDraft.objects
-      .filter(award__projectapp__application__organization_id=organization.pk)
-      .select_related())
 
   closed, current, applied, upcoming = [], [], [], []
   for cycle in cycles:
@@ -186,21 +184,43 @@ def org_home(request, organization):
     elif status == 'upcoming':
       upcoming.append(cycle)
 
+  # get awards
+  awards = (models.GivingProjectGrant.objects
+      .filter(projectapp__application_id__in=submitted_ids)
+              #agreement_mailed__gte=timezone.now().date)
+      .select_related('projectapp')
+      .prefetch_related('yearendreport_set', 'yerdraft_set'))
+
+  # organize awards by app; get list of YER drafts
+  ydrafts = []
+  award_set = {}
+  for award in awards:
+    app_id = int(award.projectapp.application_id)
+    ydrafts +=  award.yerdraft_set.all()
+    if app_id in award_set:
+      award_set[app_id].append(award)
+    else:
+      award_set[app_id] = [award]
+
+  for sub in submitted:
+    if sub.pk in award_set:
+      sub.awards = award_set[sub.pk]
+
   # staff override
   user_override = request.GET.get('user')
   if user_override:
     user_override = '?user=' + user_override
 
   return render(request, 'grants/org_home.html', {
-    'organization': organization,
+    'organization': org,
     'submitted': submitted,
-    'saved': saved,
+    'drafts': drafts,
+    'ydrafts': ydrafts,
     'cycles': cycles,
     'closed': closed,
     'open': current,
     'upcoming': upcoming,
     'applied': applied,
-    'ydrafts': yer_drafts,
     'user_override': user_override
   })
 
