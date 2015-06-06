@@ -602,8 +602,11 @@ class GivingProjectGrant(models.Model):
     summary = '${:,} '
     if self.grant_length() == 2:
       summary += 'two-year '
-    summary += 'grant from {}'
-    return summary.format(self.total_amount(), self.projectapp.giving_project)
+    summary += 'grant'
+    return summary.format(self.total_amount())
+
+  def full_description(self):
+    return unicode(self) + ' from ' + self.projectapp.giving_project
 
   def agreement_due(self):
     if self.agreement_mailed:
