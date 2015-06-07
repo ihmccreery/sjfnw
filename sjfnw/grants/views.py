@@ -157,21 +157,19 @@ def cycle_info(request, cycle_id):
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
-def org_home(request, organization):
+def org_home(request, org):
 
-  saved = (models.DraftGrantApplication.objects.filter(organization=organization)
-                                               .select_related('grant_cycle'))
-  submitted = (models.GrantApplication.objects.filter(organization=organization)
-                                              .select_related('giving_projects')
-                                              .order_by('-submission_time'))
+  # get submitted & draft grant applications
+  submitted = org.grantapplication_set.order_by('-submission_time')
+  submitted_cycles = submitted.values_list('grant_cycle', flat=True)
+  submitted_ids = submitted.values_list('id', flat=True)
+  drafts = org.draftgrantapplication_set.select_related('grant_cycle')
+
+  # get grant cycles and group by status
   cycles = (models.GrantCycle.objects
       .exclude(private=True)
       .filter(close__gt=timezone.now()-datetime.timedelta(days=180))
       .order_by('open'))
-  submitted_cycles = submitted.values_list('grant_cycle', flat=True)
-  yer_drafts = (models.YERDraft.objects
-      .filter(award__projectapp__application__organization_id=organization.pk)
-      .select_related())
 
   closed, current, applied, upcoming = [], [], [], []
   for cycle in cycles:
@@ -186,21 +184,43 @@ def org_home(request, organization):
     elif status == 'upcoming':
       upcoming.append(cycle)
 
+  # get awards
+  awards = (models.GivingProjectGrant.objects
+      .filter(projectapp__application_id__in=submitted_ids)
+              #agreement_mailed__gte=timezone.now().date)
+      .select_related('projectapp')
+      .prefetch_related('yearendreport_set', 'yerdraft_set'))
+
+  # organize awards by app; get list of YER drafts
+  ydrafts = []
+  award_set = {}
+  for award in awards:
+    app_id = int(award.projectapp.application_id)
+    ydrafts +=  award.yerdraft_set.all()
+    if app_id in award_set:
+      award_set[app_id].append(award)
+    else:
+      award_set[app_id] = [award]
+
+  for sub in submitted:
+    if sub.pk in award_set:
+      sub.awards = award_set[sub.pk]
+
   # staff override
   user_override = request.GET.get('user')
   if user_override:
     user_override = '?user=' + user_override
 
   return render(request, 'grants/org_home.html', {
-    'organization': organization,
+    'organization': org,
     'submitted': submitted,
-    'saved': saved,
+    'drafts': drafts,
+    'ydrafts': ydrafts,
     'cycles': cycles,
     'closed': closed,
     'open': current,
     'upcoming': upcoming,
     'applied': applied,
-    'ydrafts': yer_drafts,
     'user_override': user_override
   })
 
@@ -420,7 +440,7 @@ def add_file(request, draft_type, draft_id):
 def remove_file(request, draft_type, draft_id, file_field):
   """ Remove file from draft by setting that field to empty string
 
-      Note: does not delete file from Blobstore, since it could be used 
+      Note: does not delete file from Blobstore, since it could be used
         in other drafts/apps
   """
   draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
@@ -481,23 +501,23 @@ def year_end_report(request, organization, award_id):
   # get award, make sure org matches
   award = get_object_or_404(models.GivingProjectGrant, pk=award_id)
   app = award.projectapp.application
+
   if app.organization_id != organization.pk:
     logger.warning('Trying to edit someone else\'s YER')
     return redirect(org_home)
 
+  total_yers = models.YearEndReport.objects.filter(award=award).count()
   # check if already submitted
-  if models.YearEndReport.objects.filter(award=award):
-    logger.warning('YER already exists')
+  if total_yers >= award.grant_length():
+    logger.warning('Required YER(s) already submitted for this award')
     return redirect(org_home)
 
   # get or create draft
   draft, created = models.YERDraft.objects.get_or_create(award=award)
-
   if request.method == 'POST':
     draft_data = json.loads(draft.contents)
     files_data = model_to_dict(draft, fields=['photo1', 'photo2', 'photo3',
                                               'photo4', 'photo_release'])
-    logger.info(files_data)
     draft_data['award'] = award.pk
     form = YearEndReportForm(draft_data, files_data)
     if form.is_valid():
@@ -509,7 +529,7 @@ def year_end_report(request, organization, award_id):
       # send confirmation email
       html_content = render_to_string('grants/email_yer_submitted.html')
       text_content = strip_tags(html_content)
-      msg = EmailMultiAlternatives('Year-end report submitted', #subject
+      msg = EmailMultiAlternatives('Year end report submitted', #subject
                                     text_content,
                                     constants.GRANT_EMAIL, #from
                                     [yer.email], #to
@@ -520,7 +540,8 @@ def year_end_report(request, organization, award_id):
       return redirect('/report/submitted')
 
     else:
-      logger.info(form.errors)
+      logger.info('Invalid YER:')
+      logger.info(form.errors.items())
 
   else: # GET
     if created:
@@ -546,9 +567,13 @@ def year_end_report(request, organization, award_id):
     else:
       file_urls[field] = '<i>no file uploaded</i>'
 
+  mailed = award.agreement_mailed
+  yer_period = '{:%b %d, %Y} - {:%b %d, %Y}'.format(mailed.replace(year=mailed.year+total_yers),
+                                                    mailed.replace(year=mailed.year+1+total_yers))
+
   return render(request, 'grants/yer_form.html', {
       'form': form, 'org': organization, 'draft': draft, 'award': award,
-      'file_urls': file_urls, 'user_override': user_override
+      'file_urls': file_urls, 'user_override': user_override, 'yer_period': yer_period
   })
 
 
@@ -671,12 +696,28 @@ def rollover_yer(request, organization):
   if reports:
     drafts = models.YERDraft.objects.select_related().filter(
         award__projectapp__application__organization_id=organization.pk)
-    exclude_awards = [r.award_id for r in reports] + [d.award_id for d in drafts]
-    awards = (models.GivingProjectGrant.objects.select_related('award')
-        .filter(projectapp__application__organization_id=organization.pk)
-        .exclude(id__in=exclude_awards))
+
+    award_reports = {}
+    for report in reports:
+      if report.award_id in award_reports:
+        award_reports[report.award_id] += 1
+      else:
+        award_reports[report.award_id] = 1
+    for draft in drafts:
+      if draft.award_id in award_reports:
+        award_reports[draft.award_id] += 1
+      else:
+        award_reports[draft.award_id] = 1
+
+    raw_awards = (models.GivingProjectGrant.objects.select_related('award')
+        .filter(projectapp__application__organization_id=organization.pk))
+    awards = []
+    for award in raw_awards:
+      if (not award.pk in award_reports) or (award_reports[award.pk] < award.grant_length()):
+        awards.append(award)
+
     if not awards:
-      if exclude_awards:
+      if raw_awards:
         error_msg = ('You have a submitted or draft year-end report for all '
                      'of your grants. <a href="/apply">Go back</a>')
       else:
@@ -731,7 +772,7 @@ def rollover_yer(request, organization):
 
 # VIEW APPS/FILES
 
-def view_permission(user, application):
+def _view_permission(user, application):
   """ Return a number indicating viewing permission for a submitted app.
 
       Args:
@@ -739,8 +780,8 @@ def view_permission(user, application):
         application: GrantApplication
 
       Returns:
-        0 - anon viewer
-        1 - member with perm
+        0 - anon viewer or member without permission to view
+        1 - member with permission to view
         2 - staff
         3 - app creator
   """
@@ -764,7 +805,7 @@ def view_application(request, app_id):
   if not request.user.is_authenticated():
     perm = 0
   else:
-    perm = view_permission(request.user, app)
+    perm = _view_permission(request.user, app)
   logger.info('perm is ' + str(perm))
 
   form = GrantApplicationModelForm(app.grant_cycle)
@@ -803,7 +844,6 @@ def ViewDraftFile(request, draft_id, field_name):
   return ServeBlob(application, field_name)
 
 def view_yer(request, report_id):
-  logger.info('view_yer')
 
   report = get_object_or_404(models.YearEndReport.objects.select_related(), pk=report_id)
 
@@ -812,7 +852,7 @@ def view_yer(request, report_id):
   if not request.user.is_authenticated():
     perm = 0
   else:
-    perm = view_permission(request.user, projectapp.application)
+    perm = _view_permission(request.user, projectapp.application)
 
   if not report.visible and perm < 2:
     return render(request, 'grants/blocked.html', {})
@@ -981,7 +1021,6 @@ def get_app_results(options):
         ['2011-04-20 06:18:36+0:00', 'Justice League', 'LGBTQ Grant Cycle'],
         ['2013-10-23 09:08:56+0:00', 'ACLU of Idaho', 'General Grant Cycle'],
       ]
-
   """
   logger.info('Get app results')
 
@@ -1051,7 +1090,6 @@ def get_app_results(options):
     field_names.append('GP screening status')
     get_gp_ss = True
   if options['report_award']:
-    #apps = apps.prefetch_related('grantaward_set') #TODO any replacement?
     field_names.append('Awarded')
     get_awards = True
 
@@ -1091,7 +1129,7 @@ def get_app_results(options):
               award = papp.givingprojectgrant
               if award_col != '':
                 award_col += ', '
-              award_col += '%s %s ' % (award.amount, papp.giving_project.title)
+              award_col += '%s %s ' % (award.total_amount(), papp.giving_project.title)
             except models.GivingProjectGrant.DoesNotExist:
               pass
           if get_gp_ss:
@@ -1190,6 +1228,8 @@ def get_award_results(options):
         row.append(award.yearend_due())
       elif field == 'id':
         row.append('') # only for sponsored
+      elif field == 'amount':
+        row.append(award.total_amount())
       else:
         row.append(getattr(award, field, ''))
     for field in org_fields:
@@ -1297,7 +1337,7 @@ def get_org_results(options):
                 timestamp = timestamp.strftime('%m/%d/%Y')
               else:
                 timestamp = 'No timestamp'
-              awards_str += '$%s %s %s' % (award.amount, award.projectapp.giving_project.title, timestamp)
+              awards_str += '$%s %s %s' % (award.total_amount(), award.projectapp.giving_project.title, timestamp)
               awards_str += linebreak
             except models.GivingProjectGrant.DoesNotExist:
               pass
@@ -1349,17 +1389,24 @@ def yer_reminder_email(request):
   # get awards due in 7 or 30 days by agreement_returned date
   year_ago = timezone.now().date().replace(year=timezone.now().year - 1)
   award_dates = [year_ago + datetime.timedelta(days=30), year_ago + datetime.timedelta(days=7)]
-  awards = (models.GivingProjectGrant.objects.select_related()
-                                             .prefetch_related('yearendreport')
+  awards = list(models.GivingProjectGrant.objects.all()
                                              .filter(agreement_mailed__in=award_dates))
 
-  return send_yer_email(awards, 'grants/email_yer_due.html')
+  # for multiyear grants, get awards due in 7 or 30 days of second year end report due date
+  two_years_ago = timezone.now().date().replace(year=timezone.now().year - 2)
+  second_award_dates = [two_years_ago + datetime.timedelta(days=30), two_years_ago + datetime.timedelta(days=7)]
+  second_awards = list(models.GivingProjectGrant.objects.all()
+                                           .filter(agreement_mailed__in=second_award_dates,
+                                                   second_check_mailed__isnull=False))
+  total_awards = awards + second_awards
+
+  return send_yer_email(total_awards, 'grants/email_yer_due.html')
 
 
 def send_yer_email(awards, template):
 
   for award in awards:
-    if not hasattr(award, 'yearendreport'):
+    if award.yearendreport_set.all().count() < award.grant_length():
       app = award.projectapp.application
 
       subject = 'Year end report'
