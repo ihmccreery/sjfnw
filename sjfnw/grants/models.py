@@ -617,13 +617,10 @@ class GivingProjectGrant(models.Model):
   def yearend_due(self):
     if self.agreement_mailed:
       first_yearend = self.agreement_mailed.replace(year=self.agreement_mailed.year + 1)
-      today = timezone.now().date()
-
-      if (today > first_yearend) and self.second_check_mailed:
+      if (timezone.now().date() > first_yearend) and self.second_check_mailed:
         return first_yearend.replace(year=first_yearend.year + 1)
       else:
         return first_yearend
-
     else:
       return None
 

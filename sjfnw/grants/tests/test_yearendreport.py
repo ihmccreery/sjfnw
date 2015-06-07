@@ -14,12 +14,10 @@ from sjfnw.grants.tests.test_apply import BaseGrantFilesTestCase
 logger = logging.getLogger('sjfnw')
 
 def _get_autosave_url(award_id):
-  return reverse('sjfnw.grants.views.autosave_yer',
-                 kwargs={'award_id': award_id})
+  return reverse('sjfnw.grants.views.autosave_yer', kwargs={'award_id': award_id})
 
 def _get_yer_url(award_id):
-  return reverse('sjfnw.grants.views.year_end_report',
-                 kwargs={'award_id': award_id})
+  return reverse('sjfnw.grants.views.year_end_report', kwargs={'award_id': award_id})
 
 @override_settings(MEDIA_ROOT='sjfnw/grants/tests/media/',
     DEFAULT_FILE_STORAGE='django.core.files.storage.FileSystemStorage',
@@ -66,6 +64,63 @@ class YearEndReportForm(BaseGrantFilesTestCase):
 
     self.assertTemplateUsed('grants/org_home.html')
     self.assertContains(response, '<a href="/report/%d">' % self.award_id)
+
+  def test_second_home_link(self):
+    # submit first YER
+    self.test_valid_stay_informed()
+
+    # make award be two-year
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
+    award.second_amount = 5000
+    award.agreement_mailed = timezone.now() - timedelta(weeks=102)
+    award.save()
+
+    response = self.client.get('/apply/')
+
+    self.assertTemplateUsed('grants/org_home.html')
+    self.assertContains(response, 'Year end report</a> submitted', count=1)
+    self.assertContains(response, '<a href="/report/%d">' % self.award_id, count=1)
+
+  def test_no_second_home_link(self):
+    # make award be two-year
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
+    award.second_amount = 5000
+    award.agreement_mailed = timezone.now() - timedelta(weeks=102)
+    award.save()
+    # re-fetch to get updated version with fields that change during save
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
+
+    # verify that only first due date/link shows
+    response = self.client.get('/apply/')
+    first_due = award.agreement_mailed.replace(year=award.agreement_mailed.year + 1)
+    self.assertTemplateUsed('grants/org_home.html')
+    self.assertContains(response, '<a href="/report/%d">' % self.award_id, count=1)
+    self.assertContains(response, 'due {:%-m/%-d/%y}'.format(first_due), count=1)
+
+  def test_two_completed(self):
+    # submit first YER
+    self.test_valid_stay_informed()
+
+    # make award be two-year
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
+    award.second_amount = 5000
+    award.agreement_mailed = timezone.now() - timedelta(weeks=102)
+    award.save()
+
+    response = self.client.get('/apply/')
+
+    self.assertTemplateUsed('grants/org_home.html')
+    self.assertContains(response, 'Year end report</a> submitted', count=1)
+    self.assertContains(response, '<a href="/report/%d">' % self.award_id, count=1)
+
+    # submit second YER
+    self.test_valid_stay_informed()
+
+    response = self.client.get('/apply/')
+
+    self.assertTemplateUsed('grants/org_home.html')
+    self.assertContains(response, 'Year end report</a> submitted', count=2)
+    self.assertNotContains(response, '<a href="/report/%d">' % self.award_id)
 
   def test_start_report(self):
     response = self.client.get(_get_yer_url(self.award_id))
@@ -146,6 +201,10 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     draft.photo_release = 'budget1.docx'
     draft.save()
 
+    # get number of existing yer for award
+    yer_count = models.YearEndReport.objects.filter(award_id=self.award_id).count()
+    mail_count = len(mail.outbox)
+
     # submit
     response = self.client.post(_get_yer_url(self.award_id))
 
@@ -154,18 +213,17 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     # verify report matches draft
     yer = models.YearEndReport.objects.filter(award_id=self.award_id)
 
-    self.assertEqual(len(yer), 1)
-    yer = yer[0]
+    self.assertEqual(len(yer), yer_count+1)
+    yer = yer[yer_count]
 
     self.assertEqual(yer.photo1, draft.photo1)
     self.assertEqual(yer.photo2, draft.photo2)
     self.assertEqual(yer.photo_release, draft.photo_release)
 
-    self.assertEqual(len(mail.outbox), 1)
-    email = mail.outbox[0]
+    self.assertEqual(len(mail.outbox), mail_count+1)
+    email = mail.outbox[mail_count]
     self.assertEqual(email.subject, 'Year end report submitted')
     self.assertEqual(email.to, [yer.email])
-
 
   def test_valid_late(self):
     """ Run the valid test but with a YER that is overdue """
