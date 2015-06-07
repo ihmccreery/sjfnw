@@ -154,7 +154,7 @@ class GrantApplicationI(BaseShowInline):
         if papp.get_screening_status_display():
           summary += '. ' + papp.get_screening_status_display()
         if hasattr(papp, 'givingprojectgrant'):
-          summary += ': ${:,}'.format(int(papp.givingprojectgrant.amount))
+          summary += ': ${:,}'.format(int(papp.givingprojectgrant.total_amount()))
         summary += '.\n'
 
     return summary
@@ -202,8 +202,10 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
       link = '<a target="_blank" href="/admin/grants/givingprojectgrant/'
       if hasattr(obj, 'givingprojectgrant'):
         award = obj.givingprojectgrant
-        link = link + '{}/">{}</a>'
-        return mark_safe(link.format(award.pk, award.amount))
+        link += '{}/">${:,}</a>'
+        if obj.givingprojectgrant.grant_length() > 1:
+          link += ' (' + str(obj.givingprojectgrant.grant_length()) + '-year)'
+        return mark_safe(link.format(award.pk, award.total_amount()))
       else:
         link = link + 'add/?projectapp={}">Enter an award</a>'
         return mark_safe(link.format(obj.pk))
@@ -211,11 +213,15 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
 
   def year_end_report(self, obj):
     if obj.pk:
-      report = (models.YearEndReport.objects.select_related('award')
+      reports = (models.YearEndReport.objects.select_related('award')
                                             .filter(award__projectapp_id=obj.pk))
-      if report:
-        return mark_safe('<a target="_blank" href="/admin/grants/yearendreport/' +
-            str(report[0].pk) + '/">View</a>')
+      yer_link = ""
+      for i, report in enumerate(reports):
+        if i > 0:
+          yer_link += " | "
+        yer_link += ('<a target="_blank" href="/admin/grants/yearendreport/' +
+          str(report.pk) + '/">Year ' + str(i + 1) + '</a>')
+      return mark_safe(yer_link)
     return ''
 
 #------------------------------------------------------------------------------
@@ -344,18 +350,27 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
-  list_display = ['organization_name', 'grant_cycle', 'giving_project',
-                  'amount', 'check_mailed', 'year_end_report_due']
+  list_display = [
+    'organization_name', 'grant_cycle', 'giving_project',
+    'total_grant', 'fully_paid', 'check_mailed', 'next_year_end_report_due'
+  ]
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
 
-  fields = [
-    ('projectapp', 'amount'),
-    ('check_number', 'check_mailed'),
-    ('agreement_mailed', 'agreement_returned'),
-    'approved',
-    'year_end_report_due',
-  ]
-  readonly_fields = ['year_end_report_due']
+  fieldsets = (
+    ('', {
+      'fields': (
+        ('projectapp', 'total_grant'),
+        ('amount', 'check_number', 'check_mailed'),
+        ('agreement_mailed', 'agreement_returned', 'next_year_end_report_due'),
+        'approved'
+        )
+    }),
+    ('Multi-Year Grant', {
+      'fields': (('second_amount', 'second_check_number', 'second_check_mailed'),)
+    })
+  )
+
+  readonly_fields = ['next_year_end_report_due', 'total_grant']
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     logger.info('gpg page formfield_for_foreignkey')
@@ -369,14 +384,25 @@ class GivingProjectGrantA(admin.ModelAdmin):
     return super(GivingProjectGrantA, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
+  def fully_paid(self, obj):
+    if obj.second_amount and not obj.second_check_mailed:
+      return False
+    elif not obj.check_mailed:
+      return False
+    else:
+      return True
+  fully_paid.boolean = True
+
+  def total_grant(self, obj):
+    return '${:,}'.format(int(obj.total_amount()))
+
+  def next_year_end_report_due(self, obj):
+    return obj.yearend_due()
+
   def get_readonly_fields(self, request, obj=None):
     if obj is not None:
       self.readonly_fields.append('projectapp')
     return self.readonly_fields
-
-  def year_end_report_due(self, obj):
-    logger.info('gpg page year_end_report_due')
-    return obj.yearend_due() or 'N/A'
 
   def organization_name(self, obj):
     return obj.projectapp.application.organization.name
@@ -406,7 +432,7 @@ class YearEndReportA(admin.ModelAdmin):
 
   fieldsets = [
     ('', {
-      'fields': ('award', 'submitted', 'view_link')
+      'fields': ('award_link', 'submitted', 'view_link')
     }),
     ('', {
       'fields': ('visible',)
@@ -418,13 +444,22 @@ class YearEndReportA(admin.ModelAdmin):
         'major_changes', 'total_size', 'donations_count', 'donations_count_prev')
     })
   ]
-  readonly_fields = ['award', 'submitted', 'view_link']
+  readonly_fields = ['award', 'award_link', 'submitted', 'view_link']
 
   def view_link(self, obj):
     if obj.pk:
       url = reverse('sjfnw.grants.views.view_yer', kwargs={'report_id': obj.pk})
       return '<a href="%s" target="_blank">View report</a>' % url
   view_link.allow_tags = True
+  view_link.short_description = 'View'
+
+  def award_link(self, obj):
+    if obj.pk:
+      url = reverse('admin:grants_givingprojectgrant_change', args=(obj.pk,))
+      return '<a target="_blank" href="{}">{}</a>'.format(url, obj.award.full_description())
+  award_link.allow_tags = True
+  award_link.short_description = 'Award'
+
 
   def org(self, obj):
     return obj.award.projectapp.application.organization.name
@@ -433,7 +468,6 @@ class YearEndReportA(admin.ModelAdmin):
   def cycle(self, obj):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
-
 
 class DraftAdv(admin.ModelAdmin):
   """ Only used in admin-advanced """

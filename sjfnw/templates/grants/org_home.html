@@ -1,12 +1,13 @@
-﻿{% extends 'grants/base.html' %}
+{% extends 'grants/base.html' %}
 
 {% block title %}Home | {{ block.super }}{% endblock %}
 
 {% block script %}
-  <script type="text/javascript">
-  function confirmation(draft_pk) { //confirmation window before discarding a draft
-    var conf = confirm("Discard this draft?  It cannot be recovered.")
-    if (conf){
+<script type="text/javascript">
+  // confirmation window before discarding a draft
+  function confirmation(draft_pk) {
+    var conf = confirm("Discard this draft for ' + cycle + '? It cannot be recovered.")
+    if (conf) {
       window.location = '/apply/'+draft_pk+'/DELETE{{ user_override|default:'' }}'
     }
   }
@@ -23,137 +24,154 @@
 
   <h4>Saved drafts</h4>
 
-  <ul>
-    <table class="list">
-    {% for save in saved %}
-      <tr>
-      {% if save.editable %}
-        <td>
-          <li>{{ save.grant_cycle }}</li>
-        </td>
-        <td>
-        {% if save.grant_cycle.info_page %}
-          <a href="/apply/info/{{ save.grant_cycle.pk }}" target="_blank">Cycle info</a>
+    <table class="org">
+      <tbody>
+
+      {% for draft in drafts %}
+        <tr>
+        {% if draft.editable %}
+          <td class="bullet">
+            {{ draft.grant_cycle }}
+          </td>
+          <td>
+            {% if draft.grant_cycle.info_page %}
+              <a href="/apply/info/{{ draft.grant_cycle.pk }}" target="_blank">Cycle info</a>
+            {% endif %}
+          </td>
+          <td>
+            <a href="/apply/{{ draft.grant_cycle.pk }}{{ user_override|default:'' }}"><b>Edit draft</b></a>
+          </td>
+          <td>
+            Last modified {{ draft.modified|date:"n/j" }}
+          </td>
+          <td class="due">
+            Due
+            {% if draft.extended_deadline %}
+              {{ draft.extended_deadline|date:"n/j g:iA"|lower }}
+            {% else %}
+              {{ draft.grant_cycle.close|date:"n/j g:iA"|lower }}
+            {% endif %}
+          </td>
+
+        {% else %}{# not editable #}
+          <td class="inactive bullet">
+            {{ draft.grant_cycle }}
+          </td>
+          <td colspan="4" class="inactive">
+            Closed {{ draft.grant_cycle.close|date:"n/j" }}
+          </td>
         {% endif %}
-        </td>
+
         <td>
-          <a href="/apply/{{ save.grant_cycle.pk }}{{ user_override|default:'' }}"><b>Edit draft</b></a>
+          [<a title="discard draft" onclick="confirmation('{{ draft.pk }}', '{{ draft.grant_cycle }}')">Discard</a>]
         </td>
-        <td>
-          Modified {{ save.modified|date:"n/j g:iA"|lower }}
-        </td>
-        <td>
-          Due {% if save.extended_deadline %}
-          {{ save.extended_deadline|date:"n/j g:iA"|lower }}
-          {% else %}
-          {{ save.grant_cycle.close|date:"n/j g:iA"|lower }}
-          {% endif %}
-        </td>
-      {% else %}
-        <td>
-          <i><li>{{ save.grant_cycle }}</li>
-        </td>
-        <td colspan="4">
-          Cycle closed on {{ save.grant_cycle.close|date:"n/j" }}</i>
-        </td>
-      {% endif %}
-        <td>
-          [<a title="discard draft" onclick="confirmation('{{ save.pk }}')">Discard</a>]
-        </td>
+
       </tr>
       {% endfor %}
-      {# YER DRAFTS #}
+
       {% for draft in ydrafts %}
       <tr>
-        <td>
-          <li>Year end report for award from {{ draft.award.projectapp.giving_project }}</li>
+        <td class="bullet">
+          Year end report - {{ draft.award.projectapp.giving_project }}
         </td>
-        <td>(see below)</td>
-        <td><b><a href="/report/{{ draft.award_id }}{{ user_override|default:'' }}">Edit draft</a></b></td>
-        <td>Modified {{ draft.modified|date:"n/j g:iA"|lower  }}</td>
-        <td>Due {{ draft.award.yearend_due|date:"n/j/y"  }}</td>
+        <td></td>
+        <td>
+          <b><a href="/report/{{ draft.award_id }}{{ user_override|default:'' }}">Edit draft</a></b>
+        </td>
+        <td>
+          Last modified {{ draft.modified|date:"n/j" }}
+        </td>
+        <td class="due">
+          Due {{ draft.award.yearend_due|date:"n/j/y" }}
+        </td>
         <td></td>
       </tr>
-    {% endfor %}
-   {% if not saved and not ydrafts %}
-    <li>No saved drafts found</li>
-   {% endif %}
-    </table>
-  </ul>
+      {% endfor %}
+
+      {% if not drafts and not ydrafts %}
+        No saved drafts found
+      {% endif %}
+    </tbody>
+  </table>
 
   <h4>Submitted applications</h4>
 
-  <ul>
   {% if submitted %}
-    <table class="list">
+    <table class="org">
     {% for sub in submitted %}
       <tr>
-        <td><li>{{ sub.grant_cycle }}</li></td>
-        <td><a href="/grants/view/{{ sub.pk }}">View submitted application</a></td>
-        <td>Submitted {{ sub.submission_time|date:"n/j/y" }}</td>  
+        <td class="bullet">
+          {{ sub.grant_cycle }}
+        </td>
+        <td>
+          <a href="/grants/view/{{ sub.pk }}">View submitted application</a>
+        </td>
+        <td>
+          Submitted {{ sub.submission_time|date:"n/j/y" }}
+        </td>
       </tr>
-      {% with projectapps=sub.projectapp_set.all %}
-        {% for papp in projectapps %}
-        {% with award=papp.givingprojectgrant %}
+
+      {% for award in sub.awards %}
       <tr>
-        <td colspan="3">
-        {% if award %}
-          {% if award.agreement_mailed and award.agreement_mailed|timesince > 0 %}
-          <ul>
-            <li>${{ award.amount|intcomma }} awarded.</li>
-            <li>Agreement mailed {{ award.agreement_mailed|date:"n/j/y" }},
+        <td></td>
+        <td>{{ award }}</td>
+        <td>
+          {% if award.agreement_mailed %}
+            Agreement mailed {{ award.agreement_mailed|date:"n/j/y" }},
             {% if award.agreement_returned %}
-              returned {{ award.agreement_returned|date:"n/j/y" }}.</li>
+              returned {{ award.agreement_returned|date:"n/j/y" }}.
             {% else %}
-              due {{ award.agreement_due|date:"n/j/y" }}.</li>
-            {% endif %}{# agreement_returned #}
-            {% if award.yearendreport %}
-            <li>
-              <a href="{% url 'grants.views.view_yer' report_id=award.yearendreport.pk %}">
-              Year end report</a> completed.
-            </li>
-            {% else %}
-            <li>
-              <a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ award.yearend_due|date:"n/j/y" }}.
-            </li>
-            {% endif %}{# award.yearendreport #}
-          {% endif %}{# agreement_mailed #}
-          {% endif %}{# award #}
-        {% endwith %}
-      </td></tr>
-      {% endfor %}{# papp in projectapps #}
-      {% endwith %}
-    {% endfor %}{# sub in submitted #}
-    </table>
-    {% else %}
-    <li>None found</li>
-    {% endif %}
-  </ul>
+              <span class="due">due {{ award.agreement_due|date:"n/j/y" }}</span>.
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td>
+          {% if award.agreement_mailed %}
+            {% for yer in award.yearendreport_set.all %}
+              {% if forloop.counter > 1 %}<br>{% endif %}
+              <a href="{% url 'sjfnw.grants.views.view_yer' report_id=yer.pk %}">Year end report</a> submitted {{ yer.submitted|date:"n/j/y" }}.
+            {% endfor %}
+            {% if award.yearendreport_set.all|length < award.grant_length %}
+              <div class="due"><a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ award.yearend_due|date:"n/j/y" }}</div>.
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}{# awards #}
+  {% endfor %}{# submitted #}
+  </table>
+  {% else %}{# no submitted #}
+    None found
+  {% endif %}
 
   <h4>Tools</h4>
-    <ul>
-      <li><a href="/apply/copy{{ user_override|default:'' }}">Copy/rollover an application</a></li>
-      <li><a href="{% url 'sjfnw.grants.views.rollover_yer' %}{{ user_override|default:'' }}">Copy/rollover a year-end report</a></li>
-    </ul>
+  <ul>
+    <li><a href="/apply/copy{{ user_override|default:'' }}">Copy/rollover an application</a></li>
+    <li><a href="{% url 'sjfnw.grants.views.rollover_yer' %}{{ user_override|default:'' }}">Copy/rollover a year-end report</a></li>
+  </ul>
 </div>
 
-<!--- CYCLES -->
 <div class="home-section">
-  <div align="center"><h3>Social Justice Fund grant cycles</h3></div>
+  <div align="center">
+    <h3>Social Justice Fund grant cycles</h3>
+  </div>
 
   <h4>Currently accepting applications</h4>
-  <ul>
+
   {% if open or applied %}
-    <table class="list">
+    <table class="org">
     {% for ope in open %}
-      <tr><td><li>{{ ope }}</li></td>
+      <tr><td>{{ ope }}</td>
       <td>{% if ope.info_page %}<a href="/apply/info/{{ ope.pk }}" target="_blank">Cycle info</a>{% endif %}</td>
       <td><b><a href="/apply/{{ ope.pk }}{{ user_override|default:'' }}">Apply</a></b></td>
       <td>Closes {{ ope.close|date:"n/j/y" }}</a></td>
       </tr>
     {% endfor %}
     {% for appl in applied %}
-      <tr><td><li>{{ appl }}</li></td>
+      <tr><td>{{ appl }}</td>
       <td>{% if appl.info_page %}<a href="/apply/info/{{ appl.pk }}" target="_blank">Cycle info</a>{% endif %}</td>
       <td>Application submitted</td>
       <td>Closes {{ appl.close|date:"n/j/y" }}</td>
@@ -161,52 +179,55 @@
     {% endfor %}
     </table>
   {% else %}
-    <li>No grants are being accepted at this time.</li>
+    No grants are being accepted at this time.
   {% endif %}
-  </ul>
 
   <h4>Upcoming grant cycles</h4>
-  <ul><table class="list">
+  <table class="org">
   {%for up in upcoming%}
     <tr>
-      <td><li>{% if up.info_page %}<a href="/apply/info/{{ up.pk }}" target="_blank">{{ up }}</a>{% else %}{{ up }}{% endif %}</li></td>
+      <td>{% if up.info_page %}<a href="/apply/info/{{ up.pk }}" target="_blank">{{ up }}</a>{% else %}{{ up }}{% endif %}</td>
     <td>Open {{ up.open|date:"n/j/y" }} to {{ up.close|date:"n/j/y" }}</td>
     </tr>
   {% empty %}
-    <tr><td><li>No upcoming grant cycles.</li></td></tr>
+    <tr><td>No upcoming grant cycles.</td></tr>
   {% endfor %}
-  </table></ul>
+  </table>
 
   <h4>Recently closed grant cycles</h4>
-  <ul><table class="list">
+  <table class="org">
   {%for cl in closed%}
     <tr>
-      <td><li>{{ cl }}</li></td>
+      <td>{{ cl }}</td>
       <td>open {{ cl.open|date:"n/j/y" }} to {{ cl.close|date:"n/j/y" }}</td>
     </tr>
   {% empty %}
     <tr>
-      <td><li>No grant cycles closed in the last 6 months.</li></td>
+      <td>No grant cycles closed in the last 6 months.</td>
     </tr>
   {% endfor %}
-  </table></ul>
-
+  </table>
 </div>
 
 <div class="home-section">
-  <div align="center"><h3>Eligibility Information & Resources</h3></div>
+  <div align="center">
+    <h3>Eligibility Information & Resources</h3>
+  </div>
+
   <h4>Eligibility</h4>
-  <p><i>If you have not received a Social Justice Fund grant before, please fill out 
-  this <a href="http://www.surveymonkey.com/s/LJLB7Z8" target="_blank"><strong>brief pre-application questionnaire</strong></a> 
-  before you begin your application.</p></i><br>
-  To be eligible for any Social Justice Fund grant program, an organization must:
+  <p>
+    <i>If you have not received a Social Justice Fund grant before, please fill out this <a href="http://www.surveymonkey.com/s/LJLB7Z8" target="_blank"><strong>brief pre-application questionnaire</strong></a> before you begin your application.</i>
+  </p>
+  <p>
+    To be eligible for any Social Justice Fund grant program, an organization must:
+  </p>
   <ul>
     <li>
       Be an organized group of people (we do not fund individuals).
       <ul>
         <li>
           If your organization is a nonprofit with 501(c)3 or 501(c)4 status as determined by the
-          IRS, or be a federally recognized American Indian tribal government or agency OR is 
+          IRS, or be a federally recognized American Indian tribal government or agency OR is
           fiscally sponsored by 501(c)3 or 501(c)4 organizations or by federally recognized tribal
           governments, you can apply.
         </li>
@@ -225,12 +246,13 @@
   </ul>
 
   Additional information:
-  <ul><li><a href="http://socialjusticefund.org/sites/default/files/2013%20General%20Guidelines%20%28for%20applicants%29.pdf" target="_blank">Social Justice Fund Grant Guidelines</a></li>
-  <li><a href="http://www.socialjusticefund.org/sites/default/files/SJF%20Grantmaking%20Case%20Statement.pdf" target="_blank">SJF Grantmaking Case Statement</a> and <a href="http://www.socialjusticefund.org/sites/default/files/SJF%20Granting%20Criteria%20-%20for%20Grant%20Reviewers_0.pdf" target="_blank">SJF Granting Criteria</a> (used by our volunteer grantmakers to help guide their screening process)</li></ul>
+  <ul>
+    <li><a href="http://socialjusticefund.org/sites/default/files/2013%20General%20Guidelines%20%28for%20applicants%29.pdf" target="_blank">Social Justice Fund Grant Guidelines</a></li>
+    <li><a href="http://www.socialjusticefund.org/sites/default/files/SJF%20Grantmaking%20Case%20Statement.pdf" target="_blank">SJF Grantmaking Case Statement</a> and <a href="http://www.socialjusticefund.org/sites/default/files/SJF%20Granting%20Criteria%20-%20for%20Grant%20Reviewers_0.pdf" target="_blank">SJF Granting Criteria</a> (used by our volunteer grantmakers to help guide their screening process)</li>
+  </ul>
 
   <h4>More information</h4>
   <p>Each cycle has an information page with more detailed information.</p>
   <p>If you have any questions, contact Program Director, Mijo Lee by <a href="mailto:mijo@socialjusticefund.org">email</a> or by calling (206) 624-4081.</p>
 </div>
-
-{% endblock %}
+{% endblock content %}

@@ -587,6 +587,10 @@ class GivingProjectGrant(models.Model):
   check_number = models.PositiveIntegerField(null=True, blank=True)
   check_mailed = models.DateField(null=True, blank=True)
 
+  second_amount = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+  second_check_number = models.PositiveIntegerField(null=True, blank=True)
+  second_check_mailed = models.DateField(null=True, blank=True)
+
   agreement_mailed = models.DateField(null=True, blank=True)
   agreement_returned = models.DateField(null=True, blank=True)
   approved = models.DateField(verbose_name='Date approved by the ED', null=True, blank=True)
@@ -595,7 +599,14 @@ class GivingProjectGrant(models.Model):
     ordering = ['-created']
 
   def __unicode__(self):
-    return '$%d grant from %s' % (self.amount, self.projectapp.giving_project)
+    summary = '${:,} '
+    if self.grant_length() == 2:
+      summary += 'two-year '
+    summary += 'grant'
+    return summary.format(self.total_amount())
+
+  def full_description(self):
+    return u'{} from {}'.format(self, self.projectapp.giving_project)
 
   def agreement_due(self):
     if self.agreement_mailed:
@@ -605,10 +616,25 @@ class GivingProjectGrant(models.Model):
 
   def yearend_due(self):
     if self.agreement_mailed:
-      return self.agreement_mailed.replace(year=self.agreement_mailed.year + 1)
+      first_yearend = self.agreement_mailed.replace(year=self.agreement_mailed.year + 1)
+      if (timezone.now().date() > first_yearend) and self.second_check_mailed:
+        return first_yearend.replace(year=first_yearend.year + 1)
+      else:
+        return first_yearend
     else:
       return None
 
+  def total_amount(self):
+    if self.second_amount:
+      return self.second_amount + self.amount
+    else:
+      return self.amount
+
+  def grant_length(self):
+    if self.second_amount:
+      return 2
+    else:
+      return 1
 
 class SponsoredProgramGrant(models.Model):
 
@@ -640,7 +666,7 @@ def validate_photo_file_extension(value):
 class YearEndReport(models.Model):
 
   # automatic
-  award = models.OneToOneField(GivingProjectGrant)
+  award = models.ForeignKey(GivingProjectGrant)
   submitted = models.DateTimeField(default=timezone.now())
 
   # user-entered
@@ -733,7 +759,7 @@ class YearEndReport(models.Model):
 
 class YERDraft(models.Model):
 
-  award = models.OneToOneField(GivingProjectGrant)
+  award = models.ForeignKey(GivingProjectGrant)
   modified = models.DateTimeField(default=timezone.now())
   contents = models.TextField(default='{}')
 

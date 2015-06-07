@@ -1,4 +1,4 @@
-﻿/**  base  **/
+/**  base  **/
 
 #nav_menu  {
 	text-align:center;
@@ -34,24 +34,38 @@
   margin-bottom:5px;
 }
 
-table.list td{
-  padding-right:20px;
+.inactive {
+  font-style: italic;
 }
 
-div.home-section {
+table.org {
+  width: 100%;
+}
+
+table.org td{
+  padding: 0 10px 5px 0;
+}
+
+.home-section {
   border:1px solid black;
   padding: 0 10px 10px 10px;
   margin-bottom:20px;
 }
 
-div.home-section h3 {
+.home-section h3 {
   display:inline-block;
   margin: -.5em 0 .5em 0;
   padding:0 10px 0 10px;
   background:white;
 }
 
-/**  application form  **/
+.due {
+  font-weight: bold;
+}
+
+.bullet::before {
+  content: ' • ';
+}
 
 /** general **/
 

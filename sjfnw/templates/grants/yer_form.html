@@ -1,6 +1,6 @@
 {% extends 'grants/base.html' %}
 
-{% block title %}Year-end report form | {{ block.super }}{% endblock %}
+{% block title %}Year-end Report | {{ block.super }}{% endblock %}
 
 {% block script %}
 <script type="text/javascript" src="/static/js/forms.js"></script>
@@ -17,8 +17,8 @@
 
 <div class="formwrapper">
 
-  <div class="center">
-    <h1>Year-end Report</h1>
+  <div class="text-center">
+    <h1>Year-end Report for {{ yer_period }}</h1>
     <h2>{{ award }}</h2>
     {% if user_override %}<h2>Filling out on behalf of {{ org }}</h2>{% endif %}
     <span class="last_saved" title="The form is automatically saved every 30 seconds">
