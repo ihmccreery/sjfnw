@@ -374,8 +374,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     today = timezone.now()
     mailed = today.date().replace(year=today.year - 1) + timedelta(days=7)
     award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000,
-        agreement_mailed=mailed,
+        projectapp_id=1, amount=5000, agreement_mailed=mailed,
         agreement_returned=mailed + timedelta(days=3)
     )
     award.save()
@@ -383,7 +382,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     yer.save()
 
     # verify that yer is due in 7 days
-    self.assertEqual(award .yearend_due(), today.date() + timedelta(days=7))
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
@@ -397,20 +396,20 @@ class YearEndReportReminders(BaseGrantTestCase):
     today = timezone.now()
     mailed = today.date().replace(year=today.year - 2) + timedelta(days=7)
     award = models.GivingProjectGrant(
-          projectapp_id=1, amount=5000, second_amount=5000, agreement_mailed=mailed,
-          agreement_returned=mailed + timedelta(days=3), second_check_mailed=today
+        projectapp_id=1, amount=5000, second_amount=5000, agreement_mailed=mailed,
+        agreement_returned=mailed + timedelta(days=3), second_check_mailed=today
     )
     award.save()
 
-    firstyear_end = today.date().replace(year=today.year - 1) + timedelta(days=7)
-    yer = models.YearEndReport(award=award, total_size=10,
-                               submitted=firstyear_end, donations_count=50)
+    first_year_end = today.date().replace(year=today.year - 1) + timedelta(days=7)
+    yer = models.YearEndReport(award=award, submitted=first_year_end,
+                               total_size=10, donations_count=50)
     yer.save()
 
-    # verify that yer is due in 7 days
-    self.assertEqual(award .yearend_due(), today.date() + timedelta(days=7))
+    # verify that second yer is due in 7 days
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
 
-    # verify that email is not sent
+    # verify that email is sent
     self.assertEqual(len(mail.outbox), 0)
     response = self.client.get(self.url)
     self.assertEqual(response.status_code, 200)
@@ -420,25 +419,24 @@ class YearEndReportReminders(BaseGrantTestCase):
     """ Verify that reminder email is not sent if second year end report completed"""
 
     today = timezone.now()
-    mailed = today.date().replace(year=today.year - 2) + timedelta(days=7)
+    mailed = today.date().replace(year=today.year-2) + timedelta(days=7)
     award = models.GivingProjectGrant(
           projectapp_id=1, amount=5000, second_amount=5000, agreement_mailed=mailed,
           agreement_returned=mailed + timedelta(days=3), second_check_mailed=today
     )
     award.save()
 
-    firstyear_end = today.date().replace(year=today.year - 1) + timedelta(days=7)
+    firstyear_end = today.date().replace(year=today.year-1) + timedelta(days=7)
     yer = models.YearEndReport(award=award, total_size=10,
                                submitted=firstyear_end, donations_count=50)
     yer.save()
-
     second_yer = models.YearEndReport(award=award, total_size=10,
                                       submitted=firstyear_end.replace(year=firstyear_end.year + 1),
                                       donations_count=50)
     second_yer.save()
 
-    # verify that yer is due in 7 days
-    self.assertEqual(award .yearend_due(), today.date() + timedelta(days=7))
+    # verify that last yer is due in 7 days
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
@@ -480,7 +478,7 @@ class RolloverYER(BaseGrantTestCase):
 
   def test_display_no_reports(self):
     """ Verify error msg, no form if org has grant(s) but no reports """
-    # Has 1+ grants
+
     award = models.GivingProjectGrant(projectapp_id=1, amount=8000)
     award.save()
     self.assertNotEqual(models.GivingProjectGrant.objects.filter(
@@ -500,6 +498,17 @@ class RolloverYER(BaseGrantTestCase):
     self.assertRegexpMatches(response.context['error_msg'],
         'You have a submitted or draft year-end report for all of your grants')
 
+  def test_display_second_year_missing(self):
+    """ Verify form if org has completed one but not both reports for their grant """
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+        second_amount=1000)
+    award.save()
+    self.create_yer(award.pk)
+
+    response = self.client.get(self.url, follow=True)
+    self.assertContains(response, 'option value', count=4)
+    self.assertContains(response, 'This form lets you')
+
   def test_display_form(self):
     """ Verify display of form when there is a valid rollover option """
 
@@ -518,6 +527,7 @@ class RolloverYER(BaseGrantTestCase):
 
     response = self.client.get(self.url, follow=True)
     self.assertContains(response, 'option value', count=4)
+    self.assertContains(response, 'This form lets you')
 
   def test_submit(self):
     """ Verify that rollover submit works:
