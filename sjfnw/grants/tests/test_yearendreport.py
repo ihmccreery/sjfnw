@@ -122,9 +122,20 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     self.assertContains(response, 'Year end report</a> submitted', count=2)
     self.assertNotContains(response, '<a href="/report/%d">' % self.award_id)
 
-  def test_start_report(self):
-    response = self.client.get(_get_yer_url(self.award_id))
+  def _create_draft(self):
+    """ Not a test. Used by other tests to set up a draft """
 
+    draft_count = models.YERDraft.objects.filter(award_id=self.award_id).count()
+    response = self.client.get(_get_yer_url(self.award_id))
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/yer_form.html')
+    self.assertEqual(models.YERDraft.objects.filter(award_id=self.award_id).count(), draft_count+1)
+
+  def test_start_report(self):
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
+    mailed = award.agreement_mailed
+
+    response = self.client.get(_get_yer_url(self.award_id))
     self.assertTemplateUsed(response, 'grants/yer_form.html')
 
     form = response.context['form']
@@ -132,15 +143,33 @@ class YearEndReportForm(BaseGrantFilesTestCase):
 
     # assert website autofilled from app
     self.assertEqual(form['website'].value(), application.website)
-    # TODO other pre-fill fields
+    expected_title = 'Year-end Report for {:%b %d, %Y} - {:%b %d, %Y}'.format(
+        mailed.replace(year=mailed.year), mailed.replace(year=mailed.year+1))
+    self.assertContains(response, expected_title)
 
-  def _create_draft(self):
-    """ Not a test. Used by other tests to set up a draft """
+  def test_start_second_report(self):
+    # submit first YER
+    self.test_valid_stay_informed()
+
+    # make award be two-year
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
+    award.second_amount = 3000
+    award.agreement_mailed = timezone.now() - timedelta(weeks=102)
+    award.save()
+    award = models.GivingProjectGrant.objects.get(pk=self.award_id)
 
     self.assertEqual(0, models.YERDraft.objects.filter(award_id=self.award_id).count())
+
     response = self.client.get(_get_yer_url(self.award_id))
-    self.assertEqual(response.status_code, 200)
+
     self.assertTemplateUsed(response, 'grants/yer_form.html')
+    mailed = award.agreement_mailed
+    expected_title = 'Year-end Report for {:%b %d, %Y} - {:%b %d, %Y}'.format(
+        mailed.replace(year=mailed.year+1), mailed.replace(year=mailed.year+2))
+    self.assertContains(response, expected_title)
+
+    application = models.GrantApplication.objects.get(pk=1)
+    self.assertEqual(response.context['form']['website'].value(), application.website)
     self.assertEqual(1, models.YERDraft.objects.filter(award_id=self.award_id).count())
 
   def test_autosave(self):
