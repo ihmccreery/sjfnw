@@ -696,12 +696,28 @@ def rollover_yer(request, organization):
   if reports:
     drafts = models.YERDraft.objects.select_related().filter(
         award__projectapp__application__organization_id=organization.pk)
-    exclude_awards = [r.award_id for r in reports] + [d.award_id for d in drafts]
-    awards = (models.GivingProjectGrant.objects.select_related('award')
-        .filter(projectapp__application__organization_id=organization.pk)
-        .exclude(id__in=exclude_awards))
+
+    award_reports = {}
+    for report in reports:
+      if report.award_id in award_reports:
+        award_reports[report.award_id] += 1
+      else:
+        award_reports[report.award_id] = 1
+    for draft in drafts:
+      if draft.award_id in award_reports:
+        award_reports[draft.award_id] += 1
+      else:
+        award_reports[draft.award_id] = 1
+
+    raw_awards = (models.GivingProjectGrant.objects.select_related('award')
+        .filter(projectapp__application__organization_id=organization.pk))
+    awards = []
+    for award in raw_awards:
+      if (not award.pk in award_reports) or (award_reports[award.pk] < award.grant_length()):
+        awards.append(award)
+
     if not awards:
-      if exclude_awards:
+      if raw_awards:
         error_msg = ('You have a submitted or draft year-end report for all '
                      'of your grants. <a href="/apply">Go back</a>')
       else:
@@ -1005,7 +1021,6 @@ def get_app_results(options):
         ['2011-04-20 06:18:36+0:00', 'Justice League', 'LGBTQ Grant Cycle'],
         ['2013-10-23 09:08:56+0:00', 'ACLU of Idaho', 'General Grant Cycle'],
       ]
-
   """
   logger.info('Get app results')
 
@@ -1075,7 +1090,6 @@ def get_app_results(options):
     field_names.append('GP screening status')
     get_gp_ss = True
   if options['report_award']:
-    #apps = apps.prefetch_related('grantaward_set') #TODO any replacement?
     field_names.append('Awarded')
     get_awards = True
 
