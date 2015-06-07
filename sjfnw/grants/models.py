@@ -606,7 +606,7 @@ class GivingProjectGrant(models.Model):
     return summary.format(self.total_amount())
 
   def full_description(self):
-    return unicode(self) + ' from ' + self.projectapp.giving_project
+    return u'{} from {}'.format(self, self.projectapp.giving_project)
 
   def agreement_due(self):
     if self.agreement_mailed:

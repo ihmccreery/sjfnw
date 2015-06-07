@@ -202,7 +202,9 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
       link = '<a target="_blank" href="/admin/grants/givingprojectgrant/'
       if hasattr(obj, 'givingprojectgrant'):
         award = obj.givingprojectgrant
-        link = link + '{}/">{}</a>'
+        link += '{}/">${:,}</a>'
+        if obj.givingprojectgrant.grant_length() > 1:
+          link += ' (' + str(obj.givingprojectgrant.grant_length()) + '-year)'
         return mark_safe(link.format(award.pk, award.total_amount()))
       else:
         link = link + 'add/?projectapp={}">Enter an award</a>'
@@ -430,7 +432,7 @@ class YearEndReportA(admin.ModelAdmin):
 
   fieldsets = [
     ('', {
-      'fields': ('award', 'submitted', 'view_link')
+      'fields': ('award_link', 'submitted', 'view_link')
     }),
     ('', {
       'fields': ('visible',)
@@ -442,13 +444,22 @@ class YearEndReportA(admin.ModelAdmin):
         'major_changes', 'total_size', 'donations_count', 'donations_count_prev')
     })
   ]
-  readonly_fields = ['award', 'submitted', 'view_link']
+  readonly_fields = ['award', 'award_link', 'submitted', 'view_link']
 
   def view_link(self, obj):
     if obj.pk:
       url = reverse('sjfnw.grants.views.view_yer', kwargs={'report_id': obj.pk})
       return '<a href="%s" target="_blank">View report</a>' % url
   view_link.allow_tags = True
+  view_link.short_description = 'View'
+
+  def award_link(self, obj):
+    if obj.pk:
+      url = reverse('admin:grants_givingprojectgrant_change', args=(obj.pk,))
+      return '<a target="_blank" href="{}">{}</a>'.format(url, obj.award.full_description())
+  award_link.allow_tags = True
+  award_link.short_description = 'Award'
+
 
   def org(self, obj):
     return obj.award.projectapp.application.organization.name
