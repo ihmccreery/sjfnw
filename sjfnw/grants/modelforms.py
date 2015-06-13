@@ -21,7 +21,7 @@ class OrgProfile(ModelForm):
 
   class Meta:
     model = Organization
-    exclude = ('name', 'email')
+    include = Organization.get_profile_fields()
 
 
 class TimelineWidget(forms.widgets.MultiWidget):

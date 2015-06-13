@@ -109,11 +109,21 @@ class Organization(models.Model):
   fiscal_zip = models.CharField(verbose_name='ZIP', max_length=50, blank=True)
   fiscal_letter = models.FileField(upload_to='/', null=True, blank=True, max_length=255)
 
+  class Meta:
+    ordering = ['name']
+
   def __unicode__(self):
     return self.name
 
-  class Meta:
-    ordering = ('name',)
+  @classmethod
+  def get_profile_fields(_):
+    return [
+      'address', 'city', 'state', 'zip', 'telephone_number', 'fax_number',
+      'email_address', 'website', 'contact_person', 'contact_person_title',
+      'status', 'ein', 'founded', 'mission', 'fiscal_org', 'fiscal_person',
+      'fiscal_telephone', 'fiscal_email', 'fiscal_address', 'fiscal_city',
+      'fiscal_state', 'fiscal_zip', 'fiscal_letter'
+    ]
 
 
 class GrantCycle(models.Model):
@@ -494,21 +504,23 @@ class GrantApplication(models.Model):
 
   def save(self, *args, **kwargs):
     """ Update org profile if it is the most recent app for the org """
+
     super(GrantApplication, self).save(*args, **kwargs)
 
     # check if there are more recent apps
+    # pylint: disable=no-member
     apps = GrantApplication.objects.filter(organization_id=self.organization_id,
-      submission_time__gt=self.submission_time)
-    if len(apps) > 0:
-      logger.info('App saving - not the most recent app - regular save')
+                                           submission_time__gt=self.submission_time)
+
+    if apps.exists():
+      logger.info('App updated, not the most recent for org, regular save')
     else:
-      logger.info('App updated, updating org profile')
-      org = self.organization
-      #TODO less hacky way
-      for field in Organization._meta.get_all_field_names():
-        if field != 'id' and hasattr(self, field):
-          setattr(org, field, getattr(self, field))
-      org.save()
+      logger.info('App updated, is most recent, updating org profile')
+
+      for field in Organization.get_profile_fields():
+        if hasattr(self, field):
+          setattr(self.organization, field, getattr(self, field))
+      self.organization.save()
       logger.info('Org profile updated')
 
   def timeline_display(self): #TODO move to modelform?
@@ -635,6 +647,7 @@ class GivingProjectGrant(models.Model):
       return 2
     else:
       return 1
+
 
 class SponsoredProgramGrant(models.Model):
 
