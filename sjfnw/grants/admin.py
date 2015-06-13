@@ -47,6 +47,24 @@ class CycleTypeFilter(admin.SimpleListFilter):
     else:
       return queryset.filter(projectapp__application__grant_cycle__title__startswith=self.value())
 
+class MultiYearGrantFilter(admin.SimpleListFilter):
+  title = 'Grant length'
+  parameter_name = 'multiyear'
+
+  def lookups(self, request, model_admin):
+    return [
+      (1, 'Single-year'),
+      (2, 'Two-year')
+    ]
+
+  def queryset(self, request, queryset):
+    if self.value() == '1':
+      return queryset.filter(second_amount__isnull=True)
+    if self.value() == '2':
+      return queryset.filter(second_amount__isnull=False)
+    return queryset
+
+
 #------------------------------------------------------------------------------
 # INLINES
 #------------------------------------------------------------------------------
@@ -313,11 +331,11 @@ class GrantApplicationA(admin.ModelAdmin):
   def has_add_permission(self, request):
     return False
 
-  def revert_grant(self, obj):
+  def revert_grant(self, _):
     return '<a href="revert">Revert to draft</a>'
   revert_grant.allow_tags = True
 
-  def rollover(self, obj):
+  def rollover(self, _):
     return '<a href="rollover">Copy to another grant cycle</a>'
   rollover.allow_tags = True
 
@@ -351,10 +369,11 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
   list_display = [
-    'organization_name', 'grant_cycle', 'giving_project',
+     'organization_name', 'grant_cycle', 'giving_project', 'created',
     'total_grant', 'fully_paid', 'check_mailed', 'next_year_end_report_due'
   ]
-  list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter]
+  list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter, MultiYearGrantFilter]
+  ordering = ['-created']
 
   fieldsets = (
     ('', {
@@ -369,7 +388,6 @@ class GivingProjectGrantA(admin.ModelAdmin):
       'fields': (('second_amount', 'second_check_number', 'second_check_mailed'),)
     })
   )
-
   readonly_fields = ['next_year_end_report_due', 'total_grant']
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -384,13 +402,13 @@ class GivingProjectGrantA(admin.ModelAdmin):
     return super(GivingProjectGrantA, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
+  def get_readonly_fields(self, request, obj=None):
+    if obj is not None:
+      self.readonly_fields.append('projectapp')
+    return self.readonly_fields
+
   def fully_paid(self, obj):
-    if obj.second_amount and not obj.second_check_mailed:
-      return False
-    elif not obj.check_mailed:
-      return False
-    else:
-      return True
+    return obj.fully_paid()
   fully_paid.boolean = True
 
   def total_grant(self, obj):
@@ -399,20 +417,17 @@ class GivingProjectGrantA(admin.ModelAdmin):
   def next_year_end_report_due(self, obj):
     return obj.yearend_due()
 
-  def get_readonly_fields(self, request, obj=None):
-    if obj is not None:
-      self.readonly_fields.append('projectapp')
-    return self.readonly_fields
-
   def organization_name(self, obj):
     return obj.projectapp.application.organization.name
+  organization_name.admin_order_field = 'projectapp__application__organization__name'
 
   def grant_cycle(self, obj):
-    return '%s %s' % (obj.projectapp.application.grant_cycle.title,
-                      obj.projectapp.application.grant_cycle.close.year)
+    return unicode(obj.projectapp.application.grant_cycle.title)
+  grant_cycle.admin_order_field = 'projectapp__application__grant_cycle__title'
 
   def giving_project(self, obj):
     return unicode(obj.projectapp.giving_project)
+  giving_project.admin_order_field = 'projectapp__giving_project__title'
 
 
 class SponsoredProgramGrantA(admin.ModelAdmin):

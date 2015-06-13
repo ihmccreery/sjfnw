@@ -648,6 +648,13 @@ class GivingProjectGrant(models.Model):
     else:
       return 1
 
+  def fully_paid(self):
+    if not self.check_mailed:
+      return False
+    if self.second_amount and not self.second_check_mailed:
+      return False
+    return True
+
 
 class SponsoredProgramGrant(models.Model):
 
