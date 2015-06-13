@@ -237,7 +237,9 @@ def grant_application(request, organization, cycle_id):
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
 
   # check for app already submitted
-  if models.GrantApplication.objects.filter(organization=organization, grant_cycle=cycle):
+  if (models.GrantApplication.objects
+       .filter(organization=organization, grant_cycle=cycle)
+       .exists()):
     return render(request, 'grants/already_applied.html', {
       'organization': organization, 'cycle': cycle
     })
@@ -307,7 +309,6 @@ def grant_application(request, organization, cycle_id):
       org_dict['timeline'] = json.dumps(timeline)
       logger.debug('Loaded draft')
 
-    # check if draft can be submitted
     if not draft.editable():
       return render(request, 'grants/closed.html', {'cycle': cycle})
 
@@ -321,21 +322,16 @@ def grant_application(request, organization, cycle_id):
         ((not 'grant_request' in org_dict) or (not org_dict['grant_request']))):
       profiled = True
 
-    #create form
     form = GrantApplicationModelForm(cycle, initial=org_dict)
 
-  #get draft files
+  # get draft files
   file_urls = GetFileURLs(request, draft)
-  #TODO test this replacement
-  #link_template = ('<a href="{0}" target="_blank" title="">{1}</a>{1}'
-  #                '[<a onclick="fileUploads.removeFile(\'{2}\');">remove</a>]')
-  #file_urls[field] = link_template.format(url, name, field)
+  link_template = ('<a href="{0}" target="_blank" title="{1}">{1}</a>'
+                  ' [<a onclick="fileUploads.removeFile(\'{2}\');">remove</a>]')
   for field, url in file_urls.iteritems():
     if url:
       name = getattr(draft, field).name.split('/')[-1]
-      file_urls[field] = ('<a href="' + url + '" target="_blank" title="' +
-          name + '">' + name + '</a> [<a onclick="fileUploads.removeFile(\'' +
-          field + '\');">remove</a>]')
+      file_urls[field] = link_template.format(url, name, field)
     else:
       file_urls[field] = '<i>no file uploaded</i>'
 
@@ -375,9 +371,9 @@ def autosave_app(request, cycle_id):
 
     #check for simultaneous editing
     if request.GET.get('force') != 'true':
-      # check if edited recently TODO reusable method
       if draft.recently_edited():
-        if draft.modified_by and draft.modified_by != curr_user: # last save wasn't this userid
+        if draft.modified_by and draft.modified_by != curr_user:
+          # last save wasn't this userid
           logger.info('Requiring confirmation')
           return HttpResponse('confirm force', status=409)
     else:
