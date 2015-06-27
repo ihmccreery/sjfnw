@@ -1,7 +1,7 @@
 # Cron jobs
 FUND_EMAIL = 'Project Central <projectcentral@socialjusticefund.org>'
 GRANT_EMAIL = 'Social Justice Fund Grants <grants@socialjusticefund.org>'
-APP_BASE_URL = 'https://sjf-nw.appspot.com/'
+APP_BASE_URL = 'https://sjf-nw.appspot.com'
 
 # Support pages
 SUPPORT_EMAIL = 'techsupport@socialjusticefund.org'
