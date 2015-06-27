@@ -9,18 +9,18 @@
 </p>
 
 <p>
-  Congratulations on a year of community organizing and movement building for social change.
-  We at Social Justice Fund NW are proud to support you and are continually inspired by the
-  important work you do.
+  Congratulations on a year of community organizing and movement building for social change.  We at Social Justice Fund NW are proud to support you and are continually inspired by the important work you do.
 </p>
+
 <p>
   This is a reminder that <b>{{ award.yearend_due }} is the deadline to send in your Year-End Report</b>
   for the {{ gp.title }} grant your organization received in {{ award.check_mailed|date:"Y" }}.
 </p>
 
 <div align="center">
-  <p><b><a href="{{ base_url }}{% url 'sjfnw.grants.views.year_end_report' award_id=award.pk %}">
-    Click here to fill out your Year-End Report</a></b></p>
+  <p>
+    <b><a href="{{ base_url }}{% url 'sjfnw.grants.views.year_end_report' award_id=award.pk %}"> Click here to fill out your Year-End Report</a></b>
+  </p>
 </div>
 
 {% load static %}

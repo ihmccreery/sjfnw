@@ -34,7 +34,7 @@ def email_overdue(request):
         logger.info(user.email + ' has overdue step(s), emailing.')
         to_emails = [user.email]
         html_content = render_to_string('fund/emails/overdue_steps.html', {
-          'login_url': c.APP_BASE_URL+'fund/login', 'ship': ship, 'num': count,
+          'login_url': c.APP_BASE_URL + '/fund/login', 'ship': ship, 'num': count,
           'step': step, 'base_url': c.APP_BASE_URL
         })
         text_content = strip_tags(html_content)
@@ -66,7 +66,7 @@ def new_accounts(request):
       to_emails = [leader.member.email for leader in leaders]
       if to_emails:
         html_content = render_to_string('fund/emails/accounts_need_approval.html', {
-          'admin_url': c.APP_BASE_URL + 'admin/fund/membership/',
+          'admin_url': c.APP_BASE_URL + '/admin/fund/membership/',
           'count': need_approval,
           'giving_project': unicode(gp),
           'support_email': c.SUPPORT_EMAIL
@@ -95,7 +95,7 @@ def gift_notify(request):
       memberships[donor.membership] = []
     memberships[donor.membership].append(donor)
 
-  login_url = c.APP_BASE_URL + 'fund/'
+  login_url = c.APP_BASE_URL + '/fund/'
   subject = 'Gift or pledge received'
   from_email = c.FUND_EMAIL
   bcc = [c.SUPPORT_EMAIL]

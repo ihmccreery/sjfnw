@@ -43,7 +43,7 @@ else:
       'USER': 'root',
       'PASSWORD': 'SJFdb',
       'HOST': 'localhost',
-      'NAME': 'sjfdb_local',
+      'NAME': 'sjfnw_multi',
     }
   }
   DEBUG = True
