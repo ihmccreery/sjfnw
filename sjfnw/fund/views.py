@@ -588,7 +588,6 @@ def copy_contacts(request):
 
   return render(request, 'fund/forms/copy_contacts.html', {'formset': formset})
 
-
 @login_required(login_url='/fund/login/')
 @approved_membership()
 def add_mult(request):

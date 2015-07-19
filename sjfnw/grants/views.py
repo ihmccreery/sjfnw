@@ -863,6 +863,7 @@ def view_yer(request, report_id):
 
 
 # ADMIN
+
 def RedirToApply(request):
   return redirect('/apply/')
 
@@ -923,6 +924,31 @@ def AdminRollover(request, app_id):
 
   return render(request, 'admin/grants/rollover.html',
                 {'form': form, 'application': application, 'count': cycle_count})
+
+def show_yer_statuses(request):
+  awards = (models.GivingProjectGrant.objects
+    .filter(agreement_mailed__isnull=False)
+    .select_related('projectapp__application__organization', 'projectapp_giving_project')
+    .order_by('agreement_mailed'))
+  yers = models.YearEndReport.objects.values_list('award_id', flat=True)
+  # count submitted yers by award id
+  yers_by_award = {}
+  for award_id in yers:
+    award_id = str(award_id)
+    if award_id in yers_by_award:
+      yers_by_award[award_id] = yers_by_award[award_id] + 1
+    else:
+      yers_by_award[award_id] = 1
+  # set count on award object and add computed properties
+  for award in awards:
+    if str(award.pk) in yers_by_award:
+      award.yer_count = yers_by_award[str(award.pk)]
+    else:
+      award.yer_count = 0
+    award.complete = award.yer_count >= award.grant_length()
+    award.past_due = (award.yearend_due() < timezone.now().date()) and not award.complete
+
+  return render(request, 'admin/grants/yer_status.html', {'awards': awards})
 
 def Impersonate(request):
 

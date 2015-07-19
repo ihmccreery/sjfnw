@@ -52,6 +52,7 @@ urlpatterns = patterns('',
       'sjfnw.grants.views.AdminRollover'),
   (r'^admin/grants/organization/login', 'sjfnw.grants.views.Impersonate'),
   (r'^admin/grants/organization/(?P<org_id>\d+)/update', 'sjfnw.grants.views.update_profile'),
+  (r'^admin/grants/givingprojectgrant/yer-status', 'sjfnw.grants.views.show_yer_statuses'),
 
   #reporting
   (r'^admin/grants/search/?', 'sjfnw.grants.views.grants_report'),
