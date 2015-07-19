@@ -242,6 +242,15 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
       return mark_safe(yer_link)
     return ''
 
+class YERInline(BaseShowInline):
+  model = models.YearEndReport
+  fields = ['submitted', 'contact_person', 'email', 'phone', 'view']
+  readonly_fields = ['submitted', 'contact_person', 'email', 'phone', 'view']
+
+  def view(self, obj):
+    return '<a href="/report/view/{}">View</a>'.format(obj.pk)
+  view.allow_tags = True
+
 #------------------------------------------------------------------------------
 # MODEL ADMIN
 #------------------------------------------------------------------------------
@@ -369,7 +378,7 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 class GivingProjectGrantA(admin.ModelAdmin):
   list_select_related = True
   list_display = [
-     'organization_name', 'grant_cycle', 'giving_project', 'created',
+     'organization_name', 'grant_cycle', 'giving_project', 'short_created',
     'total_grant', 'fully_paid', 'check_mailed', 'next_year_end_report_due'
   ]
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter, MultiYearGrantFilter]
@@ -378,17 +387,19 @@ class GivingProjectGrantA(admin.ModelAdmin):
   fieldsets = (
     ('', {
       'fields': (
-        ('projectapp', 'total_grant'),
+        ('projectapp', 'total_grant', 'created'),
         ('amount', 'check_number', 'check_mailed'),
         ('agreement_mailed', 'agreement_returned', 'next_year_end_report_due'),
         'approved'
-        )
+      )
     }),
     ('Multi-Year Grant', {
       'fields': (('second_amount', 'second_check_number', 'second_check_mailed'),)
     })
   )
-  readonly_fields = ['next_year_end_report_due', 'total_grant']
+  readonly_fields = ['created', 'next_year_end_report_due', 'total_grant']
+
+  inlines = [YERInline]
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     logger.info('gpg page formfield_for_foreignkey')
@@ -407,15 +418,17 @@ class GivingProjectGrantA(admin.ModelAdmin):
       self.readonly_fields.append('projectapp')
     return self.readonly_fields
 
+  def short_created(self, obj):
+    return obj.created.strftime('%m/%d/%y')
+  short_created.short_description = 'Created'
+  short_created.admin_order_field = 'created'
+
   def fully_paid(self, obj):
     return obj.fully_paid()
   fully_paid.boolean = True
 
   def total_grant(self, obj):
     return '${:,}'.format(int(obj.total_amount()))
-
-  def next_year_end_report_due(self, obj):
-    return obj.yearend_due()
 
   def organization_name(self, obj):
     return obj.projectapp.application.organization.name
@@ -428,6 +441,9 @@ class GivingProjectGrantA(admin.ModelAdmin):
   def giving_project(self, obj):
     return unicode(obj.projectapp.giving_project)
   giving_project.admin_order_field = 'projectapp__giving_project__title'
+
+  def next_year_end_report_due(self, obj):
+    return obj.yearend_due()
 
 
 class SponsoredProgramGrantA(admin.ModelAdmin):
