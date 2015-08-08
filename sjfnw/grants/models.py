@@ -627,14 +627,13 @@ class GivingProjectGrant(models.Model):
       return None
 
   def yearend_due(self):
-    if self.agreement_mailed:
-      first_yearend = self.agreement_mailed.replace(year=self.agreement_mailed.year + 1)
-      if (timezone.now().date() > first_yearend) and self.second_check_mailed:
-        return first_yearend.replace(year=first_yearend.year + 1)
-      else:
-        return first_yearend
-    else:
+    if not self.agreement_mailed:
       return None
+    completed = self.yearendreport_set.count()
+    if completed >= self.grant_length():
+      return None
+    else:
+      return self.agreement_mailed.replace(year=self.agreement_mailed.year + completed + 1)
 
   def total_amount(self):
     if self.second_amount:
