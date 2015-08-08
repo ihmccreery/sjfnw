@@ -378,11 +378,16 @@ class YearEndReportReminders(BaseGrantTestCase):
         agreement_returned=mailed + timedelta(days=3)
     )
     award.save()
+
+    # verify that YER is due in 7 days
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
+
+    # create YER
     yer = models.YearEndReport(award=award, total_size=10, donations_count=50)
     yer.save()
 
-    # verify that yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
+    # verify that no more are due
+    self.assertEqual(award.yearend_due(), None)
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
@@ -401,8 +406,12 @@ class YearEndReportReminders(BaseGrantTestCase):
     )
     award.save()
 
-    first_year_end = today.date().replace(year=today.year - 1) + timedelta(days=7)
-    yer = models.YearEndReport(award=award, submitted=first_year_end,
+    # verify that first YER was due 7 days from one year ago
+    first_yer_due = today.date().replace(year=today.year-1) + timedelta(days=7)
+    self.assertEqual(award.yearend_due(), first_yer_due)
+
+    # submit first YER
+    yer = models.YearEndReport(award=award, submitted=first_yer_due,
                                total_size=10, donations_count=50)
     yer.save()
 
@@ -426,17 +435,23 @@ class YearEndReportReminders(BaseGrantTestCase):
     )
     award.save()
 
-    firstyear_end = today.date().replace(year=today.year-1) + timedelta(days=7)
+    # create first YER
+    first_yer_due = today.date().replace(year=today.year-1) + timedelta(days=7)
     yer = models.YearEndReport(award=award, total_size=10,
-                               submitted=firstyear_end, donations_count=50)
+                               submitted=first_yer_due, donations_count=50)
     yer.save()
+
+    # verify that second yer is due in 7 days
+    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
+
+    # create second YER
     second_yer = models.YearEndReport(award=award, total_size=10,
-                                      submitted=firstyear_end.replace(year=firstyear_end.year + 1),
+                                      submitted=first_yer_due.replace(year=first_yer_due.year + 1),
                                       donations_count=50)
     second_yer.save()
 
-    # verify that last yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today.date() + timedelta(days=7))
+    # verify that no YER is due
+    self.assertEqual(award.yearend_due(), None)
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
