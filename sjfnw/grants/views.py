@@ -946,7 +946,8 @@ def show_yer_statuses(request):
     else:
       award.yer_count = 0
     award.complete = award.yer_count >= award.grant_length()
-    award.past_due = (award.yearend_due() < timezone.now().date()) and not award.complete
+    next_due = award.yearend_due()
+    award.past_due = next_due and next_due < timezone.now().date()
 
   return render(request, 'admin/grants/yer_status.html', {'awards': awards})
 
