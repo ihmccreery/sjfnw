@@ -1,4 +1,5 @@
 {% extends "admin/base_site.html" %}
+
 {% load i18n admin_static admin_list %}
 {% load admin_urls %}
 
@@ -20,43 +21,43 @@
 {% endblock %}
 
 {% block extrahead %}
-{{ block.super }}
-{{ media.js }}
-{% if action_form %}{% if actions_on_top or actions_on_bottom %}
-<script type="text/javascript">
-(function($) {
-    $(document).ready(function($) {
-        $("tr input.action-select").actions();
+  {{ block.super }}
+  {{ media.js }}
+  {% if action_form %}
+  {% if actions_on_top or actions_on_bottom %}
+  <script type="text/javascript">
+    (function($) {
+        $(document).ready(function($) {
+            $("tr input.action-select").actions();
+        });
+    })(django.jQuery);
+
+    var sidebar_contents;
+    var filter_toggle;
+
+    function toggleFilterSidebar(){
+      sidebar_contents.toggle();
+      var toggle_text = filter_toggle.text();
+      if (toggle_text == '▲') {
+        filter_toggle.text('▼');
+      } else {
+        filter_toggle.text('▲');
+      }
+    }
+
+    django.jQuery(document).ready(function() {
+      sidebar_contents = django.jQuery('#changelist-filter');
+      filter_toggle = django.jQuery('#filter-toggle');
+      if (sidebar_contents) {
+        django.jQuery('#filter-header').click(toggleFilterSidebar);
+      } else {
+        console.warning('changelist filter not found');
+      }
     });
-})(django.jQuery);
-</script>
-<script type="text/javascript">
-  var sidebar_contents;
-  var filter_toggle;
-
-  function toggleFilterSidebar(){
-    console.log('TOGGLE');
-    sidebar_contents.toggle();
-    var toggle_text = filter_toggle.text();
-    if (toggle_text == '▲') {
-      filter_toggle.text('▼');
-    } else {
-      filter_toggle.text('▲');
-    }
-  }
-
-  django.jQuery(document).ready(function() {
-    sidebar_contents = django.jQuery('#changelist-filter');
-    filter_toggle = django.jQuery('#filter-toggle');
-    if (sidebar_contents) {
-      django.jQuery('#filter-header').click(toggleFilterSidebar);
-    } else {
-      console.warning('changelist filter not found');
-    }
-  });
-</script>
-{% endif %}{% endif %}
-{% endblock %}
+  </script>
+  {% endif %}
+  {% endif %}
+{% endblock extrahead %}
 
 {% block bodyclass %}change-list{% endblock %}
 
