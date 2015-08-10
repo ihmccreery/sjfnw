@@ -494,7 +494,7 @@ def project_survey(request, gp_survey_id):
   try:
     gp_survey = models.GPSurvey.objects.get(pk=gp_survey_id)
   except models.GPSurvey.DoesNotExist:
-    logger.error('GP Survey does not exist ' + str(gp_survey))
+    logger.error('GP Survey does with given id does not exist.')
     raise Http404('survey not found')
 
   if request.method == 'POST':
