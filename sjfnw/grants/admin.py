@@ -376,13 +376,10 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 
 
 class GivingProjectGrantA(admin.ModelAdmin):
-  list_select_related = True
-  list_display = [
-     'organization_name', 'grant_cycle', 'giving_project', 'short_created',
-    'total_grant', 'fully_paid', 'check_mailed'
-  ]
+  list_display = ['organization_name', 'grant_cycle', 'giving_project',
+                  'short_created', 'total_grant', 'fully_paid', 'check_mailed']
   list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter, MultiYearGrantFilter]
-  ordering = ['-created']
+  list_select_related = True
 
   fieldsets = (
     ('', {
@@ -401,7 +398,10 @@ class GivingProjectGrantA(admin.ModelAdmin):
 
   inlines = [YERInline]
 
+  # ModelAdmin methods (single view)
+
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    """ Restrict db query to selected projectapp if specified in url """
     logger.info('gpg page formfield_for_foreignkey')
     if db_field.name == 'projectapp':
       p_app = request.GET.get('projectapp')
@@ -414,36 +414,44 @@ class GivingProjectGrantA(admin.ModelAdmin):
         db_field, request, **kwargs)
 
   def get_readonly_fields(self, request, obj=None):
+    """ Don't allow projectapp to be changed once the grant has been created """
     if obj is not None:
       self.readonly_fields.append('projectapp')
     return self.readonly_fields
 
-  def short_created(self, obj):
-    return obj.created.strftime('%m/%d/%y')
-  short_created.short_description = 'Created'
-  short_created.admin_order_field = 'created'
+  # custom methods - list and single views
+
+  def next_year_end_report_due(self, obj):
+    return obj.yearend_due() or '-'
+
+  def total_grant(self, obj):
+    amt = obj.total_amount()
+    if amt:
+      return '${:,}'.format(amt)
+    return '-'
+
+  # custom methods - list page
 
   def fully_paid(self, obj):
     return obj.fully_paid()
   fully_paid.boolean = True
 
-  def total_grant(self, obj):
-    return '${:,}'.format(int(obj.total_amount()))
-
-  def organization_name(self, obj):
-    return obj.projectapp.application.organization.name
-  organization_name.admin_order_field = 'projectapp__application__organization__name'
+  def giving_project(self, obj):
+    return unicode(obj.projectapp.giving_project)
+  giving_project.admin_order_field = 'projectapp__giving_project__title'
 
   def grant_cycle(self, obj):
     return unicode(obj.projectapp.application.grant_cycle.title)
   grant_cycle.admin_order_field = 'projectapp__application__grant_cycle__title'
 
-  def giving_project(self, obj):
-    return unicode(obj.projectapp.giving_project)
-  giving_project.admin_order_field = 'projectapp__giving_project__title'
+  def organization_name(self, obj):
+    return obj.projectapp.application.organization.name
+  organization_name.admin_order_field = 'projectapp__application__organization__name'
 
-  def next_year_end_report_due(self, obj):
-    return obj.yearend_due()
+  def short_created(self, obj):
+    return obj.created.strftime('%m/%d/%y')
+  short_created.short_description = 'Created'
+  short_created.admin_order_field = 'created'
 
 
 class SponsoredProgramGrantA(admin.ModelAdmin):
