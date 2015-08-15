@@ -611,22 +611,29 @@ class GivingProjectGrant(models.Model):
     ordering = ['-created']
 
   def __unicode__(self):
-    summary = '${:,} '
+    """ Basic description of grant: amount and duration """
+    summary = u'${:,} '
     if self.grant_length() == 2:
       summary += 'two-year '
     summary += 'grant'
     return summary.format(self.total_amount())
 
   def full_description(self):
+    """ Description of grant including the giving project that made the award.
+        Not used as __unicode__ since it may trigger additional DB lookups """
     return u'{} from {}'.format(self, self.projectapp.giving_project)
 
   def agreement_due(self):
+    """ Agreement is due 30 days after it is mailed """
     if self.agreement_mailed:
       return self.agreement_mailed + timedelta(days=30)
     else:
       return None
 
   def yearend_due(self):
+    """ Year-end reports are due n year(s) after agreement was mailed
+        Returns None if all YER have been submitted for this grant
+    """
     if not self.agreement_mailed:
       return None
     completed = self.yearendreport_set.count()
@@ -636,16 +643,16 @@ class GivingProjectGrant(models.Model):
       return self.agreement_mailed.replace(year=self.agreement_mailed.year + completed + 1)
 
   def total_amount(self):
+    """ Total amount granted, or 0 if no amount has been entered """
+    first_amount = self.amount or 0
     if self.second_amount:
-      return self.second_amount + self.amount
+      return self.second_amount + first_amount
     else:
-      return self.amount
+      return first_amount
 
   def grant_length(self):
-    if self.second_amount:
-      return 2
-    else:
-      return 1
+    """ Returns length of grant in years. Only supports 1 or 2 year grants """
+    return 2 if self.second_amount else 1
 
   def fully_paid(self):
     if not self.check_mailed:
@@ -683,8 +690,6 @@ def validate_photo_file_extension(value):
 
 
 class YearEndReport(models.Model):
-
-  # automatic
   award = models.ForeignKey(GivingProjectGrant)
   submitted = models.DateTimeField(default=timezone.now())
 
