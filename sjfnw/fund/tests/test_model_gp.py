@@ -32,11 +32,11 @@ class GetSuggestedSteps(BaseFundTestCase):
     self.assertEqual(suggested[2], 'Thanks!!')
 
   def test_whitespace(self):
-    self.gp.suggested_steps = 'Talk to person     \r\n   Invite them to a thing\n  \n\nThanks!!\r\n   '
+    self.gp.suggested_steps = 'Talk  \r\n  Invite them\n  \n\n Thanks!!\r\n '
     self.gp.save()
     suggested = self.gp.get_suggested_steps()
     self.assertEqual(len(suggested), 3)
-    self.assertEqual(suggested[0], 'Talk to person')
-    self.assertEqual(suggested[1], 'Invite them to a thing')
+    self.assertEqual(suggested[0], 'Talk')
+    self.assertEqual(suggested[1], 'Invite them')
     self.assertEqual(suggested[2], 'Thanks!!')
 
