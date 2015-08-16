@@ -1,72 +1,97 @@
-import mimetypes
 import logging
 
-from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.files.uploadedfile import UploadedFile
 from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers
 from django.utils.encoding import force_unicode
 
-from google.appengine.api import files
 from google.appengine.api.images import get_serving_url, NotImageError
 from google.appengine.ext.blobstore import BlobInfo, BlobKey, delete, BlobReader
 
-from sjfnw.grants.utils import FindBlobKey
+from sjfnw.grants.utils import get_blobkey_from_body
 
 logger = logging.getLogger('sjfnw')
 
-# MODIFIED VERSION OF DJANGOAPPENGINES STORAGE FILE
-# SEE LICENSE AT BOTTOM
+# MODIFIED VERSION OF DJANGOAPPENGINES STORAGE FILE. SEE LICENSE AT BOTTOM
 
-class BlobstoreStorage(Storage):
-  """Google App Engine Blobstore storage backend."""
+""" Uploading files
+  Assume view has set up a form that posts to a blobstore url, so we are getting
+  the modified form data with blobinfo in it.
+
+  1. BlobstoreFileUploadHandler.new_file
+    a. Extracts blobkey using get_blobkey_from_body
+  2. BlobstoreFileUploadHandler.file_complete
+  3. BlobstoreUploadedFile.__init__
+  4. BlobstoreStorage._save
+    a. data is blobinfo, key is stored
+
+  Serving files (via docs viewer or direct)
+    Using grants/utils.py
+"""
+
+class BlobstoreFileUploadHandler(FileUploadHandler):
+  """ File upload handler for the Google App Engine Blobstore. """
+
+  def new_file(self, *args, **kwargs):
+    """field_name, file_name, content_type, content_length, charset=None"""
+
+    logger.debug('BlobstoreFileUploadHandler.new_file')
+    super(BlobstoreFileUploadHandler, self).new_file(*args, **kwargs)
+
+    blobkey = get_blobkey_from_body(self.request.body)
+    self.active = blobkey is not None
+    if self.active:
+      self.blobkey = BlobKey(blobkey)
+      raise StopFutureHandlers()
+
+  def receive_data_chunk(self, raw_data, start):
+    """ Add the data to the StringIO file.  """
+    if not self.active:
+      return raw_data
+
+  def file_complete(self, file_size):
+    """ Return a file object if we're activated.  """
+    logger.info('BlobstoreFileUploadHandler.file_complete')
+    if not self.active:
+      logger.info('not active')
+      return
+    return BlobstoreUploadedFile(
+      blobinfo=BlobInfo(self.blobkey),
+      charset=self.charset)
+
+
+class BlobstoreStorage(Storage): # pylint: disable=abstract-class-not-used
+  """ Google App Engine Blobstore storage backend """
 
   def _open(self, name, mode='rb'):
-    logger.info('storage open ' + str([name]))
-    return BlobstoreFile(name, mode, self)
+    raise NotImplementedError()
 
   def _save(self, name, content):
-    logger.info('storage _save on ' + str([name]))
-
+    logger.info('storage _save on %s', name)
     name = name.replace('\\', '/')
+
     if hasattr(content, 'file') and hasattr(content.file, 'blobstore_info'):
       data = content.file.blobstore_info
     elif hasattr(content, 'blobstore_info'):
       data = content.blobstore_info
-    elif isinstance(content, File):
-      logger.info('content is a File, guessing its type')
-      guessed_type = mimetypes.guess_type(name)[0]
-      file_name = files.blobstore.create(mime_type=guessed_type or
-                                         'application/octet-stream',
-                                         _blobinfo_uploaded_filename=name)
-
-      with files.open(file_name, 'a') as open_file:
-        for chunk in content.chunks():
-          open_file.write(chunk)
-
-      files.finalize(file_name)
-      data = files.blobstore.get_blob_key(file_name)
-
     else:
-      raise ValueError("The App Engine storage backend only supports "
-                       "BlobstoreFile instances or File instances.")
+      raise ValueError('BlobstoreStorage only supports content with blobinfo')
 
     if isinstance(data, (BlobInfo, BlobKey)):
       if isinstance(data, BlobInfo):
-        logger.info('data is blobinfo, storing its key')
         data = data.key()
 
-      name = name.lstrip('/')
-      if len(name) > 65: #shorten it so extension fits in FileField
-        name = name.split(".")[0][:60].rstrip() + u'.' + name.split(".")[1]
-        logger.info(name)
-        logger.info('Returning ' + str(data) + name)
+      name = name.lstrip('/') # get just the file name
+      if len(name) > 65: # shorten name so extension fits in FileField
+        name = name.split('.')[0][:60].rstrip() + u'.' + name.split('.')[1]
+        logger.info('Returning shortened name: %s', name)
+
       return '%s/%s' % (data, name)
 
     else:
-      raise ValueError("The App Engine Blobstore only supports BlobInfo "
-                       "values. Data can't be uploaded directly. You have to "
-                       "use the file upload handler.")
+      raise ValueError('BlobstoreStorage only supports BlobInfo values. Data '
+                       'cannot be uploaded directly; you have to use the file'
+                       'upload handler.')
 
   def delete(self, name):
     delete(self._get_key(name))
@@ -83,6 +108,9 @@ class BlobstoreStorage(Storage):
     except NotImageError:
       return None
 
+  def accessed_time(self, name):
+    raise NotImplementedError()
+
   def created_time(self, name):
     return self._get_blobinfo(name).creation
 
@@ -98,78 +126,17 @@ class BlobstoreStorage(Storage):
   def _get_blobinfo(self, name):
     return BlobInfo.get(self._get_key(name))
 
-class BlobstoreFile(File):
-
-  def __init__(self, name, mode, storage):
-    logger.info('BlobstoreFile__init on ' + name)
-    self.name = name
-    self._storage = storage
-    self._mode = mode
-    self.blobstore_info = storage._get_blobinfo(name)
-
-  @property
-  def size(self):
-    return self.blobstore_info.size
-
-  def write(self, content):
-    raise NotImplementedError()
-
-  @property
-  def file(self):
-    if not hasattr(self, '_file'):
-      self._file = BlobReader(self.blobstore_info.key())
-    return self._file
-
-class BlobstoreFileUploadHandler(FileUploadHandler):
-  """
-  File upload handler for the Google App Engine Blobstore.
-  """
-
-  def new_file(self, *args, **kwargs):
-    """field_name, file_name, content_type, content_length, charset=None"""
-
-    logger.debug('BlobstoreFileUploadHandler.new_file')
-    super(BlobstoreFileUploadHandler, self).new_file(*args, **kwargs)
-
-    blobkey = FindBlobKey(self.request.body)
-    self.active = blobkey is not None
-    if self.active:
-      self.blobkey = BlobKey(blobkey)
-      raise StopFutureHandlers()
-
-  def receive_data_chunk(self, raw_data, start):
-    """
-    Add the data to the StringIO file.
-    """
-    if not self.active:
-      return raw_data
-
-  def file_complete(self, file_size):
-    """
-    Return a file object if we're activated.
-    """
-    logger.info('BlobstoreFileUploadHandler.file_complete')
-    if not self.active:
-      logger.info('not active')
-      return
-    return BlobstoreUploadedFile(
-      blobinfo=BlobInfo(self.blobkey),
-      charset=self.charset)
 
 class BlobstoreUploadedFile(UploadedFile):
-  """
-  A file uploaded into memory (i.e. stream-to-memory).
-  """
+  """ A file uploaded into memory (i.e. stream-to-memory)
+      See django's InMemoryUploadedFile for a non-blobstore example  """
 
   def __init__(self, blobinfo, charset):
     logger.info('BlobstoreUploadedFile.__init__ %s', blobinfo.content_type)
     super(BlobstoreUploadedFile, self).__init__(
-      BlobReader(blobinfo.key()), blobinfo.filename,
-      blobinfo.content_type, blobinfo.size, charset)
+      BlobReader(blobinfo.key()), # read only file-like interface to blob
+      blobinfo.filename, blobinfo.content_type, blobinfo.size, charset)
     self.blobstore_info = blobinfo
-
-  def open(self, mode=None):
-    pass
 
   def chunks(self, chunk_size=1024 * 128):
     self.file.seek(0)
@@ -211,4 +178,3 @@ class BlobstoreUploadedFile(UploadedFile):
 #ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 #(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-

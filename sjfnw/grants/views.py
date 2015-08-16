@@ -1,7 +1,4 @@
-import datetime
-import json
-import logging
-import urllib2
+import datetime, json, logging, urllib2
 
 from django.conf import settings
 from django.contrib import messages
@@ -17,7 +14,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import strip_tags
 
-from google.appengine.ext import blobstore, deferred
+from google.appengine.ext import blobstore
 
 from libs import unicodecsv
 
@@ -29,7 +26,7 @@ from sjfnw.grants.forms import (AdminRolloverForm, LoginAsOrgForm, LoginForm,
    RolloverForm, RolloverYERForm)
 from sjfnw.grants.modelforms import (GrantApplicationModelForm, OrgProfile,
     YearEndReportForm)
-from sjfnw.grants.utils import local_date_str, ServeBlob, DeleteBlob
+from sjfnw.grants.utils import local_date_str, find_blobinfo, delete_blob
 from sjfnw.grants import models
 
 logger = logging.getLogger('sjfnw')
@@ -443,7 +440,7 @@ def remove_file(request, draft_type, draft_id, file_field):
 
   if hasattr(draft, file_field):
     old = getattr(draft, file_field)
-    deferred.defer(DeleteBlob, old)
+    # deferred.defer(delete_blob, old)
     setattr(draft, file_field, '')
     draft.modified = timezone.now()
     draft.save()
@@ -821,6 +818,24 @@ def view_application(request, app_id):
                 {'app': app, 'form': form, 'file_urls': file_urls, 'print_urls': print_urls,
                  'awards': awards, 'perm': perm})
 
+def serve_app_file(application, field_name):
+  """ Returns response containing file from the Blobstore
+
+    Arguments:
+      application: GrantApplication or DraftGrantApplication
+      field_name: name of the file field
+  """
+
+  file_field = getattr(application, field_name)
+  if not file_field:
+    logger.warning('Draft/app does not have a %s', field_name)
+    raise Http404
+
+  blobinfo = find_blobinfo(file_field)
+
+  return  HttpResponse(blobstore.BlobReader(blobinfo).read(),
+                       content_type=blobinfo.content_type)
+
 def view_file(request, obj_type, obj_id, field_name):
   MODEL_TYPES = {
     'app': models.GrantApplication,
@@ -833,11 +848,11 @@ def view_file(request, obj_type, obj_id, field_name):
     raise Http404
 
   obj = get_object_or_404(MODEL_TYPES[obj_type], pk=obj_id)
-  return ServeBlob(obj, field_name)
+  return serve_app_file(obj, field_name)
 
 def ViewDraftFile(request, draft_id, field_name):
   application = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
-  return ServeBlob(application, field_name)
+  return serve_app_file(application, field_name)
 
 def view_yer(request, report_id):
 
