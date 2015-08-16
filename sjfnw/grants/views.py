@@ -193,7 +193,7 @@ def org_home(request, org):
   award_set = {}
   for award in awards:
     app_id = int(award.projectapp.application_id)
-    ydrafts +=  award.yerdraft_set.all()
+    ydrafts += award.yerdraft_set.all()
     if app_id in award_set:
       award_set[app_id].append(award)
     else:
@@ -436,11 +436,17 @@ def remove_file(request, draft_type, draft_id, file_field):
       Note: does not delete file from Blobstore, since it could be used
         in other drafts/apps
   """
-  draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
+  if draft_type == 'report':
+    draft_model = models.YERDraft
+  elif draft_type == 'apply':
+    draft_model = models.DraftGrantApplication
+  else:
+    logger.error('Unknown draft type %s', draft_type)
+    return Http404
+
+  draft = get_object_or_404(draft_model, pk=draft_id)
 
   if hasattr(draft, file_field):
-    old = getattr(draft, file_field)
-    # deferred.defer(delete_blob, old)
     setattr(draft, file_field, '')
     draft.modified = timezone.now()
     draft.save()
