@@ -114,6 +114,7 @@ class Member(models.Model):
 
 class Membership(models.Model):
   """ Represents a relationship between a member and a giving project """
+
   giving_project = models.ForeignKey(GivingProject)
   member = models.ForeignKey(Member)
   approved = models.BooleanField(default=False)
@@ -142,8 +143,8 @@ class Membership(models.Model):
     """ Checks whether to send an approval email unless skip is True """
     if not skip:
       try:
-        previous = Membership.objects.get(id=self.id) # TODO why id instead of pk?
-        logger.debug('Previously: %s, now %s ' % (previous.approved, self.approved))
+        previous = Membership.objects.get(pk=self.pk)
+        logger.debug('Previously: %s, now %s ', previous.approved, self.approved)
         if self.approved and not previous.approved:
           logger.debug('Detected approval on save for ' + unicode(self))
           NotifyApproval(self)
@@ -153,8 +154,7 @@ class Membership(models.Model):
 
   def get_progress(self):
     """ Aggregate donors to return progress metrics
-        (estimated, promised, received by year)
-    """
+        (estimated, promised, received by year) """
     progress = {
       'estimated': 0,
       'promised': 0,
@@ -180,7 +180,9 @@ class Membership(models.Model):
 
   def overdue_steps(self, get_next=False): # 1 db query
     cutoff = timezone.now().date() - datetime.timedelta(days=1)
-    steps = Step.objects.filter(donor__membership = self, completed__isnull = True, date__lt = cutoff).order_by('-date')
+    steps = Step.objects.filter(
+        donor__membership_id=self.pk, completed__isnull=True, date__lt=cutoff
+      ).order_by('-date')
     count = steps.count()
     if not get_next:
       return count
@@ -190,42 +192,33 @@ class Membership(models.Model):
       return count, steps[0]
 
   def update_story(self, timestamp):
+    logger.info('update_story running for membership %d from %s', self.pk, timestamp)
 
-    logger.info('update_story running for membership ' + str(self.pk) +
-                 ' from ' + str(timestamp))
+    day_min = timestamp.replace(hour=0, minute=0, second=0)
+    day_max = timestamp.replace(hour=23, minute=59, second=59)
 
-    #today's range
-    today_min = timestamp.replace(hour=0, minute=0, second=0)
-    today_max = timestamp.replace(hour=23, minute=59, second=59)
-
-    #check for steps
-    logger.debug("Getting steps")
     steps = Step.objects.filter(
-        completed__range=(today_min, today_max),
-        donor__membership = self).select_related('donor')
+        donor__membership_id=self.pk, completed__range=(day_min, day_max)
+      ).select_related('donor')
+
     if not steps:
-      logger.warning('update story called on ' + str(self.pk) + 'but there are no steps')
+      logger.warning('update_story called on %d but no steps were completed', self.pk)
       return
 
-    #get or create newsitem object
-    logger.debug('Checking for story with date between ' + str(today_min) +
-                  ' and ' + str(today_max))
-    search = self.newsitem_set.filter(date__range=(today_min, today_max))
-    if search:
-      story = search[0]
-    else:
-      story = NewsItem(date = timestamp, membership=self, summary = '')
+    # get or create NewsItem instance
+    logger.debug('Checking for story with date between %s and %s', day_min, day_max)
+    search = self.newsitem_set.filter(date__range=(day_min, day_max))
+    story = search[0] if search else NewsItem(date=timestamp, membership=self)
 
-    #tally today's steps
+    # tally news-worthy milestones from steps
     talked, asked, promised = 0, 0, 0
-    talkedlist = [] #for talk counts, don't want to double up
+    talkedlist = [] # used to make sure each individual donor only counts once
     askedlist = []
     for step in steps:
-      logger.debug(unicode(step))
       if step.asked:
         asked += 1
-        askedlist.append(step.donor)
-        if step.donor in talkedlist: #if donor counted already, remove
+        askedlist.append(step.donor_id)
+        if step.donor_id in talkedlist: # don't count talked + asked for same donor
           talked -= 1
           talkedlist.remove(step.donor)
       elif not step.donor in talkedlist and not step.donor in askedlist:
@@ -233,20 +226,22 @@ class Membership(models.Model):
         talkedlist.append(step.donor)
       if step.promised and step.promised > 0:
         promised += step.promised
+
+    # create summary blurb
     summary = self.member.first_name
     if talked > 0:
-      summary += u' talked to ' + unicode(talked) + (u' people' if talked>1 else u' person')
+      summary += u' talked to {} {}'.format(talked, 'people' if talked > 1 else 'person')
       if asked > 0:
         if promised > 0:
-          summary += u', asked ' + unicode(asked)
+          summary += u', asked {}'.format(asked)
         else:
-          summary += u' and asked ' + unicode(asked)
+          summary += u' and asked {}'.format(asked)
     elif asked > 0:
-      summary += u' asked ' + unicode(asked) + (u' people' if asked>1 else u' person')
+      summary += u' asked {} {}'.format(asked, 'people' if asked > 1 else 'person')
     else:
-      logger.error('News update with 0 talked, 0 asked. Story pk: ' + str(story.pk))
+      logger.error('News update with 0 talked, 0 asked. Story pk: %d', story.pk)
     if promised > 0:
-      summary += u' and got $' + unicode(intcomma(promised)) + u' in promises'
+      summary += u' and got ${} in promises'.format(intcomma(promised))
     summary += u'.'
     logger.info(summary)
     story.summary = summary

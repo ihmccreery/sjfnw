@@ -293,7 +293,7 @@ def set_yer_custom_fields(field, **kwargs):
 
 
 class YearEndReportForm(ModelForm):
-  # stay in touch components
+  # add individual stay in touch components
   listserve = forms.CharField(required=False)
   sit_website = forms.CharField(required=False, label='Website')
   newsletter = forms.CharField(required=False)
@@ -312,7 +312,8 @@ class YearEndReportForm(ModelForm):
 
   def clean(self):
     stay_informed = {}
-    for field_name in self.declared_fields:
+    # declared_fields = the fields listed above (rather than fields inferred from model)
+    for field_name in self.declared_fields: # pylint: disable=no-member
       val = self.cleaned_data.get(field_name, None)
       if val:
         stay_informed[field_name] = val
@@ -321,7 +322,8 @@ class YearEndReportForm(ModelForm):
       self.cleaned_data['stay_informed'] = json.dumps(stay_informed)
     else:
       self._errors['stay_informed'] = mark_safe(
-          '<ul class="errorlist"><li>Please fill out at least one of the options below.</li></ul>')
+        '<ul class="errorlist"><li>Please fill out at least one of the options below.</li></ul>'
+      )
     return super(YearEndReportForm, self).clean()
 
 # ADMIN
