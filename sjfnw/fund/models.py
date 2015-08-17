@@ -1,3 +1,5 @@
+import datetime, json, logging
+
 from django.contrib.humanize.templatetags.humanize import intcomma
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -5,9 +7,7 @@ from django.utils import timezone
 
 from sjfnw.fund.utils import NotifyApproval
 
-import datetime, json, logging
 logger = logging.getLogger('sjfnw')
-
 
 class GivingProject(models.Model):
   title = models.CharField(max_length=255)
@@ -287,7 +287,7 @@ class Donor(models.Model):
       blank=True, default=0,
       verbose_name='Match expected ($)', # total $ amount matched by employer
       validators=[MinValueValidator(0)])
-  match_company = models.CharField(max_length=255, blank=True, verbose_name='Employer name' )#  employer name
+  match_company = models.CharField(max_length=255, blank=True, verbose_name='Employer name')
   match_received = models.PositiveIntegerField(blank=True, default=0,
       verbose_name='Match received ($)')# total $ amount of match received
 

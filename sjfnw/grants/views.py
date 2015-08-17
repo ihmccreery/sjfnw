@@ -1,4 +1,5 @@
-import datetime, json, logging, urllib2
+from datetime import datetime, timedelta
+import json, logging, urllib2
 
 from django.conf import settings
 from django.contrib import messages
@@ -26,7 +27,7 @@ from sjfnw.grants.forms import (AdminRolloverForm, LoginAsOrgForm, LoginForm,
    RolloverForm, RolloverYERForm)
 from sjfnw.grants.modelforms import (GrantApplicationModelForm, OrgProfile,
     YearEndReportForm)
-from sjfnw.grants.utils import local_date_str, find_blobinfo, delete_blob
+from sjfnw.grants.utils import local_date_str, find_blobinfo
 from sjfnw.grants import models
 
 logger = logging.getLogger('sjfnw')
@@ -165,7 +166,7 @@ def org_home(request, org):
   # get grant cycles and group by status
   cycles = (models.GrantCycle.objects
       .exclude(private=True)
-      .filter(close__gt=timezone.now()-datetime.timedelta(days=180))
+      .filter(close__gt=timezone.now()-timedelta(days=180))
       .order_by('open'))
 
   closed, current, applied, upcoming = [], [], [], []
@@ -882,10 +883,9 @@ def view_yer(request, report_id):
     'report': report, 'form': form, 'award': award, 'projectapp': projectapp,
     'file_urls': file_urls, 'perm': perm})
 
-
 # ADMIN
 
-def RedirToApply(request):
+def redirect_to_apply(request):
   return redirect('/apply/')
 
 def AppToDraft(request, app_id):
@@ -1049,7 +1049,6 @@ def grants_report(request):
   context['org_base'] = 'name'
   return render(request, 'grants/reporting.html', context)
 
-
 def get_app_results(options):
   """ Fetches application report results
 
@@ -1073,10 +1072,10 @@ def get_app_results(options):
       'organization', 'grant_cycle')
 
   #filters
-  min_year = datetime.datetime.strptime(options['year_min'] + '-01-01 00:00:01',
+  min_year = datetime.strptime(options['year_min'] + '-01-01 00:00:01',
                                         '%Y-%m-%d %H:%M:%S')
   min_year = timezone.make_aware(min_year, timezone.get_current_timezone())
-  max_year = datetime.datetime.strptime(options['year_max'] + '-12-31 23:59:59',
+  max_year = datetime.strptime(options['year_max'] + '-12-31 23:59:59',
                                         '%Y-%m-%d %H:%M:%S')
   max_year = timezone.make_aware(max_year, timezone.get_current_timezone())
   apps = apps.filter(submission_time__gte=min_year, submission_time__lte=max_year)
@@ -1218,9 +1217,9 @@ def get_award_results(options):
   sponsored = models.SponsoredProgramGrant.objects.all().select_related('organization')
 
   # filters
-  min_year = datetime.datetime.strptime(options['year_min'] + '-01-01 00:00:01', '%Y-%m-%d %H:%M:%S')
+  min_year = datetime.strptime(options['year_min'], '%Y') # defaults to beginning
   min_year = timezone.make_aware(min_year, timezone.get_current_timezone())
-  max_year = datetime.datetime.strptime(options['year_max'] + '-12-31 23:59:59', '%Y-%m-%d %H:%M:%S')
+  max_year = datetime.strptime(options['year_max'] + '-12-31 23:59:59', '%Y-%m-%d %H:%M:%S')
   max_year = timezone.make_aware(max_year, timezone.get_current_timezone())
   gp_awards = gp_awards.filter(created__gte=min_year, created__lte=max_year)
   sponsored = sponsored.filter(entered__gte=min_year, entered__lte=max_year)
@@ -1320,9 +1319,9 @@ def get_org_results(options):
   # filters
   reg = options.get('registered')
   if reg == True:
-    orgs = orgs.exclude(email="")
+    orgs = orgs.exclude(email='')
   elif reg == False:
-    org = orgs.filter(email="")
+    org = orgs.filter(email='')
   if options.get('organization_name'):
     orgs = orgs.filter(name__contains=options['organization_name'])
   if options.get('city'):
@@ -1361,16 +1360,20 @@ def get_org_results(options):
   linebreak = '\n' if options['format'] == 'csv' else '<br>'
   for org in orgs:
     row = []
+
     # org fields
     for field in fields:
       row.append(getattr(org, field))
+
     awards_str = ''
     if get_apps or get_awards:
       apps_str = ''
+
       for app in org.grantapplication_set.all():
         if get_apps:
           apps_str += (app.grant_cycle.title + ' ' +
             app.submission_time.strftime('%m/%d/%Y') + linebreak)
+
         # giving project grants
         if get_awards:
           for papp in app.projectapp_set.all():
@@ -1381,12 +1384,14 @@ def get_org_results(options):
                 timestamp = timestamp.strftime('%m/%d/%Y')
               else:
                 timestamp = 'No timestamp'
-              awards_str += '$%s %s %s' % (award.total_amount(), award.projectapp.giving_project.title, timestamp)
-              awards_str += linebreak
+              awards_str += '${} {} {}{}'.format(award.total_amount(),
+                award.projectapp.giving_project.title, timestamp, linebreak)
             except models.GivingProjectGrant.DoesNotExist:
               pass
+
       if get_apps:
         row.append(apps_str)
+
     # sponsored program grants
     if get_awards:
       for award in org.sponsoredprogramgrant_set.all():
@@ -1407,23 +1412,25 @@ def DraftWarning(request):
       Gives 7 day warning if created 7+ days before close, otherwise 3 day warning """
 
   drafts = models.DraftGrantApplication.objects.all()
-  eight = datetime.timedelta(days=8)
+  eight_days = timedelta(days=8)
 
   for draft in drafts:
     time_left = draft.grant_cycle.close - timezone.now()
-    created_offset = draft.grant_cycle.close - draft.created
-    if (created_offset > eight and eight > time_left > datetime.timedelta(days=7)) or (created_offset < eight and datetime.timedelta(days=2) < time_left <= datetime.timedelta(days=3)):
+    created_delta = draft.grant_cycle.close - draft.created
+    if ((created_delta > eight_days and eight_days > time_left > timedelta(days=7)) or
+        (created_delta < eight_days and timedelta(days=3) > time_left >= timedelta(days=2))):
       subject, from_email = 'Grant cycle closing soon', constants.GRANT_EMAIL
-      to = draft.organization.email
-      html_content = render_to_string('grants/email_draft_warning.html',
-                                      {'org': draft.organization, 'cycle': draft.grant_cycle})
+      to_email = draft.organization.email
+      html_content = render_to_string('grants/email_draft_warning.html', {
+        'org': draft.organization, 'cycle': draft.grant_cycle
+      })
       text_content = strip_tags(html_content)
-      msg = EmailMultiAlternatives(subject, text_content, from_email, [to],
+      msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email],
                                    [constants.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
-      logger.info('Email sent to ' + to + 'regarding draft application soon to expire')
-  return HttpResponse("")
+      logger.info('Email sent to %s regarding draft application soon to expire', to_email)
+  return HttpResponse('')
 
 def yer_reminder_email(request):
   """ Remind orgs of upcoming year end reports that are due
@@ -1432,20 +1439,18 @@ def yer_reminder_email(request):
 
   # get awards due in 7 or 30 days by agreement_returned date
   year_ago = timezone.now().date().replace(year=timezone.now().year - 1)
-  award_dates = [year_ago + datetime.timedelta(days=30), year_ago + datetime.timedelta(days=7)]
-  awards = list(models.GivingProjectGrant.objects.all()
-                                             .filter(agreement_mailed__in=award_dates))
+  award_dates = [year_ago + timedelta(days=30), year_ago + timedelta(days=7)]
+  awards = list(models.GivingProjectGrant.objects.filter(agreement_mailed__in=award_dates))
 
   # for multiyear grants, get awards due in 7 or 30 days of second year end report due date
   two_years_ago = timezone.now().date().replace(year=timezone.now().year - 2)
-  second_award_dates = [two_years_ago + datetime.timedelta(days=30), two_years_ago + datetime.timedelta(days=7)]
-  second_awards = list(models.GivingProjectGrant.objects.all()
-                                           .filter(agreement_mailed__in=second_award_dates,
-                                                   second_check_mailed__isnull=False))
+  second_award_dates = [two_years_ago + timedelta(days=30), two_years_ago + timedelta(days=7)]
+  second_awards = list(models.GivingProjectGrant.objects
+    .filter(agreement_mailed__in=second_award_dates, second_check_mailed__isnull=False)
+  )
   total_awards = awards + second_awards
 
   return send_yer_email(total_awards, 'grants/email_yer_due.html')
-
 
 def send_yer_email(awards, template):
 
