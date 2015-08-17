@@ -34,7 +34,7 @@ urlpatterns = patterns('',
   (r'^grants/?', include(grants_urls)),
   (r'^report/', include(report_urls)),
   (r'^', include(root_urls)),
-  (r'^org/?$', 'sjfnw.grants.views.RedirToApply'),
+  (r'^org/?$', 'sjfnw.grants.views.redirect_to_apply'),
   (r'^logout/?$', 'django.contrib.auth.views.logout', {'next_page': '/apply'}),
   (r'^get-upload-url/?', 'sjfnw.grants.views.RefreshUploadUrl'), #TODO put this under /apply
 

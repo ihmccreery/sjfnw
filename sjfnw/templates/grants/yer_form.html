@@ -5,11 +5,9 @@
 {% block script %}
 <script type="text/javascript" src="/static/js/forms.js"></script>
 <script type="text/javascript">
-
   $(document).ready(function() {
-      formUtils.init('report', {{ draft.pk }}, {{ award.pk }}, '', '{{ user_override }}');
+    formUtils.init('report', {{ draft.pk }}, {{ award.pk }}, '', '{{ user_override }}');
   });
-
 </script>
 {% endblock script %}
 
@@ -130,7 +128,7 @@
 
     <input id="hidden_submit_app" type="submit" value="Submit EVERYTHING" style="display:none;"/>
 
-  </form> <!-- end non-file form -->
+  </form> {# end non-file form #}
 
   <iframe class="upload" id="id_upload_frame" name="upload_frame" onload="fileUploads.iframeUpdated(this); console.log('iframe onload');"></iframe>
 
@@ -227,8 +225,6 @@
   </table>
   {% endautoescape %}
 
-
-  <!--- submit button -->
 	<div align="center">
 		<img class="ajax-loading" src="/static/images/ajaxloader.gif" style="display:none;"><br>
 		<button class="submit" onclick="autoSave.save(true);">Submit</button>

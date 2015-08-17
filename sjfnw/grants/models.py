@@ -116,7 +116,7 @@ class Organization(models.Model):
     return self.name
 
   @classmethod
-  def get_profile_fields(_):
+  def get_profile_fields(cls):
     return [
       'address', 'city', 'state', 'zip', 'telephone_number', 'fax_number',
       'email_address', 'website', 'contact_person', 'contact_person_title',

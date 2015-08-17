@@ -952,13 +952,15 @@ def complete_step(request, donor_id, step_id):
     raise Http404
 
   try:
-    step = models.Step.objects.get(id=step_id, donor=donor)
+    step = models.Step.objects.get(pk=step_id, donor=donor)
   except models.Step.DoesNotExist:
     logger.error(str(request.user) + ' complete step on nonexistent step ' +
                   str(step_id))
     raise Http404
 
-  action = reverse('sjfnw.fund.views.complete_step', kwargs={'donor_id': donor_id, 'step_id': step_id})
+  action = reverse('sjfnw.fund.views.complete_step', kwargs={
+    'donor_id': donor_id, 'step_id': step_id
+  })
 
   if request.method == 'POST':
     # update membership activity timestamp
@@ -1029,7 +1031,7 @@ def complete_step(request, donor_id, step_id):
         form2.save()
         logger.info('Next step created')
 
-      return HttpResponse("success")
+      return HttpResponse('success')
     else: # invalid form
       logger.info('Invalid step completion: ' + str(form.errors))
 
@@ -1048,12 +1050,11 @@ def complete_step(request, donor_id, step_id):
         initial['promised_amount'] = donor.promised
     form = forms.StepDoneForm(auto_id=str(step.pk) + '_id_%s', initial=initial)
 
-  return render(request, 'fund/forms/complete_step.html',
-                {'form': form, 'action': action, 'donor': donor,
-                 'suggested': suggested,
-                 'target': str(step.pk) + '_id_next_step', # for suggested steps
-                 'step_id': step_id,
-                 'step': step})
+  return render(request, 'fund/forms/complete_step.html', {
+    'form': form, 'action': action, 'donor': donor, 'suggested': suggested,
+    'target': str(step.pk) + '_id_next_step', # for suggested steps
+    'step_id': step_id, 'step': step
+  })
 
 #-----------------------------------------------------------------------------
 # METHODS USED BY MULTIPLE VIEWS
