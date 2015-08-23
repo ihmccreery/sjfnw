@@ -25,8 +25,10 @@ if (os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine') or
   DATABASES = {
     'default': {
       'ENGINE': 'django.db.backends.mysql',
-      'INSTANCE': 'sjf-northwest:sjf',
+      'HOST': '/cloudsql/sjf-northwest:sjf',
       'NAME': 'sjfdb',
+      'USER': 'tester',
+      'PASSWORD': os.getenv('CLOUDSQL_PASSWORD')
     }
   }
   DEBUG = False
