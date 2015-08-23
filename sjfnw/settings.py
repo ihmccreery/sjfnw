@@ -24,7 +24,7 @@ if (os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine') or
     os.getenv('SETTINGS_MODE') == 'prod'):
   DATABASES = {
     'default': {
-      'ENGINE': 'google.appengine.ext.django.backends.rdbms',
+      'ENGINE': 'django.db.backends.mysql',
       'INSTANCE': 'sjf-northwest:sjf',
       'NAME': 'sjfdb',
     }
