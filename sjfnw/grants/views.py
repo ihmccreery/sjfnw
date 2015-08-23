@@ -1035,7 +1035,7 @@ def grants_report(request):
         return render_to_response('grants/report_results.html',
                                   {'results': results, 'field_names': field_names})
       elif options['format'] == 'csv':
-        response = HttpResponse(mimetype='text/csv')
+        response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename=%s.csv' % 'grantapplications'
         writer = unicodecsv.writer(response)
         writer.writerow(field_names)
