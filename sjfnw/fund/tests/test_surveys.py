@@ -1,4 +1,5 @@
 from datetime import timedelta
+import json, logging
 
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -6,11 +7,10 @@ from django.utils import timezone
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
 
-import logging, json
 logger = logging.getLogger('sjfnw')
 
 class GPSurveys(BaseFundTestCase):
-  """ Test GP eval surveys creation, display, responses """
+  """ Test GP evaluation surveys: creation, display, responses """
 
   url = reverse('sjfnw.fund.views.home')
   template = 'fund/forms/gp_survey.html'
@@ -19,14 +19,9 @@ class GPSurveys(BaseFundTestCase):
     super(GPSurveys, self).setUp()
 
   def test_creation(self):
-    """ Create a survey, verify basic display
+    """ Create a survey, verify basic display """
 
-    Setup:
-      Logged in to admin site
-      Submit form data for survey creation in basic querydict format
-    """
-
-    # Create form through admin site
+    # create form through admin site
     self.log_in_admin()
     form_data = {
      'title': 'Another Survey',
@@ -46,14 +41,15 @@ class GPSurveys(BaseFundTestCase):
     }
     response = self.client.post('/admin/fund/survey/add/', form_data)
 
-    # Verify it was created
+    # verify it was created
     survey = models.Survey.objects.get(title='Another Survey')
     self.assertEqual(survey.intro, 'Please fill this out!')
 
-    # Connect it to GP1, log into PC and verify it is displaying as expected
+    # connect it to GP 1
     gp_survey = models.GPSurvey(survey=survey, giving_project_id=1, date=timezone.now())
     gp_survey.save()
 
+    # log into PC and verify it is displaying as expected
     self.log_in_testy()
 
     response = self.client.get(self.url, follow=True)
@@ -66,14 +62,14 @@ class GPSurveys(BaseFundTestCase):
   def pre_create_survey(self):
     # Create survey and connect it to GP 1
     survey = models.Survey(
-        title='Basic Survey',
-        intro=('Please fill out this quick survey evaluating our last meeting.'
-               ' Responses are completely anonymous. Once you have completed '
-               'it, you\'ll be taken to your regular home page.'),
-        questions=(
-          '[{"question": "How well did we meet our goals? (1 = did not meet, 5 = met all our goals)",'
-          ' "choices": [1, 2, 3, 4, 5]}, '
-          '{"question": "Any other comments for us?", "choices": []}]'))
+      title='Basic Survey',
+      intro=('Please fill out this quick survey evaluating our last meeting.'
+             ' Responses are completely anonymous. Once you have completed '
+             'it, you\'ll be taken to your regular home page.'),
+      questions=(
+        '[{"question": "How well did we meet our goals? (1 = did not meet, 5 = met all our goals)",'
+        ' "choices": [1, 2, 3, 4, 5]}, '
+        '{"question": "Any other comments for us?", "choices": []}]'))
     survey.save()
     gp_survey = models.GPSurvey(survey=survey, giving_project_id=1, date=timezone.now())
     gp_survey.save()
@@ -142,7 +138,4 @@ class GPSurveys(BaseFundTestCase):
 
     # Check home page
     response = self.client.get(self.url, follow=True)
-    self.assertTemplateNotUsed(self.template)
-
-
-
+    self.assertTemplateNotUsed(response, self.template)
