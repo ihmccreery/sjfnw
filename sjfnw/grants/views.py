@@ -709,7 +709,8 @@ def rollover_yer(request, organization):
       else:
         award_reports[draft.award_id] = 1
 
-    raw_awards = (models.GivingProjectGrant.objects.select_related('award')
+    raw_awards = (models.GivingProjectGrant.objects
+        .select_related('projectapp__application__organization')
         .filter(projectapp__application__organization_id=organization.pk))
     awards = []
     for award in raw_awards:
