@@ -306,7 +306,7 @@ class DonorA(admin.ModelAdmin):
   def export_donors(self, request, queryset):
     logger.info('Export donors called by ' + request.user.email)
 
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=prospects.csv'
     writer = unicodecsv.writer(response)
 
@@ -381,7 +381,7 @@ class SurveyResponseA(admin.ModelAdmin):
   def export_responses(self, request, queryset):
 
     logger.info('Export survey responses called by ' + request.user.email)
-    response = HttpResponse(mimetype='text/csv')
+    response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = ('attachment; filename=survey_responses %s.csv'
         % timezone.now().strftime('%Y-%m-%d'))
     writer = unicodecsv.writer(response)
