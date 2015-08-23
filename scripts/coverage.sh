@@ -4,7 +4,7 @@
 set -e
 
 # run all tests with coverage wrapper
-coverage run manage.py test fund grants
+coverage run manage.py test sjfnw
 
 if [ "$1" != "skip-html" ] ; then
   # output html results
