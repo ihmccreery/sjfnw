@@ -7,10 +7,6 @@ threadsafe: yes
 builtins:
 - deferred: on
 
-libraries:
-- name: django
-  version: "1.5"
-
 handlers:
 
 - url: /_ereporter.*
