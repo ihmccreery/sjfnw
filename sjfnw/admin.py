@@ -1,4 +1,4 @@
-﻿from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Group, Permission
@@ -37,7 +37,7 @@ class YearFilter(admin.SimpleListFilter):
     try:
       year = int(val)
     except:
-      logger.error('YearFilter received invalid value %s' % val)
+      logger.error('YearFilter received invalid value %s', val)
       messages.error(request,
           'Error loading filter. Contact techsupport@socialjusticefund.org')
       return queryset
