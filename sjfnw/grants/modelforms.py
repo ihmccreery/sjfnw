@@ -21,7 +21,7 @@ class OrgProfile(ModelForm):
 
   class Meta:
     model = Organization
-    include = Organization.get_profile_fields()
+    fields = Organization.get_profile_fields()
 
 
 class TimelineWidget(forms.widgets.MultiWidget):
@@ -331,6 +331,7 @@ class YearEndReportForm(ModelForm):
 class DraftAdminForm(ModelForm):
   class Meta:
     model = DraftGrantApplication
+    exclude = []
 
   def clean(self):
     cleaned_data = super(DraftAdminForm, self).clean()
