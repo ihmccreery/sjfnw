@@ -4,7 +4,7 @@ import time
 
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.test.simple import DjangoTestSuiteRunner
+from django.test.runner import DiscoverRunner
 
 from unittest import TextTestRunner, TestResult
 from unittest.signals import registerResult
@@ -56,7 +56,7 @@ class BaseTestCase(TestCase):
 # pylint: disable=too-many-arguments,too-many-branches,too-many-locals,
 # pylint: disable=redefined-builtin,invalid-name,bad-builtin
 
-class ColorTestSuiteRunner(DjangoTestSuiteRunner):
+class ColorTestSuiteRunner(DiscoverRunner):
   """ Redirects run_suite to ColorTestRunner """
 
   def run_suite(self, suite, **kwargs):
