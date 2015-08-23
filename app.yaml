@@ -7,6 +7,10 @@ threadsafe: yes
 builtins:
 - deferred: on
 
+libraries:
+- name: "webob"
+  version: "1.2.3"
+
 handlers:
 
 - url: /_ereporter.*
@@ -39,4 +43,3 @@ handlers:
 - url: /.*
   script: sjfnw.wsgi.application
   secure: always
-
