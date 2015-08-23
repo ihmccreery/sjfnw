@@ -8,6 +8,8 @@ builtins:
 - deferred: on
 
 libraries:
+- name: "MySQLdb"
+  version: "1.2.4"
 - name: "webob"
   version: "1.2.3"
 
