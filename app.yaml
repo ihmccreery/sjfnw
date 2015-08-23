@@ -30,7 +30,7 @@ handlers:
   login: admin
 
 - url: /static/admin
-  static_dir: sjfnw/static/django_admin
+  static_dir: libs/django/contrib/admin/static/admin
   expiration: '0'
 
 - url: /static
