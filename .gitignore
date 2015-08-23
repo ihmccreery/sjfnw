@@ -1,7 +1,10 @@
+# libs managed by pip
+libs/**/*
+!libs/__init__.py
+
 # python
 *.pyc
 
 # coverage.py
 .coverage
 .coverage-html/*
-
