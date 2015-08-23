@@ -74,24 +74,22 @@ class CreateQuestionsWidget(widgets.MultiWidget):
 
   def decompress(self, value):
     """ Takes single DB value, breaks it up for widget display """
-    val_list = []
-    if value:
-      dic = json.loads(value)
-      for q in dic:
-        val_list.append(q['question'])
-        count = 1
-        for choice in q['choices']:
-          val_list.append(choice)
-          count += 1
-        for _ in range(count, 6):
-          val_list.append(None)
-      return val_list
-    else:
+    if not value:
       return []
+    val_list = []
+    raw_survey = json.loads(value)
+    for question in raw_survey:
+      val_list.append(question['question'])
+      count = 1
+      for choice in question['choices']:
+        val_list.append(choice)
+        count += 1
+      for _ in range(count, 6):
+        val_list.append(None)
+    return val_list
 
   def format_output(self, rendered_widgets):
-    """ Formats widgets for display.
-    Returns HTML """
+    """ Formats widgets for display by wrapping them in html """
     html = ('<table id="survey-questions">'
             '<tr><th></th><th>Title</th><th>Choices</th></tr>')
     for i in range(0, len(rendered_widgets), 6):
@@ -105,34 +103,43 @@ class CreateQuestionsWidget(widgets.MultiWidget):
 
   def value_from_datadict(self, data, files, name):
     """ Consolidates widget data into a single value for storage
-    Returns json encoded string for questions field
-    [{'question': 'Rate the session', 'options': ['1', '2', '3', '4', '5']}]"""
-    #logger.info('value_from_datadict, data: ' + str(data))
+    Arguments
+      data - flat array of values from each sub-widget
+      files - request.FILES
+      name - name of this widget
 
-    value = []
+    Returns json encoded string for questions field.
+
+    Example:
+      Input (data arg):
+        ['Rate the session', '1', '2', '3', '4', '5', None,
+         'Did you learn anything?', 'Yes', 'No', None, None, None, None]
+      Output:
+      '[{"question": "Rate the session", "choices": ["1", "2", "3", "4", "5"]},
+        {"question": "Did you learn anything?", "choices": ["Yes", "No"]}]'
+    """
+
+    survey = []
     for i in range(0, len(self.widgets), 6):
-      val = self.widgets[i].value_from_datadict(data, files, name + '_%s' % i)
-      if val:
-        dic = {'question': val, 'choices': []}
-        for c in range(1, 6):
-          w = i + c
-          val = self.widgets[w].value_from_datadict(data, files, name + '_%s' % w)
-          if val:
-            dic['choices'].append(val)
-          else: #blank choice
-            break
-        value.append(dic)
-      else: #blank question
+      val = self.widgets[i].value_from_datadict(data, files, '{}_{}'.format(name, i))
+      if not val: # blank question
         break
+      question = {'question': val, 'choices': []}
+      for j in range(i, i+5):
+        val = self.widgets[j].value_from_datadict(data, files, '{}_{}'.format(name, j))
+        if val:
+          question['choices'].append(val)
+        else: # blank choice
+          break
+      survey.append(question)
 
-    #logger.info('Returning ' + json.dumps(value))
-    return json.dumps(value)
+    return json.dumps(survey)
 
 class CreateSurvey(ModelForm):
 
   class Meta:
     model = Survey
-    include = ['title', 'created_for', 'questions']
+    fields = ['title', 'intro', 'questions']
     widgets = {'questions': CreateQuestionsWidget()}
 
   def clean_questions(self):
@@ -172,14 +179,11 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
       return [None for _ in self.widgets]
 
   def format_output(self, rendered_widgets):
-    """ Formats widgets for display.
-    Returns HTML """
+    """ Formats widgets for display by wrapping them in additional html """
     html = '<table id="survey-questions">'
-    i = 0
-    for q in self.questions:
-      html += ('<tr><th>' + str(i+1) + '.</th><td>' + q['question'] +
-               rendered_widgets[i] + '</td></tr>')
-      i += 1
+    for i, question in enumerate(self.questions):
+      html += '<tr><th>{}.</th><td>{}{}</td></tr>'.format(
+          i+1, question['question'], rendered_widgets[i])
     html += '</table>'
     return html
 
@@ -194,10 +198,12 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
       val_list.append(widget.value_from_datadict(data, files, name + '_%s' % i))
     return json.dumps(val_list)
 
+
 class SurveyResponseForm(ModelForm):
 
   class Meta:
     model = SurveyResponse
+    fields = ['gp_survey', 'responses']
     widgets = {'date': widgets.HiddenInput(), 'gp_survey': widgets.HiddenInput()}
 
   def __init__(self, survey, *args, **kwargs):
@@ -220,4 +226,4 @@ class GivingProjectAdminForm(ModelForm):
 
   class Meta:
     model = GivingProject
-
+    exclude = []
