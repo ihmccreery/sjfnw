@@ -125,7 +125,7 @@ class CreateQuestionsWidget(widgets.MultiWidget):
       if not val: # blank question
         break
       question = {'question': val, 'choices': []}
-      for j in range(i, i+5):
+      for j in range(i+1, i+6):
         val = self.widgets[j].value_from_datadict(data, files, '{}_{}'.format(name, j))
         if val:
           question['choices'].append(val)
@@ -153,7 +153,6 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
   """ Displays a Survey's questions to GP members """
 
   def __init__(self, survey, attrs=None):
-    #logger.info('DisplayQuestionsWidget __init__')
     self.questions = json.loads(survey.questions)
     _widgets = []
     for question in self.questions:
@@ -168,7 +167,6 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
 
   def decompress(self, value):
     """ Takes single DB value, breaks it up for widget display """
-    #logger.info('DisplayQuestionsWidget decompress' + str(value))
     if value:
       val_list = json.loads(value)
       return_list = []
@@ -207,7 +205,6 @@ class SurveyResponseForm(ModelForm):
     widgets = {'date': widgets.HiddenInput(), 'gp_survey': widgets.HiddenInput()}
 
   def __init__(self, survey, *args, **kwargs):
-    #logger.info('SurveyResponseForm __init__')
     super(SurveyResponseForm, self).__init__(*args, **kwargs)
     self.fields['responses'].widget = DisplayQuestionsWidget(survey)
 
