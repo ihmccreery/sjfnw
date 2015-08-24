@@ -348,7 +348,7 @@ div.vertical_cushion { /* mission & grant req labels */
   margin-bottom: 3em;
 }
 
-#apply-now {
+.apply-now {
   margin-top:20px;
   font-size:135%;
   font-weight:bold;
