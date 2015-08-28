@@ -4,8 +4,7 @@ import logging
 from django.utils import timezone
 
 from sjfnw.fund import models
-from sjfnw.grants.models import ProjectApp
-from sjfnw.tests import BaseTestCase
+from sjfnw.tests.base import BaseTestCase
 
 logger = logging.getLogger('sjfnw')
 
