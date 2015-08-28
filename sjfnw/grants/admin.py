@@ -130,6 +130,7 @@ class LogI(admin.TabularInline):
         app_id = int(request.path.split('/')[-2])
         app = models.GrantApplication.objects.get(pk=app_id)
         kwargs['initial'] = app.organization_id
+        kwargs['queryset'] = models.Organization.objects.filter(pk=app.organization_id)
         return db_field.formfield(**kwargs)
 
       # application field
@@ -241,6 +242,7 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
           str(report.pk) + '/">Year ' + str(i + 1) + '</a>')
       return mark_safe(yer_link)
     return ''
+
 
 class YERInline(BaseShowInline):
   model = models.YearEndReport
