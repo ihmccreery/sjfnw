@@ -1,11 +1,12 @@
+from datetime import timedelta
+import json
+
 from django.contrib.auth.models import User
 from django.utils import timezone
 
 from sjfnw.grants import models
-from sjfnw.tests import BaseTestCase
+from sjfnw.tests.base import BaseTestCase
 
-from datetime import timedelta
-import json
 
 """ This file provides a base test class and utilities specific to the grants
     module. See other files in sjfnw/grants/tests for actual tests """
@@ -61,11 +62,11 @@ class BaseGrantTestCase(BaseTestCase):
 
   # see ./test_grants_guide.md for what is associated with each org
   def log_in_new_org(self):
-    user = User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
+    User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
     self.client.login(username='neworg@gmail.com', password='noob')
 
   def log_in_test_org(self):
-    user = User.objects.create_user('testorg@gmail.com', 'testorg@gmail.com', 'noob')
+    User.objects.create_user('testorg@gmail.com', 'testorg@gmail.com', 'noob')
     self.client.login(username='testorg@gmail.com', password='noob')
 
   def assert_draft_matches_app(self, draft, app, exclude_cycle_q=False):
