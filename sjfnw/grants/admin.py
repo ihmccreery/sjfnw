@@ -90,8 +90,8 @@ class LogReadonlyI(admin.TabularInline):
   verbose_name = 'Log'
   verbose_name_plural = 'Logs'
 
-  def queryset(self, request):
-    qs = super(LogReadonlyI, self).queryset(request)
+  def get_queryset(self, request):
+    qs = super(LogReadonlyI, self).get_queryset(request)
     return qs.select_related('staff', 'application', 'application__grant_cycle')
 
   def grantcycle(self, obj):
@@ -109,10 +109,10 @@ class LogI(admin.TabularInline):
   extra = 1
   max_num = 1
   can_delete = False
-  exclude = ['date',] # auto-populated
+  exclude = ['date'] # auto-populated
   verbose_name_plural = 'Add a log entry'
 
-  def queryset(self, request):
+  def get_queryset(self, request):
     return models.GrantApplicationLog.objects.none()
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -155,8 +155,8 @@ class GrantApplicationI(BaseShowInline):
   readonly_fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
   fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
 
-  def queryset(self, request):
-    return super(GrantApplicationI, self).queryset(request).select_related('grant_cycle')
+  def get_queryset(self, request):
+    return super(GrantApplicationI, self).get_queryset(request).select_related('grant_cycle')
 
   def summary(self, obj):
     """ Display a summary of screening status, giving projects, and awards """
