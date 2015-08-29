@@ -1,24 +1,29 @@
-﻿/** CUSTOM ADMIN STYLE OVERRIDES **/
+/** CUSTOM ADMIN STYLE OVERRIDES **/
 
-/* Adjust the top display to fit in extra action (top right) and extra
- * help text (below title). Move "Add ___" button to make room. */
-h1 {
-  display: inline-block;
+/* Index page
+ *------------*/
+
+/* home page sidebar */
+.module h2,
+.module caption,
+.inline-group h2 {
+  font-size: 12px;
 }
 
+/* Changelist
+ *------------*/
+
 .extra-action {
-  display: inline-block;
   float: right;
   z-index: 1;
 }
 
 /* Toggle-able filter sidebar -- don't shrink results around it */
-.change-list .filtered .results, .change-list .filtered .paginator, .filtered #toolbar, .filtered div.xfull {
-    margin-right: 0 !important;
-}
-
-#changelist {
-  background: none !important;
+.change-list .filtered .results,
+.change-list .filtered .paginator,
+.filtered #toolbar,
+.filtered div.xfull {
+  margin-right: 0 !important;
 }
 
 #changelist-wrapper {
@@ -47,48 +52,49 @@ h1 {
   float: right;
 }
 
-div#top_help_text {
-  /* used at top of some model pages (e.g. Org) */
-  margin-top:10px;
-  margin-bottom:10px;
-  color:#333;
-  width:90%;
-  line-height:1.2em;
+/* Edit/change page
+ *------------------*/
+
+/* used at top of some model pages (e.g. Org) */
+#top_help_text {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: #333;
+  width: 90%;
+  line-height: 1.2em;
 }
 
+/* make help text readable */
 p.help {
-  /* make help text readable */
-  font-size:12px !important;
-  font-weight:normal;
+  font-size: 12px !important;
+  font-weight: normal;
 }
 
+/* align help text better */
 form .aligned p.help {
-  /* align help text better */
-  padding-left:0px !important;
-  margin-left:0px !important;
+  padding-left: 0 !important;
+  margin-left: 0 !important;
 }
 
+/* reduce extra padding before first row in inline */
 .has_original td {
-  /* reduce extra padding before first row in inline */
   padding-top: .5em !important;
 }
 
-.module h2, .module caption, .inline-group h2 {
-  /* home page sidebar */
-  font-size:12px;
-}
+/* Model-specific
+ *----------------*/
 
-select#id_permissions {
-  /* user permissions box */
+/* user permissions box */
+#id_permissions {
     height: 400px;
 }
 
-.grants-grantapplication .add-another, .grants-organization .add-another {
-  /* block the + button next to a dropdown in an inline */
-  display:none;
+/* block the + button next to a dropdown in an inline */
+.grants-grantapplication .add-another,
+.grants-organization .add-another {
+  display: none;
 }
 
 .survey-choice {
   display: block;
 }
-

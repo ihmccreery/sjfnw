@@ -1,5 +1,4 @@
-{# Using this to inject custom stylesheet into all admin pages with minimal #}
-{# copy paste (since base_site happens to be a short file, unlike base) #}
+{# Injects custom stylesheet into all admin pages #}
 {% extends "admin/base.html" %}
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
