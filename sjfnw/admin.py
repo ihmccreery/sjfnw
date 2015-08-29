@@ -7,11 +7,29 @@ from django.contrib.contenttypes.models import ContentType
 import logging
 logger = logging.getLogger('sjfnw')
 
+# Configure admin site
+#----------------------
+
+admin.site.index_template = 'admin/index_custom.html'
+admin.site.site_header = 'Social Justice Fund Apps'
+admin.site.site_title = 'SJF Apps'
 
 # SHARED
 
 class YearFilter(admin.SimpleListFilter):
-  """ Reusable filter by year.  See __init__ """
+  """ Base filter by year. Usage: create a child class and override the class variables:
+
+    Required override:
+      filter_model: the model that has the date field to use for filtering
+
+    Optional overrides:
+      intermediate: string that connects the model being filtered to the filter_model
+                    (required if the model being filtered != the filter_model)
+      title: displayed in filters sidebar (default: 'year')
+      parameter_name: query parameter name (default: 'year')
+
+    Example: On grants application page, filter by
+  """
   title = 'year'
   parameter_name = 'year'
   filter_model = None
@@ -58,4 +76,3 @@ advanced_admin.register(User, UserAdmin)
 advanced_admin.register(Group)
 advanced_admin.register(Permission)
 advanced_admin.register(ContentType)
-
