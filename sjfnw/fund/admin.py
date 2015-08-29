@@ -125,7 +125,7 @@ class MembershipInline(admin.TabularInline):
 class ProjectResourcesInline(admin.TabularInline):
   model = ProjectResource
   extra = 0
-  template = 'admin/fund/tabular_projectresource.html'
+  template = 'admin/fund/projectresource/tabular_inline.html'
   fields = ['resource', 'session']
 
 
