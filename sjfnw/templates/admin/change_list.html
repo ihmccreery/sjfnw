@@ -60,6 +60,8 @@
 
 {% block content %}
   <div id="content-main">
+    {# extra content area below title for help text #}
+    <div id="top_help_text">{% block help_text %}{% endblock %}</div>
     {% block object-tools %}
       {% if has_add_permission %}
         <ul class="object-tools">
