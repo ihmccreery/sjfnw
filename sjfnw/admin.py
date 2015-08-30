@@ -14,7 +14,8 @@ admin.site.index_template = 'admin/index_custom.html'
 admin.site.site_header = 'Social Justice Fund Apps'
 admin.site.site_title = 'SJF Apps'
 
-# SHARED
+# Shared admin classes
+#----------------------
 
 class YearFilter(admin.SimpleListFilter):
   """ Base filter by year. Usage: create a child class and override the class variables:
@@ -64,8 +65,8 @@ class YearFilter(admin.SimpleListFilter):
       return queryset.filter(**filt)
 
 
-
-# REGISTER
+# Register
+#----------
 
 advanced_admin = AdminSite(name='advanced')
 
