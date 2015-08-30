@@ -249,8 +249,10 @@ function loadView(getUrl, divId, dasked, dpromised) {
   });
 }
 
-/* Submit form data via ajax request.
+/**
+ * Submit form data via ajax request.
  * Redirects on success, otherwise displays form with errors
+ *
  * @param {string} subUrl - url to send the POST request to
  * @param {string} formId - id of the form element
  * @param {string} divId - id of the element to load the form with errors into

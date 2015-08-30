@@ -44,7 +44,7 @@
       data.addColumn('number', 'Amount');
       data.addRows([
         ['Remaining', {{ progress.togo|default:'0'}}],
-        ["Total Promised", {{ progress.promised }}],
+        ["Promised", {{ progress.promised }}],
         ['Received', {{ progress.received }}]
       ]);
 
