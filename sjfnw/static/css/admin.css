@@ -18,14 +18,6 @@
   z-index: 1;
 }
 
-/* Toggle-able filter sidebar -- don't shrink results around it */
-.change-list .filtered .results,
-.change-list .filtered .paginator,
-.filtered #toolbar,
-.filtered div.xfull {
-  margin-right: 0 !important;
-}
-
 #changelist-wrapper {
   width: 200px;
   float: right;
@@ -36,10 +28,8 @@
 }
 
 #changelist-filter {
-  height: 100%;
-  position: relative;
-  width: 100%;
   display: none;
+  position: relative !important;
 }
 
 #filter-header {
@@ -74,11 +64,6 @@ p.help {
 form .aligned p.help {
   padding-left: 0 !important;
   margin-left: 0 !important;
-}
-
-/* reduce extra padding before first row in inline */
-.has_original td {
-  padding-top: .5em !important;
 }
 
 /* Model-specific

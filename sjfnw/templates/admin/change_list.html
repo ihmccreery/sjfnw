@@ -34,28 +34,27 @@
   {% endif %}{% endif %}
   {# javascript to enable toggling of the filter sidebar #}
   <script type="text/javascript">
-    var sidebar_contents;
-    var filter_toggle;
+    (function($) {
+      var filterSidebar;
+      var filterToggle;
 
-    function toggleFilterSidebar(){
-      sidebar_contents.toggle();
-      var toggle_text = filter_toggle.text();
-      if (toggle_text == '▲') {
-        filter_toggle.text('▼');
-      } else {
-        filter_toggle.text('▲');
+      function toggleFilterSidebar(){
+        filterSidebar.toggle();
+        var toggleArrow = filterToggle.text();
+        toggleArrow = toggleArrow === '▲' ? '▼' : '▲';
+        filterToggle.text(toggleArrow);
       }
-    }
 
-    django.jQuery(document).ready(function() {
-      sidebar_contents = django.jQuery('#changelist-filter');
-      filter_toggle = django.jQuery('#filter-toggle');
-      if (sidebar_contents) {
-        django.jQuery('#filter-header').click(toggleFilterSidebar);
-      } else {
-        console.warning('changelist filter not found');
-      }
-    });
+      $(document).ready(function() {
+        filterSidebar = $('#changelist-filter');
+        filterToggle = $('#filter-toggle');
+        if (filterSidebar) {
+          $('#filter-header').click(toggleFilterSidebar);
+        } else {
+          console.warning('changelist filter not found');
+        }
+      });
+    })(django.jQuery);
   </script>
 {% endblock extrahead %}
 
