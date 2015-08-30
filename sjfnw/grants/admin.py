@@ -15,11 +15,9 @@ logger = logging.getLogger('sjfnw')
 # CUSTOM FILTERS
 #------------------------------------------------------------------------------
 
-class GrantCycleYearFilter(YearFilter):
-  filter_model = models.GrantCycle
-  field = 'close'
-  intermediate = 'projectapp__application__grant_cycle'
-  title = 'Grant cycle year'
+class GPGYearFilter(YearFilter):
+  filter_model = models.GivingProjectGrant
+  field = 'created'
 
 class CycleTypeFilter(admin.SimpleListFilter):
   title = 'Grant cycle type'
@@ -380,7 +378,7 @@ class DraftGrantApplicationA(admin.ModelAdmin):
 class GivingProjectGrantA(admin.ModelAdmin):
   list_display = ['organization_name', 'grant_cycle', 'giving_project',
                   'short_created', 'total_grant', 'fully_paid', 'check_mailed']
-  list_filter = ['agreement_mailed', CycleTypeFilter, GrantCycleYearFilter, MultiYearGrantFilter]
+  list_filter = [CycleTypeFilter, GPGYearFilter, MultiYearGrantFilter]
   list_select_related = True
 
   fieldsets = (
