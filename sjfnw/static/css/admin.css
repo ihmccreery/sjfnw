@@ -3,10 +3,28 @@
 /* Index page
  *------------*/
 
-/* home page sidebar */
+/* Make sidebar section headers bigger */
 .module h2,
 .module caption,
 .inline-group h2 {
+  font-size: 12px;
+}
+
+/* wrapper for custom sidebar + existing */
+.admin-sidebar {
+  float: right;
+  margin-right: -19em;
+  width: 18em;
+}
+
+/* overspecify in order to override default style */
+.admin-sidebar #content-related {
+  float: none;
+  margin: 0;
+}
+
+/* Make custom sidebar links smaller */
+.admin-sidebar h3 {
   font-size: 12px;
 }
 
@@ -71,7 +89,7 @@ form .aligned p.help {
 
 /* user permissions box */
 #id_permissions {
-    height: 400px;
+  height: 400px;
 }
 
 /* block the + button next to a dropdown in an inline */
