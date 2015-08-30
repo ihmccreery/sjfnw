@@ -54,25 +54,25 @@
   {# donor details (initially hidden) #}
   <div class="donor_details indent hidden" id="details-{{ pk }}">
 
-      {# gift received #}
-      {% if d.donor.received > 0 %}
-        <p>Received by SJF: ${{ d.donor.received|intcomma }}</p>
-        <p>Original estimation: ${{ d.donor.estimated|intcomma }}</p>
+    {# gift received #}
+    {% if d.donor.received > 0 %}
+      <p>Received by SJF: ${{ d.donor.received|intcomma }}</p>
+      <p>Original estimation: ${{ d.donor.estimated|intcomma }}</p>
 
-      {# no gift, but promise #}
-      {% elif d.donor.promised != None %}
-        <p>
-          {% if d.donor.promised > 0 %}
-            Promised by contact: ${{ d.donor.promised|intcomma }} <br>
-              {% if d.donor.match_expected > 0 %} {# if gift match expected #}
-                  Expected employer match: ${{ d.donor.match_expected|intcomma }} <br>
-              {% endif %}
-            <strong>Total Promised: ${{ d.donor.total_promised|intcomma }}</strong>
-          {% else %}
-            Declined to donate.
-          {% endif %}
-        </p>
-        <p>Original estimation: ${{ d.donor.estimated|intcomma }}</p>
+    {# no gift, but promise #}
+    {% elif d.donor.promised != None %}
+      <p>
+        {% if d.donor.promised > 0 %}
+          Promised by contact: ${{ d.donor.promised|intcomma }} <br>
+            {% if d.donor.match_expected > 0 %} {# if gift match expected #}
+                Expected employer match: ${{ d.donor.match_expected|intcomma }} <br>
+            {% endif %}
+          <strong>Total promised: ${{ d.donor.total_promised|intcomma }}</strong>
+        {% else %}
+          Declined to donate.
+        {% endif %}
+      </p>
+      <p>Original estimation: ${{ d.donor.estimated|intcomma }}</p>
       {# no promise, but asked #}
       {% elif d.donor.asked %}
         <p>Asked; awaiting response.</p>
@@ -91,7 +91,15 @@
 
       {# list of completed steps #}
       {% if d.complete_steps %}
-        <p>Completed steps:</p>
+        <p>
+          Completed steps:
+          {% if not d.next_step %}
+            <span class="load" data-url="{% url 'sjfnw.fund.views.add_step' donor_id=pk %}"
+                  data-target="{{ pk }}-nextstep">
+              [add another]
+            </span>
+          {% endif %}
+        </p>
         <ul>
         {% for step in d.complete_steps %}
           <li>{{ step.date|date:"n/d/y"}}: {{ step.description }}</li>
