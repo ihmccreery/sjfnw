@@ -13,6 +13,7 @@ logger = logging.getLogger('sjfnw')
 admin.site.index_template = 'admin/index_custom.html'
 admin.site.site_header = 'Social Justice Fund Apps'
 admin.site.site_title = 'SJF Apps'
+admin.site.index_title = None
 
 # Shared admin classes
 #----------------------

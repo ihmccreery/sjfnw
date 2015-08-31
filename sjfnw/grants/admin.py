@@ -87,6 +87,7 @@ class LogReadonlyI(admin.TabularInline):
   readonly_fields = ['date', 'grantcycle', 'staff', 'contacted', 'notes']
   verbose_name = 'Log'
   verbose_name_plural = 'Logs'
+  collapsed = True
 
   def get_queryset(self, request):
     qs = super(LogReadonlyI, self).get_queryset(request)

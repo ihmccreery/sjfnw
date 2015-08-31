@@ -1,14 +1,18 @@
 /** CUSTOM ADMIN STYLE OVERRIDES **/
 
-/* Index page
- *------------*/
+/* General
+ *----------*/
 
-/* Make sidebar section headers bigger */
+/* Make table section headers bigger */
 .module h2,
 .module caption,
 .inline-group h2 {
-  font-size: 12px;
+  font-size: 13px;
+  background: #7CA0C7;
 }
+
+/* Index page
+ *------------*/
 
 /* wrapper for custom sidebar + existing */
 .admin-sidebar {
@@ -82,6 +86,17 @@ p.help {
 form .aligned p.help {
   padding-left: 0 !important;
   margin-left: 0 !important;
+}
+
+/* Don't de-emphasize collapsed headers */
+fieldset.collapsed h2 {
+  background: #7CA0C7;
+  background-image: none !important;
+  color: #fff !important;
+}
+
+fieldset h2 a:link, fieldset h2 a:visited {
+  color: #ddc;
 }
 
 /* Model-specific
