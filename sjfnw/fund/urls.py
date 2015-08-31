@@ -52,7 +52,7 @@ urlpatterns += patterns('',
   (r'^reset-sent/?$', 'django.contrib.auth.views.password_reset_done', {
     'template_name': 'fund/reset_password_sent.html'
   }),
-  (r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/?$',
+  (r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)-(?P<token>.+)/?$',
     'django.contrib.auth.views.password_reset_confirm', {
       'template_name': 'fund/reset_password.html',
       'post_reset_redirect': '/fund/reset-complete'
