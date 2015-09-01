@@ -56,7 +56,7 @@ apply_urls += patterns('',
   (r'^reset-sent/?$', 'django.contrib.auth.views.password_reset_done', {
     'template_name':'grants/password_reset_done.html'
   }),
-  (r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)-(?P<token>.+)/?$',
+  (r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/?$',
     'django.contrib.auth.views.password_reset_confirm', {
       'template_name':'grants/password_reset_confirm.html',
       'post_reset_redirect': '/apply/reset-complete'
