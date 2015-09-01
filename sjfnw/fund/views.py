@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.humanize.templatetags.humanize import intcomma
@@ -272,10 +272,10 @@ def fund_login(request):
     if form.is_valid():
       username = request.POST['email'].lower()
       password = request.POST['password']
-      user = authenticate(username=username, password=password)
+      user = auth.authenticate(username=username, password=password)
       if user:
         if user.is_active:
-          login(request, user)
+          auth.login(request, user)
           return redirect(home)
         else:
           error_msg = 'Your account is not active.  Contact an administrator.'
@@ -315,11 +315,11 @@ def fund_register(request):
           logger.info('Registration - membership in %s created, welcome message set', unicode(giv))
 
         # try to log in
-        user = authenticate(username=username_email, password=password)
+        user = auth.authenticate(username=username_email, password=password)
         if user:
           if user.is_active:
             # success! log in and redirect
-            login(request, user)
+            auth.login(request, user)
             if not membership:
               return redirect(manage_account)
             if membership.approved:
@@ -1142,4 +1142,3 @@ def _create_membership(member, giving_project, notif=''):
     member.save()
 
   return membership, error
-
