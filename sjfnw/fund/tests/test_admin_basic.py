@@ -14,7 +14,7 @@ class AdminHome(BaseFundTestCase):
   def test_home(self):
     response = self.client.get('/admin', follow=True)
     self.assertEqual(response.status_code, 200)
-    self.assertEqual(response.context['title'], 'Site administration')
+    self.assertEqual(response.context['title'], None)
     self.assertEqual(len(response.context['app_list']), 4)
 
   def test_fund_home(self):

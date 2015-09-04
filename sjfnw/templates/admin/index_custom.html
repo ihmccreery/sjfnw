@@ -2,6 +2,8 @@
 {# Admin site is configured to use this in sjfnw/admin.py #}
 {% extends "admin/index.html" %}
 
+{% block title %}Index | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
 {% block sidebar %}
 <div class="admin-sidebar">
   <div class="module" id="links-module">
