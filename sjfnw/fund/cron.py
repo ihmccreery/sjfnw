@@ -1,6 +1,8 @@
 import datetime
 import logging
 
+import setup_env
+
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 from django.template.loader import render_to_string
