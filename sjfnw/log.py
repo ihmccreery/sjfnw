@@ -2,6 +2,7 @@ import logging, os
 
 def configure_logging():
   datefmt = '%Y-%m-%d %H:%M:%S'
+
   if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
     log_format = '[%(filename)s:%(lineno)d %(funcName)s]: %(message)s'
   else:
@@ -13,6 +14,6 @@ def configure_logging():
   else:
     logging.basicConfig(format=log_format, datefmt=datefmt)
 
-# log errors
 def log_exception(*args, **kwargs):
+  # stack trace is automatically added, as is basic request info
   logging.exception('Exception in request:')
