@@ -595,14 +595,14 @@ def CopyApp(request, organization):
       try:
         cycle = models.GrantCycle.objects.get(pk=int(new_cycle))
       except models.GrantCycle.DoesNotExist:
-        logger.error('CopyApp GrantCycle ' + new_cycle + ' not found')
+        logger.warning('CopyApp GrantCycle %d not found', new_cycle)
         return render(request, 'grants/copy_app_error.html')
 
       #make sure the combo does not exist already
       new_draft, created = models.DraftGrantApplication.objects.get_or_create(
           organization=organization, grant_cycle=cycle)
       if not created:
-        logger.error('CopyApp the combo already exists!?')
+        logger.warning('CopyApp the combo already exists!?')
         return render(request, 'grants/copy_app_error.html')
 
       #get app/draft and its contents (json format for draft)
@@ -623,19 +623,18 @@ def CopyApp(request, organization):
               )))
           content = json.dumps(content)
         except models.GrantApplication.DoesNotExist:
-          logger.error('CopyApp - submitted app ' + app + ' not found')
+          logger.warning('CopyApp - submitted app %s not found', app)
       elif draft:
         try:
           application = models.DraftGrantApplication.objects.get(pk=int(draft))
           content = json.loads(application.contents)
-          logger.info(content)
           content['cycle_question'] = ''
           logger.info(content)
           content = json.dumps(content)
         except models.DraftGrantApplication.DoesNotExist:
-          logger.error('CopyApp - draft ' + app + ' not found')
+          logger.warning('CopyApp - draft %s not found', draft)
       else:
-        logger.error('CopyApp no draft or app...')
+        logger.warning('CopyApp no draft or app...')
         return render(request, 'grants/copy_app_error.html')
 
       #set contents & files
@@ -648,8 +647,7 @@ def CopyApp(request, organization):
       return redirect('/apply/' + new_cycle + user_override)
 
     else: #INVALID FORM
-      logger.warning('form invalid')
-      logger.info(form.errors)
+      logger.info('Invalid form: %s', form.errors)
       #TODO
       cycle_count = str(form['cycle']).count('<option value') - 1
       apps_count = (str(form['application']).count('<option value') +
@@ -950,7 +948,7 @@ def AdminRollover(request, app_id):
 def show_yer_statuses(request):
   awards = (models.GivingProjectGrant.objects
     .filter(agreement_mailed__isnull=False)
-    .select_related('projectapp__application__organization', 'projectapp_giving_project')
+    .select_related('projectapp__application__organization', 'projectapp__giving_project')
     .order_by('agreement_mailed'))
   yers = models.YearEndReport.objects.values_list('award_id', flat=True)
   # count submitted yers by award id
