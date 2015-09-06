@@ -691,7 +691,7 @@ def validate_photo_file_extension(value):
 
 class YearEndReport(models.Model):
   award = models.ForeignKey(GivingProjectGrant)
-  submitted = models.DateTimeField(default=timezone.now())
+  submitted = models.DateTimeField(default=timezone.now)
 
   # user-entered
   contact_person = models.TextField() # Name, title (has custom widget)
@@ -784,7 +784,7 @@ class YearEndReport(models.Model):
 class YERDraft(models.Model):
 
   award = models.ForeignKey(GivingProjectGrant)
-  modified = models.DateTimeField(default=timezone.now())
+  modified = models.DateTimeField(default=timezone.now)
   contents = models.TextField(default='{}')
 
   photo1 = models.FileField(upload_to='/', blank=True, max_length=255)
