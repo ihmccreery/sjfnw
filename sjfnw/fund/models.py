@@ -257,7 +257,7 @@ class Donor(models.Model):
       (2, '2 - Likely'),
       (1, '1 - Unlikely'),
       (0, '0 - No chance'))
-  added = models.DateTimeField(default=timezone.now())
+  added = models.DateTimeField(default=timezone.now)
   membership = models.ForeignKey(Membership)
 
   firstname = models.CharField(max_length=100, verbose_name='*First name')
@@ -345,7 +345,7 @@ class Donor(models.Model):
       return self.promised
 
 class Step(models.Model):
-  created = models.DateTimeField(default=timezone.now())
+  created = models.DateTimeField(default=timezone.now)
   date = models.DateField(verbose_name='Date')
   description = models.CharField(max_length=255, verbose_name='Description')
   donor = models.ForeignKey(Donor)
@@ -358,8 +358,8 @@ class Step(models.Model):
 
 
 class NewsItem(models.Model):
-  date = models.DateTimeField(default=timezone.now())
-  updated = models.DateTimeField(default=timezone.now())
+  date = models.DateTimeField(default=timezone.now)
+  updated = models.DateTimeField(default=timezone.now)
   membership = models.ForeignKey(Membership)
   summary = models.TextField()
 
@@ -368,7 +368,7 @@ class NewsItem(models.Model):
 
 
 class Resource(models.Model):
-  created = models.DateTimeField(null=True, blank=True, default=timezone.now())
+  created = models.DateTimeField(null=True, blank=True, default=timezone.now)
   title = models.CharField(max_length=255)
   summary = models.TextField(blank=True)
   link = models.URLField()
@@ -391,8 +391,8 @@ class ProjectResource(models.Model): #ties resource to project
 
 class Survey(models.Model):
 
-  created = models.DateTimeField(default=timezone.now())
-  updated = models.DateTimeField(default=timezone.now())
+  created = models.DateTimeField(default=timezone.now)
+  updated = models.DateTimeField(default=timezone.now)
   updated_by = models.CharField(max_length=100, blank=True)
 
   title = models.CharField(max_length=255, help_text=
@@ -429,7 +429,7 @@ class GPSurvey(models.Model):
 
 class SurveyResponse(models.Model):
 
-  date = models.DateTimeField(default=timezone.now())
+  date = models.DateTimeField(default=timezone.now)
   gp_survey = models.ForeignKey(GPSurvey)
   responses = models.TextField() #json encoded question-answer pairs
 
