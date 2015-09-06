@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from google.appengine.ext import deferred, ereporter
 
-from sjfnw import constants as c
+from sjfnw import constants as c, utils
 from sjfnw.grants.models import Organization, ProjectApp
 
 from sjfnw.fund.decorators import approved_membership
@@ -579,8 +579,9 @@ def copy_contacts(request):
 
       else: # not duplicate; add a row
         initial_data.append({
-            'firstname': donor.firstname, 'lastname': donor.lastname,
-            'phone': donor.phone, 'email': donor.email, 'notes': donor.notes})
+          'firstname': donor.firstname, 'lastname': donor.lastname,
+          'phone': donor.phone, 'email': donor.email, 'notes': donor.notes
+        })
 
     logger.debug('Loading copy contacts formset')
     logger.info('Initial data list of ' + str(len(initial_data)))
@@ -1104,7 +1105,8 @@ def _create_user(email, password, first_name, last_name):
 
   # check if Member already
   if models.Member.objects.filter(email=email):
-    error = 'That email is already registered.  <a href="/fund/login/">Login</a> instead.'
+    login_link = utils.create_link('/fund/login/', 'Login')
+    error = 'That email is already registered. {} instead.'.format(login_link)
     logger.warning(email + ' tried to re-register')
 
   # check User already but not Member

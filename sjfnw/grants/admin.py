@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 
+from sjfnw import utils
 from sjfnw.admin import advanced_admin, YearFilter
 from sjfnw.grants import models
 from sjfnw.grants.modelforms import DraftAdminForm
@@ -179,12 +180,12 @@ class GrantApplicationI(BaseShowInline):
 
   def view_or_edit(self, obj):
     """ Link to grant application change page """
-    return ('<a href="/admin/grants/grantapplication/' + str(obj.pk) +
-            '/" target="_blank">View details/Edit</a>')
+    return utils.create_link('/admin/grants/grantapplication/{}/'.format(obj.pk),
+                             'View details/Edit', new_tab=True)
   view_or_edit.allow_tags = True
 
   def read(self, obj):
-    return '<a href="/grants/view/' + str(obj.pk) + '" target="_blank">Read application</a>'
+    return utils.create_link('/grants/view/{}'.format(obj.pk), 'Read application', new_tab=True)
   read.allow_tags = True
 
 
@@ -197,8 +198,8 @@ class SponsoredProgramI(BaseShowInline):
 
   def edit(self, obj):
     if obj.pk:
-      return ('<a href="/admin/grants/sponsoredprogramgrant/' + str(obj.pk) +
-            '/" target="_blank">View/edit</a>')
+      return utils.create_link('/admin/grants/sponsoredprogramgrant/{}/'.format(obj.pk),
+                               'View/edit', new_tab=True)
     else:
       return ''
   edit.allow_tags = True
@@ -237,10 +238,11 @@ class ProjectAppI(admin.TabularInline): # GrantApplication
       for i, report in enumerate(reports):
         if i > 0:
           yer_link += " | "
-        yer_link += ('<a target="_blank" href="/admin/grants/yearendreport/' +
-          str(report.pk) + '/">Year ' + str(i + 1) + '</a>')
+        yer_link += utils.create_link('/admin/grants/yearendreport/{}/'.format(report.pk),
+                                      'Year {}'.format(i + 1), new_tab=True)
       return mark_safe(yer_link)
-    return ''
+    else:
+      return ''
 
 
 class YERInline(BaseShowInline):
@@ -249,7 +251,7 @@ class YERInline(BaseShowInline):
   readonly_fields = ['submitted', 'contact_person', 'email', 'phone', 'view']
 
   def view(self, obj):
-    return '<a href="/report/view/{}">View</a>'.format(obj.pk)
+    return utils.create_link('/report/view/{}'.format(obj.pk), 'View')
   view.allow_tags = True
 
 #------------------------------------------------------------------------------
@@ -342,21 +344,21 @@ class GrantApplicationA(admin.ModelAdmin):
     return False
 
   def revert_grant(self, _):
-    return '<a href="revert">Revert to draft</a>'
+    return utils.create_link('revert', 'Revert to draft')
   revert_grant.allow_tags = True
 
   def rollover(self, _):
-    return '<a href="rollover">Copy to another grant cycle</a>'
+    return utils.create_link('rollover', 'Copy to another grant cycle')
   rollover.allow_tags = True
 
   def organization_link(self, obj):
-    return (u'<a href="/admin/grants/organization/' + str(obj.organization.pk)
-            + '/" target="_blank">' + unicode(obj.organization) + '</a>')
+    return utils.create_link('/admin/grants/organization/{}/'.format(obj.organization.pk),
+                             unicode(obj.organization))
   organization_link.allow_tags = True
   organization_link.short_description = 'Organization'
 
   def read(self, obj):
-    return '<a href="/grants/view/' + str(obj.pk) + '" target="_blank">Read application</a>'
+    return utils.create_link('/grants/view/{}'.format(obj.pk), 'Read application', new_tab=True)
   read.allow_tags = True
 
 
@@ -489,14 +491,14 @@ class YearEndReportA(admin.ModelAdmin):
   def view_link(self, obj):
     if obj.pk:
       url = reverse('sjfnw.grants.views.view_yer', kwargs={'report_id': obj.pk})
-      return '<a href="%s" target="_blank">View report</a>' % url
+      return utils.create_link(url, 'View report', new_tab=True)
   view_link.allow_tags = True
   view_link.short_description = 'View'
 
   def award_link(self, obj):
     if obj.pk:
       url = reverse('admin:grants_givingprojectgrant_change', args=(obj.pk,))
-      return '<a target="_blank" href="{}">{}</a>'.format(url, obj.award.full_description())
+      return utils.create_link(url, obj.award.full_description(), new_tab=True)
   award_link.allow_tags = True
   award_link.short_description = 'Award'
 
