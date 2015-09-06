@@ -53,11 +53,9 @@ class GivingProject(models.Model):
       help_text=('Calendar ID of a google calendar - format: '
                  '____@group.calendar.google.com'))
 
-  resources = models.ManyToManyField('Resource', through='ProjectResource',
-                                     null=True, blank=True)
+  resources = models.ManyToManyField('Resource', through='ProjectResource', blank=True)
 
-  surveys = models.ManyToManyField('Survey', through='GPSurvey',
-                                   null=True, blank=True)
+  surveys = models.ManyToManyField('Survey', through='GPSurvey', blank=True)
 
   class Meta:
     ordering = ['-fundraising_deadline']
