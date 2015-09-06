@@ -8,10 +8,11 @@ from django.utils.safestring import mark_safe
 
 from libs import unicodecsv
 
+from sjfnw import utils
 from sjfnw.admin import advanced_admin
 from sjfnw.fund.models import (GivingProject, Member, Membership, Survey,
     GPSurvey, Resource, ProjectResource, Donor, Step, NewsItem, SurveyResponse)
-from sjfnw.fund import forms, utils, modelforms
+from sjfnw.fund import forms, utils as fund_utils, modelforms
 from sjfnw.grants.models import ProjectApp, GrantApplication
 
 logger = logging.getLogger('sjfnw')
@@ -149,20 +150,26 @@ class ProjectAppInline(admin.TabularInline):
 
   def app_link(self, obj):
     if obj and hasattr(obj, 'application'):
-      return ('<a href="/admin/grants/grantapplication/{}/">View application</a>'
-                .format(obj.application.pk))
-    return ''
+      return utils.create_link(
+        '/admin/grants/grantapplication/{}/'.format(obj.application.pk),
+        'View application')
+    else:
+      return ''
   app_link.allow_tags = True
 
   def grant_link(self, obj):
     if obj:
       if hasattr(obj, 'givingprojectgrant'):
-        return ('<a href="/admin/grants/givingprojectgrant/{}/">View grant</a>'
-                .format(obj.givingprojectgrant.pk))
+        return utils.create_link(
+          '/admin/grants/givingprojectgrant/{}/'.format(obj.givingprojectgrant.pk),
+          'View grant')
+
       if hasattr(obj, 'screening_status') and obj.screening_status > 80:
-        return ('<a href="/admin/grants/givingprojectgrant/add/?projectapp={}">Add grant</a>'
-                .format(obj.pk))
-    return ''
+        return utils.create_link(
+          '/admin/grants/givingprojectgrant/add/?projectapp={}'.format(obj.pk),
+          'Add grant')
+    else:
+      return ''
   grant_link.allow_tags = True
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
@@ -265,7 +272,7 @@ class MembershipA(admin.ModelAdmin):
   def approve(self, _, queryset):
     for memship in queryset:
       if memship.approved == False:
-        utils.NotifyApproval(memship)
+        fund_utils.NotifyApproval(memship)
     queryset.update(approved=True)
 
   def ship_progress(self, obj):
