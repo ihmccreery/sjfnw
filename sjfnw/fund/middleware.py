@@ -5,76 +5,79 @@ import logging
 logger = logging.getLogger('sjfnw')
 
 class MembershipMiddleware(object):
-  """ sets request.membership, request.membership_status
+  """ Gathers information about the member/ship of the current user and stores
+      it on the request.
 
-  checks
-    member exists
-    membership exists (try to find one that does)
-    membership is approved (try to find one that is)
+    Sets following on request:
+      .membership_status
+        0 c.NO_MEMBER      no member object
+        1 c.NO_MEMBERSHIP  no membership objects associated w/member
+        2 c.NO_APPROVED    no approved memberships
+        3 c.APPROVED       active membership is approved
+      .member       pointer to model (or None)
+      .membership   pointer to model (or None)
 
-  changes to member.current
-    if member had no membership for that proj (approved or not)
-      -> first membership in query, 0 if no memberships exist
-    if current is not approved, but 1+ other memberships are
-      -> first approved membership in query
+    May change member.current if:
+      member had no membership with that id, but has other memberships
+        -> the first one will be used (first approved one, if possible)
+      current is not approved, but 1+ other memberships are
+        -> first approved membership will be used
 
-  resulting request vars
-    .membership_status
-      0 c.NO_MEMBER = no member object
-      1 c.NO_MEMBERSHIP = no membership objects assoc w/member
-      2 c.NO_APPROVED = no approved memberships
-      3 c.APPROVED = approved :) (current was, or current was changed -> is now)
-    .member - present in 1-3
-    .membership - present in 2-3
+    Returns None (never prevents next middleware/view from executing)
   """
 
   def process_view(self, request, view_func, view_args, view_kwargs):
-    #logger.debug('fund middleware running for ' + str(view_func.__module__))
-    if 'fund' in view_func.__module__:
-      if request.user.is_authenticated():
-        request.membership_status = c.NO_MEMBER
-        request.membership = None
+    # only run on fund views
+    if not 'fund' in view_func.__module__:
+      return None
 
-        try:
-          member = models.Member.objects.get(email=request.user.username) #q3
-          #logger.info(member)
-        except models.Member.DoesNotExist: #no member object
-          logger.warning('Custom middleware: No member object with email of '+request.user.username)
-          return None
+    request.member = None
+    request.membership = None
+    request.membership_status = -1
 
-        try: # get current membership
-          membership = models.Membership.objects.select_related().get(member=member, pk=member.current) #q4
-          request.membership_status = c.APPROVED
-          request.membership = membership
-          logger.info(membership)
-        except models.Membership.DoesNotExist: #current is wrong
-          all = member.membership_set.all()
-          if all: #if 1+ memberships, update current & set ship var
-            logger.warning('Custom middleware: Current was wrong even though memberships exist')
-            request.membership_status = c.APPROVED
-            request.membership = all[0] ###
-            membership = all[0]
-            member.current = membership.pk
-            member.save()
-          else: #no memberships
-            logger.info('%s (no memberships)')
-            member.current = 0
-            member.save()
-            request.membership_status = c.NO_MEMBERSHIP
-            return None
+    if not request.user.is_authenticated():
+      return None
 
-        #membership exists, status is c.APPROVED
-        if membership.approved == False: #current not approved
-          logger.warning('Current membership not approved')
-          ships = member.membership_set.filter(approved=True)
-          if ships: #switch default to their first approved gp
-            request.membership_status = c.APPROVED
-            request.membership = ships[0]
-            member.current = membership.pk
-            member.save()
-          else: #no approved GPs
-            request.membership_status = c.NO_APPROVED
+    member = models.Member.objects.filter(email=request.user.username).first()
+
+    if not member:
+      logger.warning('No member object with email of %s', request.user.username)
+      request.membership_status = c.NO_MEMBER
+      return None
+
+    membership = (models.Membership.objects
+        .select_related()
+        .filter(member=member, pk=member.current)
+        .first())
+
+    # if member.current doesn't exist, try to find another membership
+    if not membership:
+      all_memberships = member.membership_set.all()
+      if all_memberships:
+        logger.warning('Invalid member.current (m:%d, c:%d)', member.pk, member.current)
+        membership = all[0]
       else:
-        request.membership_status = -1 #not logged in
-    return None
+        logger.info('%s has no memberships', member)
+        request.member = member
+        request.membership_status = c.NO_MEMBERSHIP
+        return None
 
+    # if membership is not approved, look for one that is
+    if not membership.approved:
+      logger.warning('Current membership not approved')
+      membership = member.membership_set.filter(approved=True).first() or membership
+
+    # update member.current if applicable
+    if member.current != membership.pk:
+      member.current = membership.pk
+      member.save()
+
+    if membership.approved:
+      request.membership_status = c.APPROVED
+    else:
+      request.membership_status = c.NO_APPROVED
+
+    request.member = member
+    request.membership = membership
+
+    return None
