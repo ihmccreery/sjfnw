@@ -1,0 +1,224 @@
+[
+  {
+    "pk": 1,
+    "model": "fund.member",
+    "fields": {
+      "current": 1,
+      "first_name": "Test",
+      "last_name": "Account",
+      "email": "testacct@gmail.com"
+    }
+  },
+  {
+    "pk": 1, 
+    "model": "fund.givingproject", 
+    "fields": {
+      "suggested_steps": "Talk to about Giving Project\nInvite to Giving Project Summit (April 20)\nSet up time to meet for the ask\nAsk\nFollow up\nThank", 
+      "title": "LGBTQ Giving Project", 
+      "fund_goal": 50000, 
+      "pre_approved": "kylie@socialjusticefund.org, Alexis.lair@gmail.com, ajkwheeler@gmail.com, antric1928@yahoo.com, bets1983@yahoo.com, danielleaskini@gmail.com, krlombard@gmail.com, lillian.hewko@gmail.com, matts@collinsgroup.com, maxx.platinum@gmail.com, apfiruz@gmail.com, ragnarthorisson@yahoo.com, saxonrawlings@yahoo.com, sofia@riseup.net, virginia.weihs@gmail.com, dianne@socialjusticefund.org, mijo@socialjusticefund.org, acca.fabulous@gmail.com", 
+      "fundraising_deadline": "2013-08-03", 
+      "site_visits": false, 
+      "calendar": "hq5eic9io9jk3alpokre5sb6cs@group.calendar.google.com", 
+      "public": true, 
+      "fundraising_training": "2013-04-02T23:34:10Z"
+    }
+  },
+  {
+    "pk": 1,
+    "model": "fund.membership",
+    "fields": {
+      "emailed": "2013-06-02",
+      "notifications": "",
+      "giving_project": 1,
+      "leader": false,
+      "member": 1,
+      "last_activity": "2013-07-17",
+      "approved": true
+    }
+  },
+  {
+    "pk": 1,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": true,
+      "received_this": 100,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Stacy",
+      "lastname": "Welake",
+      "notes": "",
+      "amount": 200,
+      "email": "stacywelae@gmail.com",
+      "phone": "",
+      "membership": 1,
+      "talked": true,
+      "promised": 100,
+      "likelihood": 90,
+      "asked": true,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  },
+  {
+    "pk": 2,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": true,
+      "received_this": 250,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Suan",
+      "lastname": "Bhanid",
+      "notes": "",
+      "amount": 200,
+      "email": "sumikinid@gmail.com",
+      "phone": "",
+      "membership": 1,
+      "talked": true,
+      "promised": 250,
+      "likelihood": 90,
+      "asked": true,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  },
+  {
+    "pk": 3,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": false,
+      "received_this": 0,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Patice",
+      "lastname": "Carl",
+      "notes": "",
+      "amount": 150,
+      "email": "",
+      "phone": "555-555-8956",
+      "membership": 1,
+      "talked": true,
+      "promised": null,
+      "likelihood": 75,
+      "asked": false,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  },
+  {
+    "pk": 4,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": true,
+      "received_this": 25,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Voa",
+      "lastname": "Sauksa",
+      "notes": "",
+      "amount": 50,
+      "email": "v.sava@gmail.com",
+      "phone": "",
+      "membership": 1,
+      "talked": true,
+      "promised": 25,
+      "likelihood": 75,
+      "asked": true,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  },
+  {
+    "pk": 5,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": true,
+      "received_this": 100,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Nate",
+      "lastname": "Blanch",
+      "notes": "",
+      "amount": 200,
+      "email": "nat@yahoo.com",
+      "phone": "",
+      "membership": 1,
+      "talked": true,
+      "promised": 100,
+      "likelihood": 75,
+      "asked": true,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  },
+  {
+    "pk": 6,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": true,
+      "received_this": 150,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Walr",
+      "lastname": "Bigs",
+      "notes": "",
+      "amount": 100,
+      "email": "wbigs@gmail.com",
+      "phone": "",
+      "membership": 1,
+      "talked": true,
+      "promised": 150,
+      "likelihood": 75,
+      "asked": true,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  },
+  {
+    "pk": 7,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": false,
+      "received_this": 0,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Lyn",
+      "lastname": "Long",
+      "notes": "",
+      "amount": 100,
+      "email": "",
+      "phone": "",
+      "membership": 1,
+      "talked": true,
+      "promised": null,
+      "likelihood": 75,
+      "asked": false,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  },
+  {
+    "pk": 8,
+    "model": "fund.donor",
+    "fields": {
+      "gift_notified": true,
+      "received_this": 50,
+      "added": "2013-01-01T00:01:44Z",
+      "firstname": "Rose",
+      "lastname": "Rock",
+      "notes": "",
+      "amount": 100,
+      "email": "rock@hotmail.com",
+      "phone": "",
+      "membership": 1,
+      "talked": true,
+      "promised": 50,
+      "likelihood": 75,
+      "asked": true,
+      "match_expected": 0,
+      "match_company": "",
+      "match_received": 0
+    }
+  }
+]

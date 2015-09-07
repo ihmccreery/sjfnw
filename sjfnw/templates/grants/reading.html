@@ -1,0 +1,134 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+	<title>Grant application | Social Justice Fund Grants</title>
+	<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/grants.css">
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script type="text/javascript"><!-- google analytics -->
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28076150-2']);
+
+    //custom variable #1 user type, session level
+    _gaq.push(['_setCustomVar', 1, 'User type', {% if user.username == 'sjfnwads@gmail.com' %}'Aisa'{% elif user.is_staff %}'Staff'{% elif perm == 3 %}'Organization'{% elif perm == 1 %}'Member'{% else %}'Unknown'{% endif %}, 2]);
+
+		{% if request.membership %}
+		//custom variable #2 giving project, page level
+    _gaq.push(['_setCustomVar', 2, 'Giving project', '{{request.membership.giving_project}}', 3]);
+		{% endif %}
+
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+  {% block scripts %}{% endblock %}
+</head>
+
+<body>
+{% block sidebar %}{% endblock %}<!--sidebar spot -->
+
+{% block main %} <!-- main content -->
+	<div id="main_content">
+	{% autoescape off %}{% load humanize %}
+  {% if not file_urls %}<!-- loaded in its own window -->
+    <div class="title"><h2>{{app.organization}} - {{app.grant_cycle}}</h2>
+		{{app.submission_time|date:"F j, Y"}}</div>
+  {% endif %}
+		<h2>Organization and Grant Request Profile</h2><!-- Profile -->
+		<table style="width:100%;">
+			<tr>
+				<td colspan="2">{{form.address.label_tag}}{{app.address}} {{app.city}}, {{app.state}} {{app.zip}}</td>
+			</tr><tr>
+				<td>{{form.telephone_number.label_tag}}{{app.telephone_number}}</td>
+				<td>{{form.fax_number.label_tag}}{{app.fax_number}}</td>
+			</tr><tr>
+				<td>{{form.email_address.label_tag}}{{app.email_address}}</td>
+				<td>{{form.website.label_tag}}{{app.website}}</td>
+			</tr><tr>
+				<td><b>{{form.contact_person.help_text}}</b></td>
+				<td>{{app.contact_person}}, {{app.contact_person_title}}</td>
+			</tr><tr>
+				<td>{{form.status.label_tag}}{{app.status}}</td>
+				<td>{{form.founded.label_tag}}{{app.founded}}</td>
+			</tr><tr>
+				<td>{{form.ein.label_tag}}{{app.ein}}</td>
+			</tr><tr>
+				<td colspan="2"><p>{{form.mission.label_tag}}{{app.mission|linebreaks}}</p></td>
+			</tr><tr>
+				<td>{{form.start_year.label_tag}}{{app.start_year}}</td>
+				<td>{{form.grant_period.label_tag}}{{app.grant_period|default:"n/a"}}</td>
+			</tr><tr>
+				<td>{{form.budget_last.label_tag}}${{app.budget_last|intcomma}}</td>
+				<td>{{form.budget_current.label_tag}}${{app.budget_current|intcomma}}</td>
+			</tr><tr>
+				<td colspan="2">{{form.previous_grants.label_tag}}{{app.previous_grants}}</td>
+			</tr><tr>
+				<td>{{form.amount_requested.label_tag}}${{app.amount_requested|intcomma}}</td>
+				<td>{{form.support_type.label_tag}}{{app.support_type}}</td>
+			</tr><tr>
+				<td>{{form.project_title.label_tag}}{{app.project_title|default:"n/a"}}</td>
+				{%if app.project_budget%}
+				<td>{{form.project_budget.label_tag}}${{app.project_budget|intcomma}}</td>
+				{%endif%}
+			</tr><tr>
+				<td colspan="2"><p>{{form.grant_request.label_tag}}{{app.grant_request|linebreaks}}</p></td>
+			</tr><tr>
+			{%if app.fiscal_org%}
+				<td colspan="2"><b>Fiscal sponsor information</b></td><!-- Fiscal sponsor info -->
+			</tr><tr>
+				<td>{{form.fiscal_org.label_tag}}{{app.fiscal_org|default:"N/A"}}</td>
+				<td>{{form.fiscal_person.label_tag}}{{app.fiscal_person}}</td>
+			</tr><tr>
+				<td>{{form.fiscal_address.label_tag}}{{app.fiscal_address}} {{app.fiscal_city}}, {{app.fiscal_state}} {{app.fiscal_zip}}</td>
+				<td>{{form.fiscal_telephone.label_tag}}{{app.fiscal_telephone}}</td>
+			</tr><tr>
+				<td>{{form.fiscal_email.label_tag}}{{app.fiscal_email}}</td>
+				<td></td>
+			</tr>
+			{% endif %}
+		</table>
+
+		<h2>Narratives</h2><!-- Narrative -->
+		<p><b>1. {{form.narrative1.label}}</b></p>
+		<p>{{app.narrative1|linebreaks}}</p>
+		<br>
+		<p><b>2. {{form.narrative2.label}}</b></p>
+		<p>{{app.narrative2|linebreaks}}</p>
+		<br>
+		<p><b>3. {{form.narrative3.label}}</b></p>
+		<p>{{app.narrative3|linebreaks}}</p>
+		<br>
+		<p><b>4. {{form.narrative4.label}}</b></p>
+		<p>{{app.narrative4|linebreaks}}</p>
+		{{app.timeline_display|linebreaks}}
+		<br>
+		<p><b>5. {{form.narrative5.label}}</b></p>
+		<p>{{app.narrative5|linebreaks}}</p>
+		<p><b>{{form.collab_ref1_name.help_text}}</b></p>
+		<p>1. {{app.collab_ref1_name}}, {{app.collab_ref1_org}}. {{app.collab_ref1_phone|add:" "}}{{app.collab_ref1_email}}</p>
+		<p>2. {{app.collab_ref2_name}}, {{app.collab_ref2_org}}. {{app.collab_ref2_phone|add:" "}}{{app.collab_ref2_email}}</p>
+		<br>
+		<p><b>6. {{form.narrative6.label}}</b></p>
+		<p>{{app.narrative6|linebreaks}}</p>
+		<p><b>{{form.racial_justice_ref1_name.help_text}}</b></p>
+		{% if app.racial_justice_ref1_org %}
+			<p>1. {{app.racial_justice_ref1_name}}, {{app.racial_justice_ref1_org}}. {{app.racial_justice_ref1_phone|add:" "}}{{app.racial_justice_ref1_email}}</p>
+			{% if app.racial_justice_ref2_name %}
+				<p>2. {{app.racial_justice_ref2_name}}, {{app.racial_justice_ref2_org}}. {{app.racial_justice_ref2_phone|add:" "}}{{app.racial_justice_ref2_email}}</p>
+			{% endif %}
+		{% else %}N/A{% endif %}
+		{% if app.cycle_question %}
+		<br>
+		<p><b>7. {{form.cycle_question.label}}</b></p>
+		<p>{{app.cycle_question|linebreaks}}</p>
+		{% endif %}
+	{% endautoescape %}
+	</div>
+{% endblock %}
+
+</body>
