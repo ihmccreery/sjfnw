@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Social Justice Fund Grants{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="/static/css/grants.css">
+{% endblock %}
+
+{% block script %}
+  <!--google analytics -->
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-28076150-2']); 
+
+    //custom variable #1 user type, session level
+    _gaq.push(['_setCustomVar', 1, 'User type', {% if user.username == 'sjfnwads@gmail.com' %}'Aisa'{% elif user.is_staff %}'Staff'{% elif user.is_authenticated %}'User'{% else %}'Anonymous'{% endif %}, 2]);     
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+{% endblock script %}
+
+{% block body %}
+  <div id="org_wrapper">
+    <!-- top nav -->
+    <div id="nav_menu">
+        <a href="{% url "sjfnw.grants.views.org_home" %}{{user_override|default:''}}">
+          <img id="logo" src="/static/images/logo_horiz.png" align="middle" alt="Social Justice Fund NW Logo">home
+        </a>
+    </div>
+
+    <div class="content_area">
+      <!-- messages -->
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      <!-- CONTENT -->
+      {% block content %}{% endblock %}  
+    </div>
+
+    <!-- footer -->
+    <table id="org_footer"><tr>
+      <td style="width:25%;"><a href="/{% url "sjfnw.grants.views.org_support" %}">support</a></td>
+      <td style="width:25%;"><a href="http://socialjusticefund.org">socialjusticefund.org</a></td>
+      <td style="width:45%;text-align:right;">
+      {% if user.is_authenticated %}
+        {{user.email}} | <a href="/logout">log out</a>
+      {% elif not register %}<a href="{% url "sjfnw.grants.views.org_login" %}">log in</a>{% endif %}</td>
+    </tr></table>
+  </div>
+{% endblock %}
+

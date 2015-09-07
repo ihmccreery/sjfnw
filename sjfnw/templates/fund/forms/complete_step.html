@@ -1,0 +1,118 @@
+<form class="complete-step" id="{{ step_id }}-complete-step" method="post" action="{{ action }}">
+
+  <h3>1) Complete a step: {{ step }}</h3>
+
+  <div class="form-row text-center">
+    <div id="asked" class="form-field third">
+      {% if donor.asked %}
+      Asked.
+      {% endif %}
+      <label id="{{ step_id }}_asked">
+        Asked {{ form.asked }}
+      </label>
+    </div>
+
+    <div id="response" class="form-field third">
+      {% if donor.promised == 0 %}
+        Declined.
+      {% elif donor.promised %}
+        Promised ${{ donor.promised }}.
+      {% endif %}
+      <label id="{{ step_id }}_response">
+        Response {{ form.response }}
+      </label>
+    </div>
+
+    <div id="promised-amount" class="form-field third">
+      {{ form.promised_amount.errors }}
+      <label id="{{ step_id }}_promise">
+        Promised ${{ form.promised_amount }}
+      </label>
+    </div>
+  </div>
+
+  {# promise follow-up, initially hidden #}
+
+  <div id="{{ step_id }}_promise_follow" class="promise-followup">
+
+    <p>Congratulations on a successful ask!</p>
+    <p>Please provide some more information so that Social Justice Fund can
+        follow up on the promise as needed.</p>
+
+    <div class="form-row">
+      <div class="form-field third">
+        {{ form.last_name.errors }}
+        {{ form.last_name.label_tag }}
+        {{ form.last_name }}
+      </div>
+
+      <div class="form-field third">
+        {{ form.phone.errors }}
+        {{ form.phone.label_tag }}
+        {{ form.phone }}
+      </div>
+
+      <div class="form-field third">
+        {{ form.email.errors }}
+        {{ form.email.label_tag }}
+        {{ form.email }}
+      </div>
+    </div>
+
+    <div class="form-row form-field multiple-choice">
+        {{ form.promise_reason.errors }}
+        {{ form.promise_reason.label_tag }}
+        {{ form.promise_reason }}
+    </div>
+    <div class="form-row form-field">
+      {{ form.likely_to_join.errors }}
+      {{ form.likely_to_join.label_tag }}<br>
+      {{ form.likely_to_join }}
+    </div><br><br>
+
+    <i><strong>*If this promise will be employer matched, please complete the
+    following:</strong></i>
+    <div class="form-row">
+      <div class="form-field third">
+        {{ form.match_expected.errors }}
+        <i> {{ form.match_expected.label}} </i><br>
+        ${{ form.match_expected }}
+      </div>
+      <div class="form-field third">
+        {{ form.match_company.errors }}
+        <i> {{ form.match_company.label}} </i><br>
+        {{ form.match_company }}
+      </div>
+    </div>
+    <p><i>Let us know if we need to follow up with the employer in the notes section below</i></p>
+  </div>
+
+  <h3>2) Update your notes for this contact <i>(optional)</i></h3>
+  <div class="form-row">
+    {{ form.notes.errors }}
+    {{ form.notes.label_tag }}<br>
+    {{ form.notes }}
+  </div>
+
+  <h3>3) Plan a next step <i>(optional)</i></h3>
+
+  <div class="form-row">
+    {{ form.next_step_date.errors }}
+    {{ form.next_step_date.label_tag }}<br>
+    {{ form.next_step_date }}
+  </div>
+  <div class="form-row">
+    {{ form.next_step.errors }}
+    {{ form.next_step.label_tag }}<br>
+    {{ form.next_step }}
+  </div>
+
+  <div class="form-row">
+    {% include 'fund/includes/suggested_steps.html' %}
+  </div>
+</form>
+<div class="form-row text-center">
+  <img class="loading" src="/static/images/ajaxloader.gif" alt="Loading...">
+  <button class="submit" onclick="Submit('{{ action }}', '#{{ step_id }}-complete-step', '{{ donor.pk }}-nextstep', 'date', '{{ donor.asked }}', '{{ donor.promised }}')">Save</button>
+  <button class="cancel" onclick="location.href='/fund/'">Cancel</button>
+</div>

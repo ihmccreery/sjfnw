@@ -1,0 +1,32 @@
+language: python
+python:
+  - "2.7"
+
+# let travis run in container
+sudo: false
+
+# only send emails for new failures
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+install:
+  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.25.zip
+  - unzip -q google_appengine_1.9.25.zip
+  - pip install codecov
+  - pip install -r requirements.txt -t libs
+  # - "pip install pylint"
+  # - "pip install pylint-django"
+
+before_script:
+  - export PATH=$PATH:$PWD/google_appengine
+  - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine
+  - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/webob-1.2.3
+  - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/yaml/lib
+
+# script to run tests
+script: ./scripts/coverage.sh skip-html
+
+# send coverage to coveralls if tests passed
+after_success: codecov
