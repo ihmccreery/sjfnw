@@ -273,7 +273,7 @@ class Donor(models.Model):
   # only if promised
   promise_reason = models.TextField(blank=True, default='[]') #json'd list of strings
   likely_to_join = models.PositiveIntegerField(null=True, blank=True,
-      choices = LIKELY_TO_JOIN_CHOICES)
+      choices=LIKELY_TO_JOIN_CHOICES)
   received_this = models.PositiveIntegerField(default=0,
       verbose_name='Received - current year')
   received_next = models.PositiveIntegerField(default=0,
@@ -281,10 +281,8 @@ class Donor(models.Model):
   received_afternext = models.PositiveIntegerField(default=0,
       verbose_name='Received - year after next')
   gift_notified = models.BooleanField(default=False)
-  match_expected = models.PositiveIntegerField(
-      blank=True, default=0,
-      verbose_name='Match expected ($)', # total $ amount matched by employer
-      validators=[MinValueValidator(0)])
+  match_expected = models.PositiveIntegerField(blank=True, default=0,
+      verbose_name='Match expected ($)', validators=[MinValueValidator(0)])
   match_company = models.CharField(max_length=255, blank=True, verbose_name='Employer name')
   match_received = models.PositiveIntegerField(blank=True, default=0,
       verbose_name='Match received ($)')# total $ amount of match received
@@ -337,10 +335,8 @@ class Donor(models.Model):
     return ', '.join(json.loads(self.promise_reason))
 
   def total_promised(self):
-    if self.match_expected:
-      return self.promised + self.match_expected
-    else:
-      return self.promised
+    return self.match_expected + (self.promised or 0)
+
 
 class Step(models.Model):
   created = models.DateTimeField(default=timezone.now)
