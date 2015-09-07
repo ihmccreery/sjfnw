@@ -1,0 +1,34 @@
+site_name: sjfnw
+theme: flatly
+include_nav: true
+include_search: true
+include_next_prev: false
+repo_url: https://github.com/aisapatino/sjfnw/
+repo_name: sjfnw
+pages:
+- Home: 'index.md'
+- Getting started:
+  - 'Installation and setup': 'installation-and-setup.md'
+  - 'Running a local server': 'running-a-local-server.md'
+  - Running tests: 'running-tests.md'
+  - 'Text editor setup': 'text-editor-setup.md'
+- Project info:
+  - Overview of models: 'models.md'
+  - Project structure: 'project-structure.md'
+  - Code conventions: 'code-conventions.md'
+  - 'Linters': 'linters.md'
+- Git & github:
+  - Git workflow: 'git-workflow.md'
+  - Issue tracking: 'issue-tracking.md'
+  - Travis CI & Codecov.io: 'continuous-integration.md'
+- Testing:
+  - 'Intro': 'intro-to-testing.md'
+  - 'Writing tests': 'writing-tests.md'
+  - 'Fundraising tests': 'basefundtestcase.md'
+- How to:
+  - Performance debugging: 'debugging-performance.md'
+  - Database management: 'database.md'
+  - Deploying: 'deploying.md'
+  - Support requests: 'support-requests.md'
+- References: 'references.md'
+theme_dir: 'docs/theme'
