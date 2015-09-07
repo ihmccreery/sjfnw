@@ -7,14 +7,14 @@
         
         
         
-        <link rel="shortcut icon" href="./img/favicon.ico">
+        <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>sjfnw</title>
+	<title>Running a local server - sjfnw</title>
 
-        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="./css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="./css/highlight.css">
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -25,7 +25,7 @@
         
     </head>
 
-    <body class="homepage">
+    <body>
 
         
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -59,37 +59,37 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="active">
-                        <a href=".">Home</a>
+                    <li >
+                        <a href="..">Home</a>
                     </li>
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
 <li >
-    <a href="installation-and-setup/">Installation and setup</a>
+    <a href="../installation-and-setup/">Installation and setup</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Running a local server</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-a-local-server/">Running a local server</a>
+    <a href="../running-tests/">Running tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-tests/">Running tests</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="text-editor-setup/">Text editor setup</a>
+    <a href="../text-editor-setup/">Text editor setup</a>
 </li>
 
                         
@@ -104,25 +104,25 @@
                         
                             
 <li >
-    <a href="models/">Overview of models</a>
+    <a href="../models/">Overview of models</a>
 </li>
 
                         
                             
 <li >
-    <a href="project-structure/">Project structure</a>
+    <a href="../project-structure/">Project structure</a>
 </li>
 
                         
                             
 <li >
-    <a href="code-conventions/">Code conventions</a>
+    <a href="../code-conventions/">Code conventions</a>
 </li>
 
                         
                             
 <li >
-    <a href="linters/">Linters</a>
+    <a href="../linters/">Linters</a>
 </li>
 
                         
@@ -137,19 +137,19 @@
                         
                             
 <li >
-    <a href="git-workflow/">Git workflow</a>
+    <a href="../git-workflow/">Git workflow</a>
 </li>
 
                         
                             
 <li >
-    <a href="issue-tracking/">Issue tracking</a>
+    <a href="../issue-tracking/">Issue tracking</a>
 </li>
 
                         
                             
 <li >
-    <a href="continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../continuous-integration/">Travis CI & Codecov.io</a>
 </li>
 
                         
@@ -164,19 +164,19 @@
                         
                             
 <li >
-    <a href="intro-to-testing/">Intro</a>
+    <a href="../intro-to-testing/">Intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="writing-tests/">Writing tests</a>
+    <a href="../writing-tests/">Writing tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="basefundtestcase/">Fundraising tests</a>
+    <a href="../basefundtestcase/">Fundraising tests</a>
 </li>
 
                         
@@ -191,25 +191,25 @@
                         
                             
 <li >
-    <a href="debugging-performance/">Performance debugging</a>
+    <a href="../debugging-performance/">Performance debugging</a>
 </li>
 
                         
                             
 <li >
-    <a href="database/">Database management</a>
+    <a href="../database/">Database management</a>
 </li>
 
                         
                             
 <li >
-    <a href="deploying/">Deploying</a>
+    <a href="../deploying/">Deploying</a>
 </li>
 
                         
                             
 <li >
-    <a href="support-requests/">Support requests</a>
+    <a href="../support-requests/">Support requests</a>
 </li>
 
                         
@@ -219,7 +219,7 @@
                 
                 
                     <li >
-                        <a href="references/">References</a>
+                        <a href="../references/">References</a>
                     </li>
                 
                 
@@ -243,20 +243,31 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#contributing">Contributing</a></li>
+        <li class="main active"><a href="#creating-accounts">Creating accounts</a></li>
         
     
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h4 align="center">Documentation related to development and project maintenance</h4>
-
-<hr />
-<h4 id="contributing">Contributing</h4>
-<p>Follow the table of contents on the right to get a local development environment set up, starting with [[installation and setup|installation-and-setup]].</p>
-<p>The [[references]] page has links for more info on the various languages/platforms/technologies that are used. (If you are new to Django, definitely check out those links)</p>
-<p>Check <a href="https://github.com/aisapatino/sjfnw/labels/ready">issues labeled "ready"</a> to see what needs doing. Feel free to post a comment if you have questions. See [[issue tracking|issue-tracking]] for more info.</p></div>
+<p>To start up the local server, (from inside the root of the repo) do</p>
+<p><code>dev_appserver.py .</code></p>
+<p><em>If you get something like 'command not found', make sure GAE is in your path. Use <code>echo $PATH</code> to confirm.</em></p>
+<h4 id="creating-accounts">Creating accounts</h4>
+<p>The superuser you created in the <code>syncdb</code> step of [[setup|installation-and-setup#setting-up-the-database]] gives you access to the admin site. For testing locally you'll want to be able to log into the fundraising and grant application areas too.</p>
+<ol>
+<li>Go to <code>/admin-advanced</code>* and log in with superuser email &amp; pw you created when you ran <code>syncdb</code>.</li>
+<li>Create a <code>Member</code> object so you can log into the fundraising app:</li>
+<li>Click on <code>+ Add</code> next to <code>Members</code></li>
+<li>Enter the email you used to log in, and whatever first &amp; last name you want.</li>
+<li>Hit <code>Save</code></li>
+<li>Go back to <code>/admin-advanced</code> to create an <code>Organization</code> for yourself:</li>
+<li>Click on <code>+Add</code> next to <code>Organizations</code></li>
+<li>Enter the same email, fill in whatever other fields are required</li>
+<li>Hit <code>Save</code></li>
+<li>You should now be able to log into both sides of the app: <code>/fund/login</code> and <code>/apply/login</code></li>
+</ol>
+<p>* The advanced admin site is only used by devs (and should eventually be replaced with better admin permissions). Staff use <code>/admin</code>, which you can use most of the time, but for this you need additional access.</p></div>
             
         </div>
 
@@ -266,12 +277,12 @@
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
 
-        <script src="./js/jquery-1.10.2.min.js"></script>
-        <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/highlight.pack.js"></script>
-        <script>var base_url = '.';</script>
-        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
-        <script src="./js/base.js"></script>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
             <div class="modal-dialog">
@@ -300,8 +311,3 @@
 
     </body>
 </html>
-
-<!--
-MkDocs version : 0.14.0
-Build Date UTC : 2015-09-07 19:16:54.942044
--->

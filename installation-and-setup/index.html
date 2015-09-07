@@ -7,14 +7,14 @@
         
         
         
-        <link rel="shortcut icon" href="./img/favicon.ico">
+        <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>sjfnw</title>
+	<title>Installation and setup - sjfnw</title>
 
-        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="./css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="./css/highlight.css">
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -25,7 +25,7 @@
         
     </head>
 
-    <body class="homepage">
+    <body>
 
         
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -59,37 +59,37 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="active">
-                        <a href=".">Home</a>
+                    <li >
+                        <a href="..">Home</a>
                     </li>
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
-<li >
-    <a href="installation-and-setup/">Installation and setup</a>
+<li class="active">
+    <a href="./">Installation and setup</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-a-local-server/">Running a local server</a>
+    <a href="../running-a-local-server/">Running a local server</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-tests/">Running tests</a>
+    <a href="../running-tests/">Running tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="text-editor-setup/">Text editor setup</a>
+    <a href="../text-editor-setup/">Text editor setup</a>
 </li>
 
                         
@@ -104,25 +104,25 @@
                         
                             
 <li >
-    <a href="models/">Overview of models</a>
+    <a href="../models/">Overview of models</a>
 </li>
 
                         
                             
 <li >
-    <a href="project-structure/">Project structure</a>
+    <a href="../project-structure/">Project structure</a>
 </li>
 
                         
                             
 <li >
-    <a href="code-conventions/">Code conventions</a>
+    <a href="../code-conventions/">Code conventions</a>
 </li>
 
                         
                             
 <li >
-    <a href="linters/">Linters</a>
+    <a href="../linters/">Linters</a>
 </li>
 
                         
@@ -137,19 +137,19 @@
                         
                             
 <li >
-    <a href="git-workflow/">Git workflow</a>
+    <a href="../git-workflow/">Git workflow</a>
 </li>
 
                         
                             
 <li >
-    <a href="issue-tracking/">Issue tracking</a>
+    <a href="../issue-tracking/">Issue tracking</a>
 </li>
 
                         
                             
 <li >
-    <a href="continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../continuous-integration/">Travis CI & Codecov.io</a>
 </li>
 
                         
@@ -164,19 +164,19 @@
                         
                             
 <li >
-    <a href="intro-to-testing/">Intro</a>
+    <a href="../intro-to-testing/">Intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="writing-tests/">Writing tests</a>
+    <a href="../writing-tests/">Writing tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="basefundtestcase/">Fundraising tests</a>
+    <a href="../basefundtestcase/">Fundraising tests</a>
 </li>
 
                         
@@ -191,25 +191,25 @@
                         
                             
 <li >
-    <a href="debugging-performance/">Performance debugging</a>
+    <a href="../debugging-performance/">Performance debugging</a>
 </li>
 
                         
                             
 <li >
-    <a href="database/">Database management</a>
+    <a href="../database/">Database management</a>
 </li>
 
                         
                             
 <li >
-    <a href="deploying/">Deploying</a>
+    <a href="../deploying/">Deploying</a>
 </li>
 
                         
                             
 <li >
-    <a href="support-requests/">Support requests</a>
+    <a href="../support-requests/">Support requests</a>
 </li>
 
                         
@@ -219,7 +219,7 @@
                 
                 
                     <li >
-                        <a href="references/">References</a>
+                        <a href="../references/">References</a>
                     </li>
                 
                 
@@ -243,20 +243,87 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#contributing">Contributing</a></li>
+        <li class="main active"><a href="#code">Code</a></li>
+        
+    
+        <li class="main "><a href="#python">Python</a></li>
+        
+    
+        <li class="main "><a href="#git">Git</a></li>
+        
+    
+        <li class="main "><a href="#mysql">MySQL</a></li>
+        
+    
+        <li class="main "><a href="#setting-up-the-database">Setting up the database</a></li>
+        
+    
+        <li class="main "><a href="#loading-fixtures">Loading fixtures</a></li>
+        
+    
+        <li class="main "><a href="#google-app-engine-sdk">Google App Engine SDK</a></li>
+        
+    
+        <li class="main "><a href="#project-dependencies">Project dependencies</a></li>
+        
+            <li><a href="#prerequisite-pip">Prerequisite: pip</a></li>
+        
+            <li><a href="#install-dependencies">Install dependencies</a></li>
+        
+    
+        <li class="main "><a href="#update-paths">Update paths</a></li>
         
     
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h4 align="center">Documentation related to development and project maintenance</h4>
-
-<hr />
-<h4 id="contributing">Contributing</h4>
-<p>Follow the table of contents on the right to get a local development environment set up, starting with [[installation and setup|installation-and-setup]].</p>
-<p>The [[references]] page has links for more info on the various languages/platforms/technologies that are used. (If you are new to Django, definitely check out those links)</p>
-<p>Check <a href="https://github.com/aisapatino/sjfnw/labels/ready">issues labeled "ready"</a> to see what needs doing. Feel free to post a comment if you have questions. See [[issue tracking|issue-tracking]] for more info.</p></div>
+<p>Instructions assume you're running linux or mac osx and can use a package manager as needed - <a href="http://brew.sh/"><code>homebrew</code></a>, <code>apt-get</code>, etc.</p>
+<h4 id="code">Code</h4>
+<p><code>git clone https://github.com/aisapatino/sjfnw.git</code></p>
+<h4 id="python">Python</h4>
+<p>The project uses python 2.7, which is probably already installed with your OS. To confirm:</p>
+<p><code>python --version</code></p>
+<p>Install using package manager if needed.</p>
+<h4 id="git">Git</h4>
+<p>May be installed already, check with</p>
+<p><code>git --version</code></p>
+<p>Install/update using package manager if needed.</p>
+<h4 id="mysql">MySQL</h4>
+<p>Install: <code>mysql-server</code>, <code>python-mysqldb</code></p>
+<p>When prompted, enter the password from <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py#L43"><code>sjfnw/settings.py</code></a></p>
+<p>Once those have installed, create the database:</p>
+<ol>
+<li><code>mysql -uroot -p</code> to get into the mysql shell. This will prompt you for the password you set when you installed.</li>
+<li>Make sure mysql is set to use <code>utf8</code> encoding everywhere.</li>
+<li>You can check with <code>show variables like 'char%';</code></li>
+<li>If anything is set to <code>latin1</code>, change it with <code>set variable_name=utf8;</code></li>
+<li><code>create database sjfdb_local;</code></li>
+</ol>
+<h4 id="setting-up-the-database">Setting up the database</h4>
+<p><code>./manage.py syncdb</code></p>
+<p>You should see output as tables are created in the local database based on the project's model definitions.
+Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.</p>
+<p><em>If this doesn't work, make sure <code>manage.py</code> has execute permissions. <code>chmod a+x manage.py</code> should work.</em></p>
+<h4 id="loading-fixtures">Loading fixtures</h4>
+<p>To populate your local db with data:</p>
+<p><code>./manage.py load_testing_data</code></p>
+<h4 id="google-app-engine-sdk"><a href="https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">Google App Engine SDK</a></h4>
+<p>Download &amp; unzip (somewhere outside the repo).</p>
+<h4 id="project-dependencies">Project dependencies</h4>
+<h5 id="prerequisite-pip">Prerequisite: <code>pip</code></h5>
+<p>You'll need <code>pip</code>, python's package manager. It is included with python 2.7.9 and above, so you should have it already. Try <code>pip --version</code>.</p>
+<p>If you don't have it, you can <a href="https://pip.pypa.io/en/stable/installing.html">install it directly</a> or upgrade your python installation.</p>
+<h5 id="install-dependencies">Install dependencies</h5>
+<p><code>pip install -r requirements.txt -t libs</code></p>
+<p>This will install everything listed in <code>requirements.txt</code> into the <code>libs</code> folder.</p>
+<h4 id="update-paths">Update paths</h4>
+<p>Update your <code>~/.bashrc</code> (or other file depending on the shell you use)</p>
+<pre><code class="sh">export PATH=$PATH:/[path to gae]
+export PYTHONPATH=$PYTHONPATH:[path to gae]
+export PYTHONPATH=$PYTHONPATH:[path to gae]/lib/webob-1.2.3
+export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
+</code></pre></div>
             
         </div>
 
@@ -266,12 +333,12 @@
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
 
-        <script src="./js/jquery-1.10.2.min.js"></script>
-        <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/highlight.pack.js"></script>
-        <script>var base_url = '.';</script>
-        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
-        <script src="./js/base.js"></script>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
             <div class="modal-dialog">
@@ -300,8 +367,3 @@
 
     </body>
 </html>
-
-<!--
-MkDocs version : 0.14.0
-Build Date UTC : 2015-09-07 19:16:54.942044
--->

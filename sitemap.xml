@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    
+    <url>
+     <loc>None/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+    
+        
+    <url>
+     <loc>None/installation-and-setup/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/running-a-local-server/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/running-tests/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/text-editor-setup/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/models/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/project-structure/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/code-conventions/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/linters/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/git-workflow/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/issue-tracking/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/continuous-integration/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/intro-to-testing/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/writing-tests/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/basefundtestcase/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/debugging-performance/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/database/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/deploying/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/support-requests/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+    <url>
+     <loc>None/references/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+    
+
+</urlset>

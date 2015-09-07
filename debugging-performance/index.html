@@ -7,14 +7,14 @@
         
         
         
-        <link rel="shortcut icon" href="./img/favicon.ico">
+        <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>sjfnw</title>
+	<title>Performance debugging - sjfnw</title>
 
-        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="./css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="./css/highlight.css">
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -25,7 +25,7 @@
         
     </head>
 
-    <body class="homepage">
+    <body>
 
         
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -59,8 +59,8 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="active">
-                        <a href=".">Home</a>
+                    <li >
+                        <a href="..">Home</a>
                     </li>
                 
                 
@@ -71,25 +71,25 @@
                         
                             
 <li >
-    <a href="installation-and-setup/">Installation and setup</a>
+    <a href="../installation-and-setup/">Installation and setup</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-a-local-server/">Running a local server</a>
+    <a href="../running-a-local-server/">Running a local server</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-tests/">Running tests</a>
+    <a href="../running-tests/">Running tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="text-editor-setup/">Text editor setup</a>
+    <a href="../text-editor-setup/">Text editor setup</a>
 </li>
 
                         
@@ -104,25 +104,25 @@
                         
                             
 <li >
-    <a href="models/">Overview of models</a>
+    <a href="../models/">Overview of models</a>
 </li>
 
                         
                             
 <li >
-    <a href="project-structure/">Project structure</a>
+    <a href="../project-structure/">Project structure</a>
 </li>
 
                         
                             
 <li >
-    <a href="code-conventions/">Code conventions</a>
+    <a href="../code-conventions/">Code conventions</a>
 </li>
 
                         
                             
 <li >
-    <a href="linters/">Linters</a>
+    <a href="../linters/">Linters</a>
 </li>
 
                         
@@ -137,19 +137,19 @@
                         
                             
 <li >
-    <a href="git-workflow/">Git workflow</a>
+    <a href="../git-workflow/">Git workflow</a>
 </li>
 
                         
                             
 <li >
-    <a href="issue-tracking/">Issue tracking</a>
+    <a href="../issue-tracking/">Issue tracking</a>
 </li>
 
                         
                             
 <li >
-    <a href="continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../continuous-integration/">Travis CI & Codecov.io</a>
 </li>
 
                         
@@ -164,19 +164,19 @@
                         
                             
 <li >
-    <a href="intro-to-testing/">Intro</a>
+    <a href="../intro-to-testing/">Intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="writing-tests/">Writing tests</a>
+    <a href="../writing-tests/">Writing tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="basefundtestcase/">Fundraising tests</a>
+    <a href="../basefundtestcase/">Fundraising tests</a>
 </li>
 
                         
@@ -185,31 +185,31 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">How to <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
-<li >
-    <a href="debugging-performance/">Performance debugging</a>
+<li class="active">
+    <a href="./">Performance debugging</a>
 </li>
 
                         
                             
 <li >
-    <a href="database/">Database management</a>
+    <a href="../database/">Database management</a>
 </li>
 
                         
                             
 <li >
-    <a href="deploying/">Deploying</a>
+    <a href="../deploying/">Deploying</a>
 </li>
 
                         
                             
 <li >
-    <a href="support-requests/">Support requests</a>
+    <a href="../support-requests/">Support requests</a>
 </li>
 
                         
@@ -219,7 +219,7 @@
                 
                 
                     <li >
-                        <a href="references/">References</a>
+                        <a href="../references/">References</a>
                     </li>
                 
                 
@@ -243,20 +243,41 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#contributing">Contributing</a></li>
+        <li class="main active"><a href="#setup">Setup</a></li>
+        
+    
+        <li class="main "><a href="#use">Use</a></li>
         
     
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h4 align="center">Documentation related to development and project maintenance</h4>
-
-<hr />
-<h4 id="contributing">Contributing</h4>
-<p>Follow the table of contents on the right to get a local development environment set up, starting with [[installation and setup|installation-and-setup]].</p>
-<p>The [[references]] page has links for more info on the various languages/platforms/technologies that are used. (If you are new to Django, definitely check out those links)</p>
-<p>Check <a href="https://github.com/aisapatino/sjfnw/labels/ready">issues labeled "ready"</a> to see what needs doing. Feel free to post a comment if you have questions. See [[issue tracking|issue-tracking]] for more info.</p></div>
+<p><a href="https://github.com/django-debug-toolbar/django-debug-toolbar">Django Debug Toolbar</a>:</p>
+<blockquote>
+<p>The Django Debug Toolbar is a configurable set of panels that display various debug information about the current request/response</p>
+</blockquote>
+<p>It is a good tool for examining the time it takes to make a request - in particular, for looking at what queries are made and how much time they're taking up. Queries are shown in the console if you use <code>--log-level debug</code> but this is a much more readable format, and shows information about timing.</p>
+<h3 id="setup">Setup</h3>
+<ol>
+<li>Install: <code>pip install django-debug-toolbar</code></li>
+<li>Make sure it is on your path; to install it somewhere specific add <code>-t [target directory]</code> </li>
+<li>If it installs django as a dependency, delete it; otherwise it will try to use that instead of the version you already have installed (and the versions may be different).</li>
+<li>Configure: In settings.py, uncomment the django debug toolbar config</li>
+<li>Copy static files: <code>cp -r [install location]/static/debug_toolbar [sjfnw repo]/sjfnw/static</code></li>
+<li>Currently, we don't do any build step, which the toolbar expects in order to serve its static assets, so copying is a quick hacky way to make it work</li>
+<li>Make sure to avoid committing the copied static files</li>
+</ol>
+<p><em>There is surely a better way to enable usage of the toolbar, but that's what I've done so far</em></p>
+<h3 id="use">Use</h3>
+<p>Run your local server and load a page. You'll see a panel on the right side. Click a section for details. Check their <a href="http://django-debug-toolbar.readthedocs.org/en/latest/panels.html">docs</a> for details.</p>
+<p>The main thing to look at is queries:
+- Look at the total time compared to the SQL time to see if queries are a major part of the page load time.
+- Look for redundant or unnecessary queries
+  - Queries that aren't being used
+  - Repeats of the same query
+  - Similar queries that could be combined
+  - Queries for related objects that could be combined</p></div>
             
         </div>
 
@@ -266,12 +287,12 @@
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
 
-        <script src="./js/jquery-1.10.2.min.js"></script>
-        <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/highlight.pack.js"></script>
-        <script>var base_url = '.';</script>
-        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
-        <script src="./js/base.js"></script>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
             <div class="modal-dialog">
@@ -300,8 +321,3 @@
 
     </body>
 </html>
-
-<!--
-MkDocs version : 0.14.0
-Build Date UTC : 2015-09-07 19:16:54.942044
--->

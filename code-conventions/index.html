@@ -7,14 +7,14 @@
         
         
         
-        <link rel="shortcut icon" href="./img/favicon.ico">
+        <link rel="shortcut icon" href="../img/favicon.ico">
 
-	<title>sjfnw</title>
+	<title>Code conventions - sjfnw</title>
 
-        <link href="./css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="./css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="./css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="./css/highlight.css">
+        <link href="../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../css/highlight.css">
 
         <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!--[if lt IE 9]>
@@ -25,7 +25,7 @@
         
     </head>
 
-    <body class="homepage">
+    <body>
 
         
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -59,8 +59,8 @@
                 <ul class="nav navbar-nav">
                 
                 
-                    <li class="active">
-                        <a href=".">Home</a>
+                    <li >
+                        <a href="..">Home</a>
                     </li>
                 
                 
@@ -71,25 +71,25 @@
                         
                             
 <li >
-    <a href="installation-and-setup/">Installation and setup</a>
+    <a href="../installation-and-setup/">Installation and setup</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-a-local-server/">Running a local server</a>
+    <a href="../running-a-local-server/">Running a local server</a>
 </li>
 
                         
                             
 <li >
-    <a href="running-tests/">Running tests</a>
+    <a href="../running-tests/">Running tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="text-editor-setup/">Text editor setup</a>
+    <a href="../text-editor-setup/">Text editor setup</a>
 </li>
 
                         
@@ -98,31 +98,31 @@
                 
                 
                 
-                    <li class="dropdown">
+                    <li class="dropdown active">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project info <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         
                             
 <li >
-    <a href="models/">Overview of models</a>
+    <a href="../models/">Overview of models</a>
 </li>
 
                         
                             
 <li >
-    <a href="project-structure/">Project structure</a>
+    <a href="../project-structure/">Project structure</a>
+</li>
+
+                        
+                            
+<li class="active">
+    <a href="./">Code conventions</a>
 </li>
 
                         
                             
 <li >
-    <a href="code-conventions/">Code conventions</a>
-</li>
-
-                        
-                            
-<li >
-    <a href="linters/">Linters</a>
+    <a href="../linters/">Linters</a>
 </li>
 
                         
@@ -137,19 +137,19 @@
                         
                             
 <li >
-    <a href="git-workflow/">Git workflow</a>
+    <a href="../git-workflow/">Git workflow</a>
 </li>
 
                         
                             
 <li >
-    <a href="issue-tracking/">Issue tracking</a>
+    <a href="../issue-tracking/">Issue tracking</a>
 </li>
 
                         
                             
 <li >
-    <a href="continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../continuous-integration/">Travis CI & Codecov.io</a>
 </li>
 
                         
@@ -164,19 +164,19 @@
                         
                             
 <li >
-    <a href="intro-to-testing/">Intro</a>
+    <a href="../intro-to-testing/">Intro</a>
 </li>
 
                         
                             
 <li >
-    <a href="writing-tests/">Writing tests</a>
+    <a href="../writing-tests/">Writing tests</a>
 </li>
 
                         
                             
 <li >
-    <a href="basefundtestcase/">Fundraising tests</a>
+    <a href="../basefundtestcase/">Fundraising tests</a>
 </li>
 
                         
@@ -191,25 +191,25 @@
                         
                             
 <li >
-    <a href="debugging-performance/">Performance debugging</a>
+    <a href="../debugging-performance/">Performance debugging</a>
 </li>
 
                         
                             
 <li >
-    <a href="database/">Database management</a>
+    <a href="../database/">Database management</a>
 </li>
 
                         
                             
 <li >
-    <a href="deploying/">Deploying</a>
+    <a href="../deploying/">Deploying</a>
 </li>
 
                         
                             
 <li >
-    <a href="support-requests/">Support requests</a>
+    <a href="../support-requests/">Support requests</a>
 </li>
 
                         
@@ -219,7 +219,7 @@
                 
                 
                     <li >
-                        <a href="references/">References</a>
+                        <a href="../references/">References</a>
                     </li>
                 
                 
@@ -243,20 +243,21 @@
                 <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
     <ul class="nav bs-sidenav">
     
-        <li class="main active"><a href="#contributing">Contributing</a></li>
+        <li class="main active"><a href="#code-style-guidelines">Code style guidelines</a></li>
         
     
     </ul>
 </div></div>
                 <div class="col-md-9" role="main">
 
-<h4 align="center">Documentation related to development and project maintenance</h4>
-
-<hr />
-<h4 id="contributing">Contributing</h4>
-<p>Follow the table of contents on the right to get a local development environment set up, starting with [[installation and setup|installation-and-setup]].</p>
-<p>The [[references]] page has links for more info on the various languages/platforms/technologies that are used. (If you are new to Django, definitely check out those links)</p>
-<p>Check <a href="https://github.com/aisapatino/sjfnw/labels/ready">issues labeled "ready"</a> to see what needs doing. Feel free to post a comment if you have questions. See [[issue tracking|issue-tracking]] for more info.</p></div>
+<p>Consistent code formatting and style makes it easier to read and maintain. This is a work in progress in the current code; existing code is being updated gradually. <strong>All new code should follow the guidelines below</strong>.</p>
+<h3 id="code-style-guidelines">Code style guidelines</h3>
+<p>Generally follow google's <a href="http://google-styleguide.googlecode.com/svn/trunk/pyguide.html">Python style guide</a></p>
+<p>A few exceptions/clarifications:
+- 2 space indents
+- Single quotes except for docstrings
+- We're not as stringent with line length; aim for &lt;100</p>
+<p>See the [[Linters|linters]] page for information on plugins that check syntax/style. Note that pylint does <em>not</em> check quotes or indentation, but should catch most other issues.</p></div>
             
         </div>
 
@@ -266,12 +267,12 @@
             <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
         </footer>
 
-        <script src="./js/jquery-1.10.2.min.js"></script>
-        <script src="./js/bootstrap-3.0.3.min.js"></script>
-        <script src="./js/highlight.pack.js"></script>
-        <script>var base_url = '.';</script>
-        <script data-main="./mkdocs/js/search.js" src="./mkdocs/js/require.js"></script>
-        <script src="./js/base.js"></script>
+        <script src="../js/jquery-1.10.2.min.js"></script>
+        <script src="../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script>var base_url = '..';</script>
+        <script data-main="../mkdocs/js/search.js" src="../mkdocs/js/require.js"></script>
+        <script src="../js/base.js"></script>
 
         <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
             <div class="modal-dialog">
@@ -300,8 +301,3 @@
 
     </body>
 </html>
-
-<!--
-MkDocs version : 0.14.0
-Build Date UTC : 2015-09-07 19:16:54.942044
--->
