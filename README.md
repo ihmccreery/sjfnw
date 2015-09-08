@@ -7,4 +7,6 @@
   </a>
 </p>
 
-See the [wiki](https://github.com/aisapatino/sjfnw/wiki) for documentation.
+<h4 align="center">
+  <a href="https://aisapatino.github.io/sjfnw">documentation</a>
+</h4>
