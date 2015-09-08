@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+
+	<title>Writing tests - sjfnw</title>
+
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="../../css/highlight.css">
+        <link href="../../theme/overrides.css" rel="stylesheet">
+
+        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+
+        
+    </head>
+
+    <body>
+
+        
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <!-- Main navigation -->
+        <ul class="nav navbar-nav">
+        <!-- Main title -->
+        <li>
+          
+              <a class="navbar-brand" href="https://github.com/aisapatino/sjfnw/" target="_blank">
+                  <i class="fa fa-github"></i>
+                  sjfnw
+              </a>
+          
+        </li>
+        
+        
+            <li >
+                <a href="../..">Home</a>
+            </li>
+        
+        
+        
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                
+                    
+<li >
+    <a href="../../getting-started/installation-and-setup/">Installation and setup</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../getting-started/local-server/">Running a local server</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../getting-started/running-tests/">Running tests</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../getting-started/text-editor-setup/">Text editor setup</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../getting-started/linters/">Linters</a>
+</li>
+
+                
+                </ul>
+            </li>
+        
+        
+        
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project info <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                
+                    
+<li >
+    <a href="../../about/models/">Overview of models</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../about/project-structure/">Project structure</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../about/code-conventions/">Code conventions</a>
+</li>
+
+                
+                </ul>
+            </li>
+        
+        
+        
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workflow <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                
+                    
+<li >
+    <a href="../../workflow/git/">Git</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../workflow/issue-tracking/">Issue tracking</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../workflow/deploying/">Deploying</a>
+</li>
+
+                
+                </ul>
+            </li>
+        
+        
+        
+            <li class="dropdown active">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Testing <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                
+                    
+<li >
+    <a href="../intro-to-testing/">Intro</a>
+</li>
+
+                
+                    
+<li class="active">
+    <a href="./">Writing tests</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../fund/">Fundraising tests</a>
+</li>
+
+                
+                </ul>
+            </li>
+        
+        
+        
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">How to <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                
+                    
+<li >
+    <a href="../../how-to/debugging-performance/">Performance debugging</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../how-to/database/">Database management</a>
+</li>
+
+                
+                    
+<li >
+    <a href="../../how-to/support-requests/">Support requests</a>
+</li>
+
+                
+                </ul>
+            </li>
+        
+        
+        
+            <li >
+                <a href="../../resources/">Resources</a>
+            </li>
+        
+        
+        <li>
+            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                <i class="fa fa-search"></i> Search
+            </a>
+        </li>
+        
+    </div>
+</div>
+
+        <div class="container">
+            
+                <div class="col-md-3">
+                  
+                  
+                    <div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+    
+        <li class="main active"><a href="#brainstorm">Brainstorm</a></li>
+        
+            <li><a href="#notes-on-tests">Notes on tests</a></li>
+        
+    
+        <li class="main "><a href="#outline-tests">Outline tests</a></li>
+        
+    
+        <li class="main "><a href="#test-setup">Test setup</a></li>
+        
+    
+        <li class="main "><a href="#writing-a-test">Writing a test</a></li>
+        
+            <li><a href="#example-test">Example test</a></li>
+        
+    
+    </ul>
+</div>
+                  
+                </div>
+                <div class="col-md-9 content" role="main">
+
+<p>We'll use the example of login form submission and go through how to start writing tests for it. This is for functional/integration tests.</p>
+<h3 id="brainstorm">Brainstorm</h3>
+<p>It's useful to start by brainstorming the various scenarios you want to test and what you want to verify in each case. Let's say the login form has two fields: email address and password. Here are some possible examples of <code>POST</code> requests and what you might expect from each.</p>
+<ul>
+<li>Blank form<ul>
+<li>User is not logged in</li>
+<li>Response contains login form with 'required' errors on both fields</li>
+</ul>
+</li>
+<li>Only email is entered<ul>
+<li>User is not logged in</li>
+<li>Response contains login form with 'required' error on password field</li>
+</ul>
+</li>
+<li>Only password is entered<ul>
+<li>User is not logged in</li>
+<li>Response contains login form with 'required' error on email field</li>
+</ul>
+</li>
+<li>Invalid format for email address<ul>
+<li>User is not logged in</li>
+<li>Response contains login form with 'invalid' error message on email field</li>
+</ul>
+</li>
+<li>Email is not registered<ul>
+<li>User is not logged in</li>
+<li>Response contains login form with 'not registered' error message</li>
+</ul>
+</li>
+<li>Email is registered, but password is incorrect<ul>
+<li>User is not logged in</li>
+<li>Response contains login form with 'wrong password' error message</li>
+</ul>
+</li>
+<li>Email is registered and password is correct (finally!)<ul>
+<li>User is logged in</li>
+<li>Response redirects to another page</li>
+</ul>
+</li>
+</ul>
+<h4 id="notes-on-tests">Notes on tests</h4>
+<p>As you can see, a few things are often true:</p>
+<ol>
+<li>There are a lot of potential tests for just a two-field form</li>
+<li>There's a lot of repetition in the things we need to verify</li>
+<li>Some of these seem like they should be a given - if we have a field like <code>email = forms.EmailField()</code> that covers the 'email should be required' test (since fields are required by default) and the 'email should be a valid email' test (since <code>EmailField</code> comes with validation).</li>
+</ol>
+<p>Re: 1 &amp; 2: Tests are very verbose and it's common to spend more time writing tests for a change than you spent on the change itself. Some of the offsetting factors are:
+- Having each test cover one small scenario makes it much easier to tell what's broken when tests fail
+- It's also very tedious to test something manually unless it's a very tiny change
+- You have a record of what is &amp; isn't tested instead of just remembering what you tested manually
+- You can reuse these tests after every change, rather than having to re-test things by hand
+- The process of writing tests can be helpful in a) clarifying desired behavior and b) catching bugs at the time.</p>
+<p>Re: 3: Part of the purpose of tests is to assert what the behavior <em>should</em> be, so that we'll get a warning if it ever changes. The obvious 'email should be required' test will fail if someone adds <code>required=False</code> to that field for some reason. So it functions as a sort of confirmation dialog when we change something to go against what we had previously said it should do. We're not really testing whether the <code>EmailField</code> validation works, we're saying that this field of the login form should only accept email addresses.</p>
+<p>(Also, you'll often be testing more complicated and customized forms than this example)</p>
+<h3 id="outline-tests">Outline tests</h3>
+<p>You can write down your brainstorming as a list of empty tests.</p>
+<pre><code class="python">import unittest
+
+from sjfnw.fund.tests.base import BaseFundTestCase
+
+class LoginForm(BaseFundTestCase):
+
+  @unittest.skip('Incomplete')
+  def test_missing_password(self):
+    &quot;&quot;&quot; Password missing - form error shown, user not logged in &quot;&quot;&quot;
+    pass
+</code></pre>
+
+<ul>
+<li><code>@unittest.skip('Incomplete')</code> will skip the test, printing out the reason - 'Incomplete', in this case.</li>
+<li>The method name should be somewhat descriptive, to make it easy to identify if the test fails.</li>
+<li>I've recently settled on aiming for a single line docstring that gives an overview of what the test is trying to verify. The details (exact assertions, etc) can be read in the code.</li>
+<li>Note: I recommend snippets for being able to write out a list of test ideas quickly. (<a href="http://docs.sublimetext.info/en/latest/extensibility/snippets.html?highlight=snippets">Sublime</a>)</li>
+</ul>
+<h3 id="test-setup">Test setup</h3>
+<p>Often, your tests will share some pre-conditions that you'll want to set up in the class's <code>setUp</code> method. For instance, the user may need to be logged in to access the form you want to test, or it may require that certain objects are in the database already. That doesn't apply for this example but see [[Intro to testing|intro-to-testing]] for more info/links.</p>
+<h3 id="writing-a-test">Writing a test</h3>
+<p>A test often has three sections.</p>
+<ol>
+<li>Verify the starting state</li>
+<li>Take an action (e.g. send a <code>POST</code> request)</li>
+<li>Verify the response &amp; ending state</li>
+</ol>
+<p>Verifying can take different forms, including:<br />
+- Assert something is/isn't in the database<br />
+- Assert the value of a field on a model retrieved from the database<br />
+- Assert various attributes of the response: status code, url, redirects, template used<br />
+- Assert that something is/isn't in the content of the response</p>
+<p>An action of POSTing a form can require some preparation to assemble the mocked form data to send.</p>
+<p>When you're done outlining and want to start on the tests themselves, you fill them in and then remove the <code>skip</code> decorator.</p>
+<h4 id="example-test">Example test</h4>
+<p>With extra comments to illustrate:</p>
+<pre><code class="python">import unittest
+
+from django.contrib.auth.models import User
+
+from sjfnw.fund.tests.base import BaseFundTestCase
+
+class LoginForm(BaseFundTestCase):
+
+  def test_missing_password(self):
+    &quot;&quot;&quot; Password missing - form error shown, user not logged in &quot;&quot;&quot;
+
+    # ------ 1. verify starting state ------
+
+    # create User
+    User.objects.create_user('abc@gmail.com', 'abc@gmail.com', 'password')
+
+    # ------ 2. take an action - submit form data ------
+
+    # create mock form data
+    form_data = {
+      'email': 'abc@gmail.com',
+      'password': ''
+    }
+
+    # make the request
+    response = self.client.post('/login', form_data, follow=True)
+
+    # ------ 3. verify response and ending state ------
+
+    self.assertTemplateUsed(response, 'fund/login.html')
+
+    # should be {} if user was not logged in, which evaluates to False
+    self.assertFalse(self.client.session)
+
+    # context is the dictionary passed into the render call in the view
+    # this assumes the login form was passed in with the key 'form'
+    errors = response.context['form'].errors
+
+    self.assertEqual(errors['password'], ['This field is required'])
+    self.assertEqual(errors['email'], [])
+</code></pre>
+
+<p>Check the <a href="../../resources/">resources</a> page for links to more info about testing.</p></div>
+            
+        <footer class="col-md-12 text-center">
+            
+            <p><i>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</i></p>
+        </footer>
+        </div>
+
+
+        <script src="../../js/jquery-1.10.2.min.js"></script>
+        <script src="../../js/bootstrap-3.0.3.min.js"></script>
+        <script src="../../js/highlight.pack.js"></script>
+        <script>var base_url = '../..';</script>
+        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            From here you can search these documents. Enter
+                            your search terms below.
+                        </p>
+                        <form role="form">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+                            </div>
+                        </form>
+                        <div id="mkdocs-search-results"></div>
+                    </div>
+                    <div class="modal-footer">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+</html>

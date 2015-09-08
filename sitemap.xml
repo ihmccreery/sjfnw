@@ -12,53 +12,31 @@
     
         
     <url>
-     <loc>None/installation-and-setup/</loc>
+     <loc>None/getting-started/installation-and-setup/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/running-a-local-server/</loc>
+     <loc>None/getting-started/local-server/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/running-tests/</loc>
+     <loc>None/getting-started/running-tests/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/text-editor-setup/</loc>
-     <lastmod>2015-09-07</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
-    
-
-    
-        
-    <url>
-     <loc>None/models/</loc>
+     <loc>None/getting-started/text-editor-setup/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/project-structure/</loc>
-     <lastmod>2015-09-07</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
-    <url>
-     <loc>None/code-conventions/</loc>
-     <lastmod>2015-09-07</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
-    <url>
-     <loc>None/linters/</loc>
+     <loc>None/getting-started/linters/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
@@ -68,41 +46,19 @@
     
         
     <url>
-     <loc>None/git-workflow/</loc>
+     <loc>None/about/models/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/issue-tracking/</loc>
+     <loc>None/about/project-structure/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/continuous-integration/</loc>
-     <lastmod>2015-09-07</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
-    
-
-    
-        
-    <url>
-     <loc>None/intro-to-testing/</loc>
-     <lastmod>2015-09-07</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
-    <url>
-     <loc>None/writing-tests/</loc>
-     <lastmod>2015-09-07</lastmod>
-     <changefreq>daily</changefreq>
-    </url>
-        
-    <url>
-     <loc>None/basefundtestcase/</loc>
+     <loc>None/about/code-conventions/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
@@ -112,25 +68,69 @@
     
         
     <url>
-     <loc>None/debugging-performance/</loc>
+     <loc>None/workflow/git/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/database/</loc>
+     <loc>None/workflow/issue-tracking/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/deploying/</loc>
+     <loc>None/workflow/continuous-integration/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
         
     <url>
-     <loc>None/support-requests/</loc>
+     <loc>None/workflow/deploying/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/tests/intro-to-testing/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/tests/writing-tests/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/tests/fund/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    
+
+    
+        
+    <url>
+     <loc>None/how-to/debugging-performance/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/how-to/database/</loc>
+     <lastmod>2015-09-07</lastmod>
+     <changefreq>daily</changefreq>
+    </url>
+        
+    <url>
+     <loc>None/how-to/support-requests/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
@@ -139,7 +139,7 @@
 
     
     <url>
-     <loc>None/references/</loc>
+     <loc>None/resources/</loc>
      <lastmod>2015-09-07</lastmod>
      <changefreq>daily</changefreq>
     </url>
