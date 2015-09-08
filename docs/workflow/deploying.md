@@ -1,4 +1,4 @@
-GAE has removed push-to-deploy without a more complicated setup involving Jenkins on a Google Compute Engine VM. So for now, we're doing tag + manual deploy. Tagging is so we can easily see what exact code is live, and compare it to the last release, in cases where something is going wrong.
+Current process: manual deploy with `appcfg.py`, tag using the date. Tagging is so we can easily see what exact code is live, and compare it to the last release, in cases where something is going wrong.
 
 #### Prepare for release
 
@@ -13,7 +13,7 @@ GAE has removed push-to-deploy without a more complicated setup involving Jenkin
   `git tag -a 2015-08-09 -m "summary of changes"`  
   a. Make sure the first line is under 72 chars like with commit messages.  
   b. The message doesn't need to be comprehensive; commit messages and diffs can be used to get the full details.  
-  c. If it's not the first tag in a day, do `2015-08-09_2` etc.
+  c. If it's not the first tag in a day, do `2015-08-09.2` etc.
 2. Deploy the code.  
   a. Make sure you don't have any local uncommitted changes; they will be deployed.  
   b. `appcfg.py update .` (if you are in root of repo) to deploy to app engine.  

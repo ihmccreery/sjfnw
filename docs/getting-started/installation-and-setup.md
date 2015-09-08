@@ -1,4 +1,4 @@
-Instructions assume you're running linux or mac osx and can use a package manager as needed - [`homebrew`](http://brew.sh/), `apt-get`, etc.
+Instructions assume you're running linux or mac osx and can use a package manager ([`homebrew`](http://brew.sh/), `apt-get`, etc.) as needed.
 
 #### Code
 
@@ -6,19 +6,11 @@ Instructions assume you're running linux or mac osx and can use a package manage
 
 #### Python
 
-The project uses python 2.7, which is probably already installed with your OS. To confirm:
-
-`python --version`
-
-Install using package manager if needed.
+The project uses python 2.7, which is probably already installed with your OS. Confirm by doing `python --version`. Install using package manager if needed.
 
 #### Git
 
-May be installed already, check with
-
-`git --version`
-
-Install/update using package manager if needed.
+May be installed already, check with `git --version`. Install/update using package manager if needed.
 
 #### MySQL
 
@@ -30,11 +22,11 @@ Once those have installed, create the database:
 
 1. `mysql -uroot -p` to get into the mysql shell. This will prompt you for the password you set when you installed.
 2. Make sure mysql is set to use `utf8` encoding everywhere.
-- You can check with `show variables like 'char%';`
-- If anything is set to `latin1`, change it with `set variable_name=utf8;`
+    - You can check with `show variables like 'char%';`
+    - If anything is set to `latin1`, change it with `set variable_name=utf8;`
 3. `create database sjfdb_local;`
 
-#### Setting up the database
+#### Set up the database
 
 `./manage.py syncdb`
 
@@ -49,9 +41,9 @@ To populate your local db with data:
 
 `./manage.py load_testing_data`
 
-#### [Google App Engine SDK](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python)
+#### Google App Engine SDK
 
-Download & unzip (somewhere outside the repo).
+[Download](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) & unzip (somewhere outside the repo).
 
 #### Project dependencies
 

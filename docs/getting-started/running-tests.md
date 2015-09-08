@@ -10,14 +10,14 @@ To get more granular, use python `.`-separated paths:
 
 Examples:
 
-Only fundraising tests: `./manage.py test sjfnw.fund`
-Specific test file: `./manage.py test sjfnw.grants.tests.test_admin`
-Specific test suite: `./manage.py test sjfnw.fund.tests.test_steps.AddStep`
+Only fundraising tests: `./manage.py test sjfnw.fund`  
+Specific test file: `./manage.py test sjfnw.grants.tests.test_admin`  
+Specific test suite: `./manage.py test sjfnw.fund.tests.test_steps.AddStep`  
 Specific test: `./manage.py test sjfnw.fund.tests.test_steps.AddStep.test_valid`
 
 #### Coverage
 
-Browse code coverage on [codecov](https://codecov.io/github/aisapatino/sjfnw) (more info: [[codecovio|continuous-integration]]).
+Browse code coverage on [codecov](https://codecov.io/github/aisapatino/sjfnw) (more info: [CI](../workflow/continuous-integration.md)).
 
 To check test coverage locally, install [coverage.py](http://nedbatchelder.com/code/coverage/), then do
 

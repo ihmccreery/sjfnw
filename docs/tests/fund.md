@@ -23,9 +23,9 @@ Usage:
     super(TestClass, self).setUp()
 ```
 
-Creates:
-  - Post-training GP (Fundraising training date has passed; estimates are required)
-  - Pre-training GP (Fundraising training has not happened; estimates not required)
+Creates:  
+    - Post-training GP (Fundraising training date has passed; estimates are required)  
+    - Pre-training GP (Fundraising training has not happened; estimates not required)
 
 ### Test memberships
 
@@ -43,18 +43,18 @@ _default_ means that `member.current` is set to that membership, so it will be u
 
 - `testacct@gmail.com` User and Member (`self.member_id`)
 - 2 Memberships:
-  - Post-training project (`self.ship_id`) _default_
-    - One Donor (`self.donor_id`) with one incomplete, overdue step (`self.step_id`)
-  - LGBTQ Giving project (membership id is `1`) _fixtures_
-    - 8 donors
-    - See `sjfnw/fund/fixtures/testy.json` for details
+    - Post-training project (`self.ship_id`) _default_
+      - One Donor (`self.donor_id`) with one incomplete, overdue step (`self.step_id`)
+    - LGBTQ Giving project (membership id is `1`)
+      - 8 donors
+      - See `sjfnw/fund/fixtures/testy.json` for details
 
 #### Newbie - `use_new_acct()`
 
 - `newacct@gmail.com` User and Member (`self.member_id`)
 - 2 Memberships:
-  - Pre-training (`self.pre_id`) _default_
-  - Post-training (`self.post_id`)
+    - Pre-training (`self.pre_id`) _default_
+    - Post-training (`self.post_id`)
 - No Donors
 
 #### Admin - `use_admin_acct()`
