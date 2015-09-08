@@ -1,0 +1,22 @@
+{# custom template for rendering full nav vertically #}
+<div class="well">
+  <div class="toc-header">Contents</div>
+  <ul class="nav">
+    {% for nav_item in nav %}
+    {% if nav_item.children %}
+      <li class="main {% if nav_item.active %} active{% endif %}">
+        {{ nav_item.title }}
+        <ul>
+          {% for nav_item in nav_item.children %}
+          {% include "nav-sub.html" %}
+          {% endfor %}
+        </ul>
+      </li>
+    {% elif not nav_item.active %}
+      <li class="main">
+        <a href="{{ nav_item.url }}">{{ nav_item.title }}</a>
+      </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</div>

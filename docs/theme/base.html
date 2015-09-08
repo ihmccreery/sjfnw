@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{# mkdocs theme template as of 74031a0 #}
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -45,18 +46,24 @@
 
         <div class="container">
             {% block content %}
-                <div class="col-md-3">{% include "toc.html" %}</div>
-                <div class="col-md-9" role="main">{% include "content.html" %}</div>
+                <div class="col-md-3">
+                  {# modified to show full TOC on homepage, and not show if empty #}
+                  {% if current_page and current_page.is_homepage %}
+                    {% include "side_nav.html" %}
+                  {% elif toc.items|length > 1 %}
+                    {% include "toc.html" %}
+                  {% endif %}
+                </div>
+                <div class="col-md-9 content" role="main">{% include "content.html" %}</div>
             {% endblock %}
-        </div>
-
-        <footer class="col-md-12">
-            <hr>
+        <footer class="col-md-12 text-center">
             {% if copyright %}
                 <p>{{ copyright }}</p>
             {% endif %}
-            <p>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</p>
+            <p><i>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</i></p>
         </footer>
+        </div>
+
 
         <script src="{{ base_url }}/js/jquery-1.10.2.min.js"></script>
         <script src="{{ base_url }}/js/bootstrap-3.0.3.min.js"></script>
