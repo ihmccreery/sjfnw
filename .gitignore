@@ -1,3 +1,6 @@
+# built docs
+site
+
 # libs managed by pip
 libs/**/*
 !libs/__init__.py
