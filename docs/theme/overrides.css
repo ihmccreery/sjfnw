@@ -1,0 +1,36 @@
+.toc-header {
+  font-size: 1.2em;
+  border-bottom: 1px solid #aaa;
+  text-align: center;
+  margin: -8px 0 8px 0;
+}
+
+/* spacing between TOC sections */
+.well>.nav>li.main,
+.well>.nav>.main>ul {
+  padding-top: 5px;
+}
+
+.nav li>ul {
+  padding-left: 20px;
+}
+
+/* reduce height of nav bar */
+.navbar-nav>li>a {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.navbar-brand {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.navbar {
+  min-height: 40px;
+  border: none;
+}
+
+footer {
+  border-top: 1px solid #aaa;
+  padding: 5px;
+  opacity: .7;
+}

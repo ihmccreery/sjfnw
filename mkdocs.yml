@@ -1,7 +1,6 @@
 site_name: sjfnw
 theme: flatly
 include_nav: true
-include_search: true
 include_next_prev: false
 repo_url: https://github.com/aisapatino/sjfnw/
 repo_name: sjfnw
@@ -22,9 +21,9 @@ pages:
   - Issue tracking: 'issue-tracking.md'
   - Travis CI & Codecov.io: 'continuous-integration.md'
 - Testing:
-  - 'Intro': 'intro-to-testing.md'
-  - 'Writing tests': 'writing-tests.md'
-  - 'Fundraising tests': 'basefundtestcase.md'
+  - 'Intro': 'tests/intro-to-testing.md'
+  - 'Writing tests': 'tests/writing-tests.md'
+  - 'Fundraising tests': 'tests/basefundtestcase.md'
 - How to:
   - Performance debugging: 'debugging-performance.md'
   - Database management: 'database.md'
