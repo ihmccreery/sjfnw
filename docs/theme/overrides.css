@@ -14,6 +14,9 @@
 .nav li>ul {
   padding-left: 20px;
 }
+.sidenav>.main>a {
+  padding-left: 0;
+}
 
 /* reduce height of nav bar */
 .navbar-nav>li>a {
@@ -30,6 +33,7 @@
 }
 
 footer {
+  z-index: -5;
   border-top: 1px solid #aaa;
   padding: 5px;
   opacity: .7;

@@ -19,7 +19,7 @@ Most of our tests are functional/integrational, focusing on a specific view, oft
 
 Onr major issue with our tests is that we don't have any way to test our front-end javascript. There is some key functionality there - things like loading and submitting forms, autosaving the grant application. There's an issue filed [here](https://github.com/aisapatino/sjfnw/issues/172).
 
-At this point, the primary goal is to add [[test coverage|running-tests]] in whatever ways seem best. In particular, we should **avoid adding any new functionality without accompanying tests**.
+At this point, the primary goal is to add [test coverage](../workflow/continuous-integration.md) in whatever ways seem best. In particular, we should **avoid adding any new functionality without accompanying tests**.
 
 ### Django and Python testing
 
@@ -45,7 +45,7 @@ Tests are located in `sjfnw/fund/tests/` and `sjfnw/grants/tests/`
 
 `sjfnw/tests.py` houses test-related classes and methods that are useful across both modules. For instance: custom test runner, base test classes, custom assertion methods, etc.
 
-### Django test basics - organizing files, suites
+### Organizing tests
 
 In Django, test classes represent test suites - bundles of tests that share a `setUp` method, fixtures, etc.
 
@@ -66,4 +66,4 @@ I usually structure it like this:
 - Each class can have a `setUp` method that runs before *each* individual test method.
 - Individual test methods test different scenarios related to the same form, model, etc.
 
-See [[Writing tests|writing-tests]] for an in-depth example.
+See [writing tests](writing-tests) for an in-depth example.

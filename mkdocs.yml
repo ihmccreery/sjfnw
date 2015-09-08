@@ -4,30 +4,30 @@ include_nav: true
 include_next_prev: false
 repo_url: https://github.com/aisapatino/sjfnw/
 repo_name: sjfnw
+theme_dir: 'docs/theme'
 pages:
 - Home: 'index.md'
 - Getting started:
-  - 'Installation and setup': 'installation-and-setup.md'
-  - 'Running a local server': 'running-a-local-server.md'
-  - Running tests: 'running-tests.md'
-  - 'Text editor setup': 'text-editor-setup.md'
+  - Installation and setup: 'getting-started/installation-and-setup.md'
+  - Running a local server: 'getting-started/local-server.md'
+  - Running tests: 'getting-started/running-tests.md'
+  - Text editor setup: 'getting-started/text-editor-setup.md'
+  - Linters: 'getting-started/linters.md'
 - Project info:
-  - Overview of models: 'models.md'
-  - Project structure: 'project-structure.md'
-  - Code conventions: 'code-conventions.md'
-  - 'Linters': 'linters.md'
-- Git & github:
-  - Git workflow: 'git-workflow.md'
-  - Issue tracking: 'issue-tracking.md'
-  - Travis CI & Codecov.io: 'continuous-integration.md'
+  - Overview of models: 'about/models.md'
+  - Project structure: 'about/project-structure.md'
+  - Code conventions: 'about/code-conventions.md'
+- Workflow:
+  - Git: 'workflow/git.md'
+  - Issue tracking: 'workflow/issue-tracking.md'
+  - Travis CI & Codecov.io: 'workflow/continuous-integration.md'
+  - Deploying: 'workflow/deploying.md'
 - Testing:
-  - 'Intro': 'tests/intro-to-testing.md'
-  - 'Writing tests': 'tests/writing-tests.md'
-  - 'Fundraising tests': 'tests/basefundtestcase.md'
+  - Intro: 'tests/intro-to-testing.md'
+  - Writing tests: 'tests/writing-tests.md'
+  - Fundraising tests: 'tests/fund.md'
 - How to:
-  - Performance debugging: 'debugging-performance.md'
-  - Database management: 'database.md'
-  - Deploying: 'deploying.md'
-  - Support requests: 'support-requests.md'
-- References: 'references.md'
-theme_dir: 'docs/theme'
+  - Performance debugging: 'how-to/debugging-performance.md'
+  - Database management: 'how-to/database.md'
+  - Support requests: 'how-to/support-requests.md'
+- Resources: 'resources.md'

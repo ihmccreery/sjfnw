@@ -5,28 +5,28 @@ We'll use the example of login form submission and go through how to start writi
 It's useful to start by brainstorming the various scenarios you want to test and what you want to verify in each case. Let's say the login form has two fields: email address and password. Here are some possible examples of `POST` requests and what you might expect from each.
 
 - Blank form
-  - User is not logged in
-  - Response contains login form with 'required' errors on both fields
+    - User is not logged in
+    - Response contains login form with 'required' errors on both fields
 - Only email is entered
-  - User is not logged in
-  - Response contains login form with 'required' error on password field
+    - User is not logged in
+    - Response contains login form with 'required' error on password field
 - Only password is entered
-  - User is not logged in
-  - Response contains login form with 'required' error on email field
+    - User is not logged in
+    - Response contains login form with 'required' error on email field
 - Invalid format for email address
-  - User is not logged in
-  - Response contains login form with 'invalid' error message on email field
+    - User is not logged in
+    - Response contains login form with 'invalid' error message on email field
 - Email is not registered
-  - User is not logged in
-  - Response contains login form with 'not registered' error message
+    - User is not logged in
+    - Response contains login form with 'not registered' error message
 - Email is registered, but password is incorrect
-  - User is not logged in
-  - Response contains login form with 'wrong password' error message
+    - User is not logged in
+    - Response contains login form with 'wrong password' error message
 - Email is registered and password is correct (finally!)
-  - User is logged in
-  - Response redirects to another page
+    - User is logged in
+    - Response redirects to another page
 
-##### Notes on tests
+#### Notes on tests
 
 As you can see, a few things are often true:
 
@@ -79,17 +79,17 @@ A test often has three sections.
 2. Take an action (e.g. send a `POST` request)
 3. Verify the response & ending state
 
-Verifying can take different forms, including:
-- Assert something is/isn't in the database
-- Assert the value of a field on a model retrieved from the database
-- Assert various attributes of the response: status code, url, redirects, template used
+Verifying can take different forms, including:  
+- Assert something is/isn't in the database  
+- Assert the value of a field on a model retrieved from the database  
+- Assert various attributes of the response: status code, url, redirects, template used  
 - Assert that something is/isn't in the content of the response
 
 An action of POSTing a form can require some preparation to assemble the mocked form data to send.
 
 When you're done outlining and want to start on the tests themselves, you fill them in and then remove the `skip` decorator.
 
-##### Example test
+#### Example test
 
 With extra comments to illustrate:
 
@@ -136,4 +136,4 @@ class LoginForm(BaseFundTestCase):
     self.assertEqual(errors['email'], [])
 ```
 
-Check [[references]] page for links to more info about testing.
+Check the [resources](../resources.md) page for links to more info about testing.

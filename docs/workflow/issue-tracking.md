@@ -5,17 +5,17 @@ We use github's built-in issues system to keep track of dev tasks: see [issues](
 - **Always search issues before creating a new one to make sure it hasn't already been filed.**
 - Everything that a dev thinks needs to be done or that is requested/suggested by staff/other users is recorded as an issue.
 - Issues are organized using milestones and labels - see below for details. Short version:
-  - Current active milestone always starts with ★
-  - Priority labels: `p1` is highest priority, `p4` is lowest
+    - Current active milestone always starts with ★
+    - Priority labels: `p1` is highest priority, `p4` is lowest
 - **If you are looking for something to do, check the [`ready` label](https://github.com/aisapatino/sjfnw/issues?q=is%3Aopen+is%3Aissue+label%3Aready)**. That's used for tasks that should be ready to work on.
 
 ## Milestones
 
 - There is always an active milestone for current tasks. It has a due date and always starts with a ★ to make it easier to find in the dropdown.
 - Three milestones for broad sorting:
-  - `Backlog - to do` tasks that we definitely want to do. Look through this when picking tasks for the active milestone.
-  - `Backlog - lower priority` tasks that we'd like to do, but may not get to.
-  - `Future ideas` tasks that are too time consuming and/or not beneficial enough to prioritize. These are often ideas without much definition.
+    - `Backlog - to do` tasks that we definitely want to do. Look through this when picking tasks for the active milestone.
+    - `Backlog - lower priority` tasks that we'd like to do, but may not get to.
+    - `Future ideas` tasks that are too time consuming and/or not beneficial enough to prioritize. These are often ideas without much definition.
 
 ## Labels
 
