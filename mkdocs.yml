@@ -5,6 +5,7 @@ include_next_prev: false
 repo_url: https://github.com/aisapatino/sjfnw/
 repo_name: sjfnw
 theme_dir: 'docs/theme'
+markdown_extensions: [markdown.extensions.nl2br]
 pages:
 - Home: 'index.md'
 - Getting started:
