@@ -1,6 +1,6 @@
-We use github's built-in issues system to keep track of dev tasks: see [issues](https://github.com/aisapatino/sjfnw/issues) tab.
-
 ## Overview
+
+We use github's built-in issues system to keep track of dev tasks: see [issues](https://github.com/aisapatino/sjfnw/issues) tab.
 
 - **Always search issues before creating a new one to make sure it hasn't already been filed.**
 - Everything that a dev thinks needs to be done or that is requested/suggested by staff/other users is recorded as an issue.
@@ -25,11 +25,11 @@ Labels are prefixed so that they are in order in the dropdown, making it easier 
 
 ```
 area:
-  admin            related to the admin site (included custom admin pages like reporting)
+  admin            related to the admin site (including custom admin pages like reporting)
   grants           related to the grant application portal
-  project central  related to the fundraising app
+  fund             related to the fundraising app
 
-lang(uage):        this is a new set of labels and isn't thoroughly applied yet. it is
+lang(uage):        this is a new set of labels and isn't thoroughly applied yet. it's
   html/css         intended as a way for potential contributors to identify front-end focused tasks
   js               that don't involve much python/django
 
@@ -42,15 +42,16 @@ lang(uage):        this is a new set of labels and isn't thoroughly applied yet.
 status:
   archived         closed without fixing/doing
   staff            waiting on information/direction from staff
-  ready            ready to be worked on  - issue should be clearly described with links/refs if applicable
+  ready            ready to be worked on (clearly described with links/refs if applicable)
 
 type:
   bug              unintended behavior that breaks or interferes with existing functionality
-  dev              development work that may not have an effect from the user perspective. ex: code refactors
-  meta             umbrella issue. things like "figure out steps to do x" or "design review."
-                   will usually not result in code changes, but in more specific tickets being created
+  dev              development work, may not have an effect from user perspective. ex: code refactors
+  meta             umbrella issue. things like "figure out steps to do x" or "design review"
+                   will usually not result in code changes, but in more specific tickets
+                   being created
   feature          add new functionality
-  performance      usually refers to reducing load times
+  performance      usually refers to reducing page load
   tests            related to automated tests
   ui/ux            improvements to appearance or interaction flow 
 
