@@ -15,7 +15,7 @@ Sublime3: [SublimeLinter](http://sublimelinter.readthedocs.org/en/latest/) + [Su
 
 In your [user settings](http://sublimelinter.readthedocs.org/en/latest/settings.html#settings-sources), under `"linters"`, include
 
-```
+```json
 "pylint": {
   "rcfile": "[path to repo]/.pylintrc",
   "args": "--load-plugins pylint_django"
@@ -26,7 +26,7 @@ Vim: [syntastic](https://github.com/scrooloose/syntastic)
 
 In your `.vimrc`, include
 
-```
+```vim
 let g:syntastic_python_checkers = ['pylint']
 let g:syntastic_python_pylint_args = '--load-plugins pylint_django --rcfile=[path to repo]/.pylintrc'
 ```
