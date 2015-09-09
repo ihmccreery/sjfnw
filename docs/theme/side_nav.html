@@ -1,7 +1,7 @@
 {# custom template for rendering full nav vertically #}
-<div class="well">
+<div class="well bs-sidebar">
   <div class="toc-header">Contents</div>
-  <ul class="nav sidenav">
+  <ul class="nav">
     {% for nav_item in nav %}
     {% if nav_item.children %}
       <li class="main {% if nav_item.active %} active{% endif %}">
