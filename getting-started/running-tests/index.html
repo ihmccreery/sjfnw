@@ -1,231 +1,227 @@
 <!DOCTYPE html>
 
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
-        
-        
-        <link rel="shortcut icon" href="../../img/favicon.ico">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
 
-	<title>Running tests - sjfnw</title>
+    <title>Running tests - sjfnw</title>
 
-        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
-        <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
-        <link href="../../css/base.css" rel="stylesheet">
-        <link rel="stylesheet" href="../../css/highlight.css">
-        <link href="../../theme/overrides.css" rel="stylesheet">
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+      <link href="../../theme/overrides.css" rel="stylesheet">
 
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
-        <![endif]-->
+    
+  </head>
 
-        
-    </head>
+  <body>
 
-    <body>
+    <div class="navbar navbar-default navbar-fixed-top text-center" role="navigation">
+  <ul class="top-nav-ul">
 
-        
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
+    <li>
+      
+        <a class="emphasize" href="https://github.com/aisapatino/sjfnw/" target="_blank">
+          <i class="fa fa-github"></i>
+          sjfnw
+        </a>
+      
+    </li>
 
-        <!-- Main navigation -->
-        <ul class="nav navbar-nav">
-        <!-- Main title -->
-        <li>
-          
-              <a class="navbar-brand" href="https://github.com/aisapatino/sjfnw/" target="_blank">
-                  <i class="fa fa-github"></i>
-                  sjfnw
-              </a>
-          
+    <li class="spacer-right"></li>
+
+    
+      
+        <li >
+          <a href="../..">Home</a>
         </li>
-        
-        
-            <li >
-                <a href="../..">Home</a>
-            </li>
-        
-        
-        
-            <li class="dropdown active">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                
-                    
+      
+    
+      
+        <li class="dropdown active">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
 <li >
     <a href="../installation-and-setup/">Installation and setup</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../local-server/">Running a local server</a>
 </li>
 
-                
-                    
+          
+            
 <li class="active">
     <a href="./">Running tests</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../text-editor-setup/">Text editor setup</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../linters/">Linters</a>
 </li>
 
-                
-                </ul>
-            </li>
-        
-        
-        
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project info <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                
-                    
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project info <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
 <li >
     <a href="../../about/models/">Overview of models</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../about/project-structure/">Project structure</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../about/code-conventions/">Code conventions</a>
 </li>
 
-                
-                </ul>
-            </li>
-        
-        
-        
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workflow <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                
-                    
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workflow <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
 <li >
     <a href="../../workflow/git/">Git</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../workflow/issue-tracking/">Issue tracking</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../workflow/deploying/">Deploying</a>
 </li>
 
-                
-                </ul>
-            </li>
-        
-        
-        
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Testing <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                
-                    
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Testing <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
 <li >
     <a href="../../tests/intro-to-testing/">Intro</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../tests/writing-tests/">Writing tests</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../tests/fund/">Fundraising tests</a>
 </li>
 
-                
-                </ul>
-            </li>
-        
-        
-        
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">How to <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                
-                    
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">How to <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
 <li >
     <a href="../../how-to/debugging-performance/">Performance debugging</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../how-to/database/">Database management</a>
 </li>
 
-                
-                    
+          
+            
 <li >
     <a href="../../how-to/support-requests/">Support requests</a>
 </li>
 
-                
-                </ul>
-            </li>
-        
-        
-        
-            <li >
-                <a href="../../resources/">Resources</a>
-            </li>
-        
-        
-        <li>
-            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
-                <i class="fa fa-search"></i> Search
-            </a>
+          
+          </ul>
         </li>
-        
-    </div>
+      
+    
+      
+        <li >
+          <a href="../../resources/">Resources</a>
+        </li>
+      
+    
+
+    <li class="spacer-left"></li>
+
+    <li>
+      <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+        <i class="fa fa-search"></i> Search
+      </a>
+    </li>
+
+  </ul>
 </div>
 
-        <div class="container">
-            
-                <div class="col-md-3">
-                  
-                  
-                    <div class="bs-sidebar hidden-print affix well" role="complementary">
-    <ul class="nav bs-sidenav">
+    <div class="container">
+      
+        <div class="col-md-3">
+          
+            <div class="bs-sidebar well affix" role="complementary">
+  <div class="toc-header">Running tests</div>
+    <ul class="nav">
     
         <li class="main active"><a href="#running-tests">Running tests</a></li>
         
@@ -235,9 +231,10 @@
     
     </ul>
 </div>
-                  
-                </div>
-                <div class="col-md-9 content" role="main">
+          
+        </div>
+        <div class="col-md-9 content" role="main">
+          
 
 <h4 id="running-tests">Running tests</h4>
 <p>Run all tests:</p>
@@ -253,46 +250,47 @@ Specific test: <code>./manage.py test sjfnw.fund.tests.test_steps.AddStep.test_v
 <p>Browse code coverage on <a href="https://codecov.io/github/aisapatino/sjfnw">codecov</a> (more info: <a href="../../workflow/continuous-integration/">CI</a>).</p>
 <p>To check test coverage locally, install <a href="http://nedbatchelder.com/code/coverage/">coverage.py</a>, then do</p>
 <p><code>./scripts/coverage.sh</code></p>
-<p>then open <code>./coverage-html/index.html</code></p></div>
-            
-        <footer class="col-md-12 text-center">
-            
-            <p><i>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</i></p>
-        </footer>
+<p>then open <code>./coverage-html/index.html</code></p>
         </div>
+      
 
+      <footer class="col-md-12 text-center">
+        
+        <p><i>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</i></p>
+      </footer>
+    </div>
 
-        <script src="../../js/jquery-1.10.2.min.js"></script>
-        <script src="../../js/bootstrap-3.0.3.min.js"></script>
-        <script src="../../js/highlight.pack.js"></script>
-        <script>var base_url = '../..';</script>
-        <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-        <script src="../../js/base.js"></script>
+    <script src="../../js/jquery-1.10.2.min.js"></script>
+    <script src="../../js/bootstrap-3.0.3.min.js"></script>
+    <script>var base_url = '../..';</script>
+    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+    <script src="../../js/base.js"></script>
+      <script src="../../theme/custom-highlight.js"></script>
 
-        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                        <h4 class="modal-title" id="exampleModalLabel">Search</h4>
-                    </div>
-                    <div class="modal-body">
-                        <p>
-                            From here you can search these documents. Enter
-                            your search terms below.
-                        </p>
-                        <form role="form">
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
-                            </div>
-                        </form>
-                        <div id="mkdocs-search-results"></div>
-                    </div>
-                    <div class="modal-footer">
-                    </div>
-                </div>
-            </div>
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog"
+         aria-labelledby="Search Modal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+          </div>
+          <div class="modal-body">
+            <p>Search the documentation.</p>
+            <form role="form">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+              </div>
+            </form>
+            <div id="mkdocs-search-results"></div>
+          </div>
+          <div class="modal-footer"></div>
         </div>
+      </div>
+    </div>
 
-    </body>
+  </body>
 </html>
