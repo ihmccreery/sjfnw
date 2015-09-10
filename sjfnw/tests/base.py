@@ -10,9 +10,9 @@ from unittest import TextTestRunner, TestResult
 from unittest.signals import registerResult
 
 # Sets root & sjfnw loggers level. Comment out for less output.
-logging.getLogger().setLevel(0)
+logging.getLogger().setLevel(logging.INFO)
 logger = logging.getLogger('sjfnw')
-logger.setLevel(0)
+logger.setLevel(logging.INFO)
 
 RED = '\033[00;31m'
 GREEN = '\033[00;32m'
