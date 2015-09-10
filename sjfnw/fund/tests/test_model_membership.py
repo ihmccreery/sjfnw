@@ -1,7 +1,46 @@
+import logging
+
 from django.utils import timezone
 
 from sjfnw.fund.models import Membership, Donor, Step
 from sjfnw.fund.tests.base import BaseFundTestCase
+
+logger = logging.getLogger('sjfnw')
+
+class GetProgress(BaseFundTestCase):
+
+  def setUp(self):
+    super(GetProgress, self).setUp()
+    self.use_new_acct()
+
+  def test_none(self):
+    membership = Membership.objects.get(pk=self.pre_id)
+    progress = membership.get_progress()
+    self.assertEqual(progress['estimated'], 0)
+    self.assertEqual(progress['promised'], 0)
+    self.assertEqual(progress['received_this'], 0)
+    self.assertEqual(progress['received_next'], 0)
+    self.assertEqual(progress['received_afternext'], 0)
+    self.assertEqual(progress['received_total'], 0)
+
+  def test_multiple_received(self):
+    donor = Donor(membership_id=self.pre_id, firstname='Sally', amount=40,
+                  likelihood=75, asked=True, promised=40, received_this=40)
+    donor.save()
+    donor = Donor(membership_id=self.pre_id, firstname='Diego', amount=200,
+                  likelihood=50, asked=True, promised=300, received_this=100,
+                  received_next=100)
+    donor.save()
+
+    membership = Membership.objects.get(pk=self.pre_id)
+    progress = membership.get_progress()
+    self.assertEqual(progress['estimated'], 130)
+    self.assertEqual(progress['promised'], 340)
+    self.assertEqual(progress['received_this'], 140)
+    self.assertEqual(progress['received_next'], 100)
+    self.assertEqual(progress['received_afternext'], 0)
+    self.assertEqual(progress['received_total'], 240)
+
 
 class UpdateStory(BaseFundTestCase):
 

@@ -151,8 +151,7 @@ class Membership(models.Model):
     super(Membership, self).save(*args, **kwargs)
 
   def get_progress(self):
-    """ Aggregate donors to return progress metrics
-        (estimated, promised, received by year) """
+    """ Compiles progress metrics (estimated, promised, received by year) """
     progress = {
       'estimated': 0,
       'promised': 0,
@@ -166,17 +165,16 @@ class Membership(models.Model):
       progress['estimated'] += donor.estimated()
       if donor.promised:
         progress['promised'] += donor.total_promised()
-      progress['received_this'] = donor.received_this
-      progress['received_next'] = donor.received_next
-      progress['received_afternext'] = donor.received_afternext
+      progress['received_this'] += donor.received_this
+      progress['received_next'] += donor.received_next
+      progress['received_afternext'] += donor.received_afternext
 
     progress['received_total'] = (progress['received_this'] +
                                  progress['received_next'] +
                                  progress['received_afternext'])
-
     return progress
 
-  def overdue_steps(self, get_next=False): # 1 db query
+  def overdue_steps(self, get_next=False):
     cutoff = timezone.now().date() - datetime.timedelta(days=1)
     steps = Step.objects.filter(
         donor__membership_id=self.pk, completed__isnull=True, date__lt=cutoff
