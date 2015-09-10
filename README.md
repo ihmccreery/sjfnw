@@ -7,6 +7,10 @@
   </a>
 </p>
 
-<h4 align="center">
+<h3 align="center">
   <a href="https://aisapatino.github.io/sjfnw">documentation</a>
-</h4>
+</h3>
+
+<br>
+
+<p align="center">check out <b><a href="https://overv.io/workspace/aisapatino/tough-owl/board/">overv.io</a></b> for a nicer view of the issues</p>
