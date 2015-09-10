@@ -254,9 +254,10 @@ class MemberAdvanced(admin.ModelAdmin):
 class MembershipA(admin.ModelAdmin):
   actions = ['approve']
   search_fields = ['member__first_name', 'member__last_name']
-
-  list_display = ['member', 'giving_project', 'ship_progress', 'overdue_steps',
-                  'last_activity', 'approved', 'leader']
+  list_display = [
+    'member', 'giving_project', 'ship_progress', 'overdue_steps', 'last_activity',
+    'approved', 'leader'
+  ]
   list_filter = ['approved', 'leader', 'giving_project']
   readonly_list = ['ship_progress', 'overdue_steps']
 
@@ -277,12 +278,13 @@ class MembershipA(admin.ModelAdmin):
 
   def ship_progress(self, obj):
     progress = obj.get_progress()
-    return ('<table><tr><td style="width:25%;padding:1px;">${estimated}</td>'
-            '<td style="width:25%;padding:1px;">${promised}</td>'
-            '<td style="width:25%;padding:1px;">${received_total}</td>'
-            '<td style="width:25%;padding:1px">{received_this}, {received_next}, '
-            '{received_afternext}</td></tr></table>').format(**progress)
-  ship_progress.short_description = 'Estimated, total promised, received, rec. by year'
+    return ('<table class="nested-column nested-column-4"><tr><td>${estimated}</td>'
+            '<td>${promised}</td><td>${received_total}</td>'
+            '<td>{received_this}, {received_next}, {received_afternext}</td>'
+            '</tr></table>').format(**progress)
+  ship_progress.short_description = mark_safe(
+      '<table class="nested-column-4"><tr><td>Estimated</td><td>Total promised</td><td>Received</td>'
+      '<td>Rec. by year</td></tr></table>')
   ship_progress.allow_tags = True
 
 
