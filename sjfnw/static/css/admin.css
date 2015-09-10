@@ -64,6 +64,16 @@
   float: right;
 }
 
+/* Columns with nested tables */
+.nested-column td {
+  padding: 1px;
+  border: none;
+}
+
+.nested-column-4 td {
+  width: 25%;
+}
+
 /* Edit/change page
  *------------------*/
 
