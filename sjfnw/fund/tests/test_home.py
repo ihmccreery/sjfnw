@@ -1,4 +1,4 @@
-import logging
+import logging, datetime
 
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -152,21 +152,50 @@ class CompileMembershipProgress(BaseFundTestCase):
     super(CompileMembershipProgress, self).setUp()
 
   def test_empty(self):
-    donor_data, progress = _compile_membership_progress([])
+    progress, incomplete_steps = _compile_membership_progress([], [])
 
-    self.assertEqual(donor_data, {})
+    self.assertEqual(incomplete_steps, [])
     for _, value in progress.iteritems():
       self.assertEqual(value, 0)
 
-  def test_single(self):
+  def test_basic(self):
     # membership with a few donors, some progress
-    self.use_test_acct()
-    donors = models.Donor.objects.filter(membership_id=self.ship_id)
+    self.create_new()
+    ship_id = self.post_id
+    donor = models.Donor(membership_id=ship_id, firstname='Alice',
+                         amount=100, likelihood=75, talked=True)
+    donor.save()
+    step = models.Step(donor=donor, date='2015-04-01',
+                       description='Talk', completed='2015-04-01')
+    step.save()
+    step = models.Step(donor=donor, date='2015-5-25', description='Ask')
+    step.save()
 
-    donor_data, progress = _compile_membership_progress(donors)
+    donor = models.Donor(membership_id=ship_id, firstname='Bab', talked=True,
+                         amount=300, likelihood=50, asked=True,
+                         promised=300, received_this=100, received_next=100)
+    donor.save()
+    step = models.Step(donor=donor, date='2015-04-01',
+                       description='Ask', completed='2015-04-01', asked=True)
+    step.save()
+    step = models.Step(donor=donor, date='2015-04-08',
+                       description='Follow upt', completed='2015-04-08',
+                       promised=300)
+    step.save()
+    step = models.Step(donor=donor, date='2015-5-25', description='Thank')
+    step.save()
 
-    for donor in donors:
-      data = donor_data[donor.pk]
-      self.assertIsInstance(data, dict)
+    donors = models.Donor.objects.filter(membership_id=ship_id)
+    steps = models.Step.objects.filter(donor__membership_id=ship_id)
+
+    progress, incomplete_steps = _compile_membership_progress(donors, steps)
+
     self.assertIsInstance(progress, dict)
-    self.assertEqual(progress['contacts'], len(donors))
+    self.assertEqual(progress['estimated'], 225)
+    self.assertEqual(progress['contacts'], 2)
+    self.assertEqual(progress['talked'], 1)
+    self.assertEqual(progress['asked'], 1)
+    self.assertEqual(progress['promised'], 300)
+    self.assertEqual(progress['received'], 200)
+    self.assertEqual(len(incomplete_steps), 2)
+    logger.info(progress)

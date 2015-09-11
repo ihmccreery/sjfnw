@@ -1,107 +1,106 @@
-{# used to display an individual donor on the home page #}
+{# display an individual donor on the home page #}
 {% load intcomma from humanize %}
-{% with pk=d.donor.pk %}
 
-<div class="donor indent" id="donor-{{ pk }}">
+<div class="donor indent" id="donor-{{ donor.pk }}">
 
   {# line 1: name & progress summary #}
   <div>
-    <a onclick="toggle('details-{{ pk }}', 'donor-{{ pk }}')">
-      <b>{{ d.donor.firstname }} {{ d.donor.lastname }}</b>
+    <a onclick="toggle('details-{{ donor.pk }}', 'donor-{{ donor.pk }}')">
+      <b>{{ donor.firstname }} {{ donor.lastname }}</b>
     </a>
-    {% if d.summary %}
+    {% if donor.summary %}
       <div class="edit_done">
-        <i class="checkmark"></i>{{ d.summary }}
+        <i class="checkmark"></i>{{ donor.summary }}
       </div>
     {% endif %}
   </div>
 
   {# line 2: next step or link to add one #}
-  <div id="{{ pk }}-nextstep">
-  {% if d.next_step %}
+  <div id="{{ donor.pk }}-nextstep">
+  {% if donor.next_step %}
     {# next step summary #}
-    {% if d.overdue %}
+    {% if donor.next_step.overdue %}
       <span title="This step's goal date has passed! Edit or complete it">
-        <span class="overdue_step">!</span> {{ d.next_step }}
+        <span class="overdue_step">!</span> {{ donor.next_step }}
       </span>
     {% else %}
-      {{ d.next_step }}
+      {{ donor.next_step }}
     {% endif %}
     {# edit/complete links #}
     <div class="edit_done">
       [<span class="load"
-             data-url="{% url 'sjfnw.fund.views.edit_step' donor_id=pk step_id=d.next_step.pk %}"
-             data-target="{{ pk }}-nextstep">
+             data-url="{% url 'sjfnw.fund.views.edit_step' donor_id=donor.pk step_id=donor.next_step.pk %}"
+             data-target="{{ donor.pk }}-nextstep">
         edit step
       </span> |
       <span class="load"
-            data-url="{% url 'sjfnw.fund.views.complete_step' donor_id=pk step_id=d.next_step.pk %}"
-            data-target="{{ pk }}-nextstep"
-            data-asked="{{ d.donor.asked }}"
-            data-promised="{{ d.donor.promised }}">
+            data-url="{% url 'sjfnw.fund.views.complete_step' donor_id=donor.pk step_id=donor.next_step.pk %}"
+            data-target="{{ donor.pk }}-nextstep"
+            data-asked="{{ donor.asked }}"
+            data-promised="{{ donor.promised }}">
         complete
       </span>]
     </div>
 
   {% else %}{# no next step #}
-    {% if d.donor.promised == None and d.donor.received == 0 %}
-    No next step. <span class="load" data-url="{% url 'sjfnw.fund.views.add_step' donor_id=pk %}"
-                        data-target="{{ pk }}-nextstep"> Add one.</span>
+    {% if donor.promised == None and donor.received == 0 %}
+    No next step. <span class="load" data-url="{% url 'sjfnw.fund.views.add_step' donor_id=donor.pk %}"
+                        data-target="{{ donor.pk }}-nextstep"> Add one.</span>
     {% endif %}
   {% endif %}
   </div>
 
   {# donor details (initially hidden) #}
-  <div class="donor_details indent hidden" id="details-{{ pk }}">
+  <div class="donor_details indent hidden" id="details-{{ donor.pk }}">
 
     {# gift received #}
-    {% if d.donor.received > 0 %}
-      <p>Received by SJF: ${{ d.donor.received|intcomma }}</p>
-      <p>Original estimation: ${{ d.donor.estimated|intcomma }}</p>
+    {% if donor.received > 0 %}
+      <p>Received by SJF: ${{ donor.received|intcomma }}</p>
+      <p>Original estimation: ${{ donor.estimated|intcomma }}</p>
 
     {# no gift, but promise #}
-    {% elif d.donor.promised != None %}
+    {% elif donor.promised != None %}
       <p>
-        {% if d.donor.promised > 0 %}
-          Promised by contact: ${{ d.donor.promised|intcomma }} <br>
-            {% if d.donor.match_expected > 0 %} {# if gift match expected #}
-                Expected employer match: ${{ d.donor.match_expected|intcomma }} <br>
+        {% if donor.promised > 0 %}
+          Promised by contact: ${{ donor.promised|intcomma }} <br>
+            {% if donor.match_expected > 0 %} {# if gift match expected #}
+                Expected employer match: ${{ donor.match_expected|intcomma }} <br>
             {% endif %}
-          <strong>Total promised: ${{ d.donor.total_promised|intcomma }}</strong>
+          <strong>Total promised: ${{ donor.total_promised|intcomma }}</strong>
         {% else %}
           Declined to donate.
         {% endif %}
       </p>
-      <p>Original estimation: ${{ d.donor.estimated|intcomma }}</p>
+      <p>Original estimation: ${{ donor.estimated|intcomma }}</p>
       {# no promise, but asked #}
-      {% elif d.donor.asked %}
+      {% elif donor.asked %}
         <p>Asked; awaiting response.</p>
 
       {# no ask, but estimates #}
-      {% elif d.donor.amount %}
-        <p>Amount to ask: ${{ d.donor.amount|intcomma }}</p>
-        <p>Likelihood: {{ d.donor.likelihood }}%</p>
+      {% elif donor.amount %}
+        <p>Amount to ask: ${{ donor.amount|intcomma }}</p>
+        <p>Likelihood: {{ donor.likelihood }}%</p>
       {% endif %}
 
       {# basic fields #}
-      {% if d.donor.email or d.donor.phone %}
-        <p>Contact info: {{ d.donor.email|default:""}} {{ d.donor.phone|default:""}}</p>
+      {% if donor.email or donor.phone %}
+        <p>Contact info: {{ donor.email|default:""}} {{ donor.phone|default:""}}</p>
       {% endif %}
-      <p>Notes: {{ d.donor.notes|default:"<i>None entered.</i>"}}</p>
+      <p>Notes: {{ donor.notes|default:"<i>None entered.</i>"}}</p>
 
       {# list of completed steps #}
-      {% if d.complete_steps %}
+      {% if donor.complete_steps %}
         <p>
           Completed steps:
-          {% if not d.next_step %}
-            <span class="load" data-url="{% url 'sjfnw.fund.views.add_step' donor_id=pk %}"
-                  data-target="{{ pk }}-nextstep">
+          {% if not donor.next_step %}
+            <span class="load" data-url="{% url 'sjfnw.fund.views.add_step' donor_id=donor.pk %}"
+                  data-target="{{ donor.pk }}-nextstep">
               [add another]
             </span>
           {% endif %}
         </p>
         <ul>
-        {% for step in d.complete_steps %}
+        {% for step in donor.complete_steps %}
           <li>{{ step.date|date:"n/d/y"}}: {{ step.description }}</li>
         {% endfor %}
         </ul>
@@ -110,12 +109,11 @@
     <br>
 
     {# delete/edit links #}
-    <div class="donor_delete" id="delete-{{ pk }}">
-      [<span class="load" data-url="{% url 'sjfnw.fund.views.edit_contact' donor_id=pk %}"
-             data-target="donor-{{ pk }}">edit contact</span>]&nbsp;
-      [<span class="load" data-url="{% url 'sjfnw.fund.views.delete_contact' donor_id=pk %}"
-             data-target="delete-{{ pk }}">remove contact</span>]
+    <div class="donor_delete" id="delete-{{ donor.pk }}">
+      [<span class="load" data-url="{% url 'sjfnw.fund.views.edit_contact' donor_id=donor.pk %}"
+             data-target="donor-{{ donor.pk }}">edit contact</span>]&nbsp;
+      [<span class="load" data-url="{% url 'sjfnw.fund.views.delete_contact' donor_id=donor.pk %}"
+             data-target="delete-{{ donor.pk }}">remove contact</span>]
     </div>
   </div>
 </div>
-{% endwith %}

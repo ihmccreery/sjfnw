@@ -26,7 +26,7 @@ if (Modernizr.inlinesvg) {
     data.addColumn('string', 'Status');
     data.addColumn('number', 'Contacts');
     data.addRows([
-      ["Haven't contacted", {{project_progress.contactsremaining}}],
+      ["Haven't contacted", {{project_progress.contacts_remaining}}],
       ["Talked to", {{project_progress.talked}}],
       ['Asked', {{project_progress.asked}}]
     ]);
@@ -76,7 +76,7 @@ function toggleNews() {
 $(document).ready(function() {
 	if (textProgress) {
 		console.log('textProgress');
-		document.getElementById('chart_div').innerHTML = "<br><br>Haven't contacted: {{project_progress.contactsremaining}}<br>Talked to: {{project_progress.talked}}<br>Asked: {{project_progress.asked}}";
+		document.getElementById('chart_div').innerHTML = "<br><br>Haven't contacted: {{project_progress.contacts_remaining}}<br>Talked to: {{project_progress.talked}}<br>Asked: {{project_progress.asked}}";
 		if ({{ giving_project.fund_goal }} > 0) {
 			document.getElementById('chart_div2').innerHTML = "<br><br>Remaining: ${{project_progress.togo|default:'0'}}<br>Promised: ${{project_progress.promised}}<br>Received: ${{project_progress.received}}";
 		}
