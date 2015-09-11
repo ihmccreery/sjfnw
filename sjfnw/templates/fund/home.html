@@ -8,13 +8,12 @@
 {% endblock %}
 
 {% block content %}
-  <div id="form_saved"></div> {# TODO what is this #}
 
   {% if notif %}
   <div id="notifications" class="center">{{ notif|safe }}</div>
   {% endif %}
 
-  {% if donor_list.0 %}
+  {% if donors.0 %}
   <div class="header">YOUR PROGRESS</div>
   <div class="progress">
     <div class="half">
@@ -31,25 +30,23 @@
   {% endif %}
 
   <div class="header" id="your-contacts">YOUR CONTACTS &amp; NEXT STEPS</div>
-  {% if donor_list.0 %}
+  {% if donors.0 %}
     {% if not load %} {# add contacts link only if mass add won't be showing #}
     <div class="edit_done">
       [<a onclick="loadView('{% url 'sjfnw.fund.views.add_mult' %}', 'addmult')">add contacts</a>]
     </div>
     {% endif %}
-    {# this div is where form to add multiple donors is placed #}
-    <div class="donor indent" id="addmult"></div>
+    <div class="donor indent" id="addmult"></div>{# form to add multiple donors is loaded here #}
   {% endif %}
 
-
-  {% for d in donor_list %}
+  {% for donor in donors %}
     {% include 'fund/includes/donor_details.html' %}
   {% empty %}{# no contacts yet #}
     {% if fd %}{# add estimates #}
       {% include 'fund/forms/add_estimates.html' %}
     {% else %}{# add contacts #}
       <div class="donor indent" id="addmult">
-        <p>You don't have any contacts yet!  Get started by adding some.  You'll be able to add, change or remove contacts at any time.</p>
+        <p>You don't have any contacts yet! Get started by adding some. You'll be able to add, change or remove contacts at any time.</p>
         {% include mult_template %}
       </div>
     {% endif %}

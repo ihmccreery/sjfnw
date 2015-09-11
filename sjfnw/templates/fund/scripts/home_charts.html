@@ -20,7 +20,7 @@
 				data.addColumn('string', 'Status');
 				data.addColumn('number', 'Contacts');
 				data.addRows([
-					["Haven't contacted", {{ progress.contactsremaining }}],
+					["Haven't contacted", {{ progress.contacts_remaining }}],
 					["Talked to", {{ progress.talked }}],
 					['Asked', {{ progress.asked }}]
 				]);
@@ -68,7 +68,7 @@
     console.log('textProgress');
     chart = document.getElementById('chart_div');
 		if (chart) {
-			chart.innerHTML = "<br><br>Haven't contacted: {{ progress.contactsremaining }}<br>Talked to: {{ progress.talked }}<br>Asked: {{ progress.asked }}";
+			chart.innerHTML = "<br><br>Haven't contacted: {{ progress.contacts_remaining }}<br>Talked to: {{ progress.talked }}<br>Asked: {{ progress.asked }}";
 			if ({{ progress.estimated }} > 0) {
 				document.getElementById('chart_div2').innerHTML = "<br><br>Remaining: ${{ progress.togo|default:'0'}}<br>Promised: ${{ progress.promised }}<br>Received: ${{ progress.received }}";
 			}
