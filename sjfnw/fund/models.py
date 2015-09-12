@@ -301,36 +301,22 @@ class Donor(models.Model):
 
   def estimated(self):
     if self.amount and self.likelihood:
-      return int(self.amount*self.likelihood*.01)
+      return int(self.amount * self.likelihood * .01)
     else:
       return 0
 
-  def received(self):
-    if self.match_received:
-      return self.received_this + self.received_next + self.received_afternext + self.match_received
-    else:
-      return self.received_this + self.received_next + self.received_afternext
-
-
-  def get_steps(self): #used in expanded view
-    return Step.objects.filter(donor=self).filter(completed__isnull=False).order_by('date')
-
-  def has_overdue(self): #needs update, if it's still used
-    steps = Step.objects.filter(donor=self, completed__isnull=True)
-    for step in steps:
-      if step.date < timezone.now().date():
-        return timezone.now().date()-step.date
-    return False
-
   def get_next_step(self):
     steps = self.step_set.filter(completed__isnull=True)
-    if steps:
-      return steps[0]
-    else:
-      return None
+    return steps[0] if steps else None
 
   def promise_reason_display(self):
     return ', '.join(json.loads(self.promise_reason))
+
+  def received(self):
+    total_received = self.received_this + self.received_next + self.received_afternext
+    if self.match_received:
+      total_received += self.match_received
+    return total_received
 
   def total_promised(self):
     return self.match_expected + (self.promised or 0)
