@@ -309,6 +309,17 @@ class Donor(models.Model):
     steps = self.step_set.filter(completed__isnull=True)
     return steps[0] if steps else None
 
+  def organize_steps(self):
+    """ Set completed_steps (list) and next_step (Step) attributes on self """
+    self.completed_steps = []
+    for step in self.step_set.all():
+      if step.completed:
+        self.completed_steps.append(step)
+      else:
+        self.next_step = step
+        self.next_step.overdue = self.next_step.date < timezone.localtime(timezone.now()).date()
+    self.completed_steps.sort(key=lambda s: s.date)
+
   def promise_reason_display(self):
     return ', '.join(json.loads(self.promise_reason))
 
