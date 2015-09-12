@@ -13,20 +13,18 @@ class GivingProject(models.Model):
   title = models.CharField(max_length=255)
 
   public = models.BooleanField(default=True,
-     help_text=('Whether this project '
-    'should show in the dropdown menu for members registering or adding a '
-    'project to their account.'))
+     help_text=('Whether this project should show in the dropdown menu for '
+     'members registering or adding a project to their account.'))
 
   pre_approved = models.TextField(blank=True,
-      help_text=('List of member emails, separated by commas.  Anyone who '
+      help_text=('List of member emails, separated by commas. Anyone who '
       'registers using an email on this list will have their account '
       'automatically approved.  IMPORTANT: Any syntax error can make this '
       'feature stop working; in that case memberships will default to '
       'requiring manual approval by an administrator.'))
 
-  # fundraising
   fundraising_training = models.DateTimeField(
-      help_text=('Date & time of fundraising training.  At this point the app '
+      help_text=('Date & time of fundraising training. At this point the app '
       'will require members to enter an ask amount & estimated likelihood for '
       'each contact.'))
 
@@ -42,16 +40,14 @@ class GivingProject(models.Model):
   suggested_steps = models.TextField(
       default=('Talk to about project\nInvite to SJF event\nSet up time to '
                'meet for the ask\nAsk\nFollow up\nThank'),
-      help_text=('Displayed to users when they add a step.  Put each step on '
-                 'a new line'))
+      help_text='Displayed to users when they add a step. Put each step on a new line')
 
   site_visits = models.BooleanField(default=False,
       help_text=('If checked, members will only see grants with a screening '
                 'status of at least "site visit awarded"'))
 
   calendar = models.CharField(max_length=255, blank=True,
-      help_text=('Calendar ID of a google calendar - format: '
-                 '____@group.calendar.google.com'))
+      help_text='Calendar ID of a google calendar - format: ____@group.calendar.google.com')
 
   resources = models.ManyToManyField('Resource', through='ProjectResource', blank=True)
 
@@ -61,7 +57,7 @@ class GivingProject(models.Model):
     ordering = ['-fundraising_deadline']
 
   def __unicode__(self):
-    return self.title + ' ' + unicode(self.fundraising_deadline.year)
+    return '{} {}'.format(self.title, self.fundraising_deadline.year)
 
   def save(self, *args, **kwargs):
     # prune CR (from Windows) that would result in extra line breaks
@@ -96,7 +92,7 @@ class GivingProject(models.Model):
 
 
 class Member(models.Model):
-  email = models.EmailField(max_length=100, unique=True) # used to match with User
+  email = models.EmailField(max_length=100, unique=True) # used to find corresponding User
   first_name = models.CharField(max_length=100)
   last_name = models.CharField(max_length=100)
 
@@ -104,7 +100,7 @@ class Member(models.Model):
   current = models.IntegerField(default=0) # pk of current membership
 
   def __unicode__(self):
-    return u'%s %s' % (self.first_name, self.last_name)
+    return u'{} {}'.format(self.first_name, self.last_name)
 
   class Meta:
     ordering = ['first_name', 'last_name']
@@ -135,7 +131,7 @@ class Membership(models.Model):
     unique_together = ('giving_project', 'member')
 
   def __unicode__(self):
-    return u'%s, %s' % (self.member, self.giving_project)
+    return u'{}, {}'.format(self.member, self.giving_project)
 
   def save(self, skip=False, *args, **kwargs):
     """ Checks whether to send an approval email unless skip is True """
@@ -343,7 +339,7 @@ class Step(models.Model):
   promised = models.PositiveIntegerField(blank=True, null=True)
 
   def __unicode__(self):
-    return unicode(self.date.strftime('%m/%d/%y')) + u' -  ' + self.description
+    return u'{:%m/%d/%y} - {}'.format(self.date, self.description)
 
 
 class NewsItem(models.Model):
@@ -372,11 +368,11 @@ class Resource(models.Model):
 class ProjectResource(models.Model): #ties resource to project
   giving_project = models.ForeignKey(GivingProject)
   resource = models.ForeignKey(Resource)
-
   session = models.CharField(max_length=255)
 
   def __unicode__(self):
-    return "%s - %s - %s" % (self.giving_project, self.session, self.resource)
+    return u'{} - {} - {}'.format(self.giving_project, self.session, self.resource)
+
 
 class Survey(models.Model):
 
@@ -414,15 +410,15 @@ class GPSurvey(models.Model):
   date = models.DateTimeField()
 
   def __unicode__(self):
-    return '%s - %s' % (self.giving_project.title, self.survey.title)
+    return u'{} - {}'.format(self.giving_project.title, self.survey.title)
+
 
 class SurveyResponse(models.Model):
 
   date = models.DateTimeField(default=timezone.now)
   gp_survey = models.ForeignKey(GPSurvey)
-  responses = models.TextField() #json encoded question-answer pairs
+  responses = models.TextField() # json encoded question-answer pairs
 
   def __unicode__(self):
-    return 'Response to %s %s survey' % (self.gp_survey.giving_project.title,
-        self.date.strftime('%m/%d/%y'))
-
+    return u'Response to {} {:%m/%d/%y} survey'.format(
+        self.gp_survey.giving_project.title, self.date)
