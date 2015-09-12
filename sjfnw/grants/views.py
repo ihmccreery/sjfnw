@@ -323,7 +323,7 @@ def grant_application(request, organization, cycle_id):
     form = GrantApplicationModelForm(cycle, initial=org_dict)
 
   # get draft files
-  file_urls = GetFileURLs(request, draft)
+  file_urls = get_file_urls(request, draft)
   link_template = (u'<a href="{0}" target="_blank" title="{1}">{1}</a> '
                    '[<a onclick="fileUploads.removeFile(\'{2}\');">remove</a>]')
   for field, url in file_urls.iteritems():
@@ -419,7 +419,7 @@ def add_file(request, draft_type, draft_id):
   if not (blob_file and field_name):
     return HttpResponse('ERROR') #TODO use status code
 
-  file_urls = GetFileURLs(request, draft)
+  file_urls = get_file_urls(request, draft)
   # TODO test this replacement:
   #content = (u'{0} ~~<a href="{1}" target="_blank" title="{2}">{2}</a> '
   #    '[<a onclick="fileUploads.removeFile(\'{0}\');">remove</a>]').format(
@@ -557,7 +557,7 @@ def year_end_report(request, organization, award_id):
 
     form = YearEndReportForm(initial=initial_data)
 
-  file_urls = GetFileURLs(request, draft)
+  file_urls = get_file_urls(request, draft)
   for field, url in file_urls.iteritems():
     if url:
       name = getattr(draft, field).name.split('/')[-1]
@@ -813,8 +813,8 @@ def view_application(request, app_id):
   if form_only:
     return render(request, 'grants/reading.html',
                   {'app': app, 'form': form, 'perm': perm})
-  file_urls = GetFileURLs(request, app)
-  print_urls = GetFileURLs(request, app, printing=True)
+  file_urls = get_file_urls(request, app)
+  print_urls = get_file_urls(request, app, printing=True)
   awards = {}
   for papp in app.projectapp_set.all():
     if hasattr(papp, 'givingprojectgrant'):# and hasattr(papp.givingprojectgrant, 'yearendreport'):
@@ -876,7 +876,7 @@ def view_yer(request, report_id):
 
   form = YearEndReportForm(instance=report)
 
-  file_urls = GetFileURLs(request, report, printing=False)
+  file_urls = get_file_urls(request, report, printing=False)
 
   return render(request, 'grants/yer_display.html', {
     'report': report, 'form': form, 'award': award, 'projectapp': projectapp,
@@ -1383,7 +1383,7 @@ def get_org_results(options):
                 timestamp = timestamp.strftime('%m/%d/%Y')
               else:
                 timestamp = 'No timestamp'
-              awards_str += '${} {} {}{}'.format(award.total_amount(),
+              awards_str += u'${} {} {}{}'.format(award.total_amount(),
                 award.projectapp.giving_project.title, timestamp, linebreak)
             except models.GivingProjectGrant.DoesNotExist:
               pass
@@ -1476,7 +1476,7 @@ def send_yer_email(awards, template):
 
 # UTILS
 # (in views because it caused import problems when in utils.py)
-def GetFileURLs(request, app, printing=False):
+def get_file_urls(request, app, printing=False):
   """ Get viewing urls for the files in a given app or year-end report, draft or final
 
     Args:
@@ -1512,7 +1512,7 @@ def GetFileURLs(request, app, printing=False):
     file_urls = report_urls
     base_url += 'grants/rdraft-file/'
   else:
-    logger.error('GetFileURLs received invalid object')
+    logger.error('get_file_urls received invalid object')
     return {}
 
   #check file fields, compile links
