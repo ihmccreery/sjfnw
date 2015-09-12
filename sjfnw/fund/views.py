@@ -57,8 +57,11 @@ def home(request):
       'gp_survey_id': surveys[0].pk
     }))
 
+  logger.info('before getting donors %d', len(connection.queries))
+
   # check if they have contacts
-  donors = membership.donor_set.all()
+  donors = membership.donor_set.prefetch_related('step_set')
+  logger.info('after getting donors + steps %d', len(connection.queries))
   if not donors:
     if not membership.copied_contacts:
       all_donors = models.Donor.objects.filter(membership__member=membership.member)
@@ -85,9 +88,9 @@ def home(request):
     membership.notifications = ''
     membership.save(skip=True)
 
+  logger.info('Before calling _compile_membership_progress %d', len(connection.queries))
   # compile steps and progress metrics
-  steps = models.Step.objects.filter(donor__membership=membership).order_by('date')
-  progress, incomplete_steps = _compile_membership_progress(donors, steps)
+  progress, incomplete_steps = _compile_membership_progress(donors)
 
   # suggested steps for step forms
   suggested = membership.giving_project.get_suggested_steps()
@@ -112,7 +115,6 @@ def home(request):
 # TODO restore the donor sort
   donors = sorted(donors, key=_get_converted_date)
 
-  logger.info(donors)
   return render(request, 'fund/home.html', {
     '1active': 'true', 'header': header, 'news': news, 'grants': grants,
     'steps': incomplete_steps, 'donors': donors, 'progress': progress,
@@ -125,7 +127,7 @@ def _get_converted_date(donor):
   return datetime.date(2100, 01, 01)
 
 
-def _compile_membership_progress(donors, steps):
+def _compile_membership_progress(donors):
   """ Go through membership's donors and steps, compiling progress metrics
     and organizing steps based on completion
 
@@ -148,19 +150,13 @@ def _compile_membership_progress(donors, steps):
   if not donors:
     logger.error('Membership has no contacts but wasn\'t redirected to add_mult')
     return progress, []
-  if not steps:
-    return progress, []
 
-  donor_lookup = {}
+  # compile progress metrics and donor summaries
   for donor in donors:
-    logger.info('Looking at %s', donor)
-    donor_lookup[donor.pk] = donor 
-    logger.info('Adding %s to estimated', donor.estimated())
     progress['estimated'] += donor.estimated()
     donor.summary = ''
 
     if donor.asked:
-      logger.info('Asked')
       progress['asked'] += 1
       donor.summary = 'Asked. '
     elif donor.talked:
@@ -169,9 +165,11 @@ def _compile_membership_progress(donors, steps):
     if donor.received() > 0:
       progress['received'] += donor.received()
       donor.summary += ' $%s received by SJF.' % intcomma(donor.received())
+
     elif donor.promised:
       progress['promised'] += donor.total_promised()
       donor.summary += ' Total promised $%s.' % intcomma(donor.total_promised())
+
     elif donor.asked:
       if donor.promised == 0:
         donor.summary += ' Declined to donate.'
@@ -179,7 +177,6 @@ def _compile_membership_progress(donors, steps):
         donor.summary += ' Awaiting response.'
 
   # progress chart calculations
-
   if progress['contacts'] > 0:
     progress['bar'] = 100 * progress['asked']/progress['contacts']
     progress['contacts_remaining'] = progress['contacts'] - progress['talked'] - progress['asked']
@@ -190,27 +187,15 @@ def _compile_membership_progress(donors, steps):
       progress['togo'] = 0
       progress['header'] = '${} raised'.format(intcomma(progress['promised'] + progress['received']))
 
-  return progress, _process_steps(steps, donor_lookup)
-
-
-def _process_steps(steps, donor_lookup):
-  """ Sorts steps into complete and incomplete, attaching incomplete to their donor """
-
+  # process steps; compile incompletes
   incomplete_steps = []
-  for step in steps:
-    donor = donor_lookup[step.donor_id]
-    if step.completed:
-      if not hasattr(donor, 'complete_steps'):
-        donor.complete_steps = []
-      donor.complete_steps.append(step)
-    else:
-      incomplete_steps.append(step)
-      donor.next_step = step
-      if step.date < timezone.localtime(timezone.now()).date():
-        step.overdue = True
+  for donor in donors:
+    donor.organize_steps()
+    if hasattr(donor, 'next_step'):
+      incomplete_steps.append(donor.next_step)
   incomplete_steps.sort(key=lambda step: step.date)
 
-  return incomplete_steps
+  return progress, incomplete_steps
 
 
 @login_required(login_url='/fund/login/')
@@ -220,9 +205,7 @@ def project_page(request):
   membership = request.membership
   project = membership.giving_project
 
-  # blocks
   steps, news, grants = _get_block_content(membership)
-
   header = project.title
 
   # project metrics/progress

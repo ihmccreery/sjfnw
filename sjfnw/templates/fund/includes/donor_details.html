@@ -89,7 +89,7 @@
       <p>Notes: {{ donor.notes|default:"<i>None entered.</i>"}}</p>
 
       {# list of completed steps #}
-      {% if donor.complete_steps %}
+      {% if donor.completed_steps %}
         <p>
           Completed steps:
           {% if not donor.next_step %}
@@ -100,7 +100,7 @@
           {% endif %}
         </p>
         <ul>
-        {% for step in donor.complete_steps %}
+        {% for step in donor.completed_steps %}
           <li>{{ step.date|date:"n/d/y"}}: {{ step.description }}</li>
         {% endfor %}
         </ul>
