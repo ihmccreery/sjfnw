@@ -2,43 +2,40 @@
   var text_progress = false;
   if (Modernizr.inlinesvg) {
 
-    var options = {chartArea: {left:0, top:8, width:'100%', height:'85%'},
-                    legend: {alignment:'center', textStyle: {fontSize:11}},
-                    tooltip: {showColorCode: false, textStyle: {fontSize:14}},
-                    slices: [{color: 'green'}, {color:'#D18316'}, {color: '#8B0E04'}],
-                    pieSliceText: 'none',
-                    pieSliceTextStyle: {fontSize:14},
-                    reverseCategories: true,
-                    sliceVisibilityThreshold:0
-                  };
+    var options = {
+      chartArea: {left: 0, top: 8, width: '100%', height: '85%'},
+      legend: {alignment: 'center', textStyle: {fontSize: 11}},
+      tooltip: {showColorCode: false, textStyle: {fontSize: 14}},
+      slices: [{color: 'green'}, {color: '#d18316'}, {color: '#8b0e04'}],
+      pieSliceText: 'none',
+      pieSliceTextStyle: {fontSize: 14},
+      reverseCategories: true,
+      sliceVisibilityThreshold:0
+    };
 
-    function drawChart() {
+    function drawContactsChart() {
 			chart_div = document.getElementById('chart_div');
 			if (chart_div) {
-				// Create the data table.
 				var data = new google.visualization.DataTable();
 				data.addColumn('string', 'Status');
 				data.addColumn('number', 'Contacts');
 				data.addRows([
 					["Haven't contacted", {{ progress.contacts_remaining }}],
-					["Talked to", {{ progress.talked }}],
+					['Talked to', {{ progress.talked }}],
 					['Asked', {{ progress.asked }}]
 				]);
 
-				// Instantiate and draw our chart, passing in some options.
 				var chart = new google.visualization.PieChart(chart_div);
 				chart.draw(data, options);
 				if ({{ progress.estimated }} > 0) {
-					drawChart2();
+					drawFundraisingChart();
 				}
 			} else {
-				console.log('no chart div, not running drawchart');
+				console.warn('no chart div found');
 			}
     }
 
-    function drawChart2() {
-
-      // Create the data table.
+    function drawFundraisingChart() {
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'Status');
       data.addColumn('number', 'Amount');
@@ -48,24 +45,19 @@
         ['Received', {{ progress.received }}]
       ]);
 
-      // Instantiate and draw our chart, passing in some options.
       var chart = new google.visualization.PieChart(document.getElementById('chart_div2'));
       chart.draw(data, options);
     }
 
-    // Load the Visualization API and the piechart package.
     google.load('visualization', '1.0', {'packages':['corechart']});
+    google.setOnLoadCallback(drawContactsChart);
 
-    // Set a callback to run when the Google Visualization API is loaded.
-    google.setOnLoadCallback(drawChart);
-
-  } else { //browser cannot support charts
-    console.log('Browser does not support charts; text_progress = true');
+  } else {
+    console.log('Browser does not support charts');
     text_progress = true;
   }
 
   function textProgress() {
-    console.log('textProgress');
     chart = document.getElementById('chart_div');
 		if (chart) {
 			chart.innerHTML = "<br><br>Haven't contacted: {{ progress.contacts_remaining }}<br>Talked to: {{ progress.talked }}<br>Asked: {{ progress.asked }}";
