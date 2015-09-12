@@ -57,7 +57,7 @@ class GivingProject(models.Model):
     ordering = ['-fundraising_deadline']
 
   def __unicode__(self):
-    return '{} {}'.format(self.title, self.fundraising_deadline.year)
+    return u'{} {}'.format(self.title, self.fundraising_deadline.year)
 
   def save(self, *args, **kwargs):
     # prune CR (from Windows) that would result in extra line breaks
