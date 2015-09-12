@@ -324,8 +324,8 @@ def grant_application(request, organization, cycle_id):
 
   # get draft files
   file_urls = GetFileURLs(request, draft)
-  link_template = ('<a href="{0}" target="_blank" title="{1}">{1}</a>'
-                  ' [<a onclick="fileUploads.removeFile(\'{2}\');">remove</a>]')
+  link_template = (u'<a href="{0}" target="_blank" title="{1}">{1}</a> '
+                   '[<a onclick="fileUploads.removeFile(\'{2}\');">remove</a>]')
   for field, url in file_urls.iteritems():
     if url:
       name = getattr(draft, field).name.split('/')[-1]
