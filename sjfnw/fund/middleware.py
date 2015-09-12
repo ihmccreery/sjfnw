@@ -5,8 +5,7 @@ import logging
 logger = logging.getLogger('sjfnw')
 
 class MembershipMiddleware(object):
-  """ Gathers information about the member/ship of the current user and stores
-      it on the request.
+  """ Gathers info on the member/ship of current user, stores it on the request
 
     Sets following on request:
       .membership_status
@@ -55,7 +54,7 @@ class MembershipMiddleware(object):
       all_memberships = member.membership_set.all()
       if all_memberships:
         logger.warning('Invalid member.current (m:%d, c:%d)', member.pk, member.current)
-        membership = all[0]
+        membership = all_memberships[0]
       else:
         logger.info('%s has no memberships', member)
         request.member = member
