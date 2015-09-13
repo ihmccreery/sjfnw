@@ -1,9 +1,8 @@
 from django import forms
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.utils import timezone
 
-from sjfnw.grants.forms import AppReportForm, AwardReportForm, OrgReportForm
+from sjfnw.grants.forms import AppReportForm, SponsoredAwardReportForm, GPGrantReportForm, OrgReportForm
 from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
 
@@ -25,7 +24,7 @@ class Reporting(BaseGrantTestCase):
   template_success = 'grants/report_results.html'
   template_error = 'grants/reporting.html'
 
-  def setUp(self): #don't super, can't set cycle dates with this fixture
+  def setUp(self): # don't super, can't set cycle dates with this fixture
     self.log_in_admin()
 
   def fill_report_form(self, form, filters=False, fields=False, fmt='browse'):
@@ -133,7 +132,7 @@ class Reporting(BaseGrantTestCase):
 
     response = self.client.post(self.url, post_dict)
 
-    reader = unicodecsv.reader(response, encoding = 'utf8')
+    reader = unicodecsv.reader(response, encoding='utf8')
     row_count = sum(1 for row in reader)
     # 1st row is blank, 2nd is headers
     self.assertEqual(row_count-2, models.GrantApplication.objects.count())
@@ -163,8 +162,8 @@ class Reporting(BaseGrantTestCase):
     results = response.context['results']
     self.assertEqual(results, [])
 
-  def test_award_fields(self):
-    """ Verify that award fields can be fetched
+  def test_gp_grant_fields(self):
+    """ Verify that gp grant fields can be fetched
 
     Setup:
       No filters selected
@@ -173,12 +172,12 @@ class Reporting(BaseGrantTestCase):
 
     Asserts:
       Basic success: 200 status, correct template
-      Number of rows in results == number of awards (gp + sponsored) in db
+      Number of rows in results == number of gp grants in db
     """
 
-    form = AwardReportForm()
+    form = GPGrantReportForm()
     post_dict = self.fill_report_form(form, fields=True)
-    post_dict['run-award'] = ''
+    post_dict['run-giving-project-grant'] = ''
 
     response = self.client.post(self.url, post_dict)
 
@@ -186,11 +185,10 @@ class Reporting(BaseGrantTestCase):
     self.assertTemplateUsed(response, self.template_success)
 
     results = response.context['results']
-    self.assertEqual(len(results),
-        models.GivingProjectGrant.objects.count() + models.SponsoredProgramGrant.objects.count())
+    self.assertEqual(len(results), models.GivingProjectGrant.objects.count())
 
-  def test_award_fields_csv(self):
-    """ Verify that award fields can be fetched in csv format
+  def test_gp_grant_fields_csv(self):
+    """ Verify that gp grant fields can be fetched in csv format
 
     Setup:
       No filters selected
@@ -203,19 +201,18 @@ class Reporting(BaseGrantTestCase):
 
     """
 
-    form = AwardReportForm()
+    form = GPGrantReportForm()
     post_dict = self.fill_report_form(form, fields=True, fmt='csv')
-    post_dict['run-award'] = ''
+    post_dict['run-giving-project-grant'] = ''
 
     response = self.client.post(self.url, post_dict)
 
-    reader = unicodecsv.reader(response, encoding = 'utf8')
+    reader = unicodecsv.reader(response, encoding='utf8')
     row_count = sum(1 for row in reader)
-    self.assertEqual(row_count-2,
-        models.GivingProjectGrant.objects.count() + models.SponsoredProgramGrant.objects.count())
+    self.assertEqual(row_count-2, models.GivingProjectGrant.objects.count())
 
-  def test_award_filters_all(self):
-    """ Verify that all filters can be selected in award report without error
+  def test_gp_grant_filters_all(self):
+    """ Verify that all filters can be selected in gp grant report without error
 
     Setup:
       All fields
@@ -226,9 +223,82 @@ class Reporting(BaseGrantTestCase):
       Basic success: 200 status, correct template
     """
 
-    form = AwardReportForm()
+    form = GPGrantReportForm()
     post_dict = self.fill_report_form(form, fields=True, filters=True)
-    post_dict['run-award'] = ''
+    post_dict['run-giving-project-grant'] = ''
+
+    response = self.client.post(self.url, post_dict)
+
+    self.assertEqual(200, response.status_code)
+    self.assertTemplateUsed(response, self.template_success)
+
+    results = response.context['results']
+    logger.info(results)
+
+  def test_sponsored_fields(self):
+    """ Verify that sponsored grant fields can be fetched
+
+    Setup:
+      No filters selected
+      All fields selected
+      Format = browse
+
+    Asserts:
+      Basic success: 200 status, correct template
+      Number of rows in results == number of gp grants in db
+    """
+
+    form = SponsoredAwardReportForm()
+    post_dict = self.fill_report_form(form, fields=True)
+    post_dict['run-sponsored-award'] = ''
+
+    response = self.client.post(self.url, post_dict)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, self.template_success)
+
+    results = response.context['results']
+    self.assertEqual(len(results), models.SponsoredProgramGrant.objects.count())
+
+  def test_sponsored_grants_csv(self):
+    """ Verify that sponsored grant fields can be fetched in csv format
+
+    Setup:
+      No filters selected
+      All fields selected
+      Format = browse
+
+    Asserts:
+      Basic success: able to iterate through response with reader
+      Number of rows in results matches number of awards (gp + sponsored) in db
+
+    """
+
+    form = SponsoredAwardReportForm()
+    post_dict = self.fill_report_form(form, fields=True, fmt='csv')
+    post_dict['run-sponsored-award'] = ''
+
+    response = self.client.post(self.url, post_dict)
+
+    reader = unicodecsv.reader(response, encoding='utf8')
+    row_count = sum(1 for row in reader)
+    self.assertEqual(row_count-2, models.SponsoredProgramGrant.objects.count())
+
+  def test_sponsored_grants_filters_all(self):
+    """ Verify that all filters can be selected in sponsored grant report without error
+
+    Setup:
+      All fields
+      All filters
+      Format = browse
+
+    Asserts:
+      Basic success: 200 status, correct template
+    """
+
+    form = SponsoredAwardReportForm()
+    post_dict = self.fill_report_form(form, fields=True, filters=True)
+    post_dict['run-sponsored-award'] = ''
 
     response = self.client.post(self.url, post_dict)
 
