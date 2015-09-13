@@ -206,6 +206,7 @@ class BaseOrgAppReport(forms.Form):
   class Meta:
     abstract = True
 
+
 class AppReportForm(BaseOrgAppReport):
 
   #filters
@@ -283,33 +284,38 @@ class AppReportForm(BaseOrgAppReport):
     return cleaned_data
 
 
-class AwardReportForm(BaseOrgAppReport):
+class BaseAwardReportForm(BaseOrgAppReport):
 
-  # filters
   year_min = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)],
       initial=timezone.now().year-1)
   year_max = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)])
 
-  # fields (always: org name, amount, check_mailed)
-  report_id = forms.BooleanField(required=False, label='ID number',
-      help_text='Only applies to sponsored program grants')
   report_check_number = forms.BooleanField(required=False, label='Check number')
-  report_date_approved = forms.BooleanField(required=False,
-      label='Date approved by E.D.')
-  report_agreement_dates = forms.BooleanField(required=False,
-      label='Date agreement mailed/returned',
-      help_text='Only applies to giving project grants')
-  report_year_end_report_due = forms.BooleanField(required=False,
-      label='Date year end report due',
-      help_text='Only applies to giving project grants')
+  report_date_approved = forms.BooleanField(required=False, label='Date approved by E.D.')
 
   def clean(self):
-    cleaned_data = super(AwardReportForm, self).clean()
+    cleaned_data = super(BaseAwardReportForm, self).clean()
     if cleaned_data['year_max'] < cleaned_data['year_min']:
       raise ValidationError('Start year must be less than or equal to end year.')
     return cleaned_data
+
+  class Meta:
+    abstract = True
+
+
+class GPGrantReportForm(BaseAwardReportForm):
+
+  report_agreement_dates = forms.BooleanField(required=False,
+      label='Date agreement mailed/returned')
+  report_year_end_report_due = forms.BooleanField(required=False,
+      label='Date year end report due')
+
+
+class SponsoredAwardReportForm(BaseAwardReportForm):
+
+  report_id = forms.BooleanField(required=False, label='ID number')
 
 
 class OrgReportForm(BaseOrgAppReport):

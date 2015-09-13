@@ -19,16 +19,15 @@ from google.appengine.ext import blobstore
 
 from libs import unicodecsv
 
-from sjfnw import constants
+from sjfnw import constants as c
 from sjfnw.fund.models import Member
+from sjfnw.grants import models
 from sjfnw.grants.decorators import registered_org
 from sjfnw.grants.forms import (AdminRolloverForm, LoginAsOrgForm, LoginForm,
-   AppReportForm, AwardReportForm, OrgReportForm, RegisterForm,
-   RolloverForm, RolloverYERForm)
-from sjfnw.grants.modelforms import (GrantApplicationModelForm, OrgProfile,
-    YearEndReportForm)
+   AppReportForm, SponsoredAwardReportForm, GPGrantReportForm, OrgReportForm,
+   RegisterForm, RolloverForm, RolloverYERForm)
+from sjfnw.grants.modelforms import GrantApplicationModelForm, YearEndReportForm
 from sjfnw.grants.utils import local_date_str, find_blobinfo
-from sjfnw.grants import models
 
 logger = logging.getLogger('sjfnw')
 
@@ -116,8 +115,8 @@ def org_register(request):
 
 def org_support(request):
   return render(request, 'grants/org_support.html', {
-    'support_email': constants.SUPPORT_EMAIL,
-    'support_form': constants.GRANT_SUPPORT_FORM
+    'support_email': c.SUPPORT_EMAIL,
+    'support_form': c.GRANT_SUPPORT_FORM
   })
 
 def cycle_info(request, cycle_id):
@@ -266,14 +265,14 @@ def grant_application(request, organization, cycle_id):
       form.save()
 
       subject = 'Grant application submitted'
-      from_email = constants.GRANT_EMAIL
+      from_email = c.GRANT_EMAIL
       to_email = organization.email
       html_content = render_to_string('grants/email_submitted.html', {
         'org': organization, 'cycle': cycle
       })
       text_content = strip_tags(html_content)
       msg = EmailMultiAlternatives(subject, text_content, from_email,
-          [to_email], [constants.SUPPORT_EMAIL])
+          [to_email], [c.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
       logger.info('Application created; confirmation email sent to ' + to_email)
@@ -531,9 +530,9 @@ def year_end_report(request, organization, award_id):
       text_content = strip_tags(html_content)
       msg = EmailMultiAlternatives('Year end report submitted', #subject
                                     text_content,
-                                    constants.GRANT_EMAIL, #from
+                                    c.GRANT_EMAIL, #from
                                     [yer.email], #to
-                                    [constants.SUPPORT_EMAIL]) #bcc
+                                    [c.SUPPORT_EMAIL]) #bcc
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
       logger.info('YER submission confirmation email send to %s', yer.email)
@@ -990,11 +989,15 @@ def grants_report(request):
 
   app_form = AppReportForm()
   org_form = OrgReportForm()
-  award_form = AwardReportForm()
+  gp_grant_form = GPGrantReportForm()
+  sponsored_form = SponsoredAwardReportForm()
 
-  context = {'app_form': app_form,
-             'org_form': org_form,
-             'award_form': award_form}
+  context = {
+    'app_form': app_form,
+    'org_form': org_form,
+    'gp_grant_form': gp_grant_form,
+    'sponsored_form': sponsored_form
+  }
 
   if request.method == 'POST':
 
@@ -1005,21 +1008,31 @@ def grants_report(request):
       context['app_form'] = form
       context['active_form'] = '#application-form'
       results_func = get_app_results
+
     elif 'run-organization' in request.POST:
       logger.info('Org report')
       form = OrgReportForm(request.POST)
       context['org_form'] = form
       context['active_form'] = '#organization-form'
       results_func = get_org_results
-    elif 'run-award' in request.POST:
-      logger.info('Award report')
-      form = AwardReportForm(request.POST)
+
+    elif 'run-giving-project-grant' in request.POST:
+      logger.info('Giving project grant report')
+      form = GPGrantReportForm(request.POST)
       context['award_form'] = form
-      context['active_form'] = '#award-form'
-      results_func = get_award_results
+      context['active_form'] = '#giving-project-grant-form'
+      results_func = get_gpg_results
+
+    elif 'run-sponsored-award' in request.POST:
+      logger.info('Sponsored award report')
+      form = SponsoredAwardReportForm(request.POST)
+      context['award_form'] = form
+      context['active_form'] = '#sponsored-award-form'
+      results_func = get_sponsored_award_results
+
     else:
       logger.error('Unknown report type')
-      form = False
+      form = None
 
     if form and form.is_valid():
       options = form.cleaned_data
@@ -1041,12 +1054,20 @@ def grants_report(request):
           writer.writerow(row)
         return response
     else:
-      logger.warning('Invalid form!' + str(form.errors))
+      logger.warning('Invalid form!')
 
   context['app_base'] = 'submission time, organization name, grant cycle'
   context['award_base'] = 'organization name, amount, date check mailed'
   context['org_base'] = 'name'
   return render(request, 'grants/reporting.html', context)
+
+def get_min_max_year(options):
+  current_tz = timezone.get_current_timezone()
+  min_year = datetime.strptime(options['year_min'], '%Y') # will default to beginning of year
+  min_year = timezone.make_aware(min_year, current_tz)
+  max_year = datetime.strptime(options['year_max'] + '-12-31 23:59:59', '%Y-%m-%d %H:%M:%S')
+  max_year = timezone.make_aware(max_year, current_tz)
+  return min_year, max_year
 
 def get_app_results(options):
   """ Fetches application report results
@@ -1193,53 +1214,47 @@ def get_app_results(options):
 
   return field_names, results
 
-def get_award_results(options):
-  """ Fetch award (all types) report results
+def get_gpg_results(options):
+  """ Fetch giving project grant report results
 
   Args:
     options: cleaned_data from a request.POST-filled instance of AwardReportForm
 
   Returns:
-    A list of display-formatted field names. Example:
-      ['Amount', 'Check mailed', 'Organization']
+    field_names: A list of display-formatted field names.
+      Example: ['Amount', 'Check mailed', 'Organization']
 
-    A list of awards & related info. Each item is a list of requested values
-    Example: [
-        ['10000', '2013-10-23 09:08:56+0:00', 'Fancy pants org'],
-        ['5987', '2011-08-04 09:08:56+0:00', 'Justice League']
-      ]
+    results: A list of requested values for each award.
+      Example (matching field_names example): [
+          ['10000', '2013-10-23 09:08:56+0:00', 'Fancy pants org'],
+          ['5987', '2011-08-04 09:08:56+0:00', 'Justice League']
+        ]
   """
 
-  # initial querysets
-  gp_awards = models.GivingProjectGrant.objects.all().select_related('projectapp',
-      'projectapp__application', 'projectapp__application__organization')
-  sponsored = models.SponsoredProgramGrant.objects.all().select_related('organization')
+  # initial queryset
+  gp_awards = models.GivingProjectGrant.objects.select_related(
+      'projectapp__application__organization')
 
   # filters
-  min_year = datetime.strptime(options['year_min'], '%Y') # defaults to beginning
-  min_year = timezone.make_aware(min_year, timezone.get_current_timezone())
-  max_year = datetime.strptime(options['year_max'] + '-12-31 23:59:59', '%Y-%m-%d %H:%M:%S')
-  max_year = timezone.make_aware(max_year, timezone.get_current_timezone())
+  min_year, max_year = get_min_max_year(options)
   gp_awards = gp_awards.filter(created__gte=min_year, created__lte=max_year)
-  sponsored = sponsored.filter(entered__gte=min_year, entered__lte=max_year)
 
   if options.get('organization_name'):
-    gp_awards = gp_awards.filter(projectapp__application__organization__name__contains=options['organization_name'])
-    sponsored = sponsored.filter(organization__name__contains=options['organization_name'])
+    gp_awards = gp_awards.filter(
+        projectapp__application__organization__name__contains=options['organization_name'])
+
   if options.get('city'):
-    gp_awards = gp_awards.filter(projectapp__application__organization__city=options['city'])
-    sponsored = sponsored.filter(organization__city=options['city'])
+    gp_awards = gp_awards.filter(projectapp__application__city=options['city'])
+
   if options.get('state'):
-    gp_awards = gp_awards.filter(projectapp__application__organization__state__in=options['state'])
-    sponsored = sponsored.filter(organization__state__in=options['state'])
+    gp_awards = gp_awards.filter(projectapp__application__state__in=options['state'])
+
   if options.get('has_fiscal_sponsor'):
-    gp_awards = gp_awards.exclude(projectapp__application__organization__fiscal_org='')
-    sponsored = sponsored.exclude(organization__fiscal_org='')
+    gp_awards = gp_awards.exclude(projectapp__application__fiscal_org='')
 
   # fields
   fields = ['check_mailed', 'amount', 'organization', 'grant_type', 'giving_project']
-  if options.get('report_id'):
-    fields.append('id')
+
   if options.get('report_check_number'):
     fields.append('check_number')
   if options.get('report_date_approved'):
@@ -1268,8 +1283,6 @@ def get_award_results(options):
         row.append(award.projectapp.giving_project.title)
       elif field == 'year_end_report_due':
         row.append(award.yearend_due())
-      elif field == 'id':
-        row.append('') # only for sponsored
       elif field == 'amount':
         row.append(award.total_amount())
       else:
@@ -1277,12 +1290,48 @@ def get_award_results(options):
     for field in org_fields:
       row.append(getattr(award.projectapp.application.organization, field))
     results.append(row)
+
+  field_names = [f.capitalize().replace('_', ' ') for f in fields]
+  field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
+
+  return field_names, results
+
+
+def get_sponsored_award_results(options):
+  sponsored = models.SponsoredProgramGrant.objects.select_related('organization')
+
+  min_year, max_year = get_min_max_year(options)
+  sponsored = sponsored.filter(entered__gte=min_year, entered__lte=max_year)
+
+  if options.get('organization_name'):
+    sponsored = sponsored.filter(organization__name__contains=options['organization_name'])
+  if options.get('city'):
+    sponsored = sponsored.filter(organization__city=options['city'])
+  if options.get('state'):
+    sponsored = sponsored.filter(organization__state__in=options['state'])
+  if options.get('has_fiscal_sponsor'):
+    sponsored = sponsored.exclude(organization__fiscal_org='')
+
+  # fields
+  fields = ['check_mailed', 'amount', 'organization']
+  if options.get('report_id'):
+    fields.append('id')
+  if options.get('report_check_number'):
+    fields.append('check_number')
+  if options.get('report_date_approved'):
+    fields.append('approved')
+
+  org_fields = options['report_contact'] + options['report_org']
+  if options.get('report_fiscal'):
+    org_fields += models.GrantApplication.fields_starting_with('fiscal')
+    org_fields.remove('fiscal_letter')
+
+  # get values
+  results = []
   for award in sponsored:
     row = []
     for field in fields:
-      if field == 'grant_type':
-        row.append('Sponsored program')
-      elif hasattr(award, field):
+      if hasattr(award, field):
         row.append(getattr(award, field))
       else:
         row.append('')
@@ -1294,6 +1343,7 @@ def get_award_results(options):
   field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
 
   return field_names, results
+
 
 def get_org_results(options):
   """ Fetch organization report results
@@ -1403,7 +1453,9 @@ def get_org_results(options):
 
   return field_names, results
 
+#------------------------------------------------------------------------------
 # CRON
+#------------------------------------------------------------------------------
 
 def DraftWarning(request):
   """ Warn orgs of impending draft freezes
@@ -1418,18 +1470,19 @@ def DraftWarning(request):
     created_delta = draft.grant_cycle.close - draft.created
     if ((created_delta > eight_days and eight_days > time_left > timedelta(days=7)) or
         (created_delta < eight_days and timedelta(days=3) > time_left >= timedelta(days=2))):
-      subject, from_email = 'Grant cycle closing soon', constants.GRANT_EMAIL
+      subject, from_email = 'Grant cycle closing soon', c.GRANT_EMAIL
       to_email = draft.organization.email
       html_content = render_to_string('grants/email_draft_warning.html', {
         'org': draft.organization, 'cycle': draft.grant_cycle
       })
       text_content = strip_tags(html_content)
       msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email],
-                                   [constants.SUPPORT_EMAIL])
+                                   [c.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
       logger.info('Email sent to %s regarding draft application soon to expire', to_email)
   return HttpResponse('')
+
 
 def yer_reminder_email(request):
   """ Remind orgs of upcoming year end reports that are due
@@ -1451,6 +1504,7 @@ def yer_reminder_email(request):
 
   return send_yer_email(total_awards, 'grants/email_yer_due.html')
 
+
 def send_yer_email(awards, template):
 
   for award in awards:
@@ -1458,46 +1512,61 @@ def send_yer_email(awards, template):
       app = award.projectapp.application
 
       subject = 'Year end report'
-      from_email = constants.GRANT_EMAIL
+      from_email = c.GRANT_EMAIL
       to_email = app.organization.email
       html_content = render_to_string(template, {
         'award': award, 'app': app, 'gp': award.projectapp.giving_project,
-        'base_url': constants.APP_BASE_URL
+        'base_url': c.APP_BASE_URL
       })
       text_content = strip_tags(html_content)
 
       msg = EmailMultiAlternatives(subject, text_content, from_email,
-                                   [to_email], [constants.SUPPORT_EMAIL])
+                                   [to_email], [c.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
       logger.info('YER reminder email sent to %s for award %d', to_email, award.pk)
 
   return HttpResponse('success')
 
-# UTILS
-# (in views because it caused import problems when in utils.py)
+#------------------------------------------------------------------------------
+# Helpers
+#------------------------------------------------------------------------------
+
 def get_file_urls(request, app, printing=False):
-  """ Get viewing urls for the files in a given app or year-end report, draft or final
+  """ Get html links to view files in a given app or year-end report, draft or final
+
+    Takes into account whether it can be viewed in google doc viewer
 
     Args:
+      request: HttpRequest
       app: one of GrantApplication, DraftGrantApplication, YearEndReport, YERDraft
+      printing: if True, will not use doc viewer for excel files to avoid known printing bug
 
     Returns:
-      a dict of urls for viewing each file, taking into account whether it can
-        be viewed in google doc viewer
-      keys are the name of the django model fields. i.e. budget, budget1, funding_sources
-
-    Raises:
+      file_urls: a dict of urls for viewing each file
+        key is name of django model field e.g. budget, budget1, funding_sources
+        value is string of html for linking to the uploaded file
       returns an empty dict if the given object is not valid
   """
-  app_urls = {'funding_sources': '', 'demographics': '', 'fiscal_letter': '', 'budget1': '',
-              'budget2': '', 'budget3': '', 'project_budget_file': ''}
-  report_urls = {'photo1': '', 'photo2': '', 'photo3': '', 'photo4': '', 'photo_release': ''}
-
-
+  app_urls = {
+    'funding_sources': '',
+    'demographics': '',
+    'fiscal_letter': '',
+    'budget1': '',
+    'budget2': '',
+    'budget3': '',
+    'project_budget_file': ''
+  }
+  report_urls = {
+    'photo1': '',
+    'photo2': '',
+    'photo3': '',
+    'photo4': '',
+    'photo_release': ''
+  }
   base_url = request.build_absolute_uri('/')
 
-
+  # determine type of app and set base url and starting dict accordingly
   if isinstance(app, models.GrantApplication):
     base_url += 'grants/app-file/'
     file_urls = app_urls
@@ -1515,42 +1584,17 @@ def get_file_urls(request, app, printing=False):
     logger.error('get_file_urls received invalid object')
     return {}
 
-  #check file fields, compile links
+  # check file fields, compile links
   for field in file_urls:
     value = getattr(app, field)
     if value:
       ext = value.name.lower().split('.')[-1]
       file_urls[field] += base_url + str(app.pk) + u'-' + field + u'.' + ext
-      if not settings.DEBUG and ext in constants.VIEWER_FORMATS: #doc viewer
+      if not settings.DEBUG and ext in c.VIEWER_FORMATS: # doc viewer
         if printing:
           if not (ext == 'xls' or ext == 'xlsx'):
             file_urls[field] = 'https://docs.google.com/viewer?url=' + file_urls[field]
         else:
           file_urls[field] = ('https://docs.google.com/viewer?url=' +
                               file_urls[field] + '&embedded=true')
-  logger.debug(file_urls)
   return file_urls
-
-def update_profile(request, org_id):
-  # TODO this should be a command
-
-  message = ''
-  org = get_object_or_404(models.Organization, pk=org_id)
-
-  apps = org.grantapplication_set.all()
-  if apps:
-    profile_data = model_to_dict(apps[0])
-    logger.info(profile_data)
-    form = OrgProfile(profile_data, instance=org)
-    if form.is_valid():
-      form.save()
-      if apps[0].fiscal_letter:
-        org.fiscal_letter = apps[0].fiscal_letter
-        org.save()
-      message = 'Organization profile updated.'
-    else:
-      message = 'Form not valid. Could not update'
-  else:
-    message = 'This org has no applications. Nothing to update'
-
-  return HttpResponse(message)

@@ -1,4 +1,4 @@
-﻿
+
 /** GENERAL **/
 
 body {
@@ -116,29 +116,25 @@ input#run { /** run the report button **/
 
 /** HELP **/
 
-.help_toggle{
-  float:right;
-  position:relative;
+.help-toggle {
+  float: right;
+  position: relative;
   margin: -3em 2em 0 0;
-  cursor:pointer;
+  cursor: pointer;
 }
 
-#help{
-  padding:5px;
+#help {
+  background-color: #fff;
+  position: fixed;
+  left: 220px;
+  top: 10px;
+  padding: 15px;
   width: 500px;
   border: 1px solid #555;
-  display:none;
-  vertical-align:top;
-  margin: 1em 0 0 1em;
 }
 
 #help h2 {
   margin-top:0;
-}
-
-#help td {
-  vertical-align: top;
-  padding: 0 1em;
 }
 
 #help ul {
