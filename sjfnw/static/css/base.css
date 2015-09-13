@@ -110,6 +110,19 @@ a: hover, a: focus {
   padding: 7px;
 }
 
+.v-top {
+  vertical-align: top;
+}
+
+.close {
+  float: right;
+  color: inherit;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding: 3px;
+}
+
 /* SHARED
  *****************************************************************************/
 

@@ -508,7 +508,6 @@ class GrantApplication(models.Model):
     super(GrantApplication, self).save(*args, **kwargs)
 
     # check if there are more recent apps
-    # pylint: disable=no-member
     apps = GrantApplication.objects.filter(organization_id=self.organization_id,
                                            submission_time__gt=self.submission_time)
 
