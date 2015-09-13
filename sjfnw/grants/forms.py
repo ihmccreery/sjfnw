@@ -307,6 +307,7 @@ class BaseAwardReportForm(BaseOrgAppReport):
 
 class GPGrantReportForm(BaseAwardReportForm):
 
+  report_support_type = forms.BooleanField(required=False, label='Support type')
   report_agreement_dates = forms.BooleanField(required=False,
       label='Date agreement mailed/returned')
   report_year_end_report_due = forms.BooleanField(required=False,

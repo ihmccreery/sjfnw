@@ -1253,7 +1253,8 @@ def get_gpg_results(options):
     gp_awards = gp_awards.exclude(projectapp__application__fiscal_org='')
 
   # fields
-  fields = ['check_mailed', 'amount', 'organization', 'grant_type', 'giving_project']
+  fields = ['check_mailed', 'first_year_amount', 'second_year_amount', 'total_amount',
+            'organization', 'giving_project', 'grant_cycle']
 
   if options.get('report_check_number'):
     fields.append('check_number')
@@ -1264,6 +1265,8 @@ def get_gpg_results(options):
     fields.append('agreement_returned')
   if options.get('report_year_end_report_due'):
     fields.append('year_end_report_due')
+  if options.get('report_support_type'):
+    fields.append('support_type')
 
   org_fields = options['report_contact'] + options['report_org']
   if options.get('report_fiscal'):
@@ -1277,13 +1280,19 @@ def get_gpg_results(options):
     for field in fields:
       if field == 'organization':
         row.append(award.projectapp.application.organization.name)
-      elif field == 'grant_type':
-        row.append('Giving project')
+      elif field == 'grant_cycle':
+        row.append(award.projectapp.application.grant_cycle.title)
+      elif field == 'support_type':
+        row.append(award.projectapp.application.support_type)
       elif field == 'giving_project':
         row.append(award.projectapp.giving_project.title)
       elif field == 'year_end_report_due':
         row.append(award.yearend_due())
-      elif field == 'amount':
+      elif field == 'first_year_amount':
+        row.append(award.amount)
+      elif field == 'second_year_amount':
+        row.append(award.second_amount or '')
+      elif field == 'total_amount':
         row.append(award.total_amount())
       else:
         row.append(getattr(award, field, ''))
