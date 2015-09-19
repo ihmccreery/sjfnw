@@ -147,34 +147,11 @@ class ProjectAppInline(admin.TabularInline):
   verbose_name_plural = 'Grant applications'
   fields = ['application', 'app_link', 'screening_status', 'grant_link']
   readonly_fields = ['app_link', 'grant_link']
+  ordering=['screening_status']
 
   def get_queryset(self, request):
     return super(ProjectAppInline, self).get_queryset(request).select_related(
         'application', 'givingprojectgrant')
-
-  def app_link(self, obj):
-    if obj and hasattr(obj, 'application'):
-      return utils.create_link(
-        '/admin/grants/grantapplication/{}/'.format(obj.application.pk),
-        'View application')
-    else:
-      return ''
-  app_link.allow_tags = True
-
-  def grant_link(self, obj):
-    if obj:
-      if hasattr(obj, 'givingprojectgrant'):
-        return utils.create_link(
-          '/admin/grants/givingprojectgrant/{}/'.format(obj.givingprojectgrant.pk),
-          'View grant')
-
-      if hasattr(obj, 'screening_status') and obj.screening_status > 80:
-        return utils.create_link(
-          '/admin/grants/givingprojectgrant/add/?projectapp={}'.format(obj.pk),
-          'Add grant')
-    else:
-      return ''
-  grant_link.allow_tags = True
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     """ Limit application dropdown choices based on GP fundraising deadline
@@ -201,6 +178,30 @@ class ProjectAppInline(admin.TabularInline):
         formfield.choices = [('', '---------')] + [(app.pk, unicode(app)) for app in apps]
 
     return formfield
+
+  def app_link(self, obj):
+    if obj and hasattr(obj, 'application'):
+      return utils.create_link(
+        '/admin/grants/grantapplication/{}/'.format(obj.application.pk),
+        'View application')
+    else:
+      return ''
+  app_link.allow_tags = True
+
+  def grant_link(self, obj):
+    if obj:
+      if hasattr(obj, 'givingprojectgrant'):
+        return utils.create_link(
+          '/admin/grants/givingprojectgrant/{}/'.format(obj.givingprojectgrant.pk),
+          'View grant')
+
+      if hasattr(obj, 'screening_status') and obj.screening_status > 80:
+        return utils.create_link(
+          '/admin/grants/givingprojectgrant/add/?projectapp={}'.format(obj.pk),
+          'Add grant')
+    else:
+      return ''
+  grant_link.allow_tags = True
 
 
 class GPSurveyI(admin.TabularInline):
