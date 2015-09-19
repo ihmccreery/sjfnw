@@ -148,6 +148,10 @@ class ProjectAppInline(admin.TabularInline):
   fields = ['application', 'app_link', 'screening_status', 'grant_link']
   readonly_fields = ['app_link', 'grant_link']
 
+  def get_queryset(self, request):
+    return super(ProjectAppInline, self).get_queryset(request).select_related(
+        'application', 'givingprojectgrant')
+
   def app_link(self, obj):
     if obj and hasattr(obj, 'application'):
       return utils.create_link(
@@ -173,47 +177,40 @@ class ProjectAppInline(admin.TabularInline):
   grant_link.allow_tags = True
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    """ Limit application dropdown choices based on GP fundraising deadline
 
-    # cache application choices to reduce queries
+      Otherwise we may get 'response too large' error
+    """
+    formfield = super(ProjectAppInline, self).formfield_for_foreignkey(
+        db_field, request, **kwargs)
+
     if db_field.name == 'application':
-
-      cached_choices = getattr(request, 'cached_projectapps', None)
-      if cached_choices:
-        logger.debug('Using cached choices for projectapp inline')
-        formfield = super(ProjectAppInline, self).formfield_for_foreignkey(
-            db_field, request, **kwargs)
-        formfield.choices = cached_choices
-
+      apps = GrantApplication.objects.select_related('grant_cycle', 'organization')
+      try:
+        gp_id = int(request.path.split('/')[-2])
+      except ValueError:
+        # this shoudn't be possible, but just to be safe
+        # (it shouuld 404 if url doesn't match expected pattern)
+        logger.error('Could not parse GP id. URL: %s', request.path)
+        raise
       else:
-        apps = GrantApplication.objects.select_related('grant_cycle', 'organization')
-        try:
-          gp_id = int(request.path.split('/')[-2])
-        except ValueError:
-          logger.warning('Could not parse gp id, not limiting app choices')
-        else:
-          gp = GivingProject.objects.get(pk=gp_id)
-          year = gp.fundraising_deadline - datetime.timedelta(weeks=52)
-          apps = apps.filter(submission_time__gte=year)
-        finally:
-          formfield = super(ProjectAppInline, self).formfield_for_foreignkey(
-              db_field, request, **kwargs)
-          # create choices from queryset (doing manually results in less queries)
-          formfield.choices = [('', '---------')] + [(app.pk, unicode(app)) for app in apps]
-          request.cached_projectapps = formfield.choices
-          logger.debug('Cached app choices for projectapp inline')
+        gp = GivingProject.objects.get(pk=gp_id)
+        year = gp.fundraising_deadline - datetime.timedelta(weeks=52)
+        apps = apps.filter(submission_time__gte=year)
+        # create choices from queryset
+        formfield.choices = [('', '---------')] + [(app.pk, unicode(app)) for app in apps]
 
-      return formfield
-
-    else: #other field
-      return super(ProjectAppInline, self).formfield_for_foreignkey(
-          db_field, request, **kwargs)
+    return formfield
 
 
-class SurveyI(admin.TabularInline):
+class GPSurveyI(admin.TabularInline):
   model = GPSurvey
   extra = 1
   verbose_name = 'Survey'
   verbose_name_plural = 'Surveys'
+
+  def get_queryset(self, request):
+    return super(GPSurveyI, self).get_queryset(request).select_related('survey')
 
 # -----------------------------------------------------------------------------
 # ModelAdmin
@@ -229,7 +226,7 @@ class GivingProjectA(admin.ModelAdmin):
   ]
   readonly_fields = ['estimated']
   form = modelforms.GivingProjectAdminForm
-  inlines = [SurveyI, ProjectResourcesInline, MembershipInline, ProjectAppInline]
+  inlines = [GPSurveyI, ProjectResourcesInline, MembershipInline, ProjectAppInline]
 
   def gp_year(self, obj):
     year = obj.fundraising_deadline.year
@@ -283,8 +280,8 @@ class MembershipA(admin.ModelAdmin):
             '<td>{received_this}, {received_next}, {received_afternext}</td>'
             '</tr></table>').format(**progress)
   ship_progress.short_description = mark_safe(
-      '<table class="nested-column-4"><tr><td>Estimated</td><td>Total promised</td><td>Received</td>'
-      '<td>Rec. by year</td></tr></table>')
+      '<table class="nested-column-4"><tr><td>Estimated</td><td>Total promised</td>'
+      '<td>Received</td><td>Rec. by year</td></tr></table>')
   ship_progress.allow_tags = True
 
 
