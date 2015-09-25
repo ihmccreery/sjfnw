@@ -10,7 +10,7 @@
     
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
-    <title>Fundraising tests - sjfnw</title>
+    <title>Documentation - sjfnw</title>
 
     <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
@@ -84,31 +84,31 @@
       
     
       
-        <li class="dropdown">
+        <li class="dropdown active">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project info <b class="caret"></b></a>
           <ul class="dropdown-menu">
           
             
 <li >
-    <a href="../../about/models/">Overview of models</a>
+    <a href="../models/">Overview of models</a>
 </li>
 
           
             
 <li >
-    <a href="../../about/project-structure/">Project structure</a>
+    <a href="../project-structure/">Project structure</a>
 </li>
 
           
             
 <li >
-    <a href="../../about/code-conventions/">Code conventions</a>
+    <a href="../code-conventions/">Code conventions</a>
 </li>
 
           
             
-<li >
-    <a href="../../about/docs/">Documentation</a>
+<li class="active">
+    <a href="./">Documentation</a>
 </li>
 
           
@@ -150,25 +150,25 @@
       
     
       
-        <li class="dropdown active">
+        <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Testing <b class="caret"></b></a>
           <ul class="dropdown-menu">
           
             
 <li >
-    <a href="../intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro</a>
 </li>
 
           
             
 <li >
-    <a href="../writing-tests/">Writing tests</a>
+    <a href="../../tests/writing-tests/">Writing tests</a>
 </li>
 
           
             
-<li class="active">
-    <a href="./">Fundraising tests</a>
+<li >
+    <a href="../../tests/fund/">Fundraising tests</a>
 </li>
 
           
@@ -225,102 +225,24 @@
       
         <div class="col-md-3">
           
-            <div class="bs-sidebar well affix" role="complementary">
-  <div class="toc-header">Fundraising tests</div>
-    <ul class="nav">
-    
-        <li class="main active"><a href="#fixtures">Fixtures</a></li>
-        
-    
-        <li class="main "><a href="#setup-creates-2-giving-projects">setUp creates 2 giving projects</a></li>
-        
-    
-        <li class="main "><a href="#test-memberships">Test memberships</a></li>
-        
-            <li><a href="#testy-use_test_acct">Testy - use_test_acct()</a></li>
-        
-            <li><a href="#newbie-use_new_acct">Newbie - use_new_acct()</a></li>
-        
-            <li><a href="#admin-use_admin_acct">Admin - use_admin_acct()</a></li>
-        
-    
-    </ul>
-</div>
-          
         </div>
         <div class="col-md-9 content" role="main">
           
 
-<p>Brief overview of what is provided to each test class that inherits from <code>BaseFundTestCase</code></p>
-<p><strong>NOTE</strong>: It is easy for documentation to get out of sync with code. If anything in here doesn't seem to match the results you're getting, take a look at the source:</p>
-<table>
-<thead>
-<tr>
-<th>Location</th>
-<th>Contains</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/tests.py"><code>sjfnw/tests.py</code></a></td>
-<td><code>BaseTestCase</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/fund/base.py"><code>sjfnw/fund/base.py</code></a></td>
-<td><code>BaseFundTestCase</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/fund/fixtures"><code>sjfnw/fund/fixtures/</code></a></td>
-<td>fixtures used by fund tests</td>
-</tr>
-</tbody>
-</table>
-<h4 id="fixtures">Fixtures</h4>
-<p>By inheriting, your test will use the fixtures specified by <code>BaseFundTestCase</code> unless you overwrite that property.</p>
-<h4 id="setup-creates-2-giving-projects"><code>setUp</code> creates 2 giving projects</h4>
-<p>Usage:</p>
-<pre><code class="python">  # inside of your test's setUp method
-  def setUp(self):
-    super(TestClass, self).setUp()
-</code></pre>
-
-<p>Creates:<br />
-    - Post-training GP (Fundraising training date has passed; estimates are required)<br />
-    - Pre-training GP (Fundraising training has not happened; estimates not required)</p>
-<h3 id="test-memberships">Test memberships</h3>
-<p>These can be used by calling one of the following methods, which create the necessary objects and then log the test user in.</p>
-<p>Usage:</p>
-<pre><code class="python">  # call from inside setUp, or in an individual test method
-  self.use_test_acct() # or one of the others listed below
-</code></pre>
-
-<p><em>default</em> means that <code>member.current</code> is set to that membership, so it will be used when the user logs into Project Central.</p>
-<h4 id="testy-use_test_acct">Testy - <code>use_test_acct()</code></h4>
+<h2 id="documentation">Documentation</h2>
+<p>This documentation is kept the <code>docs/</code> directory of the <a href="https://github.com/aisapatino/sjfnw"><code>sjfnw</code> repo</a>. It is written in markdown, converted to html using <a href="http://www.mkdocs.org/">mkdocs</a>, and published using Github Pages.</p>
+<h4 id="file-structure">File structure</h4>
 <ul>
-<li><code>testacct@gmail.com</code> User and Member (<code>self.member_id</code>)</li>
-<li>2 Memberships:<ul>
-<li>Post-training project (<code>self.ship_id</code>) <em>default</em></li>
-<li>One Donor (<code>self.donor_id</code>) with one incomplete, overdue step (<code>self.step_id</code>)</li>
-<li>LGBTQ Giving project (membership id is <code>1</code>)</li>
-<li>8 donors</li>
-<li>See <code>sjfnw/fund/fixtures/testy.json</code> for details</li>
+<li><code>mkdocs.yml</code> configures mkdocs, including a listing of all the pages, which is used to build the navigation menus.</li>
+<li><code>docs/</code> contains the documentation source files. They're grouped into folders to match the way they're grouped in nav.</li>
+<li><code>docs/_theme/</code> contains files for customizing the appearance/layout of the html output.</li>
+<li><code>docs/README.md</code> shows when you browse <a href="https://github.com/aisapatino/sjfnw/tree/master/docs"><code>docs/</code> in the repo</a> to point people to the processed version.</li>
 </ul>
-</li>
-</ul>
-<h4 id="newbie-use_new_acct">Newbie - <code>use_new_acct()</code></h4>
+<h4 id="updating-the-documentation">Updating the documentation</h4>
 <ul>
-<li><code>newacct@gmail.com</code> User and Member (<code>self.member_id</code>)</li>
-<li>2 Memberships:<ul>
-<li>Pre-training (<code>self.pre_id</code>) <em>default</em></li>
-<li>Post-training (<code>self.post_id</code>)</li>
-</ul>
-</li>
-<li>No Donors</li>
-</ul>
-<h4 id="admin-use_admin_acct">Admin - <code>use_admin_acct()</code></h4>
-<ul>
-<li>User with email <code>admin@gmail.com</code> that is a superuser</li>
-<li>No Member or Organization object associated; this one is just for testing admin site features.</li>
+<li>To preview the changes, use <code>mkdocs serve</code>. You can them view the output at <code>http://127.0.0.1:8000/</code> and it will automatically update as you make changes</li>
+<li>If you add, remove or rename a file, make sure you update <code>mkdocs.yml</code> accordingly.</li>
+<li><code>mkdocs gh-deploy</code> will build and then push to the <code>gh-pages</code> branch which updates the docs site</li>
 </ul>
         </div>
       

@@ -2,7 +2,7 @@
     "docs": [
         {
             "location": "/", 
-            "text": "Documentation related to development and project maintenance\n\n\n\n\n\nContributing\n\n\nFollow the table of contents to get a local development environment set up, starting with \ninstallation and setup\n.\n\n\nThe \nresources\n page has links with more info on the various languages/platforms/technologies that are used. If you are new to Django, definitely look through the Django docs.\n\n\nCheck \nissues labeled \"ready\"\n to see what needs doing. Post a comment on the issue if you need clarification. See \nissue tracking\n for more info.", 
+            "text": "Documentation related to development and project maintenance\n\n\n\n\n\nContributing\n\n\nFollow the table of contents to get a local development environment set up, starting with \ninstallation and setup\n.\n\n\nThe \nresources\n page has links with more info on the various languages/platforms/technologies that are used. If you are new to Django, definitely look through the Django docs.\n\n\nCheck \nissues labeled \"ready\"\n to see what needs doing. Post a comment on the issue if you need clarification. See \nissue tracking\n for more info.\n\n\nIf you notice anything missing/wrong in the docs, please submit a PR!", 
             "title": "Home"
         }, 
         {
@@ -44,6 +44,16 @@
             "location": "/about/code-conventions/", 
             "text": "Consistent code formatting and style makes it easier to read and maintain. This is a work in progress in the current code; existing code is being updated gradually. \nAll new code should follow the guidelines below\n.\n\n\nCode style guidelines\n\n\nGenerally follow google's \nPython style guide\n. A few exceptions/clarifications:\n\n\n\n\n2 space indents  \n\n\nSingle quotes except for docstrings  \n\n\nWe're not as stringent with line length; aim for \n100\n\n\n\n\nSee the \nlinters\n page for information on plugins that check syntax/style. Note that pylint does \nnot\n check quotes or indentation, but should catch most other issues.", 
             "title": "Code conventions"
+        }, 
+        {
+            "location": "/about/docs/", 
+            "text": "Documentation\n\n\nThis documentation is kept the \ndocs/\n directory of the \nsjfnw\n repo\n. It is written in markdown, converted to html using \nmkdocs\n, and published using Github Pages.\n\n\nFile structure\n\n\n\n\nmkdocs.yml\n configures mkdocs, including a listing of all the pages, which is used to build the navigation menus.\n\n\ndocs/\n contains the documentation source files. They're grouped into folders to match the way they're grouped in nav.\n\n\ndocs/_theme/\n contains files for customizing the appearance/layout of the html output.\n\n\ndocs/README.md\n shows when you browse \ndocs/\n in the repo\n to point people to the processed version.\n\n\n\n\nUpdating the documentation\n\n\n\n\nTo preview the changes, use \nmkdocs serve\n. You can them view the output at \nhttp://127.0.0.1:8000/\n and it will automatically update as you make changes\n\n\nIf you add, remove or rename a file, make sure you update \nmkdocs.yml\n accordingly.\n\n\nmkdocs gh-deploy\n will build and then push to the \ngh-pages\n branch which updates the docs site", 
+            "title": "Documentation"
+        }, 
+        {
+            "location": "/about/docs/#documentation", 
+            "text": "This documentation is kept the  docs/  directory of the  sjfnw  repo . It is written in markdown, converted to html using  mkdocs , and published using Github Pages.  File structure   mkdocs.yml  configures mkdocs, including a listing of all the pages, which is used to build the navigation menus.  docs/  contains the documentation source files. They're grouped into folders to match the way they're grouped in nav.  docs/_theme/  contains files for customizing the appearance/layout of the html output.  docs/README.md  shows when you browse  docs/  in the repo  to point people to the processed version.   Updating the documentation   To preview the changes, use  mkdocs serve . You can them view the output at  http://127.0.0.1:8000/  and it will automatically update as you make changes  If you add, remove or rename a file, make sure you update  mkdocs.yml  accordingly.  mkdocs gh-deploy  will build and then push to the  gh-pages  branch which updates the docs site", 
+            "title": "Documentation"
         }, 
         {
             "location": "/workflow/git/", 
