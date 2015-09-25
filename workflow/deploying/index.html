@@ -235,7 +235,7 @@
         <li class="main "><a href="#release">Release</a></li>
         
     
-        <li class="main "><a href="#more-info">More info:</a></li>
+        <li class="main "><a href="#more-info">More info</a></li>
         
     
     </ul>
@@ -245,7 +245,7 @@
         <div class="col-md-9 content" role="main">
           
 
-<p>Current process: manual deploy with <code>appcfg.py</code>, then add git tag using the date. Tagging is so we can easily see what exact code is live, and compare it to the last release, in cases where something is going wrong.</p>
+<p>Overview of current process: manual deploy with <code>appcfg.py</code>, then add git tag using the date. Tagging is so we can easily see what exact code is live, and compare it to the last release, in cases where something is going wrong.</p>
 <h4 id="prepare-for-release">Prepare for release</h4>
 <ol>
 <li>Merge the desired change into <code>master</code>.</li>
@@ -255,18 +255,18 @@
 </ol>
 <h4 id="release">Release</h4>
 <ol>
-<li>Tag the commit you will be releasing. Currently we're using a format like this:<br />
-<code>git tag -a 2015-08-09 -m "summary of changes"</code><br />
+<li><strong>Tag</strong> the commit you will be releasing.<br />
+<strong><code>git tag -a 2015-08-09 -m "summary of changes"</code></strong><br />
   a. Make sure the first line is under 72 chars like with commit messages.<br />
   b. The message doesn't need to be comprehensive; commit messages and diffs can be used to get the full details.<br />
   c. If it's not the first tag in a day, do <code>2015-08-09.2</code> etc.</li>
-<li>Deploy the code.<br />
+<li><strong>Deploy</strong><br />
   a. Make sure you don't have any local uncommitted changes; they will be deployed.<br />
-  b. <code>appcfg.py -E CLOUDSQL_PASSWORD:[pw] update .</code> (if you are in root of repo) to deploy to app engine.<br />
-  c. <code>git push --tags</code> to push the release tag.</li>
-<li>Verify that the live site is working</li>
+  b. <strong><code>appcfg.py -E CLOUDSQL_PASSWORD:[pw] update .</code></strong> (from root of repo) to deploy to App Engine.<br />
+  c. <strong><code>git push --tags</code></strong> to push the release tag.</li>
+<li><strong>Verify</strong> that the live site is working.</li>
 </ol>
-<h4 id="more-info">More info:</h4>
+<h4 id="more-info">More info</h4>
 <ul>
 <li><a href="https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Uploading_the_app">appcfg</a></li>
 <li><a href="https://git-scm.com/book/en/v1/Git-Basics-Tagging">git tags</a></li>
