@@ -231,18 +231,18 @@
 
 <h2 id="documentation">Documentation</h2>
 <p>This documentation is kept the <code>docs/</code> directory of the <a href="https://github.com/aisapatino/sjfnw"><code>sjfnw</code> repo</a>. It is written in markdown, converted to html using <a href="http://www.mkdocs.org/">mkdocs</a>, and published using Github Pages.</p>
-<h4 id="file-structure">File structure</h4>
+<h3 id="file-structure">File structure</h3>
 <ul>
 <li><code>mkdocs.yml</code> configures mkdocs, including a listing of all the pages, which is used to build the navigation menus.</li>
 <li><code>docs/</code> contains the documentation source files. They're grouped into folders to match the way they're grouped in nav.</li>
 <li><code>docs/_theme/</code> contains files for customizing the appearance/layout of the html output.</li>
 <li><code>docs/README.md</code> shows when you browse <a href="https://github.com/aisapatino/sjfnw/tree/master/docs"><code>docs/</code> in the repo</a> to point people to the processed version.</li>
 </ul>
-<h4 id="updating-the-documentation">Updating the documentation</h4>
+<h3 id="updates">Updates</h3>
 <ul>
-<li>To preview the changes, use <code>mkdocs serve</code>. You can them view the output at <code>http://127.0.0.1:8000/</code> and it will automatically update as you make changes</li>
+<li>To preview the docs site locally, use <code>mkdocs serve</code>, then go to <code>http://127.0.0.1:8000/</code>. It will automatically update as you make changes.</li>
 <li>If you add, remove or rename a file, make sure you update <code>mkdocs.yml</code> accordingly.</li>
-<li><code>mkdocs gh-deploy</code> will build and then push to the <code>gh-pages</code> branch which updates the docs site</li>
+<li><code>mkdocs gh-deploy</code> will build and then push to the <code>gh-pages</code> branch which updates the docs site.</li>
 </ul>
         </div>
       
