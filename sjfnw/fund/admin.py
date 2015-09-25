@@ -1,4 +1,4 @@
-import datetime, logging, json
+import datetime, logging, json, re
 
 from django.contrib import admin, messages
 from django.contrib.admin import SimpleListFilter
@@ -147,7 +147,7 @@ class ProjectAppInline(admin.TabularInline):
   verbose_name_plural = 'Grant applications'
   fields = ['application', 'app_link', 'screening_status', 'grant_link']
   readonly_fields = ['app_link', 'grant_link']
-  ordering=['screening_status']
+  ordering = ['screening_status']
 
   def get_queryset(self, request):
     return super(ProjectAppInline, self).get_queryset(request).select_related(
@@ -161,7 +161,7 @@ class ProjectAppInline(admin.TabularInline):
     formfield = super(ProjectAppInline, self).formfield_for_foreignkey(
         db_field, request, **kwargs)
 
-    if db_field.name == 'application':
+    if db_field.name == 'application' and not re.search(r'/add/', request.path):
       apps = GrantApplication.objects.select_related('grant_cycle', 'organization')
       try:
         gp_id = int(request.path.split('/')[-2])
@@ -169,7 +169,6 @@ class ProjectAppInline(admin.TabularInline):
         # this shoudn't be possible, but just to be safe
         # (it shouuld 404 if url doesn't match expected pattern)
         logger.error('Could not parse GP id. URL: %s', request.path)
-        raise
       else:
         gp = GivingProject.objects.get(pk=gp_id)
         year = gp.fundraising_deadline - datetime.timedelta(weeks=52)
