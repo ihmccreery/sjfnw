@@ -73,6 +73,7 @@ a>code {
 
 .bs-sidebar.well {
   padding: 10px 0;
+  z-index: 2;
 }
 
 .bs-sidebar > ul {
@@ -114,7 +115,6 @@ a>code {
  *---------------------------------------------------------------------------*/
 
 footer {
-  z-index: -5;
   border-top: 1px solid #aaa;
   padding: 5px;
   opacity: .7;
