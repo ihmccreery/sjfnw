@@ -164,8 +164,8 @@ class RolloverYERForm(forms.Form):
         [('', '--- Grants ---')] + [(a.id, unicode(a)) for a in awards])
 
 
-class BaseOrgAppReport(forms.Form):
-  """ Abstract form for fields shared between report types """
+class BaseReportForm(forms.Form):
+  """ Abstract form for fields shared between all report types """
 
   # filters
   organization_name = forms.CharField(max_length=255, required=False,
@@ -200,14 +200,12 @@ class BaseOrgAppReport(forms.Form):
       ])
   report_fiscal = forms.BooleanField(label='Fiscal sponsor', required=False)
 
-  #format (browse, csv)
   format = forms.ChoiceField(choices=[('csv', 'CSV'), ('browse', 'Don\'t export, just browse')])
 
   class Meta:
     abstract = True
 
-
-class AppReportForm(BaseOrgAppReport):
+class BaseAppRelatedReportForm(BaseReportForm):
 
   #filters
   year_min = forms.ChoiceField(
@@ -215,22 +213,43 @@ class AppReportForm(BaseOrgAppReport):
       initial=timezone.now().year-1)
   year_max = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)])
+  giving_projects = forms.MultipleChoiceField(
+      choices=[], widget=forms.CheckboxSelectMultiple, required=False)
+  grant_cycle = forms.MultipleChoiceField(required=False, choices=[],
+      widget=forms.CheckboxSelectMultiple)
+
+  def __init__(self, *args, **kwargs):
+    super(BaseAppRelatedReportForm, self).__init__(*args, **kwargs)
+
+    #get projects
+    choices = GivingProject.objects.values_list('title', flat=True).distinct().order_by('title')
+    choices = [(g, g) for g in choices]
+    self.fields['giving_projects'].choices = choices
+
+    #get cycles
+    choices = GrantCycle.objects.values_list('title', flat=True).distinct().order_by('title')
+    choices = [(g, g) for g in choices]
+    self.fields['grant_cycle'].choices = choices
+
+  def clean(self):
+    cleaned_data = super(BaseAppRelatedReportForm, self).clean()
+    if cleaned_data['year_max'] < cleaned_data['year_min']:
+      raise ValidationError('Start year must be less than or equal to end year.')
+    return cleaned_data
+
+
+
+class AppReportForm(BaseAppRelatedReportForm):
+
   pre_screening_status = forms.MultipleChoiceField(
       choices=PRE_SCREENING,
       widget=forms.CheckboxSelectMultiple, required=False)
   screening_status = forms.MultipleChoiceField(label='Giving project screening status',
       choices=SCREENING,
       widget=forms.CheckboxSelectMultiple, required=False)
-  giving_projects = forms.MultipleChoiceField(
-      choices=[], widget=forms.CheckboxSelectMultiple, required=False)
-  grant_cycle = forms.MultipleChoiceField(required=False, choices=[],
-      widget=forms.CheckboxSelectMultiple)
   poc_bonus = forms.BooleanField(required=False)
   geo_bonus = forms.BooleanField(required=False)
-  #awarded = forms.BooleanField(required=False)
 
-  #fields
-  #always: organization, grant cycle, submission time
   report_basics = forms.MultipleChoiceField(
       label='Basics', required=False,
       widget=CheckMultiple, choices=[
@@ -264,49 +283,11 @@ class AppReportForm(BaseOrgAppReport):
   report_gp_screening = forms.BooleanField(label='GP screening status', required=False)
   report_award = forms.BooleanField(label='Grant awards', required=False)
 
-  def __init__(self, *args, **kwargs):
-    super(AppReportForm, self).__init__(*args, **kwargs)
 
-    #get projects
-    choices = GivingProject.objects.values_list('title', flat=True).distinct().order_by('title')
-    choices = [(g, g) for g in choices]
-    self.fields['giving_projects'].choices = choices
-
-    #get cycles
-    choices = GrantCycle.objects.values_list('title', flat=True).distinct().order_by('title')
-    choices = [(g, g) for g in choices]
-    self.fields['grant_cycle'].choices = choices
-
-  def clean(self):
-    cleaned_data = super(AppReportForm, self).clean()
-    if cleaned_data['year_max'] < cleaned_data['year_min']:
-      raise ValidationError('Start year must be less than or equal to end year.')
-    return cleaned_data
-
-
-class BaseAwardReportForm(BaseOrgAppReport):
-
-  year_min = forms.ChoiceField(
-      choices=[(n, n) for n in range(timezone.now().year, 1990, -1)],
-      initial=timezone.now().year-1)
-  year_max = forms.ChoiceField(
-      choices=[(n, n) for n in range(timezone.now().year, 1990, -1)])
+class GPGrantReportForm(BaseAppRelatedReportForm):
 
   report_check_number = forms.BooleanField(required=False, label='Check number')
   report_date_approved = forms.BooleanField(required=False, label='Date approved by E.D.')
-
-  def clean(self):
-    cleaned_data = super(BaseAwardReportForm, self).clean()
-    if cleaned_data['year_max'] < cleaned_data['year_min']:
-      raise ValidationError('Start year must be less than or equal to end year.')
-    return cleaned_data
-
-  class Meta:
-    abstract = True
-
-
-class GPGrantReportForm(BaseAwardReportForm):
-
   report_support_type = forms.BooleanField(required=False, label='Support type')
   report_agreement_dates = forms.BooleanField(required=False,
       label='Date agreement mailed/returned')
@@ -314,12 +295,25 @@ class GPGrantReportForm(BaseAwardReportForm):
       label='Date year end report due')
 
 
-class SponsoredAwardReportForm(BaseAwardReportForm):
+class SponsoredAwardReportForm(BaseReportForm):
 
+  year_min = forms.ChoiceField(
+      choices=[(n, n) for n in range(timezone.now().year, 1990, -1)],
+      initial=timezone.now().year-1)
+  year_max = forms.ChoiceField(
+      choices=[(n, n) for n in range(timezone.now().year, 1990, -1)])
   report_id = forms.BooleanField(required=False, label='ID number')
+  report_check_number = forms.BooleanField(required=False, label='Check number')
+  report_date_approved = forms.BooleanField(required=False, label='Date approved by E.D.')
+
+  def clean(self):
+    cleaned_data = super(SponsoredAwardReportForm, self).clean()
+    if cleaned_data['year_max'] < cleaned_data['year_min']:
+      raise ValidationError('Start year must be less than or equal to end year.')
+    return cleaned_data
 
 
-class OrgReportForm(BaseOrgAppReport):
+class OrgReportForm(BaseReportForm):
 
   # filters
   registered = forms.ChoiceField(choices=[('None', '---'), ('True', 'yes'), ('False', 'no')])

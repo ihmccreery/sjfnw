@@ -1065,8 +1065,11 @@ def grants_report(request):
     else:
       logger.warning('Invalid form!')
 
+  # human-friendly lists of always-included fields
   context['app_base'] = 'submission time, organization name, grant cycle'
-  context['award_base'] = 'organization name, amount, date check mailed'
+  context['gpg_base'] = ('date check was mailed, amount (total and by year), '
+                         'organization, giving project, grant cycle')
+  context['sponsored_base'] = 'date check was mailed, amount, organization'
   context['org_base'] = 'name'
   return render(request, 'grants/reporting.html', context)
 
@@ -1096,17 +1099,11 @@ def get_app_results(options):
   """
   logger.info('Get app results')
 
-  #initial queryset
   apps = models.GrantApplication.objects.order_by('-submission_time').select_related(
       'organization', 'grant_cycle')
 
   #filters
-  min_year = datetime.strptime(options['year_min'] + '-01-01 00:00:01',
-                                        '%Y-%m-%d %H:%M:%S')
-  min_year = timezone.make_aware(min_year, timezone.get_current_timezone())
-  max_year = datetime.strptime(options['year_max'] + '-12-31 23:59:59',
-                                        '%Y-%m-%d %H:%M:%S')
-  max_year = timezone.make_aware(max_year, timezone.get_current_timezone())
+  min_year, max_year = get_min_max_year(options)
   apps = apps.filter(submission_time__gte=min_year, submission_time__lte=max_year)
 
   if options.get('organization_name'):
@@ -1350,7 +1347,7 @@ def get_gpg_results(options):
 
   # initial queryset
   gp_awards = models.GivingProjectGrant.objects.select_related(
-      'projectapp__application__organization')
+      'projectapp__application__organization', 'projectapp__giving_project')
 
   # filters
   min_year, max_year = get_min_max_year(options)
@@ -1368,6 +1365,11 @@ def get_gpg_results(options):
 
   if options.get('has_fiscal_sponsor'):
     gp_awards = gp_awards.exclude(projectapp__application__fiscal_org='')
+
+  if options.get('grant_cycle'):
+    gp_awards = gp_awards.filter(projectapp__application__grant_cycle__title__in=options.get('grant_cycle'))
+  if options.get('giving_projects'):
+    gp_awards = gp_awards.filter(projectapp__giving_project__title__in=options.get('giving_projects'))
 
   # fields
   fields = ['check_mailed', 'first_year_amount', 'second_year_amount', 'total_amount',
