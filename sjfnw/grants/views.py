@@ -31,11 +31,11 @@ from sjfnw.grants.utils import local_date_str, find_blobinfo
 
 logger = logging.getLogger('sjfnw')
 
-# CONSTANTS
-
 LOGIN_URL = '/apply/login/'
 
-# PUBLIC ORG VIEWS
+#------------------------------------------------------------------------------
+# Public views
+#------------------------------------------------------------------------------
 
 def org_login(request):
   if request.method == 'POST':
@@ -150,7 +150,9 @@ def cycle_info(request, cycle_id):
       'cycle': cycle, 'content': content or error_display
     })
 
-# REGISTERED ORG VIEWS
+#------------------------------------------------------------------------------
+# Org home
+#------------------------------------------------------------------------------
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
@@ -220,6 +222,54 @@ def org_home(request, org):
     'applied': applied,
     'user_override': user_override
   })
+
+#------------------------------------------------------------------------------
+# Grant application & Year-end report
+#------------------------------------------------------------------------------
+
+def autosave_app(request, cycle_id):
+  """ Save non-file fields to a draft """
+
+  # don't return actual redirect since this is an ajax request
+  if not request.user.is_authenticated():
+    return HttpResponse(LOGIN_URL, status=401)
+
+  username = request.user.username
+
+  # check for staff impersonating an org - override username
+  if request.user.is_staff and request.GET.get('user'):
+    username = request.GET.get('user')
+    logger.info('Staff override - %s logging in as %s', request.user.username, username)
+
+  try:
+    organization = models.Organization.objects.get(email=username)
+    logger.info(organization)
+  except models.Organization.DoesNotExist:
+    return HttpResponse('/apply/nr', status=401)
+
+  cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
+  draft = get_object_or_404(models.DraftGrantApplication,
+      organization=organization, grant_cycle=cycle)
+
+  if request.method == 'POST':
+    curr_user = request.POST.get('user_id')
+
+    #check for simultaneous editing
+    if request.GET.get('force') != 'true':
+      if draft.recently_edited():
+        if draft.modified_by and draft.modified_by != curr_user:
+          # last save wasn't this userid
+          logger.info('Requiring confirmation')
+          return HttpResponse('confirm force', status=409)
+    else:
+      logger.info('Force - skipped check')
+
+    logger.debug('Autosaving')
+    draft.contents = json.dumps(request.POST)
+    draft.modified = timezone.now()
+    draft.modified_by = curr_user
+    draft.save()
+    return HttpResponse('success')
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
@@ -339,139 +389,6 @@ def grant_application(request, organization, cycle_id):
       'user_override': user_override, 'flag': draft.recently_edited() and draft.modified_by
   })
 
-def autosave_app(request, cycle_id):
-  """ Save non-file fields to a draft """
-
-  # don't return actual redirect since this is an ajax request
-  if not request.user.is_authenticated():
-    return HttpResponse(LOGIN_URL, status=401)
-
-  username = request.user.username
-
-  # check for staff impersonating an org - override username
-  if request.user.is_staff and request.GET.get('user'):
-    username = request.GET.get('user')
-    logger.info('Staff override - %s logging in as %s', request.user.username, username)
-
-  try:
-    organization = models.Organization.objects.get(email=username)
-    logger.info(organization)
-  except models.Organization.DoesNotExist:
-    return HttpResponse('/apply/nr', status=401)
-
-  cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
-  draft = get_object_or_404(models.DraftGrantApplication,
-      organization=organization, grant_cycle=cycle)
-
-  if request.method == 'POST':
-    curr_user = request.POST.get('user_id')
-
-    #check for simultaneous editing
-    if request.GET.get('force') != 'true':
-      if draft.recently_edited():
-        if draft.modified_by and draft.modified_by != curr_user:
-          # last save wasn't this userid
-          logger.info('Requiring confirmation')
-          return HttpResponse('confirm force', status=409)
-    else:
-      logger.info('Force - skipped check')
-
-    logger.debug('Autosaving')
-    draft.contents = json.dumps(request.POST)
-    draft.modified = timezone.now()
-    draft.modified_by = curr_user
-    draft.save()
-    return HttpResponse('success')
-
-def add_file(request, draft_type, draft_id):
-  """ Upload a file to a draft
-      Called by javascript in application page """
-
-  if draft_type == 'apply':
-    draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
-    logger.debug(u'%s adding a file', draft.organization)
-
-  elif draft_type == 'report':
-    draft = get_object_or_404(models.YERDraft, pk=draft_id)
-    logger.debug('Adding a file to YER draft %s', draft_id)
-
-  else:
-    logger.error('Invalid draft_type %s for add_file', draft_type)
-    return Http404
-
-  # don't remove this without fixing storage to not access body blob_file = False
-  logger.debug([request.body])
-
-  blob_file = False
-  for key in request.FILES:
-    blob_file = request.FILES[key]
-    if blob_file:
-      if hasattr(draft, key):
-        setattr(draft, key, blob_file)
-        field_name = key
-        break
-      else:
-        logger.error('Tried to add an unknown file field ' + str(key))
-  draft.modified = timezone.now()
-  draft.save()
-
-  if not (blob_file and field_name):
-    return HttpResponse('ERROR') #TODO use status code
-
-  file_urls = get_file_urls(request, draft)
-  # TODO test this replacement:
-  #content = (u'{0} ~~<a href="{1}" target="_blank" title="{2}">{2}</a> '
-  #    '[<a onclick="fileUploads.removeFile(\'{0}\');">remove</a>]').format(
-  #        field_name, file_urls[field_name], blob_file)
-  content = (field_name + u'~~<a href="' + file_urls[field_name] +
-             u'" target="_blank" title="' + unicode(blob_file) + u'">' +
-             unicode(blob_file) + u'</a> [<a onclick="fileUploads.removeFile(\'' +
-             field_name + u'\');">remove</a>]')
-  logger.info(u'add_file returning: ' + content)
-  return HttpResponse(content)
-
-def remove_file(request, draft_type, draft_id, file_field):
-  """ Remove file from draft by setting that field to empty string
-
-      Note: does not delete file from Blobstore, since it could be used
-        in other drafts/apps
-  """
-  if draft_type == 'report':
-    draft_model = models.YERDraft
-  elif draft_type == 'apply':
-    draft_model = models.DraftGrantApplication
-  else:
-    logger.error('Unknown draft type %s', draft_type)
-    return Http404
-
-  draft = get_object_or_404(draft_model, pk=draft_id)
-
-  if hasattr(draft, file_field):
-    setattr(draft, file_field, '')
-    draft.modified = timezone.now()
-    draft.save()
-  else:
-    logger.error('Tried to remove non-existent field: ' + file_field)
-  return HttpResponse('success')
-
-
-def RefreshUploadUrl(request):
-  """ Get a blobstore url for uploading a file """
-
-  # staff override
-  user_override = request.GET.get('user')
-  if user_override:
-    user_override = '?user=' + user_override
-  else:
-    user_override = ''
-
-  draft_id = int(request.GET.get('id'))
-  prefix = request.GET.get('type')
-
-  upload_url = blobstore.create_upload_url('/%s/%d/add-file' % (prefix, draft_id) + user_override)
-  return HttpResponse(upload_url)
-
-
 def autosave_yer(request, award_id):
   """ Autosave a YERDraft """
 
@@ -486,7 +403,6 @@ def autosave_yer(request, award_id):
     draft.modified = timezone.now()
     draft.save()
     return HttpResponse('success')
-
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
@@ -575,11 +491,104 @@ def year_end_report(request, organization, award_id):
       'file_urls': file_urls, 'user_override': user_override, 'yer_period': yer_period
   })
 
+#------------------------------------------------------------------------------
+# File handling
+#------------------------------------------------------------------------------
 
-# ORG COPY DELETE APPS
+def add_file(request, draft_type, draft_id):
+  """ Upload a file to a draft
+      Called by javascript in application page """
+
+  if draft_type == 'apply':
+    draft = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
+    logger.debug(u'%s adding a file', draft.organization)
+
+  elif draft_type == 'report':
+    draft = get_object_or_404(models.YERDraft, pk=draft_id)
+    logger.debug('Adding a file to YER draft %s', draft_id)
+
+  else:
+    logger.error('Invalid draft_type %s for add_file', draft_type)
+    return Http404
+
+  # don't remove this without fixing storage to not access body blob_file = False
+  logger.debug([request.body])
+
+  blob_file = False
+  for key in request.FILES:
+    blob_file = request.FILES[key]
+    if blob_file:
+      if hasattr(draft, key):
+        setattr(draft, key, blob_file)
+        field_name = key
+        break
+      else:
+        logger.error('Tried to add an unknown file field ' + str(key))
+  draft.modified = timezone.now()
+  draft.save()
+
+  if not (blob_file and field_name):
+    return HttpResponse('ERROR') #TODO use status code
+
+  file_urls = get_file_urls(request, draft)
+  # TODO test this replacement:
+  #content = (u'{0} ~~<a href="{1}" target="_blank" title="{2}">{2}</a> '
+  #    '[<a onclick="fileUploads.removeFile(\'{0}\');">remove</a>]').format(
+  #        field_name, file_urls[field_name], blob_file)
+  content = (field_name + u'~~<a href="' + file_urls[field_name] +
+             u'" target="_blank" title="' + unicode(blob_file) + u'">' +
+             unicode(blob_file) + u'</a> [<a onclick="fileUploads.removeFile(\'' +
+             field_name + u'\');">remove</a>]')
+  logger.info(u'add_file returning: ' + content)
+  return HttpResponse(content)
+
+def remove_file(request, draft_type, draft_id, file_field):
+  """ Remove file from draft by setting that field to empty string
+
+      Note: does not delete file from Blobstore, since it could be used
+        in other drafts/apps
+  """
+  if draft_type == 'report':
+    draft_model = models.YERDraft
+  elif draft_type == 'apply':
+    draft_model = models.DraftGrantApplication
+  else:
+    logger.error('Unknown draft type %s', draft_type)
+    return Http404
+
+  draft = get_object_or_404(draft_model, pk=draft_id)
+
+  if hasattr(draft, file_field):
+    setattr(draft, file_field, '')
+    draft.modified = timezone.now()
+    draft.save()
+  else:
+    logger.error('Tried to remove non-existent field: ' + file_field)
+  return HttpResponse('success')
+
+def get_upload_url(request):
+  """ Get a blobstore url for uploading a file """
+
+  # staff override
+  user_override = request.GET.get('user')
+  if user_override:
+    user_override = '?user=' + user_override
+  else:
+    user_override = ''
+
+  draft_id = int(request.GET.get('id'))
+  prefix = request.GET.get('type')
+
+  upload_url = blobstore.create_upload_url('/%s/%d/add-file' % (prefix, draft_id) + user_override)
+  return HttpResponse(upload_url)
+
+#------------------------------------------------------------------------------
+# Org home page tools
+#------------------------------------------------------------------------------
+
 @login_required(login_url=LOGIN_URL)
 @registered_org()
-def CopyApp(request, organization):
+def copy_app(request, organization):
 
   user_override = '?user=' + request.GET.get('user') if request.GET.get('user') else ''
 
@@ -594,14 +603,14 @@ def CopyApp(request, organization):
       try:
         cycle = models.GrantCycle.objects.get(pk=int(new_cycle))
       except models.GrantCycle.DoesNotExist:
-        logger.warning('CopyApp GrantCycle %d not found', new_cycle)
+        logger.warning('copy_app GrantCycle %d not found', new_cycle)
         return render(request, 'grants/copy_app_error.html')
 
       #make sure the combo does not exist already
       new_draft, created = models.DraftGrantApplication.objects.get_or_create(
           organization=organization, grant_cycle=cycle)
       if not created:
-        logger.warning('CopyApp the combo already exists!?')
+        logger.warning('copy_app the combo already exists!?')
         return render(request, 'grants/copy_app_error.html')
 
       #get app/draft and its contents (json format for draft)
@@ -622,7 +631,7 @@ def CopyApp(request, organization):
               )))
           content = json.dumps(content)
         except models.GrantApplication.DoesNotExist:
-          logger.warning('CopyApp - submitted app %s not found', app)
+          logger.warning('copy_app - submitted app %s not found', app)
       elif draft:
         try:
           application = models.DraftGrantApplication.objects.get(pk=int(draft))
@@ -631,9 +640,9 @@ def CopyApp(request, organization):
           logger.info(content)
           content = json.dumps(content)
         except models.DraftGrantApplication.DoesNotExist:
-          logger.warning('CopyApp - draft %s not found', draft)
+          logger.warning('copy_app - draft %s not found', draft)
       else:
-        logger.warning('CopyApp no draft or app...')
+        logger.warning('copy_app no draft or app...')
         return render(request, 'grants/copy_app_error.html')
 
       #set contents & files
@@ -641,7 +650,7 @@ def CopyApp(request, organization):
       for field in application.file_fields():
         setattr(new_draft, field, getattr(application, field))
       new_draft.save()
-      logger.info('CopyApp -- content and files set')
+      logger.info('copy_app -- content and files set')
 
       return redirect('/apply/' + new_cycle + user_override)
 
@@ -664,7 +673,7 @@ def CopyApp(request, organization):
                 {'form': form, 'cycle_count': cycle_count, 'apps_count': apps_count})
 
 @registered_org()
-def DiscardDraft(request, organization, draft_id):
+def discard_draft(request, organization, draft_id):
 
   #look for saved draft
   try:
@@ -767,8 +776,9 @@ def rollover_yer(request, organization):
     form = RolloverYERForm(reports, awards)
     return render(request, 'grants/yer_rollover.html', {'form': form})
 
-
-# VIEW APPS/FILES
+#------------------------------------------------------------------------------
+# View apps/files
+#------------------------------------------------------------------------------
 
 def _view_permission(user, application):
   """ Return a number indicating viewing permission for a submitted app.
@@ -855,10 +865,6 @@ def view_file(request, obj_type, obj_id, field_name):
   obj = get_object_or_404(MODEL_TYPES[obj_type], pk=obj_id)
   return serve_app_file(obj, field_name)
 
-def ViewDraftFile(request, draft_id, field_name):
-  application = get_object_or_404(models.DraftGrantApplication, pk=draft_id)
-  return serve_app_file(application, field_name)
-
 def view_yer(request, report_id):
 
   report = get_object_or_404(models.YearEndReport.objects.select_related(), pk=report_id)
@@ -881,12 +887,11 @@ def view_yer(request, report_id):
     'report': report, 'form': form, 'award': award, 'projectapp': projectapp,
     'file_urls': file_urls, 'perm': perm})
 
-# ADMIN
+#------------------------------------------------------------------------------
+# Admin tools
+#------------------------------------------------------------------------------
 
-def redirect_to_apply(request):
-  return redirect('/apply/')
-
-def AppToDraft(request, app_id):
+def revert_app_to_draft(request, app_id):
 
   submitted_app = get_object_or_404(models.GrantApplication, pk=app_id)
   organization = submitted_app.organization
@@ -919,7 +924,7 @@ def AppToDraft(request, app_id):
   return render(request, 'admin/grants/confirm_revert.html',
                 {'application': submitted_app})
 
-def AdminRollover(request, app_id):
+def admin_rollover(request, app_id):
   application = get_object_or_404(models.GrantApplication, pk=app_id)
   org = application.organization
 
@@ -970,7 +975,7 @@ def show_yer_statuses(request):
 
   return render(request, 'admin/grants/yer_status.html', {'awards': awards})
 
-def Impersonate(request):
+def login_as_org(request):
 
   if request.method == 'POST':
     form = LoginAsOrgForm(request.POST)
@@ -980,11 +985,15 @@ def Impersonate(request):
   form = LoginAsOrgForm()
   return render(request, 'admin/grants/impersonate.html', {'form': form})
 
+#------------------------------------------------------------------------------
+# Reporting
+#------------------------------------------------------------------------------
+
 def grants_report(request):
   """ Handles grant reporting
 
-  Displays all reporting forms
-  Uses report type-specific methods to handle POSTs
+    Displays all reporting forms
+    Uses report-type-specific methods to handle POSTs
   """
 
   app_form = AppReportForm()
@@ -1214,146 +1223,6 @@ def get_app_results(options):
 
   return field_names, results
 
-def get_gpg_results(options):
-  """ Fetch giving project grant report results
-
-  Args:
-    options: cleaned_data from a request.POST-filled instance of AwardReportForm
-
-  Returns:
-    field_names: A list of display-formatted field names.
-      Example: ['Amount', 'Check mailed', 'Organization']
-
-    results: A list of requested values for each award.
-      Example (matching field_names example): [
-          ['10000', '2013-10-23 09:08:56+0:00', 'Fancy pants org'],
-          ['5987', '2011-08-04 09:08:56+0:00', 'Justice League']
-        ]
-  """
-
-  # initial queryset
-  gp_awards = models.GivingProjectGrant.objects.select_related(
-      'projectapp__application__organization')
-
-  # filters
-  min_year, max_year = get_min_max_year(options)
-  gp_awards = gp_awards.filter(created__gte=min_year, created__lte=max_year)
-
-  if options.get('organization_name'):
-    gp_awards = gp_awards.filter(
-        projectapp__application__organization__name__contains=options['organization_name'])
-
-  if options.get('city'):
-    gp_awards = gp_awards.filter(projectapp__application__city=options['city'])
-
-  if options.get('state'):
-    gp_awards = gp_awards.filter(projectapp__application__state__in=options['state'])
-
-  if options.get('has_fiscal_sponsor'):
-    gp_awards = gp_awards.exclude(projectapp__application__fiscal_org='')
-
-  # fields
-  fields = ['check_mailed', 'first_year_amount', 'second_year_amount', 'total_amount',
-            'organization', 'giving_project', 'grant_cycle']
-
-  if options.get('report_check_number'):
-    fields.append('check_number')
-  if options.get('report_date_approved'):
-    fields.append('approved')
-  if options.get('report_agreement_dates'):
-    fields.append('agreement_mailed')
-    fields.append('agreement_returned')
-  if options.get('report_year_end_report_due'):
-    fields.append('year_end_report_due')
-  if options.get('report_support_type'):
-    fields.append('support_type')
-
-  org_fields = options['report_contact'] + options['report_org']
-  if options.get('report_fiscal'):
-    org_fields += models.GrantApplication.fields_starting_with('fiscal')
-    org_fields.remove('fiscal_letter')
-
-  # get values
-  results = []
-  for award in gp_awards:
-    row = []
-    for field in fields:
-      if field == 'organization':
-        row.append(award.projectapp.application.organization.name)
-      elif field == 'grant_cycle':
-        row.append(award.projectapp.application.grant_cycle.title)
-      elif field == 'support_type':
-        row.append(award.projectapp.application.support_type)
-      elif field == 'giving_project':
-        row.append(award.projectapp.giving_project.title)
-      elif field == 'year_end_report_due':
-        row.append(award.yearend_due())
-      elif field == 'first_year_amount':
-        row.append(award.amount)
-      elif field == 'second_year_amount':
-        row.append(award.second_amount or '')
-      elif field == 'total_amount':
-        row.append(award.total_amount())
-      else:
-        row.append(getattr(award, field, ''))
-    for field in org_fields:
-      row.append(getattr(award.projectapp.application.organization, field))
-    results.append(row)
-
-  field_names = [f.capitalize().replace('_', ' ') for f in fields]
-  field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
-
-  return field_names, results
-
-
-def get_sponsored_award_results(options):
-  sponsored = models.SponsoredProgramGrant.objects.select_related('organization')
-
-  min_year, max_year = get_min_max_year(options)
-  sponsored = sponsored.filter(entered__gte=min_year, entered__lte=max_year)
-
-  if options.get('organization_name'):
-    sponsored = sponsored.filter(organization__name__contains=options['organization_name'])
-  if options.get('city'):
-    sponsored = sponsored.filter(organization__city=options['city'])
-  if options.get('state'):
-    sponsored = sponsored.filter(organization__state__in=options['state'])
-  if options.get('has_fiscal_sponsor'):
-    sponsored = sponsored.exclude(organization__fiscal_org='')
-
-  # fields
-  fields = ['check_mailed', 'amount', 'organization']
-  if options.get('report_id'):
-    fields.append('id')
-  if options.get('report_check_number'):
-    fields.append('check_number')
-  if options.get('report_date_approved'):
-    fields.append('approved')
-
-  org_fields = options['report_contact'] + options['report_org']
-  if options.get('report_fiscal'):
-    org_fields += models.GrantApplication.fields_starting_with('fiscal')
-    org_fields.remove('fiscal_letter')
-
-  # get values
-  results = []
-  for award in sponsored:
-    row = []
-    for field in fields:
-      if hasattr(award, field):
-        row.append(getattr(award, field))
-      else:
-        row.append('')
-    for field in org_fields:
-      row.append(getattr(award.organization, field))
-    results.append(row)
-
-  field_names = [f.capitalize().replace('_', ' ') for f in fields]
-  field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
-
-  return field_names, results
-
-
 def get_org_results(options):
   """ Fetch organization report results
 
@@ -1462,80 +1331,143 @@ def get_org_results(options):
 
   return field_names, results
 
-#------------------------------------------------------------------------------
-# CRON
-#------------------------------------------------------------------------------
+def get_gpg_results(options):
+  """ Fetch giving project grant report results
 
-def DraftWarning(request):
-  """ Warn orgs of impending draft freezes
-      NOTE: must run exactly once a day
-      Gives 7 day warning if created 7+ days before close, otherwise 3 day warning """
+  Args:
+    options: cleaned_data from a request.POST-filled instance of AwardReportForm
 
-  drafts = models.DraftGrantApplication.objects.all()
-  eight_days = timedelta(days=8)
+  Returns:
+    field_names: A list of display-formatted field names.
+      Example: ['Amount', 'Check mailed', 'Organization']
 
-  for draft in drafts:
-    time_left = draft.grant_cycle.close - timezone.now()
-    created_delta = draft.grant_cycle.close - draft.created
-    if ((created_delta > eight_days and eight_days > time_left > timedelta(days=7)) or
-        (created_delta < eight_days and timedelta(days=3) > time_left >= timedelta(days=2))):
-      subject, from_email = 'Grant cycle closing soon', c.GRANT_EMAIL
-      to_email = draft.organization.email
-      html_content = render_to_string('grants/email_draft_warning.html', {
-        'org': draft.organization, 'cycle': draft.grant_cycle
-      })
-      text_content = strip_tags(html_content)
-      msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email],
-                                   [c.SUPPORT_EMAIL])
-      msg.attach_alternative(html_content, 'text/html')
-      msg.send()
-      logger.info('Email sent to %s regarding draft application soon to expire', to_email)
-  return HttpResponse('')
+    results: A list of requested values for each award.
+      Example (matching field_names example): [
+          ['10000', '2013-10-23 09:08:56+0:00', 'Fancy pants org'],
+          ['5987', '2011-08-04 09:08:56+0:00', 'Justice League']
+        ]
+  """
 
+  # initial queryset
+  gp_awards = models.GivingProjectGrant.objects.select_related(
+      'projectapp__application__organization')
 
-def yer_reminder_email(request):
-  """ Remind orgs of upcoming year end reports that are due
-      NOTE: Must run exactly once a day
-      Sends reminder emails at 1 month and 1 week """
+  # filters
+  min_year, max_year = get_min_max_year(options)
+  gp_awards = gp_awards.filter(created__gte=min_year, created__lte=max_year)
 
-  # get awards due in 7 or 30 days by agreement_returned date
-  year_ago = timezone.now().date().replace(year=timezone.now().year - 1)
-  award_dates = [year_ago + timedelta(days=30), year_ago + timedelta(days=7)]
-  awards = list(models.GivingProjectGrant.objects.filter(agreement_mailed__in=award_dates))
+  if options.get('organization_name'):
+    gp_awards = gp_awards.filter(
+        projectapp__application__organization__name__contains=options['organization_name'])
 
-  # for multiyear grants, get awards due in 7 or 30 days of second year end report due date
-  two_years_ago = timezone.now().date().replace(year=timezone.now().year - 2)
-  second_award_dates = [two_years_ago + timedelta(days=30), two_years_ago + timedelta(days=7)]
-  second_awards = list(models.GivingProjectGrant.objects
-    .filter(agreement_mailed__in=second_award_dates, second_check_mailed__isnull=False)
-  )
-  total_awards = awards + second_awards
+  if options.get('city'):
+    gp_awards = gp_awards.filter(projectapp__application__city=options['city'])
 
-  return send_yer_email(total_awards, 'grants/email_yer_due.html')
+  if options.get('state'):
+    gp_awards = gp_awards.filter(projectapp__application__state__in=options['state'])
 
+  if options.get('has_fiscal_sponsor'):
+    gp_awards = gp_awards.exclude(projectapp__application__fiscal_org='')
 
-def send_yer_email(awards, template):
+  # fields
+  fields = ['check_mailed', 'first_year_amount', 'second_year_amount', 'total_amount',
+            'organization', 'giving_project', 'grant_cycle']
 
-  for award in awards:
-    if award.yearendreport_set.all().count() < award.grant_length():
-      app = award.projectapp.application
+  if options.get('report_check_number'):
+    fields.append('check_number')
+  if options.get('report_date_approved'):
+    fields.append('approved')
+  if options.get('report_agreement_dates'):
+    fields.append('agreement_mailed')
+    fields.append('agreement_returned')
+  if options.get('report_year_end_report_due'):
+    fields.append('year_end_report_due')
+  if options.get('report_support_type'):
+    fields.append('support_type')
 
-      subject = 'Year end report'
-      from_email = c.GRANT_EMAIL
-      to_email = app.organization.email
-      html_content = render_to_string(template, {
-        'award': award, 'app': app, 'gp': award.projectapp.giving_project,
-        'base_url': c.APP_BASE_URL
-      })
-      text_content = strip_tags(html_content)
+  org_fields = options['report_contact'] + options['report_org']
+  if options.get('report_fiscal'):
+    org_fields += models.GrantApplication.fields_starting_with('fiscal')
+    org_fields.remove('fiscal_letter')
 
-      msg = EmailMultiAlternatives(subject, text_content, from_email,
-                                   [to_email], [c.SUPPORT_EMAIL])
-      msg.attach_alternative(html_content, 'text/html')
-      msg.send()
-      logger.info('YER reminder email sent to %s for award %d', to_email, award.pk)
+  # get values
+  results = []
+  for award in gp_awards:
+    row = []
+    for field in fields:
+      if field == 'organization':
+        row.append(award.projectapp.application.organization.name)
+      elif field == 'grant_cycle':
+        row.append(award.projectapp.application.grant_cycle.title)
+      elif field == 'support_type':
+        row.append(award.projectapp.application.support_type)
+      elif field == 'giving_project':
+        row.append(award.projectapp.giving_project.title)
+      elif field == 'year_end_report_due':
+        row.append(award.yearend_due())
+      elif field == 'first_year_amount':
+        row.append(award.amount)
+      elif field == 'second_year_amount':
+        row.append(award.second_amount or '')
+      elif field == 'total_amount':
+        row.append(award.total_amount())
+      else:
+        row.append(getattr(award, field, ''))
+    for field in org_fields:
+      row.append(getattr(award.projectapp.application.organization, field))
+    results.append(row)
 
-  return HttpResponse('success')
+  field_names = [f.capitalize().replace('_', ' ') for f in fields]
+  field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
+
+  return field_names, results
+
+def get_sponsored_award_results(options):
+  sponsored = models.SponsoredProgramGrant.objects.select_related('organization')
+
+  min_year, max_year = get_min_max_year(options)
+  sponsored = sponsored.filter(entered__gte=min_year, entered__lte=max_year)
+
+  if options.get('organization_name'):
+    sponsored = sponsored.filter(organization__name__contains=options['organization_name'])
+  if options.get('city'):
+    sponsored = sponsored.filter(organization__city=options['city'])
+  if options.get('state'):
+    sponsored = sponsored.filter(organization__state__in=options['state'])
+  if options.get('has_fiscal_sponsor'):
+    sponsored = sponsored.exclude(organization__fiscal_org='')
+
+  # fields
+  fields = ['check_mailed', 'amount', 'organization']
+  if options.get('report_id'):
+    fields.append('id')
+  if options.get('report_check_number'):
+    fields.append('check_number')
+  if options.get('report_date_approved'):
+    fields.append('approved')
+
+  org_fields = options['report_contact'] + options['report_org']
+  if options.get('report_fiscal'):
+    org_fields += models.GrantApplication.fields_starting_with('fiscal')
+    org_fields.remove('fiscal_letter')
+
+  # get values
+  results = []
+  for award in sponsored:
+    row = []
+    for field in fields:
+      if hasattr(award, field):
+        row.append(getattr(award, field))
+      else:
+        row.append('')
+    for field in org_fields:
+      row.append(getattr(award.organization, field))
+    results.append(row)
+
+  field_names = [f.capitalize().replace('_', ' ') for f in fields]
+  field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
+
+  return field_names, results
 
 #------------------------------------------------------------------------------
 # Helpers

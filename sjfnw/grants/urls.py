@@ -16,8 +16,8 @@ apply_urls += patterns('sjfnw.grants.views',
 
   #home page
   (r'^$', 'org_home'),
-  (r'^(?P<draft_id>\d+)/DELETE/?$', 'DiscardDraft'),
-  (r'^copy/?$', 'CopyApp'),
+  (r'^(?P<draft_id>\d+)/DELETE/?$', 'discard_draft'),
+  (r'^copy/?$', 'copy_app'),
   (r'^support/?', 'org_support'),
 
   #application

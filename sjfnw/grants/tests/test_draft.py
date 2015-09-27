@@ -1,12 +1,11 @@
 from django.core import mail
-from django.test.utils import override_settings
 from django.utils import timezone
 
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
 from datetime import timedelta
-import json, unittest, logging
+import json, logging
 logger = logging.getLogger('sjfnw')
 
 
@@ -21,19 +20,17 @@ class DraftExtension(BaseGrantTestCase):
 
     self.assertEqual(0, models.DraftGrantApplication.objects.filter(organization_id=1).count())
 
-    response = self.client.post('/admin/grants/draftgrantapplication/add/',
-                                {'organization': '1', 'grant_cycle': '3',
-                                 'extended_deadline_0': '2013-04-07',
-                                 'extended_deadline_1': '11:19:46'})
+    response = self.client.post('/admin/grants/draftgrantapplication/add/', {
+      'organization': '1', 'grant_cycle': '3', 'extended_deadline_0': '2013-04-07',
+      'extended_deadline_1': '11:19:46'
+    })
 
     self.assertEqual(response.status_code, 302)
     new = models.DraftGrantApplication.objects.get(organization_id=1) #in effect, asserts 1 draft
     self.assertTrue(new.editable)
-    self.assertIn('/admin/grants/draftgrantapplication/', response.__getitem__('location'), )
+    self.assertIn('/admin/grants/draftgrantapplication/',
+                  response.__getitem__('location')) # pylint: disable=no-member
 
-  @unittest.skip('Incomplete')
-  def test_org_drafts_list(self):
-    pass
 
 class Draft(BaseGrantTestCase):
 
@@ -42,15 +39,16 @@ class Draft(BaseGrantTestCase):
     self.log_in_test_org()
 
   def test_autosave1(self):
-    """ scenario: steal contents of draft 2, turn it into a dict. submit that as request.POST for cycle 5
-        verify: draft contents match  """
     complete_draft = models.DraftGrantApplication.objects.get(pk=2)
-    new_draft = models.DraftGrantApplication(organization = models.Organization.objects.get(pk=2), grant_cycle = models.GrantCycle.objects.get(pk=5))
+    new_draft = models.DraftGrantApplication(
+      organization=models.Organization.objects.get(pk=2),
+      grant_cycle=models.GrantCycle.objects.get(pk=5)
+    )
     new_draft.save()
     dic = json.loads(complete_draft.contents)
     #fake a user id like the js would normally do
     dic['user_id'] = 'asdFDHAF34qqhRHFEA'
-    self.maxDiff = None
+    self.maxDiff = None # pylint: disable=invalid-name
 
     response = self.client.post('/apply/5/autosave/', dic)
     self.assertEqual(200, response.status_code)
