@@ -35,38 +35,40 @@ urlpatterns = patterns('',
   (r'^grants/', include(grants_urls)),
   (r'^report/', include(report_urls)),
   (r'^', include(root_urls)),
-  (r'^org/?$', 'sjfnw.grants.views.redirect_to_apply'),
+  (r'^org/?$', RedirectView.as_view(url='/apply/')),
   (r'^logout/?$', 'django.contrib.auth.views.logout', {'next_page': '/apply'}),
-  (r'^get-upload-url/?', 'sjfnw.grants.views.RefreshUploadUrl'), #TODO put this under /apply
+  (r'^get-upload-url/?', 'sjfnw.grants.views.get_upload_url'), #TODO put this under /apply
 
   # admin
   (r'^admin/', include(admin.site.urls)),
-  (r'^admin-advanced/', include(advanced_admin.urls)),
   (r'^admin$', RedirectView.as_view(url='/admin/')),
-  (r'^admin-advanced$', RedirectView.as_view(url='/admin-advanced/')),
-  (r'^admin/grants/grantapplication/(?P<app_id>\d+)/revert', 'sjfnw.grants.views.AppToDraft'),
-  (r'^admin-advanced/grants/grantapplication/(?P<app_id>\d+)/revert',
-      'sjfnw.grants.views.AppToDraft'),
+  (r'^admin/grants/grantapplication/(?P<app_id>\d+)/revert',
+      'sjfnw.grants.views.revert_app_to_draft'),
   (r'^admin/grants/grantapplication/(?P<app_id>\d+)/rollover',
-      'sjfnw.grants.views.AdminRollover'),
-  (r'^admin-advanced/grants/grantapplication/(?P<app_id>\d+)/rollover',
-      'sjfnw.grants.views.AdminRollover'),
-  (r'^admin/grants/organization/login', 'sjfnw.grants.views.Impersonate'),
+      'sjfnw.grants.views.admin_rollover'),
+  (r'^admin/grants/organization/login', 'sjfnw.grants.views.login_as_org'),
   (r'^admin/grants/givingprojectgrant/yer-status', 'sjfnw.grants.views.show_yer_statuses'),
 
-  #reporting
+  (r'^admin-advanced/', include(advanced_admin.urls)),
+  (r'^admin-advanced$', RedirectView.as_view(url='/admin-advanced/')),
+  (r'^admin-advanced/grants/grantapplication/(?P<app_id>\d+)/revert',
+      'sjfnw.grants.views.revert_app_to_draft'),
+  (r'^admin-advanced/grants/grantapplication/(?P<app_id>\d+)/rollover',
+      'sjfnw.grants.views.admin_rollover'),
+
+  # reporting
   (r'^admin/grants/search/?', 'sjfnw.grants.views.grants_report'),
 
   # cron emails
   (r'^mail/overdue-step', 'sjfnw.fund.cron.email_overdue'),
   (r'^mail/new-accounts', 'sjfnw.fund.cron.new_accounts'),
   (r'^mail/gifts', 'sjfnw.fund.cron.gift_notify'),
-  (r'^mail/drafts/?', 'sjfnw.grants.views.DraftWarning'),
-  (r'^mail/yer/?', 'sjfnw.grants.views.yer_reminder_email'),
+  (r'^mail/drafts/?', 'sjfnw.grants.cron.draft_app_warning'),
+  (r'^mail/yer/?', 'sjfnw.grants.cron.yer_reminder_email'),
 
   # dev
   (r'^dev/jslog/?', 'sjfnw.views.log_javascript')
 )
 
-#for dev_appserver
+# for dev_appserver
 urlpatterns += staticfiles_urlpatterns()

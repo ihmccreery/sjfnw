@@ -276,7 +276,7 @@ class YearEndReportReminders(BaseGrantTestCase):
   """ Test reminder email functionality """
 
   projectapp_id = 1
-  url = reverse('sjfnw.grants.views.yer_reminder_email')
+  url = reverse('sjfnw.grants.cron.yer_reminder_email')
 
   def setUp(self):
     super(YearEndReportReminders, self).setUp()
