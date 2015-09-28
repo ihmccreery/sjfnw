@@ -1,4 +1,5 @@
 from django.core import mail
+from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from sjfnw.grants.tests.base import BaseGrantTestCase
@@ -129,3 +130,47 @@ class DraftWarning(BaseGrantTestCase):
     self.client.get('/mail/drafts/')
     self.assertEqual(len(mail.outbox), 0)
 
+
+class DiscardDraft(BaseGrantTestCase):
+
+  url = reverse('sjfnw.grants.views.discard_draft', kwargs={'draft_id': 1})
+
+  def setUp(self):
+    super(DiscardDraft, self).setUp()
+    self.log_in_test_org()
+
+  def test_post(self):
+    self.assertEqual(models.DraftGrantApplication.objects.filter(pk=1).count(), 1)
+
+    response = self.client.post(self.url)
+
+    self.assertEqual(response.status_code, 405)
+    self.assertEqual(response.get('Allow'), 'DELETE')
+    self.assertEqual(models.DraftGrantApplication.objects.filter(pk=1).count(), 1)
+
+  def test_valid_delete(self):
+    self.assertEqual(models.DraftGrantApplication.objects.filter(pk=1).count(), 1)
+
+    response = self.client.delete(self.url)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.content, 'success')
+    self.assertEqual(models.DraftGrantApplication.objects.filter(pk=1).count(), 0)
+
+  def test_draft_not_found(self):
+    self.assertEqual(models.DraftGrantApplication.objects.filter(pk=84).count(), 0)
+
+    response = self.client.delete(
+      reverse('sjfnw.grants.views.discard_draft', kwargs={'draft_id': 84})
+    )
+    self.assertEqual(response.status_code, 404)
+    self.assertEqual(response.content, '')
+
+  def test_wrong_org(self):
+    draft = models.DraftGrantApplication.objects.get(pk=1)
+    draft.organization_id = 1 # it was 2
+    draft.save()
+
+    response = self.client.delete(self.url)
+    self.assertEqual(response.status_code, 400)
+    self.assertEqual(response.content, 'User does not have permission to delete this draft')

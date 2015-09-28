@@ -6,9 +6,18 @@
 <script type="text/javascript">
   // confirmation window before discarding a draft
   function confirmation(draft_pk) {
-    var conf = confirm("Discard this draft for ' + cycle + '? It cannot be recovered.")
+    var conf = confirm("Discard this draft? It cannot be recovered.")
     if (conf) {
-      window.location = '/apply/'+draft_pk+'/DELETE{{ user_override|default:'' }}'
+      $.ajax({
+        url: '/apply/draft/' + draft_pk + '{{ user_override|default:'' }}',
+        type: 'DELETE',
+        error: function(jqXHR, textStatus) {
+          logError({ jqXHR: jqXHR, textStatus: textStatus });
+        },
+        success: function(data, textStatus, jqXHR) {
+          window.location.reload();
+        }
+      });
     }
   }
 </script>
