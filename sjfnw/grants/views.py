@@ -14,6 +14,7 @@ from django.shortcuts import render, render_to_response, get_object_or_404, redi
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.html import strip_tags
+from django.views.decorators.http import require_http_methods
 
 from google.appengine.ext import blobstore
 
@@ -672,22 +673,20 @@ def copy_app(request, organization):
   return render(request, 'grants/org_app_copy.html',
                 {'form': form, 'cycle_count': cycle_count, 'apps_count': apps_count})
 
+@require_http_methods(['DELETE'])
 @registered_org()
 def discard_draft(request, organization, draft_id):
-
-  #look for saved draft
   try:
     saved = models.DraftGrantApplication.objects.get(pk=draft_id)
-    if saved.organization == organization:
-      saved.delete()
-      logger.info('Draft ' + str(draft_id) + ' discarded')
-    else: #trying to delete another person's draft!?
-      logger.warning('Failed attempt to discard draft ' + str(draft_id) +
-                      ' by ' + unicode(organization))
-    return redirect(org_home)
   except models.DraftGrantApplication.DoesNotExist:
-    logger.error(str(request.user) + ' discard nonexistent draft')
-    raise Http404
+    return HttpResponse(status=404)
+  else:
+    if saved.organization != organization:
+      logger.warning(u'Failed attempt to discard draft %d by %s', draft_id, organization)
+      return HttpResponse(status=400, content='User does not have permission to delete this draft')
+    saved.delete()
+    logger.info('Draft %d  discarded', draft_id)
+    return HttpResponse('success')
 
 
 @login_required(login_url=LOGIN_URL)
