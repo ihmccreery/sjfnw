@@ -21,6 +21,6 @@ Browse code coverage on [codecov](https://codecov.io/github/aisapatino/sjfnw) (m
 
 To check test coverage locally, install [coverage.py](http://nedbatchelder.com/code/coverage/), then do
 
-`./scripts/coverage.sh`
+`./scripts/coverage`
 
 then open `./coverage-html/index.html`

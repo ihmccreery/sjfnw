@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+green='\e[1;32m'
+red='\e[1;31m'
+bold='\e[1m'
+reset='\e[m'
+
+semver='\([0-9]\+.[0-9]\+.[0-9]\+\)'
+
+echo -e "Checking installation...\n"
+
+has_error=0
+
+check_version() {
+  if [ $(expr "$version" : '.*not found') -gt 0 ] ; then
+    has_error=1
+    echo -e "$red$prefix: not found$reset"
+  else
+    local version_semver=$(expr "$version" : "$match")
+    if [ "$version_semver" = "" ] ; then
+      has_error=1
+      echo -e "$red$prefix: could not parse current version.$reset. Output: $version $valid"
+    elif [ $(expr "$version_semver" : "$match_valid") -gt 0 ] ; then
+      echo -e "$green$prefix: $version_semver $reset$valid"
+    else
+      has_error=1
+      echo -e "$red$prefix: wrong version $version_semver $reset$valid"
+    fi
+  fi
+}
+
+# Python 2.7
+
+prefix='Python'
+valid='(required: 2.7.x)'
+match="Python $semver"
+match_valid='^2.7'
+version="$(python --version 2>&1)"
+check_version
+
+# pip
+
+prefix='pip'
+valid='(required: any)'
+match="pip $semver"
+match_valid='^[0-9]'
+version="$(pip --version 2>&1)"
+check_version
+
+# Mysql 5.5/6
+
+prefix='Mysql'
+valid='(required: 5.5.x or 5.6.x)'
+match="mysql.*Distrib $semver"
+match_valid='^5.[5-6]'
+version="$(mysql --version 2>&1)"
+check_version
+
+# GAE
+prefix='Google AppEngine SDK'
+onpath=$(expr "$PATH" : '.*google_appengine')
+onpythonpath=$(expr "$PYTHONPATH" : '.*google_appengine')
+if [[ $onpath -gt 0 && onpythonpath -gt 0 ]] ; then
+  echo -e "$green$prefix$reset: Found in PATH and PYTHONPATH"
+else
+  has_error=1
+  if [ $onpath -gt 0 ] ; then
+    echo -e "$red$prefix$reset: Missing from PYTHONPATH"
+  elif [ $onpythonpath -gt 0 ] ; then
+    echo -e "$red$prefix$reset: Missing from PATH"
+  else
+    echo -e "$red$prefix$reset: Missing from PATH and PYTHONPATH"
+  fi
+ fi
+
+# Libs
+lib_missing=0
+echo -e "\nChecking libs..."
+cd "$(dirname "$0")/.."
+for dir in 'django' 'pytz' 'unicodecsv' ; do
+  if [ -d "./libs/$dir" ] ; then
+    echo -e "  - $green$dir: found$reset"
+  else
+    lib_missing=1
+    echo -e "  - $red$dir: not found$reset"
+  fi
+done
+
+if [ $has_error -gt 0 ] ; then
+  echo -e "\n$red✘$reset$bold One or more errors were detected.\n\nFor a step-by-step guide to installation, check the docs:\nhttp://aisapatino.github.io/sjfnw/getting-started/installation-and-setup/"
+elif [ $lib_missing -gt 0 ] ; then
+  echo -e "\n$red✘$reset$bold Missing one or more libraries. Run ./install-libs\n"
+else
+  echo -e "\n$green✔$reset$bold Basic installation checks passed.\n"
+fi
