@@ -65,7 +65,7 @@ class CheckMultiple(forms.widgets.CheckboxSelectMultiple):
         '\', false)">none</a>]' + rendered)
 
 
-class RolloverForm(forms.Form): #used by org
+class RolloverForm(forms.Form):
   """ Used by organizations to copy a draft or app into another grant cycle
 
   Fields (created on init):
@@ -108,22 +108,26 @@ class RolloverForm(forms.Form): #used by org
     cycle = cleaned_data.get('cycle')
     application = cleaned_data.get('application')
     draft = cleaned_data.get('draft')
+
     if not cycle:
       self._errors['cycle'] = self.error_class(['Required.'])
-    else: #check cycle is still open
+    else:
       try:
         cycle_obj = GrantCycle.objects.get(pk=int(cycle))
       except GrantCycle.DoesNotExist:
         logger.error('RolloverForm submitted cycle does not exist')
         self._errors['cycle'] = self.error_class(
-            ['Internal error, please try again.'])
+            ['Grant cycle could not be found. Please refresh the page and try again.'])
+
       if not cycle_obj.is_open:
         self._errors['cycle'] = self.error_class(
             ['That cycle has closed.  Select a different one.'])
+
     if not draft and not application:
       self._errors['draft'] = self.error_class(['Select one.'])
     elif draft and application:
       self._errors['draft'] = self.error_class(['Select only one.'])
+
     return cleaned_data
 
 class AdminRolloverForm(forms.Form):

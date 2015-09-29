@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
 
-import logging, unittest
+import logging
 logger = logging.getLogger('sjfnw')
 
 
@@ -98,6 +98,8 @@ class AdminRevert(BaseGrantTestCase):
     self.assert_draft_matches_app(draft, app)
 
 class AdminRollover(BaseGrantTestCase):
+
+  url = reverse('sjfnw.grants.views.admin_rollover', kwargs={'app_id': 1})
 
   def setUp(self):
     super(AdminRollover, self).setUp()
