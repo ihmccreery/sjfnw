@@ -943,7 +943,8 @@ def admin_rollover(request, app_id):
       return redirect('/admin/grants/grantapplication/'+str(application.pk)+'/')
   else:
     form = AdminRolloverForm(org)
-    cycle_count = str(form['cycle']).count('<option value')
+
+  cycle_count = str(form['cycle']).count('<option value')
 
   return render(request, 'admin/grants/rollover.html',
                 {'form': form, 'application': application, 'count': cycle_count})

@@ -1,3 +1,5 @@
+from django.core.urlresolvers import reverse
+
 from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
 
@@ -95,9 +97,63 @@ class AdminRevert(BaseGrantTestCase):
     draft = models.DraftGrantApplication.objects.get(organization_id=2, grant_cycle_id=1)
     self.assert_draft_matches_app(draft, app)
 
-@unittest.skip('Incomplete')
 class AdminRollover(BaseGrantTestCase):
 
   def setUp(self):
     super(AdminRollover, self).setUp()
     self.log_in_admin()
+
+  def test_unknown_app(self):
+    response = self.client.post(reverse('sjfnw.grants.views.admin_rollover',
+                                        kwargs={'app_id': 101}))
+    self.assertEqual(response.status_code, 404)
+
+  def test_unknown_cycle(self):
+    response = self.client.post(
+      reverse('sjfnw.grants.views.admin_rollover', kwargs={'app_id': 1}),
+      data={'cycle': u'99'}
+    )
+    self.assertEqual(response.status_code, 200)
+    self.assertIn('Select a valid choice', response.context['form']._errors['cycle'][0])
+
+  def test_app_exists(self):
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=1).count(), 1)
+    response = self.client.post(
+      reverse('sjfnw.grants.views.admin_rollover', kwargs={'app_id': 2}),
+      data={'cycle': u'1'}
+    )
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=1).count(), 1)
+    self.assertFalse(response.context['form'].is_valid())
+
+  def test_draft_exists(self):
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=3).count(), 0)
+    self.assertEqual(models.DraftGrantApplication.objects.filter(grant_cycle_id=3).count(), 1)
+    response = self.client.post(
+      reverse('sjfnw.grants.views.admin_rollover', kwargs={'app_id': 2}),
+      data={'cycle': u'3'}
+    )
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=3).count(), 0)
+    self.assertEqual(models.DraftGrantApplication.objects.filter(grant_cycle_id=3).count(), 1)
+    self.assertFalse(response.context['form'].is_valid())
+
+  def test_cycle_closed(self):
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=4).count(), 0)
+    response = self.client.post(
+      reverse('sjfnw.grants.views.admin_rollover', kwargs={'app_id': 2}),
+      data={'cycle': u'4'}
+    )
+    self.assertEqual(response.status_code, 302)
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=4).count(), 1)
+
+  def test_cycle_open(self):
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=2).count(), 0)
+    response = self.client.post(
+      reverse('sjfnw.grants.views.admin_rollover', kwargs={'app_id': 2}),
+      data={'cycle': u'6'}
+    )
+    print(response)
+    self.assertEqual(response.status_code, 302)
+    self.assertRegexpMatches(response.get('Location'), r'/admin/grants/grantapplication/\d/$')
+    self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=6).count(), 1)

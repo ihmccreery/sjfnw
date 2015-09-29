@@ -1,5 +1,4 @@
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 from django.utils import timezone
 
 from sjfnw.grants.tests.base import BaseGrantTestCase
@@ -30,7 +29,7 @@ class OrgHomeAwards(BaseGrantTestCase):
 
   def test_early(self):
     """ org has an award, but agreement has not been mailed. verify not shown """
-    award = models.GivingProjectGrant(projectapp_id = 1, amount = 9000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=9000)
     award.save()
 
     response = self.client.get(self.url)
@@ -40,8 +39,8 @@ class OrgHomeAwards(BaseGrantTestCase):
 
   def test_sent(self):
     """ org has award, agreement mailed. verify shown """
-    award = models.GivingProjectGrant(projectapp_id = 1, amount = 9000,
-        agreement_mailed = timezone.now()-timedelta(days=1))
+    award = models.GivingProjectGrant(projectapp_id=1, amount=9000,
+        agreement_mailed=timezone.now()-timedelta(days=1))
     award.save()
 
     response = self.client.get(self.url)
@@ -77,7 +76,7 @@ class OrgRollover(BaseGrantTestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
     self.assertEqual(1, models.DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
-    new_draft = models.DraftGrantApplication.objects.get(organization_id = 1, grant_cycle_id = 1)
+    new_draft = models.DraftGrantApplication.objects.get(organization_id=1, grant_cycle_id=1)
     old_contents = json.loads(draft.contents) # TODO could this use the compare function defined in base?
     old_cycle_q = old_contents.pop('cycle_question', None)
     new_contents = json.loads(new_draft.contents)
