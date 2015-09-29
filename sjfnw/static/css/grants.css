@@ -1,37 +1,31 @@
-/**  base  **/
+/*---------------------------------- Base -----------------------------------*/
 
-#nav_menu  {
-	text-align:center;
-	margin-bottom:20px;
+#nav-menu  {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 #logo {
-	display:inline-block;
-	margin-left:20px;
-	margin-right:20px;
+  display: inline-block;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
-#org_wrapper {
-	width:725px;
-	margin-left:auto;
-	margin-right:auto;
+#org-wrapper {
+  width: 725px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-#org_wrapper ul{
-	padding-left:30px;
+#org-wrapper ul {
+  padding-left: 30px;
 }
 
-#org_footer {
-	width:100%;
-	font-size:1em;
-  padding: 1em 0;
-}
+/*-------------------------------- Home page --------------------------------*/
 
-/**  home page  **/
-
-#org_wrapper li {
-  margin-top:5px;
-  margin-bottom:5px;
+#org-wrapper li {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .inactive {
@@ -42,21 +36,21 @@ table.org {
   width: 100%;
 }
 
-table.org td{
+table.org td {
   padding: 0 10px 5px 0;
 }
 
 .home-section {
-  border:1px solid black;
+  border: 1px solid black;
   padding: 0 10px 10px 10px;
-  margin-bottom:20px;
+  margin-bottom: 20px;
 }
 
 .home-section h3 {
-  display:inline-block;
+  display: inline-block;
   margin: -.5em 0 .5em 0;
-  padding:0 10px 0 10px;
-  background:white;
+  padding: 0 10px 0 10px;
+  background: white;
 }
 
 .due {
@@ -67,14 +61,13 @@ table.org td{
   content: ' • ';
 }
 
-/** general **/
+/*-------------------------------- General ----------------------------------*/
 
 div.formwrapper {
-	width:725px;
-	/*border:1px solid;*/
-	border-color:#CCC;
+  width: 725px;
+  border-color:#CCC;
   word-wrap: break-word;
-  line-height:120%;
+  line-height: 120%;
 }
 
 div.formwrapper h1 {
@@ -82,34 +75,33 @@ div.formwrapper h1 {
 }
 
 #application_form {
-	margin-top:5px;
-  width:100%;
-  border:1px solid black;
-  padding-left:4px;
+  margin-top: 5px;
+  width: 100%;
+  border: 1px solid black;
+  padding-left: 4px;
 }
 
-#application_form td{
-	width:360px;
+#application_form td {
+  width: 360px;
 }
 
-#application_form h4{
-	margin-top:.5em;
+#application_form h4 {
+  margin-top:.5em;
 }
 
 label {
-	margin-right:8px;
+  margin-right: 8px;
 }
 
-/** info/errors **/
+/*------------------------------ Info/errors --------------------------------*/
 
-#org_wrapper ul.errorlist, ul.errorlist li {
-	list-style-type: none;
-	font-style:italic;
-	color:red;
-	margin:0 0 0 0;
-	/* vertical-align:bottom; */
-	padding:0px;
-  display:inline;
+#org-wrapper ul.errorlist, ul.errorlist li {
+  list-style-type: none;
+  font-style: italic;
+  color: red;
+  margin: 0;
+  padding: 0;
+  display: inline;
 }
 
 #file-uploads ul.errorlist {
@@ -117,18 +109,18 @@ label {
 }
 
 div.form_error {
-  font-style:italic;
-	color:red;
+  font-style: italic;
+  color: red;
 }
 
 #last_saved {
-	font-style:italic;
+  font-style: italic;
 }
 
 #autofilled {
-  cursor:help;
-  float:right;
-  margin-right:15px;
+  cursor: help;
+  float: right;
+  margin-right: 15px;
 }
 
 .has-more-info {
@@ -137,14 +129,14 @@ div.form_error {
   padding-right: 12px;
 }
 
-.has-more-info:hover {
+.has-more-info: hover {
   cursor: help;
   text-decoration: underline;
 }
 
 .more-info {
   position: absolute;
-  z-index:2;
+  z-index: 2;
   padding: 8px;
   margin: -80px 0 0 350px;
   width: 400px;
@@ -163,11 +155,11 @@ div.form_error {
 /** specific field/input types **/
 
 textarea {
-  font-family:Arial, sans-serif;
-  width:99%;
-  resize:vertical;
-  font-size:inherit;
-  overflow:hidden;
+  font-family: Arial, sans-serif;
+  width: 99%;
+  resize: vertical;
+  font-size: inherit;
+  overflow: hidden;
 }
 
 #file-uploads tr {
@@ -175,92 +167,92 @@ textarea {
 }
 
 div.formwrapper input[type="text"] {
-  width:140px;
+  width: 140px;
 }
 
-/** jquery ui dialog **/
+/*---------------------------- jQueryUI dialog ------------------------------*/
 
 .ui-widget-overlay {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: #aaaaaa;
-	opacity: .3;
+  opacity: .3;
 }
 
 div.ui-dialog {
-  position:fixed;
-  background-color:white;
-  border:2px outset #8B0E04;
-  padding:5px;
+  position: fixed;
+  background-color: white;
+  border: 2px outset #8B0E04;
+  padding: 5px;
 }
 
 .ui-dialog-titlebar {
-  width:100%;
-  text-align:center;
-  font-size:1.2em;
-  font-weight:bold;
-  margin-bottom:.5em;
+  width: 100%;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: .5em;
 }
 
 .ui-dialog-buttonset {
-  text-align:center;
-  margin-top:5px;
+  text-align: center;
+  margin-top: 5px;
 }
 
 .ui-dialog-titlebar-close {
-  display:none;
+  display: none;
 }
 
-/** narratives **/
+/*------------------------------- Narratives --------------------------------*/
 
 div.narrative_q {
-  margin-top:2em;
+  margin-top: 2em;
 }
 
 table.narrative_references {
-  padding-top:15px;
+  padding-top: 15px;
 }
 
 table.narrative_references .main_row {
-  height:27px;
-  vertical-align:bottom;
+  height: 27px;
+  vertical-align: bottom;
 }
 
 table.narrative_references .label {
-  padding-left:2px;
+  padding-left: 2px;
 }
 
 span.char_counter_ok, span.char_counter_over {
-  float:right;
-  padding-right:2%; /* to match text boxes */
+  float: right;
+  padding-right: 2%; /* to match text boxes */
 }
 
 span.char_counter_over {
-	color:red;
+  color: red;
 }
 
-/** timeline **/
+/*-------------------------------- Timeline ---------------------------------*/
 
 #timeline_form {
-  margin-top:10px;
-  border-spacing:0;
-  width:100%;
+  margin-top: 10px;
+  border-spacing: 0;
+  width: 100%;
 }
 
 #timeline_form th {
-  font-weight:normal
+  font-weight: normal;
 }
 
-#timeline_form tr.heading th{
-  padding-bottom:2px;
+#timeline_form tr.heading th {
+  padding-bottom: 2px;
 }
 
-/** file uploads **/
+/*------------------------------ File uploads -------------------------------*/
 
-span.file_wrapper { // outermost element 
+span.file_wrapper { /* outermost element */
   overflow: hidden;
   position: relative;
   width: 100px;
@@ -274,7 +266,7 @@ span.file_wrapper { // outermost element
   position: absolute;
   top: 0;
   right: 0;
-  left:0;
+  left: 0;
 }
 
 .default-file-input input {
@@ -282,20 +274,18 @@ span.file_wrapper { // outermost element
   position: absolute;
   top: 0;
   right: 0;
-  left:0;
+  left: 0;
   cursor: pointer;
-  font-size:2em;
-  width:84px;
-
+  font-size: 2em;
+  width: 84px;
 }
-
 
 span.upload_button {
   cursor: pointer;
   padding: 0px 8px;
-  appearance:button;
-  -moz-appearance:button; /* Firefox */
-  -webkit-appearance:button; /* Safari and Chrome */
+  appearance: button;
+  -moz-appearance: button; /* Firefox */
+  -webkit-appearance: button; /* Safari and Chrome */
   -o-appearance: button; /* Opera */
   color: buttontext; /* IE */
   background-color: buttonface; /* IE */
@@ -303,98 +293,96 @@ span.upload_button {
 }
 
 form.files_form {
-  margin:0;
+  margin: 0;
 }
 
 iframe.upload {
-  height:0;
-  width:0;
-  border:none;
+  height: 0;
+  width: 0;
+  border: none;
 }
 
-#file_upload_table td{
-  line-height:2em;
-  white-space:nowrap;
-  overflow:ellipsis;
-  vertical-align:middle;
+#file_upload_table td {
+  line-height: 2em;
+  white-space: nowrap;
+  overflow: ellipsis;
+  vertical-align: middle;
 }
 
-/** other specific fields **/
+/*-------------------------- Other specific fields ---------------------------*/
 
 #id_contact_person, #id_previous_grants, #id_fiscal_address {
-	width:300px;
+  width: 300px;
 }
 
 #id_ein {
-	width:100px;
+  width: 100px;
 }
 
 div.vertical_cushion { /* mission & grant req labels */
-  margin-top:5px;
-  margin-bottom:5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
-
-/** submit button **/
 
 .submit {
-  font-size:135%;
-  font-weight:bold;
+  font-size: 135%;
+  font-weight: bold;
 }
 
 
-/**  cycle info pages  **/
+/*----------------------------- Cycle info page -----------------------------*/
 
 .info-frame {
   margin-bottom: 3em;
 }
 
 .apply-now {
-  margin-top:20px;
-  font-size:135%;
-  font-weight:bold;
+  margin-top: 20px;
+  font-size: 135%;
+  font-weight: bold;
 }
 
-/**  grant reading  **/
+/*------------------------------ Grant reading ------------------------------*/
 
-div.reading_sidebar{
-  width:255px;
-  border-right:1px solid black;
-  position:fixed;
-  height:100%;
+div.reading_sidebar {
+  width: 255px;
+  border-right: 1px solid black;
+  position: fixed;
+  height: 100%;
 }
 
-div.reading_pane{
-  margin-left:265px;
-  height:100%;
+div.reading_pane {
+  margin-left: 265px;
+  height: 100%;
 }
 
-#main_content{
-  width:725px;
+#main_content {
+  width: 725px;
 }
 
-#main_content label{
-  font-weight:bold;
+#main_content label {
+  font-weight: bold;
 }
 
-#reading_frame{
-  border:none;
-  width:100%;
-  height:100%;
+#reading_frame {
+  border: none;
+  width: 100%;
+  height: 100%;
 }
 
-div.title{
-  text-align:center;
-  padding-bottom:5px;
-  border-bottom:1px solid black;
+div.title {
+  text-align: center;
+  padding-bottom: 5px;
+  border-bottom: 1px solid black;
 }
 
-div.heading_sm_margin{
-  font-size:1.3em;
-  font-weight:bold;
+div.heading_sm_margin {
+  font-size: 1.3em;
+  font-weight: bold;
   margin-bottom:.25em;
 }
 
-div.contents{
+div.contents {
   padding: 20px 0 0 10px;
   font-size: 1.2em;
   line-height: 1.3em;
@@ -403,48 +391,48 @@ div.contents{
 }
 
 img.print {
-  vertical-align:middle;
-  padding-right:5px;
-  float:right;
+  vertical-align: middle;
+  padding-right: 5px;
+  float: right;
 }
 
-ol.contents{
-  margin-top:0;
+ol.contents {
+  margin-top: 0;
 }
 
 #timeline_display {
-  margin:auto;
-  padding:0 5px;
-  border:1px solid black;
-  text-align:left;
-  border-collapse:collapse;
+  margin: auto;
+  padding: 0 5px;
+  border: 1px solid black;
+  text-align: left;
+  border-collapse: collapse;
 }
 
 #timeline_display th, #timeline_display td {
-  font-weight:normal;
-  border:1px solid black;
-  padding:5px 10px;
+  font-weight: normal;
+  border: 1px solid black;
+  padding: 5px 10px;
 }
 
-/**  rollover page  **/
+/*-------------------------------- Rollover ---------------------------------*/
 
 #rollover_form {
-  width:100%;
+  width: 100%;
 }
 
 #rollover_form select {
-  margin-top:10px;
-  margin-left:16px;
+  margin-top: 10px;
+  margin-left: 16px;
 }
 
 #rollover_form input[type="submit"] {
-  font-size:1.2em;
-  width:75px;
+  font-size: 1.2em;
+  width: 75px;
   margin: 15px auto;
-  display:block;
+  display: block;
 }
 
-/** yer form **/
+/*-------------------------- Year end report form ---------------------------*/
 
 div.narrative_q label {
   display: block;
@@ -481,4 +469,3 @@ div.narrative_q label {
 .file-uploads label {
   padding: 1em 0;
 }
-

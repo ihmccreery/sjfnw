@@ -919,9 +919,7 @@ def revert_app_to_draft(request, app_id):
     submitted_app.delete()
     #redirect to draft page
     return redirect('/admin/grants/draftgrantapplication/'+str(draft.pk)+'/')
-  #GET
-  return render(request, 'admin/grants/confirm_revert.html',
-                {'application': submitted_app})
+  return render(request, 'admin/grants/confirm_revert.html', {'application': submitted_app})
 
 def admin_rollover(request, app_id):
   application = get_object_or_404(models.GrantApplication, pk=app_id)
@@ -931,8 +929,7 @@ def admin_rollover(request, app_id):
     form = AdminRolloverForm(org, request.POST)
     if form.is_valid():
       cycle = get_object_or_404(models.GrantCycle, pk=int(form.cleaned_data['cycle']))
-      logger.info('Success rollover of ' + unicode(application) +
-                   ' to ' + str(cycle))
+      logger.info(u'Successful rollover of %s to %s', application, cycle)
       application.pk = None # this + save makes new copy
       application.pre_screening_status = 10
       application.submission_time = timezone.now()
@@ -940,14 +937,15 @@ def admin_rollover(request, app_id):
       application.cycle_question = ''
       application.budget = ''
       application.save()
-      return redirect('/admin/grants/grantapplication/'+str(application.pk)+'/')
+      return redirect('/admin/grants/grantapplication/' + str(application.pk) + '/')
   else:
     form = AdminRolloverForm(org)
 
   cycle_count = str(form['cycle']).count('<option value')
 
-  return render(request, 'admin/grants/rollover.html',
-                {'form': form, 'application': application, 'count': cycle_count})
+  return render(request, 'admin/grants/rollover.html', {
+    'form': form, 'application': application, 'count': cycle_count
+  })
 
 def show_yer_statuses(request):
   awards = (models.GivingProjectGrant.objects
