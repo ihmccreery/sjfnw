@@ -58,7 +58,7 @@ If you don't have it, you can [install it directly](https://pip.pypa.io/en/stabl
 
 ##### Install dependencies
 
-`pip install -r requirements.txt -t libs`
+`./scripts/install-libs`
 
 This will install everything listed in `requirements.txt` into the `libs` folder.
 
@@ -71,4 +71,24 @@ export PATH=$PATH:/[path to gae]
 export PYTHONPATH=$PYTHONPATH:[path to gae]
 export PYTHONPATH=$PYTHONPATH:[path to gae]/lib/webob-1.2.3
 export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
+```
+
+#### Verify
+
+Run `./scripts/verify-install` to verify that you've installed everything successfully. It doesn't verify everything (for instance, database setup), but can check the basics. You should see output like this:
+
+```
+Checking installation...
+
+Python: 2.7.6 (required: 2.7.x)
+pip: 7.1.2 (required: any)
+Mysql: 5.5.44 (required: 5.5.x or 5.6.x)
+Google AppEngine SDK: Found in PATH and PYTHONPATH
+
+Checking libs...
+  - django: found
+  - pytz: found
+  - unicodecsv: found
+
+✔ Basic installation checks passed.
 ```

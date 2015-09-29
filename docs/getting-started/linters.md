@@ -14,8 +14,8 @@ The repo is set up to use [pylint](http://www.pylint.org/) and [eslint](http://e
 See [text editor setup](text-editor-setup.md) for more info.
 
 #### Usage - CLI
-  - To lint the whole project: `./scripts/lint.sh`
-  - That will output results to the console. If you want to save results to a file, you can do `./scripts/lint.sh > filename.txt`
+  - To lint the whole project: `./scripts/lint`
+  - That will output results to the console. If you want to save results to a file, you can do `./scripts/lint > filename.txt`
 
 #### Configuration
 
