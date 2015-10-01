@@ -60,7 +60,7 @@ class BlobstoreFileUploadHandler(FileUploadHandler):
       charset=self.charset)
 
 
-class BlobstoreStorage(Storage): # pylint: disable=abstract-class-not-used
+class BlobstoreStorage(Storage):
   """ Google App Engine Blobstore storage backend """
 
   def _open(self, name, mode='rb'):
