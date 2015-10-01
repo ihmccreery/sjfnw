@@ -37,7 +37,7 @@ def find_blobinfo(file_field, hide_errors=False):
       return blobinfo
 
   if hide_errors:
-    return False
+    return
   else:
     raise Http404('Blobinfo not found')
 
@@ -47,7 +47,7 @@ def delete_blob(file_field):
     return
 
   blobinfo = find_blobinfo(file_field, hide_errors=True)
-  if blobinfo:
+  if blobinfo is not None:
     blobinfo.delete()
     logger.info('Blob deleted')
     return HttpResponse('deleted')
