@@ -94,7 +94,6 @@ class MembershipInline(admin.TabularInline):
   model = Membership
   formset = forms.MembershipInlineFormset
   extra = 0
-  can_delete = False
   fields = ['member', 'giving_project', 'approved', 'leader']
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
