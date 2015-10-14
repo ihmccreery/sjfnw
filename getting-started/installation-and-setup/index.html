@@ -312,8 +312,22 @@ export PYTHONPATH=$PYTHONPATH:[path to gae]/lib/webob-1.2.3
 export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
 </code></pre>
 
-<h2 id="verify">Verify</h2>
-<p>Run <code>./scripts/verify-install</code> to check that you have installed everything successfully. It doesn't check everything, but does cover the basics.</p>
+<h4 id="verify">Verify</h4>
+<p>Run <code>./scripts/verify-install</code> to verify that you've installed everything successfully. It doesn't verify everything (for instance, database setup), but can check the basics. You should see output like this:</p>
+<pre><code>Checking installation...
+
+Python: 2.7.6 (required: 2.7.x)
+pip: 7.1.2 (required: any)
+Mysql: 5.5.44 (required: 5.5.x or 5.6.x)
+Google AppEngine SDK: Found in PATH and PYTHONPATH
+
+Checking libs...
+  - django: found
+  - pytz: found
+  - unicodecsv: found
+
+✔ Basic installation checks passed.
+</code></pre>
         </div>
       
 
