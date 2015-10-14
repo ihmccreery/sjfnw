@@ -1,32 +1,5 @@
 [
 {
-  "pk": 3,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 280,
-    "giving_project": 19,
-    "screening_status": null
-  }
-},
-{
-  "pk": 5,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 274,
-    "giving_project": 12,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 6,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 222,
-    "giving_project": 13,
-    "screening_status": 90
-  }
-},
-{
   "pk": 7,
   "model": "grants.projectapp",
   "fields": {
@@ -42,15 +15,6 @@
     "application": 71,
     "giving_project": 10,
     "screening_status": 80
-  }
-},
-{
-  "pk": 9,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 198,
-    "giving_project": 16,
-    "screening_status": null
   }
 },
 {
@@ -81,33 +45,6 @@
   }
 },
 {
-  "pk": 13,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 260,
-    "giving_project": 13,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 14,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 243,
-    "giving_project": 12,
-    "screening_status": 80
-  }
-},
-{
-  "pk": 15,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 305,
-    "giving_project": 14,
-    "screening_status": 90
-  }
-},
-{
   "pk": 16,
   "model": "grants.projectapp",
   "fields": {
@@ -126,47 +63,11 @@
   }
 },
 {
-  "pk": 18,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 199,
-    "giving_project": 16,
-    "screening_status": null
-  }
-},
-{
   "pk": 19,
   "model": "grants.projectapp",
   "fields": {
     "application": 72,
     "giving_project": 10,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 20,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 236,
-    "giving_project": 12,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 21,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 306,
-    "giving_project": 14,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 22,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 304,
-    "giving_project": 19,
     "screening_status": 90
   }
 },
@@ -189,33 +90,6 @@
   }
 },
 {
-  "pk": 25,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 259,
-    "giving_project": 13,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 26,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 275,
-    "giving_project": 12,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 27,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 291,
-    "giving_project": 19,
-    "screening_status": 90
-  }
-},
-{
   "pk": 28,
   "model": "grants.projectapp",
   "fields": {
@@ -234,30 +108,12 @@
   }
 },
 {
-  "pk": 30,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 278,
-    "giving_project": 19,
-    "screening_status": null
-  }
-},
-{
   "pk": 31,
   "model": "grants.projectapp",
   "fields": {
     "application": 95,
     "giving_project": 10,
     "screening_status": 80
-  }
-},
-{
-  "pk": 32,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 251,
-    "giving_project": 16,
-    "screening_status": null
   }
 },
 {
@@ -288,30 +144,12 @@
   }
 },
 {
-  "pk": 36,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 271,
-    "giving_project": 11,
-    "screening_status": 90
-  }
-},
-{
   "pk": 37,
   "model": "grants.projectapp",
   "fields": {
     "application": 103,
     "giving_project": 12,
     "screening_status": 60
-  }
-},
-{
-  "pk": 38,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 307,
-    "giving_project": 14,
-    "screening_status": 90
   }
 },
 {
@@ -330,24 +168,6 @@
     "application": 47,
     "giving_project": 9,
     "screening_status": 90
-  }
-},
-{
-  "pk": 41,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 195,
-    "giving_project": 16,
-    "screening_status": null
-  }
-},
-{
-  "pk": 42,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 19,
-    "giving_project": 16,
-    "screening_status": null
   }
 },
 {
@@ -383,24 +203,6 @@
   "fields": {
     "application": 80,
     "giving_project": 10,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 47,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 226,
-    "giving_project": 16,
-    "screening_status": null
-  }
-},
-{
-  "pk": 48,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 202,
-    "giving_project": 13,
     "screening_status": 90
   }
 },
@@ -444,15 +246,6 @@
   "pk": 53,
   "model": "grants.projectapp",
   "fields": {
-    "application": 287,
-    "giving_project": 19,
-    "screening_status": null
-  }
-},
-{
-  "pk": 54,
-  "model": "grants.projectapp",
-  "fields": {
     "application": 192,
     "giving_project": 12,
     "screening_status": 80
@@ -471,24 +264,6 @@
   "pk": 56,
   "model": "grants.projectapp",
   "fields": {
-    "application": 276,
-    "giving_project": 15,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 57,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 279,
-    "giving_project": 19,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 58,
-  "model": "grants.projectapp",
-  "fields": {
     "application": 179,
     "giving_project": 15,
     "screening_status": 60
@@ -505,33 +280,6 @@
 },
 {
   "pk": 60,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 209,
-    "giving_project": 12,
-    "screening_status": 60
-  }
-},
-{
-  "pk": 61,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 300,
-    "giving_project": 19,
-    "screening_status": 80
-  }
-},
-{
-  "pk": 62,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 310,
-    "giving_project": 14,
-    "screening_status": 80
-  }
-},
-{
-  "pk": 63,
   "model": "grants.projectapp",
   "fields": {
     "application": 75,
@@ -651,15 +399,6 @@
   "pk": 76,
   "model": "grants.projectapp",
   "fields": {
-    "application": 272,
-    "giving_project": 11,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 77,
-  "model": "grants.projectapp",
-  "fields": {
     "application": 148,
     "giving_project": 15,
     "screening_status": 60
@@ -667,24 +406,6 @@
 },
 {
   "pk": 78,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 277,
-    "giving_project": 15,
-    "screening_status": 60
-  }
-},
-{
-  "pk": 79,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 249,
-    "giving_project": 16,
-    "screening_status": null
-  }
-},
-{
-  "pk": 80,
   "model": "grants.projectapp",
   "fields": {
     "application": 161,
@@ -703,42 +424,6 @@
 },
 {
   "pk": 82,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 267,
-    "giving_project": 10,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 83,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 268,
-    "giving_project": 12,
-    "screening_status": 80
-  }
-},
-{
-  "pk": 84,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 14,
-    "giving_project": 11,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 85,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 264,
-    "giving_project": 16,
-    "screening_status": null
-  }
-},
-{
-  "pk": 86,
   "model": "grants.projectapp",
   "fields": {
     "application": 56,
@@ -766,15 +451,6 @@
 },
 {
   "pk": 89,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 225,
-    "giving_project": 13,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 90,
   "model": "grants.projectapp",
   "fields": {
     "application": 49,
@@ -822,15 +498,6 @@
   "pk": 95,
   "model": "grants.projectapp",
   "fields": {
-    "application": 309,
-    "giving_project": 14,
-    "screening_status": 80
-  }
-},
-{
-  "pk": 96,
-  "model": "grants.projectapp",
-  "fields": {
     "application": 160,
     "giving_project": 16,
     "screening_status": null
@@ -838,15 +505,6 @@
 },
 {
   "pk": 97,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 258,
-    "giving_project": 9,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 98,
   "model": "grants.projectapp",
   "fields": {
     "application": 188,
@@ -867,15 +525,6 @@
   "pk": 100,
   "model": "grants.projectapp",
   "fields": {
-    "application": 238,
-    "giving_project": 16,
-    "screening_status": null
-  }
-},
-{
-  "pk": 101,
-  "model": "grants.projectapp",
-  "fields": {
     "application": 78,
     "giving_project": 9,
     "screening_status": 80
@@ -894,15 +543,6 @@
   "pk": 103,
   "model": "grants.projectapp",
   "fields": {
-    "application": 228,
-    "giving_project": 13,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 104,
-  "model": "grants.projectapp",
-  "fields": {
     "application": 141,
     "giving_project": 16,
     "screening_status": null
@@ -910,15 +550,6 @@
 },
 {
   "pk": 105,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 231,
-    "giving_project": 12,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 106,
   "model": "grants.projectapp",
   "fields": {
     "application": 62,
@@ -937,15 +568,6 @@
 },
 {
   "pk": 108,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 293,
-    "giving_project": 19,
-    "screening_status": 80
-  }
-},
-{
-  "pk": 109,
   "model": "grants.projectapp",
   "fields": {
     "application": 112,
@@ -993,15 +615,6 @@
   "pk": 114,
   "model": "grants.projectapp",
   "fields": {
-    "application": 301,
-    "giving_project": 19,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 115,
-  "model": "grants.projectapp",
-  "fields": {
     "application": 140,
     "giving_project": 16,
     "screening_status": null
@@ -1009,60 +622,6 @@
 },
 {
   "pk": 116,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 273,
-    "giving_project": 12,
-    "screening_status": 80
-  }
-},
-{
-  "pk": 117,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 240,
-    "giving_project": 16,
-    "screening_status": null
-  }
-},
-{
-  "pk": 118,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 244,
-    "giving_project": 13,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 119,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 248,
-    "giving_project": 12,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 120,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 308,
-    "giving_project": 14,
-    "screening_status": 90
-  }
-},
-{
-  "pk": 121,
-  "model": "grants.projectapp",
-  "fields": {
-    "application": 289,
-    "giving_project": 19,
-    "screening_status": null
-  }
-},
-{
-  "pk": 122,
   "model": "grants.projectapp",
   "fields": {
     "application": 193,
