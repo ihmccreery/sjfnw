@@ -244,7 +244,7 @@
         <li class="main "><a href="#set-up-the-database">Set up the database</a></li>
         
     
-        <li class="main "><a href="#loading-fixtures">Loading fixtures</a></li>
+        <li class="main "><a href="#load-fixtures">Load fixtures</a></li>
         
     
         <li class="main "><a href="#google-app-engine-sdk">Google App Engine SDK</a></li>
@@ -258,6 +258,9 @@
         
     
         <li class="main "><a href="#update-paths">Update paths</a></li>
+        
+    
+        <li class="main "><a href="#verify">Verify</a></li>
         
     
     </ul>
@@ -282,19 +285,14 @@ OSX: <code>brew install mysql</code>, <code>pip install mysql-python</code> (you
 <p>Once those have installed, create the database:</p>
 <ol>
 <li><code>mysql -uroot -p</code> to get into the mysql shell. This will prompt you for the password you set when you installed.</li>
-<li>Make sure mysql is set to use <code>utf8</code> encoding everywhere.<ul>
-<li>You can check with <code>show variables like 'char%';</code></li>
-<li>If anything is set to <code>latin1</code>, change it with <code>set variable_name=utf8;</code></li>
-</ul>
-</li>
-<li><code>create database sjfdb_local;</code></li>
+<li><code>create database sjfdb_local character set utf8 collate utf8_general_ci;</code></li>
 </ol>
 <h4 id="set-up-the-database">Set up the database</h4>
 <p><code>./manage.py syncdb</code></p>
 <p>You should see output as tables are created in the local database based on the project's model definitions.<br />
 Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.</p>
-<p><em>If this doesn't work, make sure <code>manage.py</code> has execute permissions. <code>chmod a+x manage.py</code> should work.</em></p>
-<h4 id="loading-fixtures">Loading fixtures</h4>
+<p><em>If this doesn't work, make sure <code>manage.py</code> has execute permissions. <code>chmod u+x manage.py</code> should work.</em></p>
+<h4 id="load-fixtures">Load fixtures</h4>
 <p>To populate your local db with data:</p>
 <p><code>./manage.py load_testing_data</code></p>
 <h4 id="google-app-engine-sdk">Google App Engine SDK</h4>
@@ -304,7 +302,7 @@ Create a superuser when prompted - that creates a user account that you can use 
 <p>You'll need <code>pip</code>, python's package manager. It is included with python 2.7.9 and above, so you should have it already. Try <code>pip --version</code>.</p>
 <p>If you don't have it, you can <a href="https://pip.pypa.io/en/stable/installing.html">install it directly</a> or upgrade your python installation.</p>
 <h5 id="install-dependencies">Install dependencies</h5>
-<p><code>pip install -r requirements.txt -t libs</code></p>
+<p><code>./scripts/install-libs</code></p>
 <p>This will install everything listed in <code>requirements.txt</code> into the <code>libs</code> folder.</p>
 <h4 id="update-paths">Update paths</h4>
 <p>Update your <code>~/.bashrc</code> (or other file depending on the shell you use)</p>
@@ -313,6 +311,9 @@ export PYTHONPATH=$PYTHONPATH:[path to gae]
 export PYTHONPATH=$PYTHONPATH:[path to gae]/lib/webob-1.2.3
 export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
 </code></pre>
+
+<h2 id="verify">Verify</h2>
+<p>Run <code>./scripts/verify-install</code> to check that you have installed everything successfully. It doesn't check everything, but does cover the basics.</p>
         </div>
       
 
