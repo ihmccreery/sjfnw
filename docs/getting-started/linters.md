@@ -5,7 +5,7 @@ The repo is set up to use [pylint](http://www.pylint.org/) and [eslint](http://e
     - `sudo apt-get install pylint` or `pip install pylint` (details [here](http://www.pylint.org/#install))
     - make sure you have v1.4+ (do `pip list` to see, `pip -U pylint` to upgrade)
     - `pip install pylint-django` ([plugin](https://github.com/landscapeio/pylint-django) that makes pylint more django friendly)
-  - eslint: _(optional)_
+  - eslint: _(only if you're doing a lot of javascript work)_
     - You'll need npm first: `sudo apt-get install node` + `sudo apt-get install npm` or see their [docs](https://docs.npmjs.com/getting-started/installing-node) for instructions.
     - `npm install -g eslint` See [this page](https://docs.npmjs.com/getting-started/fixing-npm-permissions) if you get a permissions error.
 
