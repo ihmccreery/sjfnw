@@ -231,6 +231,10 @@
     
         <li class="main active"><a href="#installation">Installation</a></li>
         
+            <li><a href="#pylint-recommended">pylint: (recommended)</a></li>
+        
+            <li><a href="#eslint-only-if-youre-doing-a-lot-of-javascript-work">eslint: (only if you're doing a lot of javascript work)</a></li>
+        
     
         <li class="main "><a href="#usage-in-text-editor">Usage - in text editor</a></li>
         
@@ -250,16 +254,22 @@
 
 <p>The repo is set up to use <a href="http://www.pylint.org/">pylint</a> and <a href="http://eslint.org/docs/">eslint</a>, syntax &amp; style checkers for python and javascript.</p>
 <h4 id="installation">Installation</h4>
+<h5 id="pylint-recommended">pylint: <em>(recommended)</em></h5>
 <ul>
-<li>pylint: <em>(recommended)</em><ul>
-<li><code>sudo apt-get install pylint</code> or <code>pip install pylint</code> (details <a href="http://www.pylint.org/#install">here</a>)</li>
+<li><code>pip install pylint</code> (details <a href="http://www.pylint.org/#install">here</a>)<ul>
 <li>make sure you have v1.4+ (do <code>pip list</code> to see, <code>pip -U pylint</code> to upgrade)</li>
-<li><code>pip install pylint-django</code> (<a href="https://github.com/landscapeio/pylint-django">plugin</a> that makes pylint more django friendly)</li>
 </ul>
 </li>
-<li>eslint: <em>(only if you're doing a lot of javascript work)</em><ul>
-<li>You'll need npm first: <code>sudo apt-get install node</code> + <code>sudo apt-get install npm</code> or see their <a href="https://docs.npmjs.com/getting-started/installing-node">docs</a> for instructions.</li>
-<li><code>npm install -g eslint</code> See <a href="https://docs.npmjs.com/getting-started/fixing-npm-permissions">this page</a> if you get a permissions error.</li>
+<li><code>pip install pylint-django</code> (<a href="https://github.com/landscapeio/pylint-django">plugin</a> that makes pylint more django friendly)</li>
+</ul>
+<h5 id="eslint-only-if-youre-doing-a-lot-of-javascript-work">eslint: <em>(only if you're doing a lot of javascript work)</em></h5>
+<ul>
+<li>Install <a href="https://nodejs.org">node</a>, which comes with <a href="https://www.npmjs.com/">npm</a> (node package manager): <code>sudo apt-get install node</code> or <code>brew install node</code><ul>
+<li>See their <a href="https://docs.npmjs.com/getting-started/installing-node">docs</a> for more info if needed.</li>
+</ul>
+</li>
+<li><code>npm install -g eslint</code> will install eslint globally (i.e. always on your path).<ul>
+<li>See <a href="https://docs.npmjs.com/getting-started/fixing-npm-permissions">this page</a> if you get a permissions error.</li>
 </ul>
 </li>
 </ul>
