@@ -16,51 +16,30 @@ class AdminInlines(BaseGrantTestCase):
     self.log_in_admin()
 
   def test_organization(self):
-    """ Verify that related inlines show existing objs
+    """ Verify that related inlines show existing objs """
 
-    Setup:
-      Log in as admin, go to org #
-      Orgs 41, 154, 156 have application, draft, gp grant
+    app = models.GrantApplication.objects.first()
 
-    Asserts:
-      Application inline
-    """
-
-    organization = models.Organization.objects.get(pk=41)
-
-    app = organization.grantapplication_set.all()[0]
-
-    response = self.client.get('/admin/grants/organization/41/')
+    response = self.client.get('/admin/grants/organization/{}/'.format(app.organization_id))
 
     self.assertContains(response, app.grant_cycle.title)
     self.assertContains(response, app.pre_screening_status)
 
   def test_givingproject(self):
-    """ Verify that assigned grant applications (projectapps) are shown as inlines
+    """ Verify that projectapps are shown as inlines """
 
-    Setup:
-      Find a GP that has projectapps
+    papp = models.ProjectApp.objects.first()
 
-    Asserts:
-      Displays one of the assigned apps
-    """
+    response = self.client.get('/admin/fund/givingproject/{}/'.format(papp.giving_project_id))
 
-    apps = models.ProjectApp.objects.filter(giving_project_id=19)
-
-    response = self.client.get('/admin/fund/givingproject/19/')
-
-    self.assertContains(response, 'selected="selected">' + str(apps[0].application))
+    self.assertContains(response, unicode(papp.application.organization))
 
   def test_application(self):
-    """ Verify that gp assignment and awards are shown on application page
+    """ Verify that gp assignment and awards are shown on application page """
 
-    Setup:
-      Use application with GP assignment. App 274, Papp 3
-    """
+    papp = models.ProjectApp.objects.first()
 
-    papp = models.ProjectApp.objects.get(pk=3)
-
-    response = self.client.get('/admin/grants/grantapplication/274/')
+    response = self.client.get('/admin/grants/grantapplication/{}/'.format(papp.application_id))
 
     self.assertContains(response, papp.giving_project.title)
     self.assertContains(response, papp.screening_status)
