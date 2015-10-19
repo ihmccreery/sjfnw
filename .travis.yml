@@ -12,8 +12,8 @@ notifications:
     on_failure: change
 
 install:
-  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.25.zip
-  - unzip -q google_appengine_1.9.25.zip
+  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.27.zip
+  - unzip -q google_appengine_1.9.27.zip
   - pip install codecov
   - pip install -r requirements.txt -t libs
   # - "pip install pylint"
@@ -26,7 +26,7 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/yaml/lib
 
 # script to run tests
-script: ./scripts/coverage.sh skip-html
+script: ./scripts/coverage skip-html
 
 # send coverage to coveralls if tests passed
 after_success: codecov
