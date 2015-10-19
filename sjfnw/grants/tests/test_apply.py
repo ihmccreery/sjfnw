@@ -1,9 +1,11 @@
+from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from google.appengine.ext import testbed
 
 from sjfnw.grants.tests.base import BaseGrantTestCase
-from sjfnw.grants.models import Organization, DraftGrantApplication, GrantApplication
+from sjfnw.grants.models import (Organization, DraftGrantApplication,
+  GrantApplication, GrantCycle)
 
 import json, logging
 logger = logging.getLogger('sjfnw')
@@ -39,6 +41,50 @@ def alter_draft_files(draft, files_dict):
   for key, val in files.iteritems():
     setattr(draft, key, val)
   draft.save()
+
+
+class CycleInfo(BaseGrantTestCase):
+  url = reverse('sjfnw.grants.views.cycle_info', kwargs={'cycle_id': 1})
+  info_url = 'http://www.socialjusticefund.org/grant-app/criminal-justice-grant-cycle-2014'
+
+  def setUp(self):
+    super(CycleInfo, self).setUp()
+
+  def test_no_url(self):
+    cycle = GrantCycle.objects.get(pk=1)
+    self.assertTrue(cycle.is_open())
+    self.assertEqual(cycle.info_page, '')
+
+    response = self.client.get(self.url, follow=True)
+
+    self.assertEqual(response.status_code, 404)
+
+  def test_invalid_url(self):
+    cycle = GrantCycle.objects.get(pk=1)
+    cycle.info_page = 'invalid_url'
+    cycle.save()
+    self.assertTrue(cycle.is_open())
+
+    response = self.client.get(self.url, follow=True)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/cycle_info.html')
+    self.assertNotContains(response, 'node-grant-portal-info-page')
+    self.assertContains(response, 'cycle information page could not be loaded')
+    self.assertContains(response, 'a href="invalid_url"')
+
+  def test_valid_url(self):
+    cycle = GrantCycle.objects.get(pk=1)
+    cycle.info_page = self.info_url
+    cycle.save()
+    self.assertTrue(cycle.is_open())
+
+    response = self.client.get(self.url, follow=True)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/cycle_info.html')
+    self.assertContains(response, 'node-grant-portal-info-page')
+    self.assertNotContains(response, 'cycle information page could not be loaded')
 
 
 @override_settings(MEDIA_ROOT='sjfnw/grants/tests/media/',

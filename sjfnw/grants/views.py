@@ -131,12 +131,8 @@ def cycle_info(request, cycle_id):
     raise Http404
   try:
     info_page = urllib2.urlopen(cycle.info_page)
-  except urllib2.HTTPError as err:
-    logger.error('Error fetching cycle info page; HTTPError: %s %s', err.code, err.reason)
   except urllib2.URLError as err:
-    logger.error('Error fetching cycle info page; URLError: ' + str(err.reason))
-  except IOError as err:
-    logger.error('Unknown error fetching cycle info page: %s', err)
+    logger.error('Error fetching cycle info page: %s', err)
   else:
     content = info_page.read()
     start = content.find('<div id="content"')
