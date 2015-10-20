@@ -1,8 +1,6 @@
 import datetime
 import logging
 
-import setup_env
-
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -13,10 +11,6 @@ from sjfnw import constants as c
 from sjfnw.fund import models
 
 logger = logging.getLogger('sjfnw')
-
-#-----------------------------------------------------------------------------
-# CRON TASKS
-#-----------------------------------------------------------------------------
 
 # pylint: disable=unused-argument
 

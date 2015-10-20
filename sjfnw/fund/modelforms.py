@@ -1,5 +1,4 @@
-import json
-import logging
+import json, logging
 
 from django.db import models
 from django.forms import ModelForm, widgets, ValidationError
@@ -8,7 +7,6 @@ from sjfnw.forms import IntegerCommaField
 from sjfnw.fund.models import Donor, Step, Survey, GivingProject, SurveyResponse
 
 logger = logging.getLogger('sjfnw')
-
 
 def custom_integer_field(field, **kwargs):
   if field.name == 'amount':
@@ -31,9 +29,8 @@ def make_custom_datefield(field):
   return formfield
 
 
-class DonorForm(ModelForm):
-  """ used to edit a contact (creation uses custom form) """
-
+class DonorEditForm(ModelForm):
+  """ Edit a contact including estimate fields """
   formfield_callback = custom_integer_field
 
   class Meta:
@@ -41,8 +38,9 @@ class DonorForm(ModelForm):
     fields = ('firstname', 'lastname', 'amount', 'likelihood', 'phone', 'email', 'notes')
     widgets = {'notes': widgets.Textarea(attrs={'cols': 25, 'rows': 4})}
 
+
 class DonorPreForm(ModelForm):
-  """ For editing a contact prior to fund training """
+  """ Edit a contact prior to fundraising training """
 
   class Meta:
     model = Donor
@@ -50,8 +48,9 @@ class DonorPreForm(ModelForm):
     widgets = {'notes': widgets.Textarea(attrs={'cols': 25, 'rows': 4})}
 
 
-class StepForm(ModelForm): #for adding a step
-  formfield_callback = make_custom_datefield #date input
+class StepForm(ModelForm):
+  """ Add a step """
+  formfield_callback = make_custom_datefield
 
   class Meta:
     model = Step
@@ -59,6 +58,7 @@ class StepForm(ModelForm): #for adding a step
 
 
 class CreateQuestionsWidget(widgets.MultiWidget):
+  """ Widget used by staff to create GPSurvey questions """
 
   def __init__(self, attrs=None):
     _widgets = []
@@ -71,9 +71,8 @@ class CreateQuestionsWidget(widgets.MultiWidget):
                    widgets.Textarea(attrs={'rows': 1, 'class': 'survey-choice'})]
     super(CreateQuestionsWidget, self).__init__(_widgets, attrs)
 
-
   def decompress(self, value):
-    """ Takes single DB value, breaks it up for widget display """
+    """ Take single DB value, break it up for widget display """
     if not value:
       return []
     val_list = []
@@ -89,7 +88,7 @@ class CreateQuestionsWidget(widgets.MultiWidget):
     return val_list
 
   def format_output(self, rendered_widgets):
-    """ Formats widgets for display by wrapping them in html """
+    """ Format widgets for display by wrapping them in html """
     html = ('<table id="survey-questions">'
             '<tr><th></th><th>Title</th><th>Choices</th></tr>')
     for i in range(0, len(rendered_widgets), 6):
@@ -100,15 +99,15 @@ class CreateQuestionsWidget(widgets.MultiWidget):
     html += '</table>'
     return html
 
-
   def value_from_datadict(self, data, files, name):
-    """ Consolidates widget data into a single value for storage
-    Arguments
-      data - flat array of values from each sub-widget
-      files - request.FILES
-      name - name of this widget
+    """ Consolidate widget data into a single value for storage
 
-    Returns json encoded string for questions field.
+    Arguments:
+      data   flat array of values from each sub-widget
+      files  request.FILES
+      name   name of this widget
+
+    Returns json encoded string for questions field
 
     Example:
       Input (data arg):
@@ -122,18 +121,19 @@ class CreateQuestionsWidget(widgets.MultiWidget):
     survey = []
     for i in range(0, len(self.widgets), 6):
       val = self.widgets[i].value_from_datadict(data, files, '{}_{}'.format(name, i))
-      if not val: # blank question
+      if not val: # first blank question signifies end of survey
         break
       question = {'question': val, 'choices': []}
       for j in range(i+1, i+6):
         val = self.widgets[j].value_from_datadict(data, files, '{}_{}'.format(name, j))
         if val:
           question['choices'].append(val)
-        else: # blank choice
+        else: # first blank choice signifies end of answer options for this q
           break
       survey.append(question)
 
     return json.dumps(survey)
+
 
 class CreateSurvey(ModelForm):
 
@@ -150,7 +150,7 @@ class CreateSurvey(ModelForm):
 
 
 class DisplayQuestionsWidget(widgets.MultiWidget):
-  """ Displays a Survey's questions to GP members """
+  """ Display a Survey's questions to GP members """
 
   def __init__(self, survey, attrs=None):
     self.questions = json.loads(survey.questions)
@@ -166,7 +166,7 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
 
 
   def decompress(self, value):
-    """ Takes single DB value, breaks it up for widget display """
+    """ Take single DB value, break it up for widget display """
     if value:
       val_list = json.loads(value)
       return_list = []
@@ -177,7 +177,7 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
       return [None for _ in self.widgets]
 
   def format_output(self, rendered_widgets):
-    """ Formats widgets for display by wrapping them in additional html """
+    """ Format widgets for display by wrapping them in additional html """
     html = '<table id="survey-questions">'
     for i, question in enumerate(self.questions):
       html += '<tr><th>{}.</th><td>{}{}</td></tr>'.format(
@@ -187,8 +187,8 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
 
 
   def value_from_datadict(self, data, files, name):
-    """ Consolidates widget data into a single value for storage
-    Returns json encoded string for questions field """
+    """ Consolidate widget data into a single value for storage
+      Returns json encoded string for questions field """
 
     val_list = []
     for i, widget in enumerate(self.widgets):
@@ -214,6 +214,7 @@ class SurveyResponseForm(ModelForm):
       if response is None or response == '':
         raise ValidationError('Please answer every question.')
     return self.cleaned_data['responses']
+
 
 class GivingProjectAdminForm(ModelForm):
   fund_goal = IntegerCommaField(label='Fundraising goal', initial=0,
