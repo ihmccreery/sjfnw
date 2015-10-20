@@ -1,5 +1,4 @@
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
@@ -25,27 +24,21 @@ class Grants(BaseFundTestCase):
     self.use_test_acct()
 
   def test_grants_display(self):
-    """ Verify that assigned grants are shown on grants page
-
-    Setup:
-      Use GP 19, create membership for testy
-
-    Asserts:
-      Assert that an identifying string for each application appears on page
-    """
+    """ Verify that assigned grants are shown on grants page """
 
     member = models.Member.objects.get(email='testacct@gmail.com')
-    ship = models.Membership(giving_project_id=19, member=member, approved=True)
+    ship = models.Membership(giving_project_id=16, member=member, approved=True)
     ship.save()
     member.current = ship.pk
     member.save()
 
     response = self.client.get(self.url)
 
-    papps = ProjectApp.objects.filter(giving_project_id=19).select_related(
-        'application', 'application__organization')
+    papps = (ProjectApp.objects.filter(giving_project_id=16)
+                               .select_related('application', 'application__organization'))
     self.assertNotEqual(papps.count(), 0)
     for papp in papps:
-      self.assertContains(response, unicode(papp.application.organization))
-
-
+      if papp.application.pre_screening_status == 45:
+        self.assertNotContains(response, unicode(papp.application.organization))
+      else:
+        self.assertContains(response, unicode(papp.application.organization))

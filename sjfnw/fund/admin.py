@@ -269,7 +269,7 @@ class MembershipA(admin.ModelAdmin):
   def approve(self, _, queryset):
     for memship in queryset:
       if memship.approved == False:
-        fund_utils.NotifyApproval(memship)
+        fund_utils.notify_approval(memship)
     queryset.update(approved=True)
 
   def ship_progress(self, obj):

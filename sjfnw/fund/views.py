@@ -378,8 +378,6 @@ def registered(request):
     'member': member, 'proj': gp
   })
 
-
-
 #-----------------------------------------------------------------------------
 # MEMBERSHIP MANAGEMENT
 #-----------------------------------------------------------------------------
@@ -750,7 +748,7 @@ def edit_contact(request, donor_id):
     request.membership.last_activity = timezone.now()
     request.membership.save(skip=True)
     if est:
-      form = modelforms.DonorForm(request.POST, instance=donor,
+      form = modelforms.DonorEditForm(request.POST, instance=donor,
                               auto_id=str(donor.pk) + '_id_%s')
     else:
       form = modelforms.DonorPreForm(request.POST, instance=donor,
@@ -761,7 +759,7 @@ def edit_contact(request, donor_id):
       return HttpResponse("success")
   else:
     if est:
-      form = modelforms.DonorForm(instance=donor, auto_id=str(donor.pk) +
+      form = modelforms.DonorEditForm(instance=donor, auto_id=str(donor.pk) +
                               '_id_%s')
     else:
       form = modelforms.DonorPreForm(instance=donor, auto_id=str(donor.pk) +

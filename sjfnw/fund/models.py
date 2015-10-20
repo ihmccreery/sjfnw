@@ -5,7 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
 
-from sjfnw.fund.utils import NotifyApproval
+from sjfnw.fund.utils import notify_approval
 
 logger = logging.getLogger('sjfnw')
 
@@ -141,7 +141,7 @@ class Membership(models.Model):
         logger.debug('Previously: %s, now %s ', previous.approved, self.approved)
         if self.approved and not previous.approved:
           logger.debug('Detected approval on save for ' + unicode(self))
-          NotifyApproval(self)
+          notify_approval(self)
       except Membership.DoesNotExist: # this is the first save for this membership
         pass
     super(Membership, self).save(*args, **kwargs)

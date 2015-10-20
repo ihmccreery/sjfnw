@@ -1,5 +1,5 @@
-from functools import wraps
 import logging
+from functools import wraps
 
 from django.shortcuts import redirect
 from django.utils.decorators import available_attrs
@@ -9,9 +9,9 @@ from sjfnw import constants as c
 logger = logging.getLogger('sjfnw')
 
 def approved_membership(function=None):
-  """ Allows access to view only if request.membership_status is c.APPROVED
+  """ Restrict access to view: only if request.membership_status is c.APPROVED
 
-    If not allowing access to view, redirects to appropriate settings/notice page
+    If not allowing access to view, redirect to appropriate settings/notice page
 
     Should be used with @login_required
     Relies on data set by MembershipMiddleware

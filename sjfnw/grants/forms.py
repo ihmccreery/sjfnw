@@ -5,7 +5,8 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from sjfnw.fund.models import GivingProject
-from sjfnw.grants.models import Organization, GrantCycle, GrantApplication, DraftGrantApplication, STATE_CHOICES, SCREENING, PRE_SCREENING
+from sjfnw.grants.models import (Organization, GrantCycle, GrantApplication,
+    DraftGrantApplication, STATE_CHOICES, SCREENING, PRE_SCREENING)
 
 import datetime, logging
 
@@ -16,53 +17,52 @@ class LoginForm(forms.Form):
   email = forms.EmailField(max_length=255)
   password = forms.CharField(widget=forms.PasswordInput())
 
+
 class RegisterForm(forms.Form):
   email = forms.EmailField(max_length=255)
   password = forms.CharField(widget=forms.PasswordInput())
-  passwordtwo = forms.CharField(widget=forms.PasswordInput(),
-                                label='Re-enter password')
+  passwordtwo = forms.CharField(widget=forms.PasswordInput(), label='Re-enter password')
   organization = forms.CharField()
 
   def clean(self):
     cleaned_data = super(RegisterForm, self).clean()
-    # make sure org is not already registered
     org = cleaned_data.get('organization')
     email = cleaned_data.get('email')
+
     if org and email:
       if Organization.objects.filter(email=email):
-        logger.warning(org + 'tried to re-register with ' + email)
+        logger.warning(u'%s tried to re-register with %s', org, email)
         raise ValidationError('That email is already registered. Log in instead.')
+
       name_match = Organization.objects.filter(name__iexact=org)
       if name_match:
         if name_match[0].email:
-          logger.warning('Name match on registration, emails diff: ' + org)
+          logger.warning(u'Name match on registration, different emails: %s', org)
           raise ValidationError('That organization is already registered. Log in instead.')
-        else: #name match, blank email
+        else:
           logger.warning('Name match, blank email. ' + org)
-      # check if User already exists
+
       if User.objects.filter(username=email):
-        logger.warning('User already exists, but not Org: ' + email)
+        logger.warning(u'User already exists, but not Org: %s', email)
         raise ValidationError('That email is registered with Project Central.'
                               ' Please register using a different email.')
-      # make sure passwords match
+
       password = cleaned_data.get('password')
       passwordtwo = cleaned_data.get('passwordtwo')
       if password and passwordtwo and password != passwordtwo:
         raise ValidationError('Passwords did not match.')
+
     return cleaned_data
 
 
 class CheckMultiple(forms.widgets.CheckboxSelectMultiple):
-  """ Adds links to javascript function to select all/none of options
-
-  Subclasses CheckboxSelectMultiple; only modifies the render function
-  """
+  """ Multiple-select checkbox widget with select all/none shortcuts """
 
   def render(self, name, value, attrs=None, choices=()):
     rendered = super(CheckMultiple, self).render(name, value, attrs, choices)
-    return mark_safe('[<a onclick="check(\'' + name +
-        '\', true)">all</a>] [<a onclick="check(\'' + name +
-        '\', false)">none</a>]' + rendered)
+    shortcuts = ('[<a onclick="check(\'{0}\', true)">all</a>] '
+                 '[<a onclick="check(\'{0}\', false)">none</a>]')
+    return mark_safe(shortcuts.format(name) + rendered)
 
 
 class RolloverForm(forms.Form):
@@ -77,31 +77,31 @@ class RolloverForm(forms.Form):
   def __init__(self, organization, *args, **kwargs):
     super(RolloverForm, self).__init__(*args, **kwargs)
 
-    #get apps & drafts
-    submitted = (GrantApplication.objects
-        .select_related('grant_cycle')
-        .filter(organization=organization)
-        .order_by('-submission_time'))
-    drafts = (DraftGrantApplication.objects
-        .select_related('grant_cycle')
-        .filter(organization=organization))
+    submitted = (GrantApplication.objects.select_related('grant_cycle')
+                                         .filter(organization=organization)
+                                         .order_by('-submission_time'))
+    drafts = (DraftGrantApplication.objects.select_related('grant_cycle')
+                                           .filter(organization=organization))
 
-    #filter out their cycles, get rest of open ones
+    # filter out cycles covered by apps/drafts, get remaining open ones
     exclude_cycles = ([draft.grant_cycle.pk for draft in drafts] +
                       [sub.grant_cycle.pk for sub in submitted])
-    cycles = (GrantCycle.objects
-        .filter(open__lt=timezone.now(), close__gt=timezone.now())
-        .exclude(id__in=exclude_cycles))
+    cycles = (GrantCycle.objects.filter(open__lt=timezone.now(), close__gt=timezone.now())
+                                .exclude(id__in=exclude_cycles))
 
-    #create fields
-    choices = [(a.id, u'{} - submitted {:%m/%d/%y}'.format(a.grant_cycle, a.submission_time)) for a in submitted]
-    self.fields['application'] = forms.ChoiceField(required=False, initial=0,
-        choices=[('', '--- Submitted applications ---')] + choices)
-    choices = [(d.id, u'{} - modified {:%m/%d/%y}'.format(d.grant_cycle, d.modified)) for d in drafts]
-    self.fields['draft'] = forms.ChoiceField(required=False, initial=0,
-        choices=[('', '--- Saved drafts ---')] + choices)
+    # create fields
+    self.fields['application'] = forms.ChoiceField(
+        required=False, initial=0,
+        choices=[('', '--- Submitted applications ---')] +
+                [(a.id, u'{} - submitted {:%m/%d/%y}'.format(a.grant_cycle, a.submission_time))
+                 for a in submitted])
+    self.fields['draft'] = forms.ChoiceField(
+        required=False, initial=0,
+        choices=[('', '--- Saved drafts ---')] +
+                [(d.id, u'{} - modified {:%m/%d/%y}'.format(d.grant_cycle, d.modified))
+                 for d in drafts])
     self.fields['cycle'] = forms.ChoiceField(
-      choices=[('', '--- Open cycles ---')] + [(c.id, unicode(c)) for c in cycles])
+        choices=[('', '--- Open cycles ---')] + [(c.id, unicode(c)) for c in cycles])
 
   def clean(self):
     cleaned_data = super(RolloverForm, self).clean()
@@ -130,25 +130,23 @@ class RolloverForm(forms.Form):
 
     return cleaned_data
 
+
 class AdminRolloverForm(forms.Form):
   def __init__(self, organization, *args, **kwargs):
     super(AdminRolloverForm, self).__init__(*args, **kwargs)
 
-    #get apps & drafts (for eliminating cycles)
-    submitted = (GrantApplication.objects
-        .select_related('grant_cycle')
-        .filter(organization=organization)
-        .order_by('-submission_time'))
-    drafts = (DraftGrantApplication.objects
-        .select_related('grant_cycle')
-        .filter(organization=organization))
+    submitted = (GrantApplication.objects.select_related('grant_cycle')
+                                         .filter(organization=organization)
+                                         .order_by('-submission_time'))
+    drafts = (DraftGrantApplication.objects.select_related('grant_cycle')
+                                           .filter(organization=organization))
 
-    #get last 6 mos of cycles
+    # get last 6 mos of cycles
     cutoff = timezone.now() - datetime.timedelta(days=180)
     exclude_cycles = [d.grant_cycle.pk for d in drafts] + [a.grant_cycle.pk for a in submitted]
     cycles = GrantCycle.objects.filter(close__gt=cutoff).exclude(id__in=exclude_cycles)
 
-    #create field
+    # create field
     self.fields['cycle'] = forms.ChoiceField(
         choices=[('', '--- Grant cycles ---')] + [(c.id, unicode(c)) for c in cycles])
 
@@ -162,10 +160,11 @@ class RolloverYERForm(forms.Form):
 
   def __init__(self, reports, awards, *args, **kwargs):
     super(RolloverYERForm, self).__init__(*args, **kwargs)
-    self.fields['report'] = forms.ChoiceField(choices=
-        [('', '--- Year-end reports ---')] + [(r.id, unicode(r) + ' ({:%-m/%-d/%y})'.format(r.submitted)) for r in reports])
-    self.fields['award'] = forms.ChoiceField(label='Grant', choices=
-        [('', '--- Grants ---')] + [(a.id, unicode(a)) for a in awards])
+    self.fields['report'] = forms.ChoiceField(
+        choices=[('', '--- Year-end reports ---')] +
+                [(r.id, unicode(r) + ' ({:%-m/%-d/%y})'.format(r.submitted)) for r in reports])
+    self.fields['award'] = forms.ChoiceField(
+        label='Grant', choices=[('', '--- Grants ---')] + [(a.id, unicode(a)) for a in awards])
 
 
 class BaseReportForm(forms.Form):
@@ -209,9 +208,9 @@ class BaseReportForm(forms.Form):
   class Meta:
     abstract = True
 
+
 class BaseAppRelatedReportForm(BaseReportForm):
 
-  #filters
   year_min = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)],
       initial=timezone.now().year-1)
@@ -225,12 +224,10 @@ class BaseAppRelatedReportForm(BaseReportForm):
   def __init__(self, *args, **kwargs):
     super(BaseAppRelatedReportForm, self).__init__(*args, **kwargs)
 
-    #get projects
     choices = GivingProject.objects.values_list('title', flat=True).distinct().order_by('title')
     choices = [(g, g) for g in choices]
     self.fields['giving_projects'].choices = choices
 
-    #get cycles
     choices = GrantCycle.objects.values_list('title', flat=True).distinct().order_by('title')
     choices = [(g, g) for g in choices]
     self.fields['grant_cycle'].choices = choices
@@ -240,7 +237,6 @@ class BaseAppRelatedReportForm(BaseReportForm):
     if cleaned_data['year_max'] < cleaned_data['year_min']:
       raise ValidationError('Start year must be less than or equal to end year.')
     return cleaned_data
-
 
 
 class AppReportForm(BaseAppRelatedReportForm):
@@ -323,19 +319,15 @@ class OrgReportForm(BaseReportForm):
   registered = forms.ChoiceField(choices=[('None', '---'), ('True', 'yes'), ('False', 'no')])
 
   # fields
-  report_account_email = forms.BooleanField(label='Login email',
-      required=False)
-  report_applications = forms.BooleanField(label='List of applications',
-      required=False)
-  report_awards = forms.BooleanField(label='List of awards',
-      required=False)
+  report_account_email = forms.BooleanField(label='Login email', required=False)
+  report_applications = forms.BooleanField(label='List of applications', required=False)
+  report_awards = forms.BooleanField(label='List of awards', required=False)
 
 
 class LoginAsOrgForm(forms.Form):
 
   def __init__(self, *args, **kwargs):
     super(LoginAsOrgForm, self).__init__(*args, **kwargs)
-
     orgs = Organization.objects.order_by('name')
     self.fields['organization'] = forms.ChoiceField(
         choices=[('', '--- Organizations ---')] + [(o.email, unicode(o)) for o in orgs])
