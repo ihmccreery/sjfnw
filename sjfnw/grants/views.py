@@ -506,7 +506,7 @@ def add_file(request, draft_type, draft_id):
 
   else:
     logger.error('Invalid draft_type %s for add_file', draft_type)
-    return Http404
+    raise Http404
 
   # don't remove this without fixing storage to not access body blob_file = False
   logger.debug([request.body])
@@ -551,7 +551,7 @@ def remove_file(request, draft_type, draft_id, file_field):
     draft_model = models.DraftGrantApplication
   else:
     logger.error('Unknown draft type %s', draft_type)
-    return Http404
+    raise Http404
 
   draft = get_object_or_404(draft_model, pk=draft_id)
 

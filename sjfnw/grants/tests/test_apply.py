@@ -1,7 +1,9 @@
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from google.appengine.ext import testbed
+from google.appengine.api import blobstore, datastore
 
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants.models import (Organization, DraftGrantApplication,
@@ -12,13 +14,27 @@ logger = logging.getLogger('sjfnw')
 
 
 class BaseGrantFilesTestCase(BaseGrantTestCase):
-  """ Extension of BaseGrantTestCase that can handle file uploads """
+  """ Subclass of BaseGrantTestCase that can handle file uploads """
 
   def setUp(self):
     super(BaseGrantFilesTestCase, self).setUp()
     self.testbed = testbed.Testbed()
     self.testbed.activate()
     self.testbed.init_datastore_v3_stub()
+    self.testbed.init_blobstore_stub()
+
+  def tearDown(self):
+    self.testbed.deactivate()
+
+  def create_blob(self, key, **kwargs):
+    logger.info(kwargs)
+    bs_stub = self.testbed.get_stub('blobstore')
+    entity = datastore.Entity(blobstore.BLOB_INFO_KIND, name=key, namespace='')
+    entity['size'] = len(kwargs['content'])
+    entity['filename'] = kwargs['filename']
+    entity['content_type'] = kwargs['content_type']
+    datastore.Put(entity)
+    bs_stub.storage.CreateBlob('fakeblobkey123', kwargs['content'])
 
   class Meta:
     abstract = True
@@ -100,22 +116,13 @@ class ApplySuccessful(BaseGrantFilesTestCase):
     self.log_in_test_org()
 
   def test_saved_timeline1(self):
-    """ Verify that a timeline with just a complete first row is accepted
-
-    Setup:
-      Use same complete draft as test_post_valid_app
-      Modify so just first row (first 3 entries of timeline) are filled in.
-
-    Asserts:
-      Gets newly created application (throws exception if not created)
-      App timeline matches inputted timeline fields
-    """
+    """ Verify that a timeline with just a complete first row is accepted """
 
     answers = ['Jan', 'Chillin', 'Not applicable',
                '', '', '', '', '', '', '', '', '', '', '', '']
 
     draft = DraftGrantApplication.objects.get(organization_id=self.org_id,
-                                                     grant_cycle_id=self.cycle_id)
+                                              grant_cycle_id=self.cycle_id)
     alter_draft_timeline(draft, answers)
 
     response = self.client.post('/apply/%d/' % self.cycle_id, follow=True)
@@ -137,13 +144,13 @@ class ApplySuccessful(BaseGrantFilesTestCase):
     ]
 
     draft = DraftGrantApplication.objects.get(organization_id=self.org_id,
-                                                     grant_cycle_id=self.cycle_id)
+                                              grant_cycle_id=self.cycle_id)
     alter_draft_timeline(draft, answers)
 
     response = self.client.post('/apply/%d/' % self.cycle_id, follow=True)
     self.assertEqual(response.status_code, 200)
     app = GrantApplication.objects.get(organization_id=self.org_id,
-                                              grant_cycle_id=self.cycle_id)
+                                       grant_cycle_id=self.cycle_id)
     self.assertEqual(app.timeline, json.dumps(answers))
 
   def test_mult_budget(self):
@@ -216,70 +223,51 @@ class ApplyBlocked(BaseGrantTestCase):
 
 
 class ApplyValidation(BaseGrantFilesTestCase):
-  """TO DO
-      fiscal
-      collab
-      timeline
-      files  """
 
-  cycle_id = 2
-  org_id = 2
+  ids = {'grant_cycle_id': 2, 'organization_id': 2}
 
   def setUp(self):
     super(ApplyValidation, self).setUp()
     self.log_in_test_org()
 
   def test_project_requirements(self):
-    """ scenario: support type = project, b1 & b2, no other project info given
-        verify: not submitted
-                no app created, draft still exists
-                form errors - project title, project budget, project budget file """
-
     draft = DraftGrantApplication.objects.get(pk=2)
     contents_dict = json.loads(draft.contents)
     contents_dict['support_type'] = 'Project support'
     draft.contents = json.dumps(contents_dict)
     draft.save()
 
-    response = self.client.post('/apply/%d/' % self.cycle_id, follow=True)
+    response = self.client.post('/apply/%d/' % self.ids['grant_cycle_id'], follow=True)
 
     self.assertTemplateUsed(response, 'grants/org_app.html')
-    self.assertEqual(0, GrantApplication.objects
-        .filter(organization_id=self.org_id, grant_cycle_id=self.cycle_id)
-        .count())
-    self.assertEqual(1, DraftGrantApplication.objects
-        .filter(organization_id=self.org_id, grant_cycle_id=self.cycle_id)
-        .count())
+    self.assertEqual(0, GrantApplication.objects.filter(**self.ids).count())
+    self.assertEqual(1, DraftGrantApplication.objects.filter(**self.ids).count())
+
     self.assertFormError(response, 'form', 'project_title',
         'This field is required when applying for project support.')
     self.assertFormError(response, 'form', 'project_budget',
         'This field is required when applying for project support.')
 
   def test_timeline_incomplete(self):
-
-    draft = DraftGrantApplication.objects.get(organization_id=self.org_id,
-                                              grant_cycle_id=self.cycle_id)
-    answers = [
-      'Jan', 'Chillin', 'Not applicable',
-      'Feb', 'Petting dogs', '5 dogs',
-      'Mar', '', 'Sprouts',
-      'July', '', '',
-      '', 'Reading in the shade', 'No sunburns',]
+    draft = DraftGrantApplication.objects.get(**self.ids)
+    answers = ['Jan', 'Chillin', 'Not applicable',
+               'Feb', 'Petting dogs', '5 dogs',
+               'Mar', '', 'Sprouts',
+               'July', '', '',
+               '', 'Reading in the shade', 'No sunburns']
     alter_draft_timeline(draft, answers)
 
-    response = self.client.post('/apply/%d/' % self.cycle_id, follow=True)
+    response = self.client.post('/apply/%d/' % self.ids['grant_cycle_id'], follow=True)
     self.assertFormError(response, 'form', 'timeline',
         '<div class="form_error">All three columns are required for each '
         'quarter that you include in your timeline.</div>')
 
   def test_timeline_empty(self):
-
-    draft = DraftGrantApplication.objects.get(organization_id=self.org_id,
-                                              grant_cycle_id=self.cycle_id)
+    draft = DraftGrantApplication.objects.get(**self.ids)
     answers = ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '']
     alter_draft_timeline(draft, answers)
 
-    response = self.client.post('/apply/%d/' % self.cycle_id, follow=True)
+    response = self.client.post('/apply/%d/' % self.ids['grant_cycle_id'], follow=True)
     self.assertFormError(response, 'form', 'timeline',
         '<div class="form_error">This field is required.</div>')
 
@@ -287,37 +275,62 @@ class ApplyValidation(BaseGrantFilesTestCase):
 class StartApplication(BaseGrantTestCase):
 
   def test_load_first_app(self):
-    """ Brand new org starting an application
-        Page loads
-        Form is blank
-        Draft is created """
-
+    ids = {'organization_id': 1, 'grant_cycle_id': 1}
     self.log_in_new_org()
-    self.assertEqual(0,
-        DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
+    self.assertEqual(0, DraftGrantApplication.objects.filter(**ids).count())
 
     response = self.client.get('/apply/1/')
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
-    self.assertEqual(1,
-        DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
+    self.assertEqual(1, DraftGrantApplication.objects.filter(**ids).count())
 
   def test_load_second_app(self):
-    """ Org with profile starting an application
-        Page loads
-        Form has stuff from profile
-        Draft is created """
-
+    ids = {'organization_id': 2, 'grant_cycle_id': 6}
     self.log_in_test_org()
-    self.assertEqual(0,
-        DraftGrantApplication.objects.filter(organization_id=2, grant_cycle_id=6).count())
+    self.assertEqual(0, DraftGrantApplication.objects.filter(**ids).count())
 
     response = self.client.get('/apply/6/')
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
     org = Organization.objects.get(pk=2)
+    self.assertEqual(1, DraftGrantApplication.objects.filter(**ids).count())
+    # mission should be pre-filled using last application
     self.assertContains(response, org.mission)
-    self.assertEqual(1,
-        DraftGrantApplication.objects.filter(organization_id=2, grant_cycle_id=6).count())
+
+
+class AddFile(BaseGrantFilesTestCase):
+
+  def setUp(self):
+    super(AddFile, self).setUp()
+
+  def test_draft_not_found(self):
+    url = reverse('sjfnw.grants.views.add_file',
+                  kwargs={'draft_type': 'apply', 'draft_id': 0})
+    response = self.client.get(url, follow=True)
+    self.assertEqual(response.status_code, 404)
+
+  def test_invalid_type(self):
+    url = reverse('sjfnw.grants.views.add_file',
+                  kwargs={'draft_type': 'what', 'draft_id': 2})
+    response = self.client.get(url, follow=True)
+    self.assertEqual(response.status_code, 404)
+
+  def test_valid(self):
+    draft = DraftGrantApplication.objects.get(pk=2)
+    original = draft.budget3
+
+    self.create_blob('fakeblobkey123', filename='file.txt',
+                     content_type='text', content='filler')
+
+    url = reverse('sjfnw.grants.views.add_file',
+                  kwargs={'draft_type': 'apply', 'draft_id': 2})
+    budget = SimpleUploadedFile("file.txt", "blob-key=fakeblobkey123")
+    response = self.client.post(url, {'budget3': budget}, follow=True)
+
+    self.assertEqual(response.status_code, 200)
+    self.assertContains(response, 'file.txt')
+    draft = DraftGrantApplication.objects.get(pk=2)
+    self.assertEqual(draft.budget3.name, 'fakeblobkey123/file.txt')
+    self.assertNotEqual(draft.budget3, original)
