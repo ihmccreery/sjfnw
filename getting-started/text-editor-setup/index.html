@@ -25,7 +25,7 @@
         m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-        ga('create', 'UA-28076150-3', 'aisapatino.github.io/sjfnw');
+        ga('create', 'UA-28076150-3', 'aisapatino.github.io/sjfnw/');
         ga('send', 'pageview');
       </script>
     
@@ -252,27 +252,26 @@
         <div class="col-md-9 content" role="main">
           
 
-<p>Recommended setup:</p>
-<h3 id="editorconfig">Editorconfig</h3>
-<p>Helps maintain consistent per-project coding style by automating some of your text editor's settings (indentation in particular) based on the <a href="https://github.com/aisapatino/sjfnw/blob/master/.editorconfig"><code>.editorconfig</code></a> file. See <a href="http://editorconfig.org/">editorconfig.org</a> for more info.</p>
+<p>There's no particular setup <em>needed</em> for this project, but a few tools may be helpful:</p>
+<h4 id="editorconfig">Editorconfig</h4>
+<p>Helps maintain consistent per-project coding style by automating some of your text editor's settings (indentation in particular) based on the <a href="https://github.com/aisapatino/sjfnw/blob/master/.editorconfig"><code>.editorconfig</code></a> file. See <a href="http://editorconfig.org/">editorconfig.org</a> for more info. There are plugins for many editors, including:</p>
 <ul>
 <li><a href="https://github.com/sindresorhus/editorconfig-sublime#readme">Sublime</a></li>
-<li><a href="https://github.com/editorconfig/editorconfig-vim#readme">vim</a></li>
+<li><a href="https://github.com/editorconfig/editorconfig-vim#readme">Vim</a></li>
 </ul>
-<h3 id="pylint-plugin">Pylint plugin</h3>
+<h4 id="pylint-plugin">Pylint plugin</h4>
 <p>Show lint warnings in your editor so you don't need to run the command line script. <a href="../linters/">Install pylint</a> first.</p>
-<p>Sublime3: <a href="http://sublimelinter.readthedocs.org/en/latest/">SublimeLinter</a> + <a href="https://packagecontrol.io/packages/SublimeLinter-pylint">SublimeLinter-pylint</a> + <a href="https://github.com/roadhump/SublimeLinter-eslint">SublimeLinter-eslint</a></p>
+<p><strong>Sublime3</strong>: <a href="http://sublimelinter.readthedocs.org/en/latest/">SublimeLinter</a> + <a href="https://packagecontrol.io/packages/SublimeLinter-pylint">SublimeLinter-pylint</a></p>
 <p>In your <a href="http://sublimelinter.readthedocs.org/en/latest/settings.html#settings-sources">user settings</a>, under <code>"linters"</code>, include</p>
 <pre><code class="json">&quot;pylint&quot;: {
-  &quot;rcfile&quot;: &quot;[path to repo]/.pylintrc&quot;,
-  &quot;args&quot;: &quot;--load-plugins pylint_django&quot;
+  &quot;rcfile&quot;: &quot;[path to repo]/.pylintrc&quot;
 }
 </code></pre>
 
-<p>Vim: <a href="https://github.com/scrooloose/syntastic">syntastic</a></p>
+<p><strong>Vim</strong>: <a href="https://github.com/scrooloose/syntastic">syntastic</a></p>
 <p>In your <code>.vimrc</code>, include</p>
 <pre><code class="vim">let g:syntastic_python_checkers = ['pylint']
-let g:syntastic_python_pylint_args = '--load-plugins pylint_django --rcfile=[path to repo]/.pylintrc'
+let g:syntastic_python_pylint_args = '--rcfile=[path to repo]/.pylintrc'
 </code></pre>
         </div>
       
@@ -282,13 +281,6 @@ let g:syntastic_python_pylint_args = '--load-plugins pylint_django --rcfile=[pat
         <p><i>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</i></p>
       </footer>
     </div>
-
-    <script src="../../js/jquery-1.10.2.min.js"></script>
-    <script src="../../js/bootstrap-3.0.3.min.js"></script>
-    <script>var base_url = '../..';</script>
-    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
-    <script src="../../js/base.js"></script>
-      <script src="../../_theme/custom-highlight.js"></script>
 
     <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog"
          aria-labelledby="Search Modal" aria-hidden="true">
@@ -314,6 +306,13 @@ let g:syntastic_python_pylint_args = '--load-plugins pylint_django --rcfile=[pat
         </div>
       </div>
     </div>
+
+    <script src="../../js/jquery-1.10.2.min.js"></script>
+    <script src="../../js/bootstrap-3.0.3.min.js"></script>
+    <script>var base_url = '../..';</script>
+    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+    <script src="../../js/base.js"></script>
+      <script src="../../_theme/custom-highlight.js"></script>
 
   </body>
 </html>
