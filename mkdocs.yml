@@ -6,6 +6,7 @@ repo_url: https://github.com/aisapatino/sjfnw/
 repo_name: sjfnw
 theme_dir: 'docs/_theme'
 markdown_extensions: [markdown.extensions.nl2br]
+google_analytics: ['UA-28076150-3', 'auto']
 pages:
 - Home: 'index.md'
 - Getting started:
