@@ -60,15 +60,6 @@
       </footer>
     </div>
 
-    <script src="{{ base_url }}/js/jquery-1.10.2.min.js"></script>
-    <script src="{{ base_url }}/js/bootstrap-3.0.3.min.js"></script>
-    <script>var base_url = '{{ base_url }}';</script>
-    <script data-main="{{ base_url }}/mkdocs/js/search.js" src="{{ base_url }}/mkdocs/js/require.js"></script>
-    <script src="{{ base_url }}/js/base.js"></script>
-    {%- for path in extra_javascript %}
-      <script src="{{ path }}"></script>
-    {%- endfor %}
-
     <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog"
          aria-labelledby="Search Modal" aria-hidden="true">
       <div class="modal-dialog">
@@ -93,6 +84,15 @@
         </div>
       </div>
     </div>
+
+    <script src="{{ base_url }}/js/jquery-1.10.2.min.js"></script>
+    <script src="{{ base_url }}/js/bootstrap-3.0.3.min.js"></script>
+    <script>var base_url = '{{ base_url }}';</script>
+    <script data-main="{{ base_url }}/mkdocs/js/search.js" src="{{ base_url }}/mkdocs/js/require.js"></script>
+    <script src="{{ base_url }}/js/base.js"></script>
+    {%- for path in extra_javascript %}
+      <script src="{{ path }}"></script>
+    {%- endfor %}
 
   </body>
 </html>
