@@ -1,6 +1,22 @@
 /* Elements
  *---------------------------------------------------------------------------*/
 
+h1, h2 {
+  text-align: center;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  border-bottom: 1px solid #ccc;
+}
+
+h3 {
+  font-size: 24px;
+}
+
 blockquote p {
   font-size: 1em;
   color: #555;
@@ -10,11 +26,13 @@ pre code {
   color: #333;
   font-size: 13px;
 }
+
 code {
   color: #333;
   background-color: #efefef;
 }
-a>code {
+
+a > code {
   color: #18bc9c;
 }
 
@@ -60,7 +78,7 @@ a>code {
   text-align: left;
 }
 
-/* TOC & nav sidebars
+/* TOC & nav sidebar
  *----------------------------------------------------------------------------*/
 
 .toc-header {
@@ -104,10 +122,11 @@ a>code {
 /* Content
  *---------------------------------------------------------------------------*/
 
-.content>h1,
-.content>h2,
-.content>h3,
-.content>h4 {
+/* no margin for heading if it's the first thing on the page */
+.content > h1,
+.content > h2,
+.content > h3,
+.content > h4 {
   margin-top: 0;
 }
 
