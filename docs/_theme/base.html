@@ -43,11 +43,14 @@
         <div class="col-md-3">
           {% if current_page.is_homepage %}
             {% include "side_nav.html" %}
-          {% elif toc.items|length > 1 %}
+          {% elif toc|string|length > 1 %}
             {% include "toc.html" %}
           {% endif %}
         </div>
         <div class="col-md-9 content" role="main">
+          {% if not current_page.is_homepage %}
+              <h1>{{ page_title }}</h1>
+            {% endif %}
           {% include "content.html" %}
         </div>
       {% endblock %}
