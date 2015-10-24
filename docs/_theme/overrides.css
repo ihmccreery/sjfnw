@@ -29,7 +29,7 @@ pre code {
 
 code {
   color: #333;
-  background-color: #efefef;
+  background-color: #ecf0f1;
 }
 
 a > code {
@@ -38,6 +38,10 @@ a > code {
 
 .emphasize {
   font-size: 1.2em;
+}
+
+.table > thead > tr > th {
+  border: none;
 }
 
 /* Navigation (top bar)
@@ -122,11 +126,7 @@ a > code {
 /* Content
  *---------------------------------------------------------------------------*/
 
-/* no margin for heading if it's the first thing on the page */
-.content > h1,
-.content > h2,
-.content > h3,
-.content > h4 {
+.content > h1 {
   margin-top: 0;
 }
 

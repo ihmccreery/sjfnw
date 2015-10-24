@@ -56,10 +56,7 @@
       {% endblock %}
 
       <footer class="col-md-12 text-center">
-        {% if copyright %}
-          <p>{{ copyright }}</p>
-        {% endif %}
-        <p><i>Documentation built with <a href="http://www.mkdocs.org/">MkDocs</a>.</i></p>
+        <p><a href="{{ repo_url }}tree/master/docs/{{ current_page.input_path }}" target="_blank"><i class="fa fa-github"></i> View page source</a></p>
       </footer>
     </div>
 
@@ -92,7 +89,7 @@
     <script src="{{ base_url }}/js/bootstrap-3.0.3.min.js"></script>
     <script>var base_url = '{{ base_url }}';</script>
     <script data-main="{{ base_url }}/mkdocs/js/search.js" src="{{ base_url }}/mkdocs/js/require.js"></script>
-    <script src="{{ base_url }}/js/base.js"></script>
+    <script src="{{ base_url }}/js/base-override.js"></script>
     {%- for path in extra_javascript %}
       <script src="{{ path }}"></script>
     {%- endfor %}
