@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../../tests/intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -251,29 +251,31 @@
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Performance debugging</h1>
+            
+          
 
 <p><a href="https://github.com/django-debug-toolbar/django-debug-toolbar">Django Debug Toolbar</a>:</p>
 <blockquote>
 <p>The Django Debug Toolbar is a configurable set of panels that display various debug information about the current request/response</p>
 </blockquote>
-<p>It is a good tool for examining the time it takes to make a request - in particular, for looking at what queries are made and how much time they're taking up. Queries are shown in the console if you use <code>--log-level debug</code> but this is a much more readable format, and shows information about timing.</p>
+<p>A good tool for examining the time it takes to make a request - in particular, for looking at what queries are made and how much time they're taking up. Queries can be logged to the console if you use <code>--log-level debug</code>, but this is a much more readable format, and shows information about timing.</p>
 <h3 id="setup">Setup</h3>
 <ol>
 <li>Install: <code>pip install django-debug-toolbar</code><ul>
-<li>Make sure it is on your path; to install it somewhere specific add <code>-t [target directory]</code> </li>
-<li>If it installs django as a dependency, delete it; otherwise it will try to use that instead of the version you already have installed (and the versions may be different).</li>
+<li>Make sure it's on your path. To install it somewhere specific add <code>-t [target directory]</code> </li>
+<li>If it installs django as a dependency, delete that copy; otherwise it may clash with the version of Django you already have installed.</li>
 </ul>
 </li>
-<li>Configure: In settings.py, uncomment the django debug toolbar config</li>
+<li>Configure: In <code>settings.py</code>, uncomment the django debug toolbar config</li>
 <li>Copy static files: <code>cp -r [install location]/static/debug_toolbar [sjfnw repo]/sjfnw/static</code><ul>
 <li>Currently, we don't do any build step, which the toolbar expects in order to serve its static assets, so copying is a quick hacky way to make it work</li>
 <li>Make sure to avoid committing the copied static files</li>
 </ul>
 </li>
 </ol>
-<p><em>There is surely a better way to enable usage of the toolbar, but that's what I've done so far</em></p>
 <h3 id="use">Use</h3>
-<p>Run your local server and load a page. You'll see a panel on the right side. Click a section for details. Check their <a href="http://django-debug-toolbar.readthedocs.org/en/latest/panels.html">docs</a> for details.</p>
+<p>Run your local server and load a page. You'll see a panel on the right side. Click a section to see more information. Check the <a href="http://django-debug-toolbar.readthedocs.org/en/latest/panels.html">django debug toolbar docs</a> for details.</p>
 <p>The main thing to look at is queries:</p>
 <ul>
 <li>Look at the total time compared to the SQL time to see if queries are a major part of the page load time.</li>

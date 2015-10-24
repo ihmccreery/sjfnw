@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../intro-to-testing/">Intro</a>
+    <a href="../intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -260,6 +260,9 @@
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Fundraising tests</h1>
+            
+          
 
 <p>Brief overview of what is provided to each test class that inherits from <code>BaseFundTestCase</code></p>
 <p><strong>NOTE</strong>: It is easy for documentation to get out of sync with code. If anything in here doesn't seem to match the results you're getting, take a look at the source:</p>
@@ -304,7 +307,6 @@
   self.use_test_acct() # or one of the others listed below
 </code></pre>
 
-<p><em>default</em> means that <code>member.current</code> is set to that membership, so it will be used when the user logs into Project Central.</p>
 <h4 id="testy-use_test_acct">Testy - <code>use_test_acct()</code></h4>
 <ul>
 <li><code>testacct@gmail.com</code> User and Member (<code>self.member_id</code>)</li>
@@ -327,6 +329,7 @@
 </li>
 <li>No Donors</li>
 </ul>
+<p><em>default</em> means that <code>member.current</code> is set to that membership, so it will be used when the user logs into Project Central.</p>
 <h4 id="admin-use_admin_acct">Admin - <code>use_admin_acct()</code></h4>
 <ul>
 <li>User with email <code>admin@gmail.com</code> that is a superuser</li>

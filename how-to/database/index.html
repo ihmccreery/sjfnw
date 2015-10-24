@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../../tests/intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -239,15 +239,17 @@
   <div class="toc-header">Database management</div>
     <ul class="nav">
     
-        <li class="main active"><a href="#migrations-changes-to-models">Migrations (changes to models)</a></li>
+        <li class="main active"><a href="#migrations">Migrations</a></li>
         
     
-        <li class="main "><a href="#background">Background</a></li>
+        <li class="main "><a href="#databases">Databases</a></li>
         
     
         <li class="main "><a href="#connecting-to-mysql">Connecting to MySQL</a></li>
         
-            <li><a href="#cloudsql-permissions">CloudSQL permissions</a></li>
+            <li><a href="#locally">Locally</a></li>
+        
+            <li><a href="#remote-cloudsql-database">Remote CloudSQL database</a></li>
         
     
     </ul>
@@ -256,9 +258,12 @@
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Database management</h1>
+            
+          
 
-<h2 id="migrations-changes-to-models">Migrations (changes to models)</h2>
-<p>Whenever you add/change/delete a model or a model field, you should add a migration. See the docs for <a href="https://docs.djangoproject.com/en/1.8/topics/migrations/#workflow">migration workflow</a>. Short version:</p>
+<h3 id="migrations">Migrations</h3>
+<p>Whenever you add/change/delete a model or a model field, you should add a migration. See the django docs on <a href="https://docs.djangoproject.com/en/1.8/topics/migrations/#workflow">migration workflow</a> for more info.</p>
 <ol>
 <li>Make the change in your local code</li>
 <li>Record the change: <code>./manage.py makemigrations</code>. Preferably, use <code>-n</code> to give it a descriptive name.</li>
@@ -268,34 +273,29 @@
 <li>Always put the model change and the new migration file in the same commit.</li>
 </ol>
 <p>See the linked docs for more detail on migrations and the commands used.</p>
-<h2 id="background">Background</h2>
-<p>See <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py">sjfnw/settings.py</a> where databases are configured.</p>
+<h3 id="databases">Databases</h3>
+<p>See <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py">sjfnw/settings.py</a> where databases are configured. Each environment uses a different db:</p>
 <ul>
 <li><strong>Testing</strong>: <code>sqlite3</code>, a local, in-memory, super fast db. It is managed automatically by the testing framework. See <a href="../../tests/intro-to-testing/#django-and-python-testing">intro to testing</a> for more info.</li>
 <li><strong>Local server</strong>: Local <code>mysql</code> instance. See <a href="../../getting-started/installation-and-setup/#mysql">installation and setup</a>.</li>
 <li><strong>Production</strong>: The deployed app uses a CloudSQL database, which is basically a hosted MySQL.</li>
 </ul>
-<h2 id="connecting-to-mysql">Connecting to MySQL</h2>
+<h3 id="connecting-to-mysql">Connecting to MySQL</h3>
+<h4 id="locally">Locally</h4>
 <ol>
-<li>
-<p>Connect to a mysql instance from the command line<br />
-  local: <code>mysql -uroot -p</code><br />
-  remote: <code>mysql --host=111.111.111.111 -uroot -p</code><br />
-<code>-uroot</code> means sign in as the user 'root'<br />
-<code>-p</code> means prompt for password<br />
-<code>-host</code> specifies the IP of the remote host (replace with actual IP)<br />
-<em>Every time you connect to CloudSQL from a different IP address, you'll need to adjust permissions as described below.</em></p>
-</li>
-<li>
-<p>Use the app's database</p>
-</li>
+<li><code>mysql -uroot -p</code></li>
+<li>Enter password when prompted</li>
+<li><code>use sjfdb_local;</code></li>
 </ol>
-<p>local: <code>use sjfdb_local;</code><br />
-  remote: <code>use sjfdb;</code></p>
-<h4 id="cloudsql-permissions">CloudSQL permissions</h4>
-<p>To connect to CloudSQL, you need to configure it to allow connections from your IP address.</p>
+<h4 id="remote-cloudsql-database">Remote CloudSQL database</h4>
 <ol>
-<li>Find your ip address. Googling 'my ip' works.</li>
+<li><code>mysql --host=111.111.111.111 -uroot -p</code> (replace with actual IP)</li>
+<li>Enter password when prompted</li>
+<li><code>use sjfdb;</code></li>
+</ol>
+<p>Note: To connect to CloudSQL, you need to configure it to allow connections from your IP address. Every time you connect to CloudSQL from a different IP address, you'll need to repeat this.</p>
+<ol>
+<li>Find your IP address. Googling 'my ip' works.</li>
 <li>Convert it to CIDR notation: use <a href="http://www.ipaddressguide.com/cidr#range">this tool</a> and enter your IP in both fields.</li>
 <li>Take the output and enter it in the <a href="https://console.developers.google.com/project/1038977021851/sql/instances/sjf/access-control/authorization">CloudSQL console</a> under 'Allowed Networks'</li>
 </ol>

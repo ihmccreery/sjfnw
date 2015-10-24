@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../../tests/intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -235,20 +235,35 @@
       
         <div class="col-md-3">
           
+            <div class="bs-sidebar well affix" role="complementary">
+  <div class="toc-header">Documentation</div>
+    <ul class="nav">
+    
+        <li class="main active"><a href="#file-structure">File structure</a></li>
+        
+    
+        <li class="main "><a href="#updating">Updating</a></li>
+        
+    
+    </ul>
+</div>
+          
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Documentation</h1>
+            
+          
 
-<h2 id="documentation">Documentation</h2>
 <p>This documentation is kept the <code>docs/</code> directory of the <a href="https://github.com/aisapatino/sjfnw"><code>sjfnw</code> repo</a>. It is written in markdown, converted to html using <a href="http://www.mkdocs.org/">mkdocs</a>, and published using Github Pages.</p>
 <h3 id="file-structure">File structure</h3>
 <ul>
-<li><code>mkdocs.yml</code> configures mkdocs, including a listing of all the pages, which is used to build the navigation menus.</li>
-<li><code>docs/</code> contains the documentation source files. They're grouped into folders to match the way they're grouped in nav.</li>
-<li><code>docs/_theme/</code> contains files for customizing the appearance/layout of the html output.</li>
+<li><code>mkdocs.yml</code> configures mkdocs. It includes an index of all the pages, which is used to build the navigation menus.</li>
+<li><code>docs/</code> contains the source files. They're grouped into folders to match the way they're grouped in nav.</li>
+<li><code>docs/_theme/</code> contains files for customizing the appearance/layout of the output.</li>
 <li><code>docs/README.md</code> shows when you browse <a href="https://github.com/aisapatino/sjfnw/tree/master/docs"><code>docs/</code> in the repo</a> to point people to the processed version.</li>
 </ul>
-<h3 id="updates">Updates</h3>
+<h3 id="updating">Updating</h3>
 <ul>
 <li>To preview the docs site locally, use <code>mkdocs serve</code>, then go to <code>http://127.0.0.1:8000/</code>. It will automatically update as you make changes.</li>
 <li>If you add, remove or rename a file, make sure you update <code>mkdocs.yml</code> accordingly.</li>

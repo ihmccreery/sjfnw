@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../../tests/intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -239,7 +239,7 @@
   <div class="toc-header">Running tests</div>
     <ul class="nav">
     
-        <li class="main active"><a href="#running-tests">Running tests</a></li>
+        <li class="main active"><a href="#run-tests">Run tests</a></li>
         
     
         <li class="main "><a href="#coverage">Coverage</a></li>
@@ -251,18 +251,22 @@
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Running tests</h1>
+            
+          
 
-<h4 id="running-tests">Running tests</h4>
-<p>Run all tests:</p>
-<p><code>./manage.py test sjfnw</code></p>
+<h3 id="run-tests">Run tests</h3>
+<p>All tests: <code>./manage.py test sjfnw</code></p>
 <p>To get more granular, use python <code>.</code>-separated paths:</p>
 <p><code>./manage.py test sjfnw.[module].tests.[test_file].[TestClass].[test_name]</code></p>
 <p>Examples:</p>
-<p>Only fundraising tests: <code>./manage.py test sjfnw.fund</code><br />
-Specific test file: <code>./manage.py test sjfnw.grants.tests.test_admin</code><br />
-Specific test suite: <code>./manage.py test sjfnw.fund.tests.test_steps.AddStep</code><br />
-Specific test: <code>./manage.py test sjfnw.fund.tests.test_steps.AddStep.test_valid</code></p>
-<h4 id="coverage">Coverage</h4>
+<ul>
+<li>Only fundraising tests: <code>./manage.py test sjfnw.fund</code>  </li>
+<li>Specific test file: <code>./manage.py test sjfnw.grants.tests.test_admin</code>  </li>
+<li>Specific test suite: <code>./manage.py test sjfnw.fund.tests.test_steps.AddStep</code>  </li>
+<li>Specific test: <code>./manage.py test sjfnw.fund.tests.test_steps.AddStep.test_valid</code></li>
+</ul>
+<h3 id="coverage">Coverage</h3>
 <p>Browse code coverage on <a href="https://codecov.io/github/aisapatino/sjfnw">codecov</a> (more info: <a href="../../workflow/continuous-integration/">CI</a>).</p>
 <p>To check test coverage locally, install <a href="http://nedbatchelder.com/code/coverage/">coverage.py</a>, then do</p>
 <p><code>./scripts/coverage</code></p>

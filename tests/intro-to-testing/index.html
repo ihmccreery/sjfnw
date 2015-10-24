@@ -10,7 +10,7 @@
     
     <link rel="shortcut icon" href="../../img/favicon.ico">
 
-    <title>Intro - sjfnw</title>
+    <title>Intro to testing - sjfnw</title>
 
     <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
     <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li class="active">
-    <a href="./">Intro</a>
+    <a href="./">Intro to testing</a>
 </li>
 
           
@@ -236,7 +236,7 @@
         <div class="col-md-3">
           
             <div class="bs-sidebar well affix" role="complementary">
-  <div class="toc-header">Intro</div>
+  <div class="toc-header">Intro to testing</div>
     <ul class="nav">
     
         <li class="main active"><a href="#basics">Basics</a></li>
@@ -263,6 +263,9 @@
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Intro to testing</h1>
+            
+          
 
 <h3 id="basics">Basics</h3>
 <p>Tests generally consist of a combination of actions and assertions. Assertions are used to describe the outcome you expect. If an assertion fails, it will raise an exception, and that test will stop running and be considered 'failed'.</p>
@@ -274,7 +277,7 @@
 Functional tests are often defined as verifying a certain function from the user's perspective - e.g. 'When I load this url, I expect to see these things on the page'.  Integration tests are focused on testing that multiple parts of the app work together. For instance, 'If I submit this form, I expect that a new Donor model will be created with these properties.' We tend to go for a combo approach where we test what is in the response as well as what effects that has on the database. These tests take more setup, often use fixtures and usually revolve around http requests though the test client.</p>
 <h3 id="current-state-of-tests-in-sjfnw">Current state of tests in sjfnw</h3>
 <p>Most of our tests are functional/integrational, focusing on a specific view, often involving at least one form and model. They are the easiest type to write given the way our code is set up and they test a lot of parts of the app. As we refactor some code into smaller pieces, we can write more unit tests, like these ones for <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/fund/tests/test_home.py#L139"><code>_compile_membership_progress</code></a>.</p>
-<p>Onr major issue with our tests is that we don't have any way to test our front-end javascript. There is some key functionality there - things like loading and submitting forms, autosaving the grant application. There's an issue filed <a href="https://github.com/aisapatino/sjfnw/issues/172">here</a>.</p>
+<p>One major issue with our tests is that we don't have any way to test our front-end javascript. There is some key functionality there - things like loading and submitting forms, autosaving the grant application. There's an issue filed <a href="https://github.com/aisapatino/sjfnw/issues/172">here</a>.</p>
 <p>At this point, the primary goal is to add <a href="../../workflow/continuous-integration/">test coverage</a> in whatever ways seem best. In particular, we should <strong>avoid adding any new functionality without accompanying tests</strong>.</p>
 <h3 id="django-and-python-testing">Django and Python testing</h3>
 <p>Django and Python provide a lot of tools/infrastructure for testing. To start:</p>
@@ -304,12 +307,14 @@ class LoginForm(BaseFundTestCase):
 
 <p>A basic test class can inherit from <code>django.test.TestCase</code>, but more frequently you'll be using the fundraising base test case above, or the one in grants.</p>
 <p>Test methods have to start with <code>test_</code>. Meaning you can include helper methods (not tests themselves, but used by tests) as long as they don't use that prefix.</p>
-<p>I usually structure it like this:<br />
-- A file has tests relating to a theme (<code>test_steps.py</code>, <code>test_home.py</code>, etc).<br />
-- Inside the file, there's a class for each smaller breakdown of the theme, e.g. <code>AddStep</code>, <code>CompleteStep</code>, <code>EditStep</code><br />
-- If the file gets too long, you can split it into pieces. One class per file or multiple classes per file are ok.<br />
-- Each class can have a <code>setUp</code> method that runs before <em>each</em> individual test method.<br />
-- Individual test methods test different scenarios related to the same form, model, etc.</p>
+<p>I usually structure it like this:</p>
+<ul>
+<li>A file has tests relating to a theme (<code>test_steps.py</code>, <code>test_home.py</code>, etc).</li>
+<li>Inside the file, there's a class for each smaller breakdown of the theme, e.g. <code>AddStep</code>, <code>CompleteStep</code>, <code>EditStep</code></li>
+<li>If the file gets too long, you can split it into pieces. One class per file or multiple classes per file are ok.</li>
+<li>Each class can have a <code>setUp</code> method that runs before <em>each</em> individual test method.</li>
+<li>Individual test methods test different scenarios related to the same form, model, etc.</li>
+</ul>
 <p>See <a href="../writing-tests">writing tests</a> for an in-depth example.</p>
         </div>
       

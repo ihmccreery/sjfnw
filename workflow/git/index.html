@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../../tests/intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -239,10 +239,13 @@
   <div class="toc-header">Git</div>
     <ul class="nav">
     
-        <li class="main active"><a href="#commits">Commits</a></li>
+        <li class="main active"><a href="#short-version">Short version</a></li>
         
     
         <li class="main "><a href="#branches">Branches</a></li>
+        
+    
+        <li class="main "><a href="#commits">Commits</a></li>
         
     
         <li class="main "><a href="#pull-requests">Pull requests</a></li>
@@ -254,11 +257,28 @@
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Git</h1>
+            
+          
 
-<h4 id="commits">Commits</h4>
+<h3 id="short-version">Short version</h3>
+<ol>
+<li>Branch off of the latest <code>master</code></li>
+<li>Use concise, descriptive commit messages</li>
+<li>Add/update tests</li>
+<li>Open a PR against <code>master</code></li>
+</ol>
+<h3 id="branches">Branches</h3>
+<p><code>master</code> is for code that is tested, reviewed and ready to deploy. When working on a feature/change, create a new branch:</p>
+<pre><code class="sh">git checkout master
+git pull
+git checkout -b new-branch-name
+</code></pre>
+
+<h3 id="commits">Commits</h3>
 <ul>
 <li>Try to keep commits granular - group related changes into commits rather than one huge commit at the end</li>
-<li>First line of the commit message should be a short overview of the changes (&lt;72 chars so it isn't truncated)</li>
+<li>The first line of the commit message should be a short overview of the changes (&lt;72 chars so it isn't truncated)</li>
 <li>Use the commit body to give more detail and/or <a href="https://help.github.com/articles/closing-issues-via-commit-messages/">link issues</a> if applicable</li>
 </ul>
 <p>Example:</p>
@@ -268,16 +288,8 @@ remove console.logs, use more description function names
 fixes #43
 </code></pre>
 
-<h4 id="branches">Branches</h4>
-<p><code>master</code> is the main branch. Avoid ever pushing directly to <code>master</code>. Instead, when working on a feature/change, create a new branch:</p>
-<pre><code class="sh">git checkout master
-git pull
-git checkout -b new-branch-name
-</code></pre>
-
-<p>For a long-running feature, use a feature branch based off of <code>master</code>. Open PRs/merge into that branch, and base new feature-related branches off of it. Then when the feature is complete, merge that branch into <code>master</code>.</p>
-<h4 id="pull-requests">Pull requests</h4>
-<p>When your changes are ready, open a <a href="https://help.github.com/articles/using-pull-requests/">pull request</a> so the code can be reviewed and merged into <code>master</code>.</p>
+<h3 id="pull-requests">Pull requests</h3>
+<p>When your changes are ready, open a <a href="https://help.github.com/articles/using-pull-requests/">pull request</a> so the code can be reviewed and merged.</p>
         </div>
       
 

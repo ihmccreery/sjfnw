@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../../tests/intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -261,10 +261,13 @@
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Linters</h1>
+            
+          
 
 <p>The repo is set up to use <a href="http://www.pylint.org/">pylint</a> and <a href="http://eslint.org/docs/">eslint</a>, syntax &amp; style checkers for python and javascript.</p>
-<h4 id="installation">Installation</h4>
-<h5 id="pylint-recommended">pylint: <em>(recommended)</em></h5>
+<h3 id="installation">Installation</h3>
+<h4 id="pylint-recommended">pylint: <em>(recommended)</em></h4>
 <ul>
 <li><code>pip install pylint</code> (details <a href="http://www.pylint.org/#install">here</a>)<ul>
 <li>make sure you have v1.4+ (do <code>pip list</code> to see, <code>pip -U pylint</code> to upgrade)</li>
@@ -272,7 +275,7 @@
 </li>
 <li><code>pip install pylint-django</code> (<a href="https://github.com/landscapeio/pylint-django">plugin</a> that makes pylint more django friendly)</li>
 </ul>
-<h5 id="eslint-only-if-youre-doing-a-lot-of-javascript-work">eslint: <em>(only if you're doing a lot of javascript work)</em></h5>
+<h4 id="eslint-only-if-youre-doing-a-lot-of-javascript-work">eslint: <em>(only if you're doing a lot of javascript work)</em></h4>
 <ul>
 <li>Install <a href="https://nodejs.org">node</a>, which comes with <a href="https://www.npmjs.com/">npm</a> (node package manager): <code>sudo apt-get install node</code> or <code>brew install node</code><ul>
 <li>See their <a href="https://docs.npmjs.com/getting-started/installing-node">docs</a> for more info if needed.</li>
@@ -283,17 +286,17 @@
 </ul>
 </li>
 </ul>
-<h4 id="usage-in-text-editor">Usage - in text editor</h4>
+<h3 id="usage-in-text-editor">Usage - in text editor</h3>
 <p>See <a href="../text-editor-setup/">text editor setup</a> for more info.</p>
-<h4 id="usage-cli">Usage - CLI</h4>
+<h3 id="usage-cli">Usage - CLI</h3>
 <ul>
 <li>To lint the whole project: <code>./scripts/lint</code></li>
 <li>That will output results to the console. If you want to save results to a file, you can do <code>./scripts/lint &gt; filename.txt</code></li>
 </ul>
-<h4 id="configuration">Configuration</h4>
+<h3 id="configuration">Configuration</h3>
 <ul>
-<li><a href="https://github.com/aisapatino/sjfnw/blob/master/.pylintrc">.pylintrc</a> , <a href="http://docs.pylint.org/features.html">pylint docs</a></li>
-<li><a href="https://github.com/aisapatino/sjfnw/blob/master/.eslintrc">.eslintrc</a> , <a href="http://eslint.org/docs/rules/">eslint docs</a></li>
+<li>current config: <a href="https://github.com/aisapatino/sjfnw/blob/master/.pylintrc">.pylintrc</a> , more info: <a href="http://docs.pylint.org/features.html">pylint docs</a></li>
+<li>current config: <a href="https://github.com/aisapatino/sjfnw/blob/master/.eslintrc">.eslintrc</a> , more info: <a href="http://eslint.org/docs/rules/">eslint docs</a></li>
 </ul>
         </div>
       

@@ -145,7 +145,7 @@
           
             
 <li >
-    <a href="../../workflow/continuous-integration/">Travis CI & Codecov.io</a>
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
 </li>
 
           
@@ -166,7 +166,7 @@
           
             
 <li >
-    <a href="../../tests/intro-to-testing/">Intro</a>
+    <a href="../../tests/intro-to-testing/">Intro to testing</a>
 </li>
 
           
@@ -235,25 +235,47 @@
       
         <div class="col-md-3">
           
+            <div class="bs-sidebar well affix" role="complementary">
+  <div class="toc-header">Running a local server</div>
+    <ul class="nav">
+    
+        <li class="main active"><a href="#start-the-server">Start the server</a></li>
+        
+    
+        <li class="main "><a href="#create-accounts-first-time-only">Create accounts (first time only)</a></li>
+        
+    
+    </ul>
+</div>
+          
         </div>
         <div class="col-md-9 content" role="main">
           
+              <h1>Running a local server</h1>
+            
+          
 
-<p>To start up the local server, (from inside the root of the repo) do</p>
+<h3 id="start-the-server">Start the server</h3>
+<p>From inside the root of the repo do</p>
 <p><code>dev_appserver.py .</code></p>
 <p><em>If you get something like 'command not found', make sure GAE is in your path. Use <code>echo $PATH</code> to confirm. See <a href="../installation-and-setup/#update-paths">setup</a>.</em></p>
-<h4 id="create-accounts">Create accounts</h4>
+<hr />
+<h3 id="create-accounts-first-time-only">Create accounts (first time only)</h3>
 <p>The superuser you created in the <code>syncdb</code> step of <a href="../installation-and-setup#setting-up-the-database">setup</a> gives you access to the admin site. For using the app locally you'll want to be able to log into the fundraising and grant application areas too.</p>
 <ol>
 <li>Go to <code>/admin-advanced</code>* and log in with superuser email &amp; pw you created when you ran <code>syncdb</code>.</li>
-<li>Create a <code>Member</code> object so you can log into the fundraising app:</li>
+<li>Create a <code>Member</code> object so you can log into the fundraising app:<ul>
 <li>Click on <code>+ Add</code> next to <code>Members</code></li>
 <li>Enter the email you used to log in, and whatever first &amp; last name you want.</li>
 <li>Hit <code>Save</code></li>
-<li>Go back to <code>/admin-advanced</code> to create an <code>Organization</code> for yourself:</li>
+</ul>
+</li>
+<li>Go back to <code>/admin-advanced</code> to create an <code>Organization</code> for yourself:<ul>
 <li>Click on <code>+Add</code> next to <code>Organizations</code></li>
 <li>Enter the same email, fill in whatever other fields are required</li>
 <li>Hit <code>Save</code></li>
+</ul>
+</li>
 <li>You should now be able to log into both sides of the app: <code>/fund/login</code> and <code>/apply/login</code></li>
 </ol>
 <p>* The advanced admin site is only used by devs (and should eventually be replaced with better admin permissions). Staff use <code>/admin</code>, which you can use most of the time, but for this you need additional access.</p>
