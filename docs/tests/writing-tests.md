@@ -1,4 +1,4 @@
-We'll use the example of login form submission and go through how to start writing tests for it. This is for functional/integration tests.
+If you're new to test-writing in general, this is a walkthrough of what a test-writing process could look like. I use the example of login form submission and go through how to start writing tests for it. This is for functional/integration tests.
 
 ### Brainstorm
 

@@ -37,8 +37,6 @@ Usage:
   self.use_test_acct() # or one of the others listed below
 ```
 
-_default_ means that `member.current` is set to that membership, so it will be used when the user logs into Project Central.
-
 #### Testy - `use_test_acct()`
 
 - `testacct@gmail.com` User and Member (`self.member_id`)
@@ -56,6 +54,8 @@ _default_ means that `member.current` is set to that membership, so it will be u
     - Pre-training (`self.pre_id`) _default_
     - Post-training (`self.post_id`)
 - No Donors
+
+_default_ means that `member.current` is set to that membership, so it will be used when the user logs into Project Central.
 
 #### Admin - `use_admin_acct()`
 

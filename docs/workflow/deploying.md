@@ -1,13 +1,13 @@
 Overview of current process: manual deploy with `appcfg.py`, then add git tag using the date. Tagging is so we can easily see what exact code is live, and compare it to the last release, in cases where something is going wrong.
 
-#### Prepare for release
+### Prepare for release
 
 1. Merge the desired change into `master`.
 2. Verify that the changes don't break anything. (This should have been done before merging to `master`, too)
   a. Make sure all tests pass.
   b. Checkout master locally and test the app; particularly the parts that have been changed.
 
-#### Release
+### Release
 
 1. **Tag** the commit you will be releasing.
   **`git tag -a 2015-08-09 -m "summary of changes"`**
@@ -20,7 +20,7 @@ Overview of current process: manual deploy with `appcfg.py`, then add git tag us
   c. **`git push --tags`** to push the release tag.
 3. **Verify** that the live site is working.
 
-#### More info
+### More info
 
 - [appcfg](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Uploading_the_app)
 - [git tags](https://git-scm.com/book/en/v1/Git-Basics-Tagging)
