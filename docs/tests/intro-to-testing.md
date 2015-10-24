@@ -17,7 +17,7 @@ Functional tests are often defined as verifying a certain function from the user
 
 Most of our tests are functional/integrational, focusing on a specific view, often involving at least one form and model. They are the easiest type to write given the way our code is set up and they test a lot of parts of the app. As we refactor some code into smaller pieces, we can write more unit tests, like these ones for [`_compile_membership_progress`](https://github.com/aisapatino/sjfnw/blob/master/sjfnw/fund/tests/test_home.py#L139).
 
-Onr major issue with our tests is that we don't have any way to test our front-end javascript. There is some key functionality there - things like loading and submitting forms, autosaving the grant application. There's an issue filed [here](https://github.com/aisapatino/sjfnw/issues/172).
+One major issue with our tests is that we don't have any way to test our front-end javascript. There is some key functionality there - things like loading and submitting forms, autosaving the grant application. There's an issue filed [here](https://github.com/aisapatino/sjfnw/issues/172).
 
 At this point, the primary goal is to add [test coverage](../workflow/continuous-integration.md) in whatever ways seem best. In particular, we should **avoid adding any new functionality without accompanying tests**.
 
@@ -60,6 +60,7 @@ A basic test class can inherit from `django.test.TestCase`, but more frequently 
 Test methods have to start with `test_`. Meaning you can include helper methods (not tests themselves, but used by tests) as long as they don't use that prefix.
 
 I usually structure it like this:
+
 - A file has tests relating to a theme (`test_steps.py`, `test_home.py`, etc).
 - Inside the file, there's a class for each smaller breakdown of the theme, e.g. `AddStep`, `CompleteStep`, `EditStep`
 - If the file gets too long, you can split it into pieces. One class per file or multiple classes per file are ok.

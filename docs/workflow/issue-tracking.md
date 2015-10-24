@@ -1,4 +1,4 @@
-## Overview
+### Overview
 
 We use github's built-in issues system to keep track of dev tasks: see [issues](https://github.com/aisapatino/sjfnw/issues) tab.
 
@@ -9,7 +9,7 @@ We use github's built-in issues system to keep track of dev tasks: see [issues](
     - Priority labels: `p1` is highest priority, `p4` is lowest
 - **If you are looking for something to do, check the [`ready` label](https://github.com/aisapatino/sjfnw/issues?q=is%3Aopen+is%3Aissue+label%3Aready)**. That's used for tasks that should be ready to work on.
 
-## Milestones
+### Milestones
 
 - There is always an active milestone for current tasks. It has a due date and always starts with a ★ to make it easier to find in the dropdown.
 - Three milestones for broad sorting:
@@ -17,7 +17,7 @@ We use github's built-in issues system to keep track of dev tasks: see [issues](
     - `Backlog - lower priority` tasks that we'd like to do, but may not get to.
     - `Future ideas` tasks that are too time consuming and/or not beneficial enough to prioritize. These are often ideas without much definition.
 
-## Labels
+### Labels
 
 Labels are used for more fine-grained categorizing of issues. See the [labels](https://github.com/aisapatino/sjfnw/labels) page for a current list. This may get out of sync, but is meant to provide some explanation for how they're organized.
 

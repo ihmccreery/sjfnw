@@ -23,10 +23,10 @@ pages:
 - Workflow:
   - Git: 'workflow/git.md'
   - Issue tracking: 'workflow/issue-tracking.md'
-  - Travis CI & Codecov.io: 'workflow/continuous-integration.md'
+  - Continuous Integration: 'workflow/continuous-integration.md'
   - Deploying: 'workflow/deploying.md'
 - Testing:
-  - Intro: 'tests/intro-to-testing.md'
+  - Intro to testing: 'tests/intro-to-testing.md'
   - Writing tests: 'tests/writing-tests.md'
   - Fundraising tests: 'tests/fund.md'
 - How to:

@@ -1,15 +1,15 @@
 There's no particular setup _needed_ for this project, but a few tools may be helpful:
 
-#### Editorconfig
+### Editorconfig
 
-Helps maintain consistent per-project coding style by automating some of your text editor's settings (indentation in particular) based on the [`.editorconfig`](https://github.com/aisapatino/sjfnw/blob/master/.editorconfig) file. See [editorconfig.org](http://editorconfig.org/) for more info. There are plugins for many editors, including:
+Tool for maintaining consistent per-project coding style by automating some of your text editor's settings (indentation in particular) based on the [`.editorconfig`](https://github.com/aisapatino/sjfnw/blob/master/.editorconfig) file. See [editorconfig.org](http://editorconfig.org/) for more info. There are plugins for many editors, including:
 
   - [Sublime](https://github.com/sindresorhus/editorconfig-sublime#readme)
   - [Vim](https://github.com/editorconfig/editorconfig-vim#readme)
 
-#### Pylint plugin
+### Pylint plugin
 
-Show lint warnings in your editor so you don't need to run the command line script. [Install pylint](linters.md) first.
+Shows lint warnings in your editor so you don't need to run the command line script. [Install pylint](linters.md) first.
 
 **Sublime3**: [SublimeLinter](http://sublimelinter.readthedocs.org/en/latest/) + [SublimeLinter-pylint](https://packagecontrol.io/packages/SublimeLinter-pylint)
 

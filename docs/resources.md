@@ -1,3 +1,32 @@
+##### Communication
+
+- [Asana](https://app.asana.com/0/5175284945766/list) (shared staff/dev task tracker)
+- [Slack channel](https://socialjusticefund.slack.com/messages/project-central/)
+
+##### Code
+
+- [Github repository](https://github.com/aisapatino/sjfnw)
+- Issue tracker: view on [Github](https://github.com/aisapatino/sjfnw/issues) or [overv.io](https://overv.io/workspace/aisapatino/tough-owl/board/)
+- [Travis CI](https://travis-ci.org/aisapatino/sjfnw) (tests) 
+- [Code coverage](https://codecov.io/github/aisapatino/sjfnw?branch=master)
+
+##### User activity
+
+- [GAE Logs](https://console.developers.google.com/project/sjf-nw/logs) (requests and `logger` output)
+- [Google Analytics](https://analytics.google.com/analytics/web/#report/visitors-overview/a28076150w59219748p60506002/)
+
+##### Links to site
+
+- [Project Central](https://sjf-nw.appspot.com/fund)
+- [Grants portal](https://sjf-nw.appspot.com/apply)
+- [Admin site](https://sjf-nw.appspot.com/admin)
+
+_Talk to [@aisapatino](https://github.com/aisapatino) if you need access to any of the above_
+
+
+<h4 align="center">External resources</h4>
+---
+
 - **[Git](http://git-scm.com/docs)**
     - Includes a good [cheatsheet](https://training.github.com/kit/downloads/github-git-cheat-sheet.pdf)
 - **[Python](https://docs.python.org/2/library/index.html)**

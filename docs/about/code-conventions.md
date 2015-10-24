@@ -1,4 +1,4 @@
-Consistent code formatting and style makes it easier to read and maintain. This is a work in progress in the current code; existing code is being updated gradually. **All new code should follow the guidelines below**.
+Consistent code formatting and style makes the codebase easier to read and maintain. This is a work in progress in the current code; existing code is being updated gradually. **All new code should follow the guidelines below**.
 
 ### Code style guidelines
 

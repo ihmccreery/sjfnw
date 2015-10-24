@@ -1,8 +1,6 @@
-#### Running tests
+### Run tests
 
-Run all tests:
-
-`./manage.py test sjfnw`
+All tests: `./manage.py test sjfnw`
 
 To get more granular, use python `.`-separated paths:
 
@@ -10,12 +8,12 @@ To get more granular, use python `.`-separated paths:
 
 Examples:
 
-Only fundraising tests: `./manage.py test sjfnw.fund`  
-Specific test file: `./manage.py test sjfnw.grants.tests.test_admin`  
-Specific test suite: `./manage.py test sjfnw.fund.tests.test_steps.AddStep`  
-Specific test: `./manage.py test sjfnw.fund.tests.test_steps.AddStep.test_valid`
+- Only fundraising tests: `./manage.py test sjfnw.fund`  
+- Specific test file: `./manage.py test sjfnw.grants.tests.test_admin`  
+- Specific test suite: `./manage.py test sjfnw.fund.tests.test_steps.AddStep`  
+- Specific test: `./manage.py test sjfnw.fund.tests.test_steps.AddStep.test_valid`
 
-#### Coverage
+### Coverage
 
 Browse code coverage on [codecov](https://codecov.io/github/aisapatino/sjfnw) (more info: [CI](../workflow/continuous-integration.md)).
 
