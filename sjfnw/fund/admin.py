@@ -216,6 +216,7 @@ class GPSurveyI(admin.TabularInline):
 # -----------------------------------------------------------------------------
 
 class GivingProjectA(BaseModelAdmin):
+  list_per_page = 15
   list_display = ['title', 'gp_year', 'estimated']
   list_filter = [GPYearFilter]
   fields = [
