@@ -27,7 +27,7 @@ if (os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine') or
       'ENGINE': 'django.db.backends.mysql',
       'HOST': '/cloudsql/sjf-northwest:sjf',
       'NAME': 'sjfdb',
-      'USER': 'tester',
+      'USER': 'root',
       'PASSWORD': os.getenv('CLOUDSQL_PASSWORD')
     }
   }
