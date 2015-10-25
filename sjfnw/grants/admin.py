@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 
 from sjfnw import utils
-from sjfnw.admin import advanced_admin, YearFilter
+from sjfnw.admin import BaseModelAdmin, advanced_admin, YearFilter
 from sjfnw.grants import models
 from sjfnw.grants.modelforms import DraftAdminForm
 
@@ -62,7 +62,6 @@ class MultiYearGrantFilter(admin.SimpleListFilter):
     if self.value() == '2':
       return queryset.filter(second_amount__isnull=False)
     return queryset
-
 
 #------------------------------------------------------------------------------
 # INLINES
@@ -255,10 +254,10 @@ class YERInline(BaseShowInline):
   view.allow_tags = True
 
 #------------------------------------------------------------------------------
-# MODEL ADMIN
+# MODELADMIN
 #------------------------------------------------------------------------------
 
-class GrantCycleA(admin.ModelAdmin):
+class GrantCycleA(BaseModelAdmin):
   list_display = ['title', 'open', 'close']
   fields = [
     ('title', 'open', 'close'),
@@ -268,8 +267,10 @@ class GrantCycleA(admin.ModelAdmin):
   inlines = [AppCycleI]
 
 
-class OrganizationA(admin.ModelAdmin):
+class OrganizationA(BaseModelAdmin):
   list_display = ['name', 'email']
+  search_fields = ['name', 'email']
+
   fieldsets = [
     ('', {
       'fields': (('name', 'email'),)
@@ -293,7 +294,6 @@ class OrganizationA(admin.ModelAdmin):
                 ('fiscal_telephone', 'fiscal_address', 'fiscal_email'))
     })
   ]
-  search_fields = ['name', 'email']
   inlines = []
 
   def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -308,7 +308,7 @@ class OrganizationA(admin.ModelAdmin):
     return super(OrganizationA, self).change_view(request, object_id)
 
 
-class GrantApplicationA(admin.ModelAdmin):
+class GrantApplicationA(BaseModelAdmin):
   list_display = ['organization', 'grant_cycle', 'submission_time', 'read']
   list_filter = ['grant_cycle']
   search_fields = ['organization__name']
@@ -362,7 +362,7 @@ class GrantApplicationA(admin.ModelAdmin):
   read.allow_tags = True
 
 
-class DraftGrantApplicationA(admin.ModelAdmin):
+class DraftGrantApplicationA(BaseModelAdmin):
   list_display = ['organization', 'grant_cycle', 'modified', 'overdue',
                   'extended_deadline']
   list_filter = ['grant_cycle']
@@ -378,7 +378,7 @@ class DraftGrantApplicationA(admin.ModelAdmin):
     return self.readonly_fields
 
 
-class GivingProjectGrantA(admin.ModelAdmin):
+class GivingProjectGrantA(BaseModelAdmin):
   list_display = ['organization_name', 'grant_cycle', 'giving_project',
                   'short_created', 'total_grant', 'fully_paid', 'check_mailed']
   list_filter = [CycleTypeFilter, GPGYearFilter, MultiYearGrantFilter]
@@ -457,7 +457,7 @@ class GivingProjectGrantA(admin.ModelAdmin):
   short_created.admin_order_field = 'created'
 
 
-class SponsoredProgramGrantA(admin.ModelAdmin):
+class SponsoredProgramGrantA(BaseModelAdmin):
   list_display = ['organization', 'amount', 'check_mailed']
   list_filter = ['check_mailed']
   exclude = ['entered']
@@ -466,7 +466,7 @@ class SponsoredProgramGrantA(admin.ModelAdmin):
             'description']
 
 
-class YearEndReportA(admin.ModelAdmin):
+class YearEndReportA(BaseModelAdmin):
   list_display = ['org', 'award', 'cycle', 'submitted', 'visible', 'view_link']
   list_filter = ['award__projectapp__application__grant_cycle']
   list_select_related = True
@@ -511,14 +511,15 @@ class YearEndReportA(admin.ModelAdmin):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
 
-class DraftAdv(admin.ModelAdmin):
+class DraftAdv(BaseModelAdmin):
   """ Only used in admin-advanced """
   list_display = ['organization', 'grant_cycle', 'modified', 'overdue',
                   'extended_deadline']
   list_filter = ['grant_cycle']
 
-
+#------------------------------------------------------------------------------
 # REGISTER
+#------------------------------------------------------------------------------
 
 admin.site.register(models.GrantCycle, GrantCycleA)
 admin.site.register(models.Organization, OrganizationA)

@@ -18,6 +18,11 @@ admin.site.index_title = None
 # Shared admin classes
 #----------------------
 
+class BaseModelAdmin(admin.ModelAdmin):
+  """ Base class for setting a universal per-page limit """
+  list_per_page = 40
+
+
 class YearFilter(admin.SimpleListFilter):
   """ Base filter by year. Usage: create a child class and override the class variables:
 

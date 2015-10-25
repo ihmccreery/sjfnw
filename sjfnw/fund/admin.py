@@ -9,10 +9,10 @@ from django.utils.safestring import mark_safe
 from libs import unicodecsv
 
 from sjfnw import utils
-from sjfnw.admin import advanced_admin
+from sjfnw.admin import BaseModelAdmin, advanced_admin
 from sjfnw.fund.models import (GivingProject, Member, Membership, Survey,
     GPSurvey, Resource, ProjectResource, Donor, Step, NewsItem, SurveyResponse)
-from sjfnw.fund import forms, utils as fund_utils, modelforms
+from sjfnw.fund import forms, modelforms, utils as fund_utils
 from sjfnw.grants.models import ProjectApp, GrantApplication
 
 logger = logging.getLogger('sjfnw')
@@ -215,7 +215,7 @@ class GPSurveyI(admin.TabularInline):
 # ModelAdmin
 # -----------------------------------------------------------------------------
 
-class GivingProjectA(admin.ModelAdmin):
+class GivingProjectA(BaseModelAdmin):
   list_display = ['title', 'gp_year', 'estimated']
   list_filter = [GPYearFilter]
   fields = [
@@ -237,17 +237,17 @@ class GivingProjectA(admin.ModelAdmin):
   gp_year.allow_tags = True
 
 
-class ResourceA(admin.ModelAdmin):
+class ResourceA(BaseModelAdmin):
   list_display = ['title', 'created']
   fields = ['title', 'summary', 'link']
 
 
-class MemberAdvanced(admin.ModelAdmin):
+class MemberAdvanced(BaseModelAdmin):
   list_display = ['first_name', 'last_name', 'email']
   search_fields = ['first_name', 'last_name', 'email']
 
 
-class MembershipA(admin.ModelAdmin):
+class MembershipA(BaseModelAdmin):
   actions = ['approve']
   search_fields = ['member__first_name', 'member__last_name']
   list_display = [
@@ -284,7 +284,7 @@ class MembershipA(admin.ModelAdmin):
   ship_progress.allow_tags = True
 
 
-class DonorA(admin.ModelAdmin):
+class DonorA(BaseModelAdmin):
   list_display = ['firstname', 'lastname', 'membership', 'amount', 'talked',
                   'asked', 'total_promised', 'received_this', 'received_next',
                   'received_afternext', 'match_expected', 'match_received']
@@ -338,12 +338,12 @@ class DonorA(admin.ModelAdmin):
     return response
 
 
-class NewsA(admin.ModelAdmin):
+class NewsA(BaseModelAdmin):
   list_display = ['summary', 'date', 'membership']
   list_filter = ['membership__giving_project']
 
 
-class StepAdv(admin.ModelAdmin):
+class StepAdv(BaseModelAdmin):
   list_display = ['description', 'donor', 'step_membership', 'date',
                   'completed', 'promised']
   list_filter = ['donor__membership', PromisedBooleanFilter,
@@ -353,7 +353,7 @@ class StepAdv(admin.ModelAdmin):
     return obj.donor.membership
 
 
-class SurveyA(admin.ModelAdmin):
+class SurveyA(BaseModelAdmin):
   list_display = ['title', 'updated']
   form = modelforms.CreateSurvey
   fields = ['title', 'intro', 'questions']
@@ -365,7 +365,7 @@ class SurveyA(admin.ModelAdmin):
     obj.save()
 
 
-class SurveyResponseA(admin.ModelAdmin):
+class SurveyResponseA(BaseModelAdmin):
   list_display = ['gp_survey', 'date']
   list_filter = ['gp_survey__giving_project']
   fields = ['gp_survey', 'date', 'display_responses']
