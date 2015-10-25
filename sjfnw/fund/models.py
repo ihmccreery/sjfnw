@@ -279,7 +279,7 @@ class Donor(models.Model):
       verbose_name='Match expected ($)', validators=[MinValueValidator(0)])
   match_company = models.CharField(max_length=255, blank=True, verbose_name='Employer name')
   match_received = models.PositiveIntegerField(blank=True, default=0,
-      verbose_name='Match received ($)')# total $ amount of match received
+      verbose_name='Match received ($)')
 
   # contact info only required if promise is entered
   phone = models.CharField(max_length=15, blank=True)

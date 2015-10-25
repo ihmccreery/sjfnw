@@ -13,14 +13,6 @@ handler500 = 'sjfnw.views.server_error'
 
 admin.autodiscover() # load admin.py from all apps
 
-"""
-if settings.DEBUG:
-  import debug_toolbar
-  urlpatterns += patterns('',
-    url(r'^__debug__/', include(debug_toolbar.urls)),
-  )
-"""
-
 urlpatterns = patterns('',
   (r'^/?$', TemplateView.as_view(template_name='home.html')),
 
@@ -72,3 +64,10 @@ urlpatterns = patterns('',
 
 # for dev_appserver
 urlpatterns += staticfiles_urlpatterns()
+
+""" uncomment to support django debug toolbar
+import debug_toolbar
+urlpatterns += patterns('',
+  (r'^__debug__/', include(debug_toolbar.urls)),
+)
+"""
