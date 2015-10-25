@@ -251,21 +251,22 @@ class MemberAdvanced(BaseModelAdmin):
 class MembershipA(BaseModelAdmin):
   actions = ['approve']
   search_fields = ['member__first_name', 'member__last_name']
-  list_display = [
-    'member', 'giving_project', 'ship_progress', 'overdue_steps', 'last_activity',
-    'approved', 'leader'
-  ]
+  list_display = ['member', 'giving_project', 'ship_progress', 'overdue_steps',
+                  'last_activity', 'approved', 'leader']
   list_filter = ['approved', 'leader', 'giving_project']
   readonly_list = ['ship_progress', 'overdue_steps']
+  list_select_related = ['member', 'giving_project']
 
-  fields = [
-    ('member', 'giving_project', 'approved'),
-    ('leader', 'last_activity', 'emailed'),
-    ('ship_progress'),
-    'notifications'
-  ]
+  fields = [('member', 'giving_project', 'approved'),
+            ('leader', 'last_activity', 'emailed'),
+            ('ship_progress'),
+            'notifications']
   readonly_fields = ['last_activity', 'emailed', 'ship_progress']
   inlines = [DonorInline]
+  ordering=['-last_activity']
+
+  def get_queryset(self, request):
+    return super(MembershipA, self).get_queryset(request).prefetch_related('donor_set')
 
   def approve(self, _, queryset):
     for memship in queryset:
