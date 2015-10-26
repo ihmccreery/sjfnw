@@ -1055,20 +1055,21 @@ def _get_block_content(membership, get_steps=True):
 
   Args:
     membership: current Membership
-    get_steps: include list of upcoming steps or not
+    get_steps: whether to include list of upcoming steps
 
   Returns: Tuple:
     steps: 2 closest upcoming steps (None if get_steps=False)
     news: news items, sorted by date descending
-    grants: ProjectApps ordered by org name
+    gp_apps: ProjectApps ordered by org name
   """
 
-  steps, news, grants = None, None, None
+  steps, news, gp_apps = None, None, None
+
   # upcoming steps
   if get_steps:
     steps = (models.Step.objects
-        .select_related('donor')
         .filter(donor__membership=membership, completed__isnull=True)
+        .select_related('donor')
         .order_by('date')[:2])
 
   # project news
@@ -1077,17 +1078,16 @@ def _get_block_content(membership, get_steps=True):
       .order_by('-date')[:25])
 
   # grants
-  p_apps = ProjectApp.objects.filter(giving_project=membership.giving_project)
-  p_apps = p_apps.select_related('giving_project', 'application',
-      'application__organization')
-  # never show screened out by sub-committee
-  p_apps = p_apps.exclude(application__pre_screening_status=45)
+  gp_apps = (ProjectApp.objects
+      .filter(giving_project=membership.giving_project)
+      .exclude(application__pre_screening_status=45) # subcommittee screened out
+      .select_related('giving_project', 'application__organization')
+      .order_by('application__organization__name'))
   if membership.giving_project.site_visits == 1:
     logger.info('Filtering grants for site visits')
-    p_apps = p_apps.filter(screening_status__gte=70)
-  grants = p_apps.order_by('application__organization__name')
+    gp_apps = gp_apps.filter(screening_status__gte=70)
 
-  return steps, news, grants
+  return steps, news, gp_apps
 
 def _create_user(email, password, first_name, last_name):
   user, member, error = None, None, None
