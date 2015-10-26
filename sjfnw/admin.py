@@ -20,7 +20,7 @@ admin.site.index_title = None
 
 class BaseModelAdmin(admin.ModelAdmin):
   """ Base class for setting a universal per-page limit """
-  list_per_page = 40
+  list_per_page = 30
 
 
 class YearFilter(admin.SimpleListFilter):
