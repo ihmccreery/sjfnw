@@ -375,7 +375,6 @@ class ProjectResource(models.Model): #ties resource to project
 
 
 class Survey(models.Model):
-
   created = models.DateTimeField(default=timezone.now)
   updated = models.DateTimeField(default=timezone.now)
   updated_by = models.CharField(max_length=100, blank=True)
@@ -390,8 +389,8 @@ class Survey(models.Model):
       default=('Please fill out this quick survey to let us know how the last '
                'meeting went.  Responses are anonymous, and once you fill out '
                'the survey you\'ll be taken to your regular home page.'))
-  questions = models.TextField( #json encoded list of questions
-      help_text=('Leave all of a question\' choices blank if you want a '
+  questions = models.TextField( # json encoded list of questions
+      help_text=('Leave all of a question\'s choices blank if you want a '
                  'write-in response instead of multiple choice'),
       default=('[{"question": "Did we meet our goals? (1=not at all, '
                '5=completely)", "choices": ["1", "2", "3", "4", "5"]}]'))
@@ -414,7 +413,6 @@ class GPSurvey(models.Model):
 
 
 class SurveyResponse(models.Model):
-
   date = models.DateTimeField(default=timezone.now)
   gp_survey = models.ForeignKey(GPSurvey)
   responses = models.TextField() # json encoded question-answer pairs

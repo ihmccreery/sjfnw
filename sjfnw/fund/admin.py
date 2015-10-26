@@ -21,22 +21,23 @@ logger = logging.getLogger('sjfnw')
 # Filters
 # -----------------------------------------------------------------------------
 
-class PromisedBooleanFilter(SimpleListFilter):
+class PromisedFilter(SimpleListFilter):
+
   """ Filter by promised field """
   title = 'promised'
-  parameter_name = 'promised_tf'
+  parameter_name = 'promised'
 
   def lookups(self, request, model_admin):
     return (('True', 'Promised'),
             ('False', 'Declined'),
-            ('None', 'None entered'))
+            ('Unknown', 'No response entered'))
 
   def queryset(self, request, queryset):
     if self.value() == 'True':
       return queryset.filter(promised__gt=0)
     if self.value() == 'False':
       return queryset.filter(promised=0)
-    elif self.value() == 'None':
+    elif self.value() == 'Unknown':
       return queryset.filter(promised__isnull=True)
 
 
@@ -219,6 +220,7 @@ class GivingProjectA(BaseModelAdmin):
   list_per_page = 15
   list_display = ['title', 'gp_year', 'estimated']
   list_filter = [GPYearFilter]
+
   fields = [
     ('title', 'public'),
     ('fundraising_training', 'fundraising_deadline'),
@@ -263,7 +265,7 @@ class MembershipA(BaseModelAdmin):
             'notifications']
   readonly_fields = ['last_activity', 'emailed', 'ship_progress']
   inlines = [DonorInline]
-  ordering=['-last_activity']
+  ordering = ['-last_activity']
 
   def get_queryset(self, request):
     return super(MembershipA, self).get_queryset(request).prefetch_related('donor_set')
@@ -287,16 +289,17 @@ class MembershipA(BaseModelAdmin):
 
 
 class DonorA(BaseModelAdmin):
+  actions = ['export_donors']
+  search_fields = ['firstname', 'lastname', 'membership__member__first_name',
+                   'membership__member__last_name']
   list_display = ['firstname', 'lastname', 'membership', 'amount', 'talked',
                   'asked', 'total_promised', 'received_this', 'received_next',
                   'received_afternext', 'match_expected', 'match_received']
-  list_filter = ['membership__giving_project', 'asked', PromisedBooleanFilter,
-                 ReceivedBooleanFilter]
   list_editable = ['received_this', 'received_next', 'received_afternext',
                    'match_expected', 'match_received']
-  search_fields = ['firstname', 'lastname', 'membership__member__first_name',
-                   'membership__member__last_name']
-  actions = ['export_donors']
+  list_filter = ['asked', PromisedFilter, ReceivedBooleanFilter,
+                 'membership__giving_project']
+  list_select_related = ['membership__giving_project', 'membership__member']
 
   fields = [
     'membership',
@@ -310,8 +313,15 @@ class DonorA(BaseModelAdmin):
   ]
   readonly_fields = ['promise_reason_display', 'likely_to_join']
 
+  def formfield_for_foreignkey(self, db_field, request, **kwargs):
+    field = super(DonorA, self).formfield_for_foreignkey(db_field, request, **kwargs)
+    if db_field.name == 'membership':
+      ships = Membership.objects.select_related('giving_project', 'member')
+      field.choices = [(ship.pk, unicode(ship)) for ship in ships]
+    return field
+
   def export_donors(self, request, queryset):
-    logger.info('Export donors called by ' + request.user.email)
+    logger.info('Export donors called by %s', request.user.email)
 
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=prospects.csv'
@@ -348,7 +358,7 @@ class NewsA(BaseModelAdmin):
 class StepAdv(BaseModelAdmin):
   list_display = ['description', 'donor', 'step_membership', 'date',
                   'completed', 'promised']
-  list_filter = ['donor__membership', PromisedBooleanFilter,
+  list_filter = ['donor__membership', PromisedFilter,
                  ReceivedBooleanFilter]
 
   def step_membership(self, obj):
@@ -368,8 +378,10 @@ class SurveyA(BaseModelAdmin):
 
 
 class SurveyResponseA(BaseModelAdmin):
+  search_fields = ['gp_survey__survey__title', 'gp_survey__giving_project__title']
   list_display = ['gp_survey', 'date']
-  list_filter = ['gp_survey__giving_project']
+  list_filter = ['date', 'gp_survey__giving_project']
+
   fields = ['gp_survey', 'date', 'display_responses']
   readonly_fields = ['gp_survey', 'date', 'display_responses']
   actions = ['export_responses']
