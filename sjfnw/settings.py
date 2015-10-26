@@ -54,7 +54,6 @@ else:
   #INSTALLED_APPS.append('debug_toolbar')
 
 MIDDLEWARE_CLASSES = (
-  #'google.appengine.ext.appstats.recording.AppStatsDjangoMiddleware', #must be first
   'django.middleware.common.CommonMiddleware',
   'django.contrib.sessions.middleware.SessionMiddleware',
   'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -87,4 +86,3 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 FILE_UPLOAD_HANDLERS = ('sjfnw.grants.storage.BlobstoreFileUploadHandler',)
 
 TEST_RUNNER = 'sjfnw.tests.base.ColorTestSuiteRunner'
-
