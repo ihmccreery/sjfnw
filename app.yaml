@@ -33,14 +33,16 @@ handlers:
 
 - url: /static/admin
   static_dir: libs/django/contrib/admin/static/admin
-  expiration: '0'
+  expiration: '1d'
 
 - url: /static
   static_dir: sjfnw/static
+  expiration: '1h'
 
 - url: /favicon\.ico
   static_files: sjfnw/static/favicon.ico
   upload: favicon\.ico
+  expiration: '1d'
 
 - url: /.*
   script: sjfnw.wsgi.application
