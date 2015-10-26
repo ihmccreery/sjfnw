@@ -242,7 +242,7 @@
         <li class="main active"><a href="#code">Code</a></li>
         
     
-        <li class="main "><a href="#python">Python</a></li>
+        <li class="main "><a href="#python-pip">Python &amp; pip</a></li>
         
     
         <li class="main "><a href="#git">Git</a></li>
@@ -251,26 +251,22 @@
         <li class="main "><a href="#mysql">MySQL</a></li>
         
     
-        <li class="main "><a href="#set-up-the-database">Set up the database</a></li>
-        
-    
-        <li class="main "><a href="#load-fixtures">Load fixtures</a></li>
-        
-    
         <li class="main "><a href="#google-app-engine-sdk">Google App Engine SDK</a></li>
         
     
         <li class="main "><a href="#project-dependencies">Project dependencies</a></li>
-        
-            <li><a href="#prerequisite-pip">Prerequisite: pip</a></li>
-        
-            <li><a href="#install-dependencies">Install dependencies</a></li>
         
     
         <li class="main "><a href="#update-paths">Update paths</a></li>
         
     
         <li class="main "><a href="#verify">Verify</a></li>
+        
+    
+        <li class="main "><a href="#set-up-your-local-database">Set up your local database</a></li>
+        
+    
+        <li class="main "><a href="#load-fixtures">Load fixtures</a></li>
         
     
     </ul>
@@ -286,35 +282,25 @@
 <p>Instructions assume you're running linux or mac osx and can use a package manager (<a href="http://brew.sh/"><code>homebrew</code></a>, <code>apt-get</code>, etc.) as needed.</p>
 <h4 id="code">Code</h4>
 <p><code>git clone https://github.com/aisapatino/sjfnw.git</code></p>
-<h4 id="python">Python</h4>
+<h4 id="python-pip">Python &amp; pip</h4>
 <p>The project uses python 2.7, which is probably already installed with your OS. Confirm by doing <code>python --version</code>. Install using package manager if needed.</p>
+<p>You'll also need <code>pip</code>, python's package manager. It is included with python 2.7.9 and above, so you should have it already. Try <code>pip --version</code>.</p>
+<p>If you don't have it, you can upgrade your python installation to 2.7.9 or 2.7.10, or <a href="https://pip.pypa.io/en/stable/installing.html">install pip directly</a>.</p>
 <h4 id="git">Git</h4>
 <p>May be installed already, check with <code>git --version</code>. Install/update using package manager if needed.</p>
 <h4 id="mysql">MySQL</h4>
 <p>Install mysql and a python-mysql adapter.</p>
 <p>Linux: <code>apt-get install mysql-server python-mysqldb</code><br />
-OSX: <code>brew install mysql</code>, <code>pip install mysql-python</code> (you should have <code>pip</code> already, see <a href="#prerequisite-pip">below</a> if not)</p>
+OSX: <code>brew install mysql</code>, <code>pip install mysql-python</code></p>
 <p>When prompted, enter the password from <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py#L43"><code>sjfnw/settings.py</code></a></p>
-<p>Once those have installed, create the database:</p>
+<p>Create the database:</p>
 <ol>
 <li><code>mysql -uroot -p</code> to get into the mysql shell. This will prompt you for the password you set when you installed.</li>
-<li><code>create database sjfdb_local character set utf8 collate utf8_general_ci;</code></li>
+<li><code>create database sjfdb_multi character set utf8 collate utf8_general_ci;</code></li>
 </ol>
-<h4 id="set-up-the-database">Set up the database</h4>
-<p><code>./manage.py syncdb</code></p>
-<p>You should see output as tables are created in the local database based on the project's model definitions.<br />
-Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.</p>
-<p><em>If this doesn't work, make sure <code>manage.py</code> has execute permissions. <code>chmod u+x manage.py</code> should work.</em></p>
-<h4 id="load-fixtures">Load fixtures</h4>
-<p>To populate your local db with data:</p>
-<p><code>./manage.py load_testing_data</code></p>
 <h4 id="google-app-engine-sdk">Google App Engine SDK</h4>
 <p><a href="https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">Download</a> &amp; unzip (somewhere outside the repo).</p>
 <h4 id="project-dependencies">Project dependencies</h4>
-<h5 id="prerequisite-pip">Prerequisite: <code>pip</code></h5>
-<p>You'll need <code>pip</code>, python's package manager. It is included with python 2.7.9 and above, so you should have it already. Try <code>pip --version</code>.</p>
-<p>If you don't have it, you can <a href="https://pip.pypa.io/en/stable/installing.html">install it directly</a> or upgrade your python installation.</p>
-<h5 id="install-dependencies">Install dependencies</h5>
 <p><code>./scripts/install-libs</code></p>
 <p>This will install everything listed in <code>requirements.txt</code> into the <code>libs</code> folder.</p>
 <h4 id="update-paths">Update paths</h4>
@@ -326,7 +312,7 @@ export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
 </code></pre>
 
 <h4 id="verify">Verify</h4>
-<p>Run <code>./scripts/verify-install</code> to verify that you've installed everything successfully. It doesn't verify everything (for instance, database setup), but can check the basics. You should see output like this:</p>
+<p>Run <code>./scripts/verify-install</code> to verify that you've installed everything successfully. It doesn't verify everything (for instance, database creation), but can check the basics. You should see output like this:</p>
 <pre><code>Checking installation...
 
 Python: 2.7.6 (required: 2.7.x)
@@ -341,6 +327,18 @@ Checking libs...
 
 ✔ Basic installation checks passed.
 </code></pre>
+
+<h4 id="set-up-your-local-database">Set up your local database</h4>
+<p><code>./manage.py migrate</code></p>
+<p>You should see output as tables are created in the local database based on the project's model definitions.</p>
+<p>Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.</p>
+<p>For more info on what this does, see the <a href="https://docs.djangoproject.com/en/1.8/topics/migrations/">django docs</a> and the <a href="../../how-to/database/">project migration docs</a>.</p>
+<p><em>If that didn't work, make sure <code>manage.py</code> has execute permissions. <code>chmod u+x manage.py</code> should work.</em></p>
+<h4 id="load-fixtures">Load fixtures</h4>
+<p>We have fixtures with data from the real site. To load that data into your local db:</p>
+<p><code>./manage.py load_testing_data</code></p>
+<hr />
+<p>Installation complete! Now check out <a href="../local-server/">running a local server</a> and <a href="../running-tests/">running tests</a>.</p>
         </div>
       
 
