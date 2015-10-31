@@ -16,7 +16,7 @@ May be installed already, check with `git --version`. Install/update using packa
 
 Install mysql and a python-mysql adapter.
 
-Linux: `apt-get install mysql-server python-mysqldb`  
+Linux: `apt-get install mysql-server python-mysqldb`
 OSX: `brew install mysql`, `pip install mysql-python` (you should have `pip` already, see [below](#prerequisite-pip) if not)
 
 When prompted, enter the password from [`sjfnw/settings.py`](https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py#L43)
@@ -44,6 +44,7 @@ To populate your local db with data:
 #### Google App Engine SDK
 
 [Download](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) & unzip (somewhere outside the repo).
+Follow the instructions to install using the GoogleAppEngineLauncher.
 
 #### Project dependencies
 
@@ -65,8 +66,8 @@ Update your `~/.bashrc` (or other file depending on the shell you use)
 
 ```sh
 export PATH=$PATH:/[path to gae]
-export PYTHONPATH=$PYTHONPATH:[path to gae]
-export PYTHONPATH=$PYTHONPATH:[path to gae]/lib/webob-1.2.3
+export PYTHONPATH=$PYTHONPATH:[path to Google App Engine]
+export PYTHONPATH=$PYTHONPATH:[path to GAE]/lib/webob-1.2.3
 export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
 ```
 
