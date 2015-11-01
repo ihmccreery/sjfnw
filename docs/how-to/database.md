@@ -25,7 +25,7 @@ See [sjfnw/settings.py](https://github.com/aisapatino/sjfnw/blob/master/sjfnw/se
 
 1. `mysql -uroot -p`
 2. Enter password when prompted
-3. `use sjfdb_local;`
+3. `use sjfdb_multi;`
 
 #### Remote CloudSQL database
 
