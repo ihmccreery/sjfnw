@@ -11,7 +11,7 @@ class Command(BaseCommand):
   help = 'Load fixture data into local db for manual testing purposes. Loads from live fixtures; use dump_live_data first if needed.'
 
   def handle(self, *args, **options):
-    if settings.DATABASES['default']['NAME'] != 'sjfdb_local':
+    if settings.DATABASES['default']['NAME'] != 'sjfdb_multi':
       self.stderr.write('Error: This can only be used on the local database.')
       return
 
