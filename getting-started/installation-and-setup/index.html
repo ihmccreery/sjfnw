@@ -299,15 +299,16 @@ OSX: <code>brew install mysql</code>, <code>pip install mysql-python</code></p>
 <li><code>create database sjfdb_multi character set utf8 collate utf8_general_ci;</code></li>
 </ol>
 <h4 id="google-app-engine-sdk">Google App Engine SDK</h4>
-<p><a href="https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">Download</a> &amp; unzip (somewhere outside the repo).</p>
+<p><a href="https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">Download</a> &amp; unzip (somewhere outside the repo).<br />
+Follow the instructions to install using the GoogleAppEngineLauncher.</p>
 <h4 id="project-dependencies">Project dependencies</h4>
 <p><code>./scripts/install-libs</code></p>
 <p>This will install everything listed in <code>requirements.txt</code> into the <code>libs</code> folder.</p>
 <h4 id="update-paths">Update paths</h4>
 <p>Update your <code>~/.bashrc</code> (or other file depending on the shell you use)</p>
 <pre><code class="sh">export PATH=$PATH:/[path to gae]
-export PYTHONPATH=$PYTHONPATH:[path to gae]
-export PYTHONPATH=$PYTHONPATH:[path to gae]/lib/webob-1.2.3
+export PYTHONPATH=$PYTHONPATH:[path to Google App Engine]
+export PYTHONPATH=$PYTHONPATH:[path to GAE]/lib/webob-1.2.3
 export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
 </code></pre>
 
