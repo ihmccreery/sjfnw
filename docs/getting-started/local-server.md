@@ -6,6 +6,8 @@ From inside the root of the repo do
 
 _If you get something like 'command not found', make sure GAE is in your path. Use `echo $PATH` to confirm. See [setup](installation-and-setup.md#update-paths)._
 
+_If you see a mySQL connection error, make sure that mySQL is running in another terminal window: `$ mysqld`_
+
 ---
 
 ### Create accounts (first time only)
