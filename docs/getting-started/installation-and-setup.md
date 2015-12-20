@@ -78,11 +78,15 @@ Checking libs...
 
 You should see output as tables are created in the local database based on the project's model definitions.
 
-Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.
-
 For more info on what this does, see the [django docs](https://docs.djangoproject.com/en/1.8/topics/migrations/) and the [project migration docs](../how-to/database.md).
 
 _If that didn't work, make sure `manage.py` has execute permissions. `chmod u+x manage.py` should work._
+
+#### Create a superuser
+
+`./manage.py createsuperuser`
+
+A superuser is a django user account with the highest access levels - you can use it to log into the admin site on your local server.
 
 #### Load fixtures
 
