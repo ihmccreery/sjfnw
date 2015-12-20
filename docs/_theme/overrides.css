@@ -30,6 +30,8 @@ pre code {
 code {
   color: #333;
   background-color: #ecf0f1;
+  padding: 1px 3px;
+  border-radius: 3px;
 }
 
 a > code {
