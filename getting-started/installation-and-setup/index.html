@@ -266,6 +266,9 @@
         <li class="main "><a href="#set-up-your-local-database">Set up your local database</a></li>
         
     
+        <li class="main "><a href="#create-a-superuser">Create a superuser</a></li>
+        
+    
         <li class="main "><a href="#load-fixtures">Load fixtures</a></li>
         
     
@@ -332,9 +335,11 @@ Checking libs...
 <h4 id="set-up-your-local-database">Set up your local database</h4>
 <p><code>./manage.py migrate</code></p>
 <p>You should see output as tables are created in the local database based on the project's model definitions.</p>
-<p>Create a superuser when prompted - that creates a user account that you can use to log into the admin site on your local server.</p>
 <p>For more info on what this does, see the <a href="https://docs.djangoproject.com/en/1.8/topics/migrations/">django docs</a> and the <a href="../../how-to/database/">project migration docs</a>.</p>
 <p><em>If that didn't work, make sure <code>manage.py</code> has execute permissions. <code>chmod u+x manage.py</code> should work.</em></p>
+<h4 id="create-a-superuser">Create a superuser</h4>
+<p><code>./manage.py createsuperuser</code></p>
+<p>A superuser is a django user account with the highest access levels - you can use it to log into the admin site on your local server.</p>
 <h4 id="load-fixtures">Load fixtures</h4>
 <p>We have fixtures with data from the real site. To load that data into your local db:</p>
 <p><code>./manage.py load_testing_data</code></p>
