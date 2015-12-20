@@ -294,9 +294,11 @@ Functional tests are often defined as verifying a certain function from the user
 </ul>
 <p>Note: We have sub-classed Django's <code>TestCase</code> as <code>BaseTestCase</code>, which is further specialized as <code>BaseFundTestCase</code> and <code>BaseGrantTestCase</code>. They just provide a few convenient shortcuts for common tasks like creating a User and logging them in.</p>
 <h3 id="test-files">Test files</h3>
-<p>Tests are located in <code>sjfnw/fund/tests/</code> and <code>sjfnw/grants/tests/</code><br />
-- Split tests into separate files by subject<br />
-- Files all start with <code>test_</code> (to be found by the test runner)</p>
+<p>Tests are located in <code>sjfnw/fund/tests/</code> and <code>sjfnw/grants/tests/</code></p>
+<ul>
+<li>Split tests into separate files by subject</li>
+<li>Files all start with <code>test_</code> (to be found by the test runner)</li>
+</ul>
 <p><code>sjfnw/tests.py</code> houses test-related classes and methods that are useful across both modules. For instance: custom test runner, base test classes, custom assertion methods, etc.</p>
 <h3 id="organizing-tests">Organizing tests</h3>
 <p>In Django, test classes represent test suites - bundles of tests that share a <code>setUp</code> method, fixtures, etc.</p>

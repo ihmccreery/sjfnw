@@ -295,10 +295,14 @@
 <p>Install mysql and a python-mysql adapter.</p>
 <p>Linux: <code>apt-get install mysql-server python-mysqldb</code><br />
 OSX: <code>brew install mysql</code>, <code>pip install mysql-python</code></p>
-<p>When prompted, enter the password from <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py#L43"><code>sjfnw/settings.py</code></a></p>
+<p>If prompted for a password, enter the password from <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py#L43"><code>sjfnw/settings.py</code></a>.</p>
 <p>Create the database:</p>
 <ol>
-<li><code>mysql -uroot -p</code> to get into the mysql shell. This will prompt you for the password you set when you installed.</li>
+<li><code>mysql -uroot -p</code> to get into the mysql shell. This will prompt you for the password you set when you installed.<ul>
+<li>If you were <strong>not</strong> prompted for a password, your starting password is probably blank.  When prompted for it, just hit enter.  Once you've logged in, change your password to match <code>settings.py</code> (linked above):<br />
+<code>SET PASSWORD FOR 'root'@'localhost' = PASSWORD('password goes here');</code></li>
+</ul>
+</li>
 <li><code>create database sjfdb_multi character set utf8 collate utf8_general_ci;</code></li>
 </ol>
 <h4 id="google-app-engine-sdk">Google App Engine SDK</h4>
