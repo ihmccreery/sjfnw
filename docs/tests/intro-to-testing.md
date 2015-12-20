@@ -40,6 +40,7 @@ Note: We have sub-classed Django's `TestCase` as `BaseTestCase`, which is furthe
 ### Test files
 
 Tests are located in `sjfnw/fund/tests/` and `sjfnw/grants/tests/`
+
 - Split tests into separate files by subject
 - Files all start with `test_` (to be found by the test runner)
 
