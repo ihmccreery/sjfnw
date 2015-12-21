@@ -381,6 +381,7 @@ class DraftGrantApplicationA(BaseModelAdmin):
 class GivingProjectGrantA(BaseModelAdmin):
   list_display = ['organization_name', 'grant_cycle', 'giving_project',
                   'short_created', 'total_grant', 'fully_paid', 'check_mailed']
+  search_fields = ['projectapp__application__organization__name', 'projectapp__giving_project__title' ]
   list_filter = [CycleTypeFilter, GPGYearFilter, MultiYearGrantFilter]
   list_select_related = True
 
