@@ -244,6 +244,10 @@
     
         <li class="main "><a href="#create-accounts-first-time-only">Create accounts (first time only)</a></li>
         
+            <li><a href="#project-central-giving-project-member">Project Central (Giving Project member)</a></li>
+        
+            <li><a href="#grant-application-organization">Grant application (Organization)</a></li>
+        
     
     </ul>
 </div>
@@ -262,24 +266,51 @@
 <p><em>If you see a mySQL connection error, make sure that mySQL is running in another terminal window: <code>$ mysqld</code></em></p>
 <hr />
 <h3 id="create-accounts-first-time-only">Create accounts (first time only)</h3>
-<p>The superuser you created in the <code>syncdb</code> step of <a href="../installation-and-setup#setting-up-the-database">setup</a> gives you access to the admin site. For using the app locally you'll want to be able to log into the fundraising and grant application areas too.</p>
+<p>The superuser you created during <a href="../installation-and-setup#setting-up-the-database">setup</a> gives you access to the admin site. You'll probably also want access to the fundraising and grant application areas too.</p>
+<h4 id="project-central-giving-project-member">Project Central (Giving Project member)</h4>
 <ol>
-<li>Go to <code>/admin-advanced</code>* and log in with superuser email &amp; pw you created when you ran <code>syncdb</code>.</li>
-<li>Create a <code>Member</code> object so you can log into the fundraising app:<ul>
+<li>Go to <code>/admin-advanced</code>* and log in with superuser credentials you chose.</li>
+<li>Either of these options:<ul>
+<li>Create a new <code>Member</code> object<ul>
 <li>Click on <code>+ Add</code> next to <code>Members</code></li>
 <li>Enter the email you used to log in, and whatever first &amp; last name you want.</li>
-<li>Hit <code>Save</code></li>
+<li>Save</li>
 </ul>
 </li>
-<li>Go back to <code>/admin-advanced</code> to create an <code>Organization</code> for yourself:<ul>
-<li>Click on <code>+Add</code> next to <code>Organizations</code></li>
-<li>Enter the same email, fill in whatever other fields are required</li>
-<li>Hit <code>Save</code></li>
+<li>(OR)</li>
+<li>Pick an existing <code>Member</code><ul>
+<li>Pick a <code>Member</code> and click on it to edit</li>
+<li>Change the login email to match your account's email</li>
+<li>Save</li>
 </ul>
 </li>
-<li>You should now be able to log into both sides of the app: <code>/fund/login</code> and <code>/apply/login</code></li>
+</ul>
+</li>
 </ol>
-<p>* The advanced admin site is only used by devs (and should eventually be replaced with better admin permissions). Staff use <code>/admin</code>, which you can use most of the time, but for this you need additional access.</p>
+<p>You should now be able to access Project Central: <a href="http://localhost:8080/fund">/fund</a></p>
+<p>* <em>The advanced admin site is only used by devs (and should eventually be replaced with better admin permissions). <code>/admin</code> is used for almost everything, but it does not show <code>Member</code>s</em></p>
+<h4 id="grant-application-organization">Grant application (Organization)</h4>
+<ol>
+<li>Go to <code>/admin</code> and log in with superuser credentials you chose.</li>
+<li>Either of these options:<ul>
+<li>Create a new organization<ul>
+<li>Click on <code>+Add</code> next to <code>Organizations</code></li>
+<li>Enter the same email you used to log in</li>
+<li>Fill in whatever other fields are required</li>
+<li>Save</li>
+</ul>
+</li>
+<li>(OR)</li>
+<li>Pick an organization to use<ul>
+<li>Click on it to edit</li>
+<li>Change the login email to match your account's email</li>
+<li>Save</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>You should now be able to access the grant application area: <a href="http://localhost:8080/apply">/apply</a></p>
         </div>
       
 
