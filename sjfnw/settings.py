@@ -18,6 +18,7 @@ INSTALLED_APPS = [
   'sjfnw.fund',
   'sjfnw.support',
   'libs.pytz',
+  'easy_pdf'
 ]
 
 DEBUG = False

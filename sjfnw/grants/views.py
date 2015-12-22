@@ -31,6 +31,9 @@ from sjfnw.grants.forms import (AdminRolloverForm, LoginAsOrgForm, LoginForm,
 from sjfnw.grants.modelforms import GrantApplicationModelForm, YearEndReportForm
 from sjfnw.grants.utils import local_date_str, find_blobinfo
 
+#django-easy-pdf
+from easy_pdf.views import PDFTemplateView
+
 logger = logging.getLogger('sjfnw')
 
 LOGIN_URL = '/apply/login/'
@@ -812,6 +815,16 @@ def _view_permission(user, application):
       return 0
     except Member.DoesNotExist:
       return 0
+
+class HelloPDFView(PDFTemplateView):
+    template_name = "164.html"
+    def get_context_data(self, **kwargs):
+       return super(HelloPDFView, self).get_context_data(
+        pagesize="A4",
+        title="Hi there!",
+        **kwargs
+     )
+#pass id into url
 
 def view_application(request, app_id):
   app = get_object_or_404(models.GrantApplication, pk=app_id)

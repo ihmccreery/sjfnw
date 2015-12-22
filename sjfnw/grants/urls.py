@@ -69,4 +69,5 @@ grants_urls = patterns('sjfnw.grants.views',
   # reading
   (r'^view/(?P<app_id>\d+)/?$', 'view_application'),
   (r'^(?P<obj_type>.*)-file/(?P<obj_id>\d+)-(?P<field_name>.*)', 'view_file'),
+  (r'^view/(?P<app_id>\d+)/?.pdf$', HelloPDFView.as_view())
 )
