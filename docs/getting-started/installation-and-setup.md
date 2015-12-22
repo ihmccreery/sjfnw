@@ -49,9 +49,9 @@ This will install everything listed in `requirements.txt` into the `libs` folder
 Update your `~/.bashrc` (or other file depending on the shell you use)
 
 ```sh
-export PATH=$PATH:/[path to gae]
+export PATH=$PATH:[path to Google App Engine]
 export PYTHONPATH=$PYTHONPATH:[path to Google App Engine]
-export PYTHONPATH=$PYTHONPATH:[path to GAE]/lib/webob-1.2.3
+export PYTHONPATH=$PYTHONPATH:[path to Google App Engine]/lib/webob-1.2.3
 export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
 ```
 
