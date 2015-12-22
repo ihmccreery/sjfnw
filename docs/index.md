@@ -1,4 +1,4 @@
-<h3 align="center">Documentation related to development and project maintenance</h3>
+<h3 align="center">Development and project maintenance</h3>
 
 ---
 
