@@ -369,6 +369,12 @@ class GrantApplicationA(BaseModelAdmin):
                      'fax_number', 'email_address', 'website'),
                    ('status', 'ein'))
     }),
+    ('Uploaded files', {
+        'classes': ('collapse',),
+        'description':
+            ('This should show a list of uploaded files'),
+        'fields': (('get_uploaded_file_names'),)
+    }),
     ('Administration', {
       'fields': (
         ('pre_screening_status', 'scoring_bonus_poc', 'scoring_bonus_geo', 'site_visit_report'),
@@ -377,8 +383,31 @@ class GrantApplicationA(BaseModelAdmin):
     })
   ]
   readonly_fields = ['organization_link', 'grant_cycle', 'submission_time',
-                     'read', 'revert_grant', 'rollover']
+                     'read', 'revert_grant', 'rollover', 'get_uploaded_file_names']
   inlines = [ProjectAppI, LogReadonlyI, LogI]
+
+  def get_uploaded_file_names(self, obj):
+    uploaded_files = {
+      'budget'             : 'No budget uploaded',
+      'demographics'       : 'No diversity chart uploaded',
+      'funding_sources'    : 'No funding sources uploaded',
+      'budget1'            : 'No annual statement uploaded',
+      'budget2'            : 'No annual operating budget uploaded',
+      'budget3'            : 'No balance sheet uploaded',
+      'project_budget_file': 'No project budget uploaded',
+      'fiscal_letter'      : 'No fiscal letter uploaded'
+    }
+    list_of_filefield_names = uploaded_files.keys()
+
+    for field_name in list_of_filefield_names:
+      matching_file_name = obj.get_file_name(field_name)
+      if matching_file_name:
+        uploaded_files[field_name] = matching_file_name
+
+    return '<ul>' + '</li> '.join([("<li>" + str(f)) for f in uploaded_files.values()]) + '</ul>'
+
+  get_uploaded_file_names.allow_tags = True
+  get_uploaded_file_names.short_description = 'Uploaded files'
 
   def has_add_permission(self, request):
     return False
