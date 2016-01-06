@@ -102,6 +102,11 @@ def custom_fields(field, **kwargs): #sets phonenumber and money fields
 
 class GrantApplicationModelForm(forms.ModelForm):
 
+  two_year_question = forms.CharField(required=False,
+      widget=forms.Textarea(attrs={
+        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[8]
+      }))
+
   formfield_callback = custom_fields
 
   class Meta:

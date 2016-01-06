@@ -393,8 +393,6 @@ class GrantApplication(models.Model):
                                 help_text=HELP_TEXTS['leadership'])
   cycle_question = models.TextField(
       validators=[WordLimitValidator(NARRATIVE_CHAR_LIMITS[7])], blank=True)
-  two_year_question = models.TextField(
-      validators=[WordLimitValidator(NARRATIVE_CHAR_LIMITS[8])], blank=True)
 
   timeline = models.TextField(
       verbose_name='Please fill in this timeline to describe your activities '
@@ -566,6 +564,13 @@ class GrantApplication(models.Model):
   @classmethod
   def file_fields(cls):
     return [f.name for f in cls._meta.fields if isinstance(f, models.FileField)]
+
+
+class GrantApplicationOverflow(models.Model):
+
+  grant_application = models.OneToOneField(GrantApplication, related_name='overflow')
+  two_year_question = models.TextField(
+      validators=[WordLimitValidator(GrantApplication.NARRATIVE_CHAR_LIMITS[8])], blank=True)
 
 
 class ProjectApp(models.Model):

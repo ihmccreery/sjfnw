@@ -1,7 +1,9 @@
-from sjfnw.grants.tests.base import BaseGrantTestCase
-from sjfnw.grants import models
-
 import logging
+
+from sjfnw.grants.tests.base import BaseGrantTestCase
+from sjfnw.grants.models import (GivingProjectGrant, GrantApplicationOverflow,
+    GrantCycle, ProjectApp, YearEndReport)
+
 logger = logging.getLogger('sjfnw')
 
 
@@ -11,11 +13,11 @@ class GrantReading(BaseGrantTestCase):
               'sjfnw/fund/fixtures/test_fund.json']
 
   def setUp(self):
-    papp = models.ProjectApp(application_id=1, giving_project_id=2)
+    papp = ProjectApp(application_id=1, giving_project_id=2)
     papp.save()
-    award = models.GivingProjectGrant(projectapp_id=papp.pk, amount=8900)
+    award = GivingProjectGrant(projectapp_id=papp.pk, amount=8900)
     award.save()
-    yer = models.YearEndReport(award=award, total_size=83,
+    yer = YearEndReport(award=award, total_size=83,
         donations_count_prev=6, donations_count=9,
         other_comments='Critical feedback')
     yer.save()
@@ -68,7 +70,7 @@ class GrantReading(BaseGrantTestCase):
 
   def test_valid_member_visible(self):
     self.log_in_newbie()
-    yer = models.YearEndReport.objects.get(pk=self.yer_id)
+    yer = YearEndReport.objects.get(pk=self.yer_id)
     yer.visible = True
     yer.save()
 
@@ -80,7 +82,7 @@ class GrantReading(BaseGrantTestCase):
 
   def test_invalid_member_visible(self):
     self.log_in_testy()
-    yer = models.YearEndReport.objects.get(pk=self.yer_id)
+    yer = YearEndReport.objects.get(pk=self.yer_id)
     yer.visible = True
     yer.save()
 
@@ -101,13 +103,17 @@ class GrantReading(BaseGrantTestCase):
     self.assertNotContains(response, 'two-year grants')
 
     # View the app again after adding text to its two_year_question field
-    application = models.GrantApplication.objects.get(pk=1)
-    application.two_year_question = 'A response about two-year grants'
-    application.save()
+    cycle = GrantCycle.objects.get(pk=1)
+    cycle.two_year_grants = True
+    cycle.save()
+    overflow = GrantApplicationOverflow(grant_application_id=1,
+        two_year_question='A response about two-year grants')
+    overflow.save()
 
     response = self.client.get('/grants/view/1', follow=True)
 
     self.assertTemplateUsed(response, 'grants/reading.html')
     self.assertEqual(3, response.context['perm'])
     self.assertContains(response, 'year end report')
+    self.assertContains(response, cycle.two_year_question)
     self.assertContains(response, 'two-year grants')
