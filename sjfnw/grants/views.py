@@ -296,11 +296,11 @@ def grant_application(request, organization, cycle_id):
     if not draft.editable():
       return render(request, 'grants/submitted_closed.html', {'cycle': cycle})
 
-    #get fields & files from draft
+    # get fields & files from draft
     draft_data = json.loads(draft.contents)
     files_data = model_to_dict(draft, fields=draft.file_fields())
 
-    #add automated fields
+    # add automated fields
     draft_data['organization'] = organization.pk
     draft_data['grant_cycle'] = cycle.pk
 
@@ -309,7 +309,11 @@ def grant_application(request, organization, cycle_id):
     if form.is_valid():
       logger.info('========= Application form valid')
 
-      form.save()
+      application = form.save()
+      if cycle.two_year_grants:
+        overflow = models.GrantApplicationOverflow(
+            grant_application=application, two_year_question=draft_data['two_year_question'])
+        overflow.save()
 
       subject = 'Grant application submitted'
       from_email = c.GRANT_EMAIL

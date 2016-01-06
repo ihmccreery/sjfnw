@@ -133,6 +133,7 @@ class ApplySuccessful(BaseGrantFilesTestCase):
     app = GrantApplication.objects.get(organization_id=self.org_id,
                                               grant_cycle_id=self.cycle_id)
     self.assertEqual(app.timeline, json.dumps(answers))
+    self.assertFalse(hasattr(app, 'overflow'))
 
   def test_saved_timeline5(self):
     """ Verify that a completely filled out timeline is accepted """
@@ -193,6 +194,28 @@ class ApplySuccessful(BaseGrantFilesTestCase):
     org = Organization.objects.get(id=self.org_id)
     self.assertTemplateUsed(response, 'grants/submitted.html')
     self.assertEqual(draft_contents['mission'], org.mission)
+
+  def test_overflow_created(self):
+    """ Verify that GrantApplicationOverflow is created when two_year_question is filled out """
+
+    cycle = GrantCycle.objects.get(pk=self.cycle_id)
+    cycle.two_year_grants = True
+    cycle.save()
+
+    draft = DraftGrantApplication.objects.get(organization_id=self.org_id,
+                                              grant_cycle_id=self.cycle_id)
+    draft_contents = json.loads(draft.contents)
+    draft_contents['two_year_question'] = 'Year two answer'
+    draft.contents = json.dumps(draft_contents)
+    draft.save()
+
+    response = self.client.post('/apply/%d/' % self.cycle_id, follow=True)
+
+    self.assertEqual(response.status_code, 200)
+    app = GrantApplication.objects.get(organization_id=self.org_id,
+                                       grant_cycle_id=self.cycle_id)
+    self.assertTrue(hasattr(app, 'overflow'))
+    self.assertEqual(app.overflow.two_year_question, u'Year two answer')
 
 
 class ApplyBlocked(BaseGrantTestCase):
@@ -273,14 +296,13 @@ class ApplyValidation(BaseGrantFilesTestCase):
     self.assertFormError(response, 'form', 'timeline',
         '<div class="form_error">This field is required.</div>')
 
-  def test_two_year(self):
+  def test_require_two_year(self):
     cycle = GrantCycle.objects.get(pk=self.ids['grant_cycle_id'])
     cycle.two_year_grants = True
     cycle.save()
 
-    draft = DraftGrantApplication.objects.get(**self.ids)
-
     response = self.client.post('/apply/%d/' % self.ids['grant_cycle_id'], follow=True)
+
     self.assertFormError(response, 'form', 'two_year_question', 'This field is required.')
 
 
