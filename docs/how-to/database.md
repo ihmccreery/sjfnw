@@ -3,7 +3,9 @@
 Whenever you add/change/delete a model or a model field, you should add a migration. See the django docs on [migration workflow](https://docs.djangoproject.com/en/1.8/topics/migrations/#workflow) for more info.
 
 1. Make the change in your local code
-2. Record the change: `./manage.py makemigrations`. Preferably, use `-n` to give it a descriptive name.
+2. Record the change with `./manage.py makemigrations`
+  - Do `--dry-run` first to make sure it looks correct.
+  - Use `--name` to give it a descriptive name. E.g. `--name add_cycle_question`
 3. Update your local database: `./manage.py migrate` will run the migration you created.
 4. Run local server and verify that it doesn't crash.
 5. Add/update tests as needed, verify that all tests are passing
