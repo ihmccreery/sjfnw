@@ -1,3 +1,6 @@
+import json
+import logging
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
@@ -9,7 +12,6 @@ from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants.models import (Organization, DraftGrantApplication,
   GrantApplication, GrantCycle)
 
-import json, logging
 logger = logging.getLogger('sjfnw')
 
 
@@ -271,6 +273,16 @@ class ApplyValidation(BaseGrantFilesTestCase):
     self.assertFormError(response, 'form', 'timeline',
         '<div class="form_error">This field is required.</div>')
 
+  def test_two_year(self):
+    cycle = GrantCycle.objects.get(pk=self.ids['grant_cycle_id'])
+    cycle.two_year_grants = True
+    cycle.save()
+
+    draft = DraftGrantApplication.objects.get(**self.ids)
+
+    response = self.client.post('/apply/%d/' % self.ids['grant_cycle_id'], follow=True)
+    self.assertFormError(response, 'form', 'two_year_question', 'This field is required.')
+
 
 class StartApplication(BaseGrantTestCase):
 
@@ -284,6 +296,8 @@ class StartApplication(BaseGrantTestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
     self.assertEqual(1, DraftGrantApplication.objects.filter(**ids).count())
+    form = response.context['form']
+    self.assertFalse(form.fields['two_year_question'].required)
 
   def test_load_second_app(self):
     ids = {'organization_id': 2, 'grant_cycle_id': 6}
@@ -298,7 +312,24 @@ class StartApplication(BaseGrantTestCase):
     self.assertEqual(1, DraftGrantApplication.objects.filter(**ids).count())
     # mission should be pre-filled using last application
     self.assertContains(response, org.mission)
+    form = response.context['form']
+    self.assertFalse(form.fields['two_year_question'].required)
 
+  def test_with_two_year_grant(self):
+    ids = {'organization_id': 2, 'grant_cycle_id': 6}
+    cycle = GrantCycle.objects.get(pk=ids['grant_cycle_id'])
+    cycle.two_year_grants = True
+    cycle.save()
+
+    self.log_in_test_org()
+
+    response = self.client.get('/apply/6/')
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/org_app.html')
+    self.assertContains(response, cycle.two_year_question)
+    form = response.context['form']
+    self.assertTrue(form.fields['two_year_question'].required)
 
 class AddFile(BaseGrantFilesTestCase):
 
