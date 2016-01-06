@@ -313,6 +313,15 @@ $(document).ready(function() {
         {{ form.timeline }}
       </li>
 
+      {% if cycle.two_year_grants and cycle.two_year_question %}
+        <li class="narrative_q">
+          {{ form.two_year_question.label }}
+          {{ form.two_year_question.errors }}
+          {{ form.two_year_question }}
+          <span class="char_counter" id="two_year_question_counter">{{ limits.8 }}</span>
+        </li>
+      {% endif %}
+
       <li class="narrative_q">
         {{ form.narrative5.label }}
         {{ form.narrative5.errors }}
@@ -348,14 +357,6 @@ $(document).ready(function() {
           </tr>
         </table>
       </li>
-
-      {% if cycle.two_year_grants and cycle.two_year_question %}
-        <li class="narrative_q">
-          {{ form.two_year_question.label }}
-          {{ form.two_year_question.errors }}
-          {{ form.two_year_question }}
-        </li>
-      {% endif %}
 
       <li class="narrative_q">{{ form.narrative6.label }}
       <div class="more-info" id="nar-6-info" style="display:none;">{{ form.narrative6.help_text }}</div>
