@@ -140,15 +140,20 @@ class GrantApplicationModelForm(forms.ModelForm):
 
   def __init__(self, cycle, *args, **kwargs):
     super(GrantApplicationModelForm, self).__init__(*args, **kwargs)
-    if cycle and cycle.extra_question:
-      self.fields['cycle_question'].required = True
-      self.fields['cycle_question'].label = cycle.extra_question
-      logger.info('Requiring the cycle question')
+    if cycle:
+      if cycle.extra_question:
+        self.fields['cycle_question'].required = True
+        self.fields['cycle_question'].label = cycle.extra_question
+        logger.info('Requiring the cycle question')
+      if cycle.two_year_grants:
+        self.fields['two_year_question'].required = True
+        self.fields['two_year_question'].label = cycle.two_year_question
+        logger.info('Requiring the two-year question')
 
   def clean(self):
     cleaned_data = super(GrantApplicationModelForm, self).clean()
 
-    #timeline
+    # timeline
     timeline = json.loads(cleaned_data.get('timeline'))
     empty = False
     incomplete = False

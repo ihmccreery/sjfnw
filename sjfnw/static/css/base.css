@@ -133,6 +133,11 @@ footer {
   padding: 3px;
 }
 
+ol.main {
+  padding-left: 0;
+  list-style-position: inside;
+}
+
 /*---------------------- Shared specific classes/ids ------------------------*/
 
 .multiple-choice ul {

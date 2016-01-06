@@ -262,6 +262,7 @@ class GrantCycleA(BaseModelAdmin):
   fields = [
     ('title', 'open', 'close'),
     ('info_page', 'email_signature'),
+    ('two_year_grants', 'two_year_question'),
     'private', 'extra_question', 'conflicts',
   ]
   inlines = [AppCycleI]

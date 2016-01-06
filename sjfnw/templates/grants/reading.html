@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
@@ -30,16 +30,18 @@
 </head>
 
 <body>
-{% block sidebar %}{% endblock %}<!--sidebar spot -->
+{% block sidebar %}{% endblock %}
 
-{% block main %} <!-- main content -->
+{% block main %}
 	<div id="main_content">
-	{% autoescape off %}{% load humanize %}
-  {% if not file_urls %}<!-- loaded in its own window -->
-    <div class="title"><h2>{{app.organization}} - {{app.grant_cycle}}</h2>
-		{{app.submission_time|date:"F j, Y"}}</div>
-  {% endif %}
-		<h2>Organization and Grant Request Profile</h2><!-- Profile -->
+    {% autoescape off %}{% load humanize %}
+    {% if not file_urls %}{# loaded in its own window #}
+      <div class="title"><h2>{{app.organization}} - {{app.grant_cycle}}</h2>
+      {{app.submission_time|date:"F j, Y"}}</div>
+    {% endif %}
+
+		<h2>Organization and Grant Request Profile</h2>
+
 		<table style="width:100%;">
 			<tr>
 				<td colspan="2">{{form.address.label_tag}}{{app.address}} {{app.city}}, {{app.state}} {{app.zip}}</td>
@@ -93,40 +95,59 @@
 			{% endif %}
 		</table>
 
-		<h2>Narratives</h2><!-- Narrative -->
-		<p><b>1. {{form.narrative1.label}}</b></p>
-		<p>{{app.narrative1|linebreaks}}</p>
-		<br>
-		<p><b>2. {{form.narrative2.label}}</b></p>
-		<p>{{app.narrative2|linebreaks}}</p>
-		<br>
-		<p><b>3. {{form.narrative3.label}}</b></p>
-		<p>{{app.narrative3|linebreaks}}</p>
-		<br>
-		<p><b>4. {{form.narrative4.label}}</b></p>
-		<p>{{app.narrative4|linebreaks}}</p>
-		{{app.timeline_display|linebreaks}}
-		<br>
-		<p><b>5. {{form.narrative5.label}}</b></p>
-		<p>{{app.narrative5|linebreaks}}</p>
-		<p><b>{{form.collab_ref1_name.help_text}}</b></p>
-		<p>1. {{app.collab_ref1_name}}, {{app.collab_ref1_org}}. {{app.collab_ref1_phone|add:" "}}{{app.collab_ref1_email}}</p>
-		<p>2. {{app.collab_ref2_name}}, {{app.collab_ref2_org}}. {{app.collab_ref2_phone|add:" "}}{{app.collab_ref2_email}}</p>
-		<br>
-		<p><b>6. {{form.narrative6.label}}</b></p>
-		<p>{{app.narrative6|linebreaks}}</p>
-		<p><b>{{form.racial_justice_ref1_name.help_text}}</b></p>
-		{% if app.racial_justice_ref1_org %}
-			<p>1. {{app.racial_justice_ref1_name}}, {{app.racial_justice_ref1_org}}. {{app.racial_justice_ref1_phone|add:" "}}{{app.racial_justice_ref1_email}}</p>
-			{% if app.racial_justice_ref2_name %}
-				<p>2. {{app.racial_justice_ref2_name}}, {{app.racial_justice_ref2_org}}. {{app.racial_justice_ref2_phone|add:" "}}{{app.racial_justice_ref2_email}}</p>
-			{% endif %}
-		{% else %}N/A{% endif %}
-		{% if app.cycle_question %}
-		<br>
-		<p><b>7. {{form.cycle_question.label}}</b></p>
-		<p>{{app.cycle_question|linebreaks}}</p>
-		{% endif %}
+		<h2>Narratives</h2>
+    <ol class="main">
+      <li>
+        <b>{{form.narrative1.label}}</b>
+        <p>{{app.narrative1|linebreaks}}</p>
+      </li>
+      <li>
+        <b>{{form.narrative2.label}}</b>
+        <p>{{app.narrative2|linebreaks}}
+      </li>
+      <li>
+        <b>{{form.narrative3.label}}</b>
+        <p>{{app.narrative3|linebreaks}}</p>
+      </li>
+      <li>
+        <b>{{form.narrative4.label}}</b>
+        <p>{{app.narrative4|linebreaks}}</p>
+        {{app.timeline_display|linebreaks}}
+      </li>
+      {% if app.two_year_question %}
+      <li>
+        <b>{{form.two_year_question.label}}</b>
+        <p>{{app.two_year_question|linebreaks}}</p>
+      </li>
+      {% endif %}
+      <li>
+        <b>{{form.narrative5.label}}</b>
+        <p>{{app.narrative5|linebreaks}}</p>
+        <p><b>{{form.collab_ref1_name.help_text}}</b></p>
+        <p>1. {{app.collab_ref1_name}}, {{app.collab_ref1_org}}. {{app.collab_ref1_phone|add:" "}}{{app.collab_ref1_email}}</p>
+        <p>2. {{app.collab_ref2_name}}, {{app.collab_ref2_org}}. {{app.collab_ref2_phone|add:" "}}{{app.collab_ref2_email}}</p>
+      </li>
+      <li>
+        <b>{{form.narrative6.label}}</b>
+        <p>{{app.narrative6|linebreaks}}</p>
+      </li>
+      <li>
+        <b>Racial justice references</b>
+        {% if app.racial_justice_ref1_org %}
+          <p>1. {{app.racial_justice_ref1_name}}, {{app.racial_justice_ref1_org}}. {{app.racial_justice_ref1_phone|add:" "}}{{app.racial_justice_ref1_email}}</p>
+          {% if app.racial_justice_ref2_name %}
+            <p>2. {{app.racial_justice_ref2_name}}, {{app.racial_justice_ref2_org}}. {{app.racial_justice_ref2_phone|add:" "}}{{app.racial_justice_ref2_email}}</p>
+          {% endif %}
+        {% else %}
+          <p>N/A</p>
+        {% endif %}
+      </li>
+      {% if app.cycle_question %}
+      <li>
+        <b>{{form.cycle_question.label}}</b>
+        <p>{{app.cycle_question|linebreaks}}</p>
+      </li>
+      {% endif %}
 	{% endautoescape %}
 	</div>
 {% endblock %}

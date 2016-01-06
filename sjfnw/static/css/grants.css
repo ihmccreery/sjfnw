@@ -23,7 +23,7 @@
 
 /*-------------------------------- Home page --------------------------------*/
 
-#org-wrapper li {
+li {
   margin-top: 5px;
   margin-bottom: 5px;
 }
@@ -208,7 +208,7 @@ div.ui-dialog {
 
 /*------------------------------- Narratives --------------------------------*/
 
-div.narrative_q {
+li.narrative_q {
   margin-top: 2em;
 }
 

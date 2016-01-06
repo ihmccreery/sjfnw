@@ -140,7 +140,7 @@ class GrantCycle(models.Model):
       'Private (will not be displayed to orgs, but can be accessed by '
        'anyone who has the direct link)')
   two_year_grants = models.BooleanField(default=False,
-      verbose_name='Cycles associated with two-year grants have an extra '
+      help_text='Cycles associated with two-year grants have an extra '
       'question in their application.')
   two_year_question = models.TextField(blank=True, default=
       'This grant will provide funding for two years. While we know it can be '
@@ -148,7 +148,8 @@ class GrantCycle(models.Model):
       'what the second year might look like.<ol><li>What overall goals and '
       'strategies do you forecast in the second year?</li><li>How will the '
       'second year of this grant build on your work in the first year?</li></ol>',
-      verbose_name='This question is only shown if "Two year grants" is checked')
+      help_text='Only shown if "Two year grants" is checked. HTML can be used '
+      'for formatting')
 
   class Meta:
     ordering = ['-close', 'title']
@@ -308,7 +309,7 @@ class GrantApplication(models.Model):
   fiscal_zip = models.CharField(verbose_name='ZIP', max_length=50, blank=True)
 
   # narratives. index matches question number
-  NARRATIVE_CHAR_LIMITS = [0, 300, 150, 450, 300, 300, 450, 750]
+  NARRATIVE_CHAR_LIMITS = [0, 300, 150, 450, 300, 300, 450, 750, 500]
   NARRATIVE_TEXTS = ['Placeholder for 0',
     ('Describe your organization\'s mission, history and major '
      'accomplishments.'), #1
@@ -390,8 +391,10 @@ class GrantApplication(models.Model):
   narrative6 = models.TextField(validators=[WordLimitValidator(NARRATIVE_CHAR_LIMITS[6])],
                                 verbose_name=NARRATIVE_TEXTS[6],
                                 help_text=HELP_TEXTS['leadership'])
-  cycle_question = models.TextField(validators=[WordLimitValidator(NARRATIVE_CHAR_LIMITS[7])],
-                                    blank=True)
+  cycle_question = models.TextField(
+      validators=[WordLimitValidator(NARRATIVE_CHAR_LIMITS[7])], blank=True)
+  two_year_question = models.TextField(
+      validators=[WordLimitValidator(NARRATIVE_CHAR_LIMITS[8])], blank=True)
 
   timeline = models.TextField(
       verbose_name='Please fill in this timeline to describe your activities '
@@ -431,13 +434,14 @@ class GrantApplication(models.Model):
                                         blank=True)
 
   #racial justice references (after narrative 6)
-  racial_justice_ref1_name = models.CharField(verbose_name='Name', max_length=150, blank=True)
-  racial_justice_ref1_org = models.CharField(verbose_name='Organization',
-                                             max_length=150, blank=True)
-  racial_justice_ref1_phone = models.CharField(verbose_name='Phone number',
-                                               max_length=20, blank=True)
-  racial_justice_ref1_email = models.EmailField(verbose_name='Email',
-                                                max_length=100, blank=True)
+  racial_justice_ref1_name = models.CharField(
+      verbose_name='Name', max_length=150, blank=True)
+  racial_justice_ref1_org = models.CharField(
+      verbose_name='Organization', max_length=150, blank=True)
+  racial_justice_ref1_phone = models.CharField(
+      verbose_name='Phone number', max_length=20, blank=True)
+  racial_justice_ref1_email = models.EmailField(
+      verbose_name='Email', max_length=100, blank=True)
 
   racial_justice_ref2_name = models.CharField(verbose_name='Name',
                                               max_length=150, blank=True)
@@ -633,7 +637,9 @@ class GivingProjectGrant(models.Model):
     return u'{} from {}'.format(self, self.projectapp.giving_project)
 
   def agreement_due(self):
-    """ Agreement is due 30 days after it is mailed """
+    """ Agreement is due 30 days after it is mailed
+      Returns datetime.date or None if agreement has not been mailed
+    """
     if self.agreement_mailed:
       return self.agreement_mailed + timedelta(days=30)
     else:
@@ -641,7 +647,7 @@ class GivingProjectGrant(models.Model):
 
   def yearend_due(self):
     """ Year-end reports are due n year(s) after agreement was mailed
-        Returns None if all YER have been submitted for this grant
+      Returns datetime.date or None if all YER have been submitted for this grant
     """
     if not self.agreement_mailed:
       return None

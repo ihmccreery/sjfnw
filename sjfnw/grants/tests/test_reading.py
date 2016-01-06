@@ -89,3 +89,25 @@ class GrantReading(BaseGrantTestCase):
     self.assertTemplateUsed(response, 'grants/reading.html')
     self.assertEqual(0, response.context['perm'])
     self.assertNotContains(response, 'year end report')
+
+  def test_two_year_grant_question(self):
+    self.log_in_test_org()
+
+    response = self.client.get('/grants/view/1', follow=True)
+
+    self.assertTemplateUsed(response, 'grants/reading.html')
+    self.assertEqual(3, response.context['perm'])
+    self.assertContains(response, 'year end report')
+    self.assertNotContains(response, 'two-year grants')
+
+    # View the app again after adding text to its two_year_question field
+    application = models.GrantApplication.objects.get(pk=1)
+    application.two_year_question = 'A response about two-year grants'
+    application.save()
+
+    response = self.client.get('/grants/view/1', follow=True)
+
+    self.assertTemplateUsed(response, 'grants/reading.html')
+    self.assertEqual(3, response.context['perm'])
+    self.assertContains(response, 'year end report')
+    self.assertContains(response, 'two-year grants')
