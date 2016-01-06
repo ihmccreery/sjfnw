@@ -212,6 +212,10 @@ li.narrative_q {
   margin-top: 2em;
 }
 
+.narrative_q ol {
+  list-style-type: lower-roman;
+}
+
 table.narrative_references {
   padding-top: 15px;
 }
