@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags
 
 from sjfnw import constants as c
-from sjfnw.grants import models
+from sjfnw.grants.models import DraftGrantApplication, GivingProjectGrant
 
 logger = logging.getLogger('sjfnw')
 
@@ -19,7 +19,7 @@ def draft_app_warning(request):
       NOTE: must run exactly once a day
       Gives 7 day warning if created 7+ days before close, otherwise 3 day warning """
 
-  drafts = models.DraftGrantApplication.objects.all()
+  drafts = DraftGrantApplication.objects.all()
   eight_days = timedelta(days=8)
 
   for draft in drafts:
@@ -46,24 +46,25 @@ def yer_reminder_email(request):
       NOTE: Must run exactly once a day
       Sends reminder emails at 1 month and 1 week """
 
-  # get awards due in 7 or 30 days by agreement_returned date
-  year_ago = timezone.now().date().replace(year=timezone.now().year - 1)
+  today = timezone.now().date()
+
+  # get awards due in 7 or 30 days by agreement_mailed date
+  year_ago = today.replace(year=today.year - 1)
   award_dates = [year_ago + timedelta(days=30), year_ago + timedelta(days=7)]
-  awards = list(models.GivingProjectGrant.objects.filter(agreement_mailed__in=award_dates))
+  awards = GivingProjectGrant.objects.filter(agreement_mailed__in=award_dates)
 
   # for multiyear grants, get awards due in 7 or 30 days of second year end report due date
-  two_years_ago = timezone.now().date().replace(year=timezone.now().year - 2)
+  two_years_ago = today.replace(year=today.year - 2)
   second_award_dates = [two_years_ago + timedelta(days=30), two_years_ago + timedelta(days=7)]
-  second_awards = list(models.GivingProjectGrant.objects
-    .filter(agreement_mailed__in=second_award_dates, second_check_mailed__isnull=False)
-  )
-  total_awards = awards + second_awards
+  second_awards = GivingProjectGrant.objects.filter(
+      agreement_mailed__in=second_award_dates, second_check_mailed__isnull=False)
+
+  total_awards = list(awards) + list(second_awards)
 
   for award in total_awards:
     if award.yearendreport_set.all().count() < award.grant_length():
       app = award.projectapp.application
 
-      subject = 'Year end report'
       from_email = c.GRANT_EMAIL
       to_email = app.organization.email
       html_content = render_to_string('grants/email_yer_due.html', {
@@ -72,7 +73,7 @@ def yer_reminder_email(request):
       })
       text_content = strip_tags(html_content)
 
-      msg = EmailMultiAlternatives(subject, text_content, from_email,
+      msg = EmailMultiAlternatives('Year end report', text_content, from_email,
                                    [to_email], [c.SUPPORT_EMAIL])
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
