@@ -625,6 +625,11 @@ class GivingProjectGrant(models.Model):
   agreement_returned = models.DateField(null=True, blank=True)
   approved = models.DateField(verbose_name='Date approved by the ED', null=True, blank=True)
 
+  first_yer_due = models.DateField(
+      verbose_name='Year-end report due-date',
+      help_text='If this is a two-year grant, the second YER will '
+                'automatically be due one year after the first')
+
   class Meta:
     ordering = ['-created']
 
