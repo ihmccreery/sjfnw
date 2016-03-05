@@ -1,5 +1,5 @@
-import logging
 from datetime import timedelta
+import logging
 
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
@@ -43,26 +43,24 @@ def draft_app_warning(request):
 
 def yer_reminder_email(request):
   """ Remind orgs of upcoming year end reports that are due
-      NOTE: Must run exactly once a day
+      NOTE: Must run exactly once a day. ONLY SUPPORTS UP TO 2-YEAR GRANTS
       Sends reminder emails at 1 month and 1 week """
 
   today = timezone.now().date()
 
-  # get awards due in 7 or 30 days by agreement_mailed date
+  # get awards due in 7 or 30 days
   year_ago = today.replace(year=today.year - 1)
-  award_dates = [year_ago + timedelta(days=30), year_ago + timedelta(days=7)]
-  awards = GivingProjectGrant.objects.filter(agreement_mailed__in=award_dates)
-
-  # for multiyear grants, get awards due in 7 or 30 days of second year end report due date
   two_years_ago = today.replace(year=today.year - 2)
-  second_award_dates = [two_years_ago + timedelta(days=30), two_years_ago + timedelta(days=7)]
-  second_awards = GivingProjectGrant.objects.filter(
-      agreement_mailed__in=second_award_dates, second_check_mailed__isnull=False)
+  award_dates = [
+      year_ago + timedelta(days=30),
+      year_ago + timedelta(days=7),
+      two_years_ago + timedelta(days=30),
+      two_years_ago + timedelta(days=7)
+  ]
+  awards = GivingProjectGrant.objects.filter(first_yer_due=award_dates)
 
-  total_awards = list(awards) + list(second_awards)
-
-  for award in total_awards:
-    if award.yearendreport_set.all().count() < award.grant_length():
+  for award in awards:
+    if award.yearendreport_set.count() < award.grant_length():
       app = award.projectapp.application
 
       from_email = c.GRANT_EMAIL

@@ -295,7 +295,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     award.save()
 
     # verify that yer is due in 60 days
-    self.assertEqual(award.yearend_due(), today + timedelta(days=60))
+    self.assertEqual(award.next_yer_due(), today + timedelta(days=60))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
@@ -316,7 +316,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     award.save()
 
     # verify that yer is due in 30 days
-    self.assertEqual(award.yearend_due(), today + timedelta(days=30))
+    self.assertEqual(award.next_yer_due(), today + timedelta(days=30))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
@@ -337,7 +337,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     award.save()
 
     # verify that yer is due in 15 days
-    self.assertEqual(award.yearend_due(), today + timedelta(days=15))
+    self.assertEqual(award.next_yer_due(), today + timedelta(days=15))
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
@@ -358,7 +358,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     award.save()
 
     # verify that yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today + timedelta(days=7))
+    self.assertEqual(award.next_yer_due(), today + timedelta(days=7))
 
     # verify that email is sent
     self.assertEqual(len(mail.outbox), 0)
@@ -379,14 +379,14 @@ class YearEndReportReminders(BaseGrantTestCase):
     award.save()
 
     # verify that YER is due in 7 days
-    self.assertEqual(award.yearend_due(), today + timedelta(days=7))
+    self.assertEqual(award.next_yer_due(), today + timedelta(days=7))
 
     # create YER
     yer = models.YearEndReport(award=award, total_size=10, donations_count=50)
     yer.save()
 
     # verify that no more are due
-    self.assertEqual(award.yearend_due(), None)
+    self.assertEqual(award.next_yer_due(), None)
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)
@@ -407,7 +407,7 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # verify that first YER was due 7 days from one year ago
     first_yer_due = (today + timedelta(days=7)).replace(year=today.year-1)
-    self.assertEqual(award.yearend_due(), first_yer_due)
+    self.assertEqual(award.next_yer_due(), first_yer_due)
 
     # submit first YER
     yer = models.YearEndReport(award=award, submitted=first_yer_due,
@@ -415,7 +415,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     yer.save()
 
     # verify that second yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today + timedelta(days=7))
+    self.assertEqual(award.next_yer_due(), today + timedelta(days=7))
 
     # verify that email is sent
     self.assertEqual(len(mail.outbox), 0)
@@ -441,7 +441,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     yer.save()
 
     # verify that second yer is due in 7 days
-    self.assertEqual(award.yearend_due(), today + timedelta(days=7))
+    self.assertEqual(award.next_yer_due(), today + timedelta(days=7))
 
     # create second YER
     second_yer = models.YearEndReport(award=award, total_size=10,
@@ -450,7 +450,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     second_yer.save()
 
     # verify that no YER is due
-    self.assertEqual(award.yearend_due(), None)
+    self.assertEqual(award.next_yer_due(), None)
 
     # verify that email is not sent
     self.assertEqual(len(mail.outbox), 0)

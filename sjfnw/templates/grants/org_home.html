@@ -91,7 +91,7 @@
           Last modified {{ draft.modified|date:"n/j" }}
         </td>
         <td class="due">
-          Due {{ draft.award.yearend_due|date:"n/j/y" }}
+          Due {{ draft.award.next_yer_due|date:"n/j/y" }}
         </td>
         <td></td>
       </tr>
@@ -144,7 +144,7 @@
               <a href="{% url 'sjfnw.grants.views.view_yer' report_id=yer.pk %}">Year end report</a> submitted {{ yer.submitted|date:"n/j/y" }}.
             {% endfor %}
             {% if award.yearendreport_set.all|length < award.grant_length %}
-              <div class="due"><a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ award.yearend_due|date:"n/j/y" }}</div>.
+              <div class="due"><a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ award.next_yer_due|date:"n/j/y" }}</div>.
             {% endif %}
           {% endif %}
         </td>

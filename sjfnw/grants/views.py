@@ -968,7 +968,7 @@ def show_yer_statuses(request):
     else:
       award.yer_count = 0
     award.complete = award.yer_count >= award.grant_length()
-    next_due = award.yearend_due()
+    next_due = award.next_yer_due()
     award.past_due = next_due and next_due < timezone.now().date()
 
   return render(request, 'admin/grants/yer_status.html', {'awards': awards})
@@ -1404,7 +1404,7 @@ def get_gpg_results(options):
       elif field == 'giving_project':
         row.append(award.projectapp.giving_project.title)
       elif field == 'year_end_report_due':
-        row.append(award.yearend_due())
+        row.append(award.next_yer_due())
       elif field == 'first_year_amount':
         row.append(award.amount)
       elif field == 'second_year_amount':

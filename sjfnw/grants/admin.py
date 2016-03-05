@@ -427,7 +427,7 @@ class GivingProjectGrantA(BaseModelAdmin):
   # custom methods - list and single views
 
   def next_year_end_report_due(self, obj):
-    return obj.yearend_due() or '-'
+    return obj.next_yer_due() or '-'
 
   def total_grant(self, obj):
     amt = obj.total_amount()
