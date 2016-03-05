@@ -655,17 +655,15 @@ class GivingProjectGrant(models.Model):
     else:
       return None
 
-  def yearend_due(self):
+  def next_yer_due(self):
     """ Year-end reports are due n year(s) after agreement was mailed
       Returns datetime.date or None if all YER have been submitted for this grant
     """
-    if not self.agreement_mailed:
-      return None
     completed = self.yearendreport_set.count()
     if completed >= self.grant_length():
       return None
     else:
-      return self.agreement_mailed.replace(year=self.agreement_mailed.year + completed + 1)
+      return self.first_yer_due.replace(year=self.first_yer_due.year + completed)
 
   def total_amount(self):
     """ Total amount granted, or 0 if no amount has been entered """
