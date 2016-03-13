@@ -1,5 +1,7 @@
 import logging
 
+from django.utils import timezone
+
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants.models import (GivingProjectGrant, GrantApplicationOverflow,
     GrantCycle, ProjectApp, YearEndReport)
@@ -15,7 +17,7 @@ class GrantReading(BaseGrantTestCase):
   def setUp(self):
     papp = ProjectApp(application_id=1, giving_project_id=2)
     papp.save()
-    award = GivingProjectGrant(projectapp_id=papp.pk, amount=8900)
+    award = GivingProjectGrant(projectapp_id=papp.pk, amount=8900, first_yer_due=timezone.now())
     award.save()
     yer = YearEndReport(award=award, total_size=83,
         donations_count_prev=6, donations_count=9,

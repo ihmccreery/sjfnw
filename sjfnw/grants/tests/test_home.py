@@ -29,7 +29,8 @@ class OrgHomeAwards(BaseGrantTestCase):
 
   def test_early(self):
     """ org has an award, but agreement has not been mailed. verify not shown """
-    award = models.GivingProjectGrant(projectapp_id=1, amount=9000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=9000,
+                                      first_yer_due=timezone.now()+timedelta(weeks=53))
     award.save()
 
     response = self.client.get(self.url)
@@ -39,8 +40,12 @@ class OrgHomeAwards(BaseGrantTestCase):
 
   def test_sent(self):
     """ org has award, agreement mailed. verify shown """
-    award = models.GivingProjectGrant(projectapp_id=1, amount=9000,
-        agreement_mailed=timezone.now()-timedelta(days=1))
+    today = timezone.now()
+    award = models.GivingProjectGrant(
+        projectapp_id=1,
+        amount=9000,
+        agreement_mailed=today-timedelta(days=1),
+        first_yer_due=today+timedelta(weeks=52))
     award.save()
 
     response = self.client.get(self.url)

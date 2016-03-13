@@ -29,9 +29,11 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     self.log_in_test_org()
     today = timezone.now()
     award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000,
+        projectapp_id=1,
+        amount=5000,
         agreement_mailed=today - timedelta(days=345),
-        agreement_returned=today - timedelta(days=350))
+        agreement_returned=today - timedelta(days=350),
+        first_yer_due=today + timedelta(days=9))
     award.save()
     self.award_id = award.pk
 
@@ -42,7 +44,7 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     self.assertContains(response, '<a href="/report/%d">' % self.award_id)
 
   def test_home_link_early(self):
-    """ Link to report isn't shown if agreement hasn't been mailed """
+    """ Link to report is shown even if agreement hasn't been mailed """
 
     award = models.GivingProjectGrant.objects.get(pk=self.award_id)
     award.agreement_mailed = None
@@ -51,13 +53,13 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     response = self.client.get('/apply/')
 
     self.assertTemplateUsed('grants/org_home.html')
-    self.assertNotContains(response, '<a href="/report/%d">' % self.award_id)
+    self.assertContains(response, '<a href="/report/%d">' % self.award_id)
 
   def test_late_home_link(self):
     """ Link to report is shown even if due date has passed """
 
     award = models.GivingProjectGrant.objects.get(pk=self.award_id)
-    award.agreement_mailed = timezone.now() - timedelta(days=400)
+    award.first_yer_due = timezone.now() - timedelta(days=4)
     award.save()
 
     response = self.client.get('/apply/')
@@ -82,20 +84,21 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     self.assertContains(response, '<a href="/report/%d">' % self.award_id, count=1)
 
   def test_no_second_home_link(self):
+
     # make award be two-year
     award = models.GivingProjectGrant.objects.get(pk=self.award_id)
     award.second_amount = 5000
-    award.agreement_mailed = timezone.now() - timedelta(weeks=102)
+    award.first_yer_due = timezone.now() - timedelta(weeks=1)
     award.save()
+
     # re-fetch to get updated version with fields that change during save
     award = models.GivingProjectGrant.objects.get(pk=self.award_id)
 
     # verify that only first due date/link shows
     response = self.client.get('/apply/')
-    first_due = award.agreement_mailed.replace(year=award.agreement_mailed.year + 1)
     self.assertTemplateUsed('grants/org_home.html')
     self.assertContains(response, '<a href="/report/%d">' % self.award_id, count=1)
-    self.assertContains(response, 'due {:%-m/%-d/%y}'.format(first_due), count=1)
+    self.assertContains(response, 'due {:%-m/%-d/%y}'.format(award.first_yer_due), count=1)
 
   def test_two_completed(self):
     # submit first YER
@@ -273,7 +276,6 @@ class YearEndReportForm(BaseGrantFilesTestCase):
 
 
 class YearEndReportReminders(BaseGrantTestCase):
-  """ Test reminder email functionality """
 
   projectapp_id = 1
   url = reverse('sjfnw.grants.cron.yer_reminder_email')
@@ -287,11 +289,8 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 60 days
     today = timezone.now().date()
-    mailed = (today + timedelta(days=60)).replace(year=today.year - 1)
-    award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000, agreement_mailed=mailed,
-        agreement_returned=mailed + timedelta(days=3)
-    )
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+                                      first_yer_due=today + timedelta(days=60))
     award.save()
 
     # verify that yer is due in 60 days
@@ -308,11 +307,8 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 30 days
     today = timezone.now().date()
-    mailed = (today + timedelta(days=30)).replace(year=today.year - 1)
-    award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000, agreement_mailed=mailed,
-        agreement_returned=mailed + timedelta(days=3)
-    )
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+                                      first_yer_due=today + timedelta(days=30))
     award.save()
 
     # verify that yer is due in 30 days
@@ -329,11 +325,8 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 15 days
     today = timezone.now().date()
-    mailed = (today + timedelta(days=15)).replace(year=today.year - 1)
-    award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000, agreement_mailed=mailed,
-        agreement_returned=mailed + timedelta(days=3)
-    )
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+                                      first_yer_due=today + timedelta(days=15))
     award.save()
 
     # verify that yer is due in 15 days
@@ -350,11 +343,8 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 7 days
     today = timezone.now().date()
-    mailed = (today + timedelta(days=7)).replace(year=today.year - 1)
-    award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000, agreement_mailed=mailed,
-        agreement_returned=mailed + timedelta(days=3)
-    )
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+                                      first_yer_due=today + timedelta(days=7))
     award.save()
 
     # verify that yer is due in 7 days
@@ -371,11 +361,8 @@ class YearEndReportReminders(BaseGrantTestCase):
 
     # create award where yer should be due in 7 days
     today = timezone.now().date()
-    mailed = (today + timedelta(days=7)).replace(year=today.year - 1)
-    award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000, agreement_mailed=mailed,
-        agreement_returned=mailed + timedelta(days=3)
-    )
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+                                      first_yer_due=today + timedelta(days=7))
     award.save()
 
     # verify that YER is due in 7 days
@@ -398,16 +385,14 @@ class YearEndReportReminders(BaseGrantTestCase):
     """ Verify that reminder email is sent if second year end report due"""
 
     today = timezone.now().date()
-    mailed = (today + timedelta(days=7)).replace(year=today.year - 2)
+    first_yer_due = (today + timedelta(days=7)).replace(year=today.year-1)
     award = models.GivingProjectGrant(
-        projectapp_id=1, amount=5000, second_amount=5000, agreement_mailed=mailed,
-        agreement_returned=mailed + timedelta(days=3), second_check_mailed=today
+        projectapp_id=1, amount=5000, second_amount=5000,
+        first_yer_due=first_yer_due, second_check_mailed=today
     )
     award.save()
 
-    # verify that first YER was due 7 days from one year ago
-    first_yer_due = (today + timedelta(days=7)).replace(year=today.year-1)
-    self.assertEqual(award.next_yer_due(), first_yer_due)
+    self.assertEqual(award.next_yer_due(), award.first_yer_due)
 
     # submit first YER
     yer = models.YearEndReport(award=award, submitted=first_yer_due,
@@ -427,26 +412,24 @@ class YearEndReportReminders(BaseGrantTestCase):
     """ Verify that reminder email is not sent if second year end report completed"""
 
     today = timezone.now().date()
-    mailed = (today + timedelta(days=7)).replace(year=today.year-2)
+    first_yer_due = (today + timedelta(days=7)).replace(year=today.year-1)
     award = models.GivingProjectGrant(
-          projectapp_id=1, amount=5000, second_amount=5000, agreement_mailed=mailed,
-          agreement_returned=mailed + timedelta(days=3), second_check_mailed=today
+          projectapp_id=1, amount=5000, second_amount=5000,
+          first_yer_due=first_yer_due, second_check_mailed=today
     )
     award.save()
 
     # create first YER
-    first_yer_due = (today + timedelta(days=7)).replace(year=today.year-1)
     yer = models.YearEndReport(award=award, total_size=10,
                                submitted=first_yer_due, donations_count=50)
     yer.save()
 
-    # verify that second yer is due in 7 days
-    self.assertEqual(award.next_yer_due(), today + timedelta(days=7))
+    self.assertEqual(award.next_yer_due(), award.first_yer_due.replace(year = first_yer_due.year + 1))
 
     # create second YER
-    second_yer = models.YearEndReport(award=award, total_size=10,
-                                      submitted=first_yer_due.replace(year=first_yer_due.year + 1),
-                                      donations_count=50)
+    second_yer = models.YearEndReport(
+        award=award, total_size=10, donations_count=50,
+        submitted=first_yer_due.replace(year=first_yer_due.year + 1))
     second_yer.save()
 
     # verify that no YER is due
@@ -469,11 +452,8 @@ class RolloverYER(BaseGrantTestCase):
     self.log_in_test_org()
 
   def create_yer(self, award_id):
-    yer = models.YearEndReport(
-        award_id=award_id,
-        total_size=10,
-        donations_count=50,
-        contact_person='Mr. Spier, Exec. Dir.')
+    yer = models.YearEndReport(award_id=award_id, total_size=10,
+                               donations_count=50, contact_person='Name, Position')
     yer.save()
 
   def test_rollover_link(self):
@@ -493,7 +473,7 @@ class RolloverYER(BaseGrantTestCase):
   def test_display_no_reports(self):
     """ Verify error msg, no form if org has grant(s) but no reports """
 
-    award = models.GivingProjectGrant(projectapp_id=1, amount=8000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=8000, first_yer_due=timezone.now())
     award.save()
     self.assertNotEqual(models.GivingProjectGrant.objects.filter(
       projectapp__application__organization_id=2).count(), 0)
@@ -504,7 +484,7 @@ class RolloverYER(BaseGrantTestCase):
 
   def test_display_all_reports_done(self):
     """ Verify error msg, no form if org has reports for all grants """
-    award = models.GivingProjectGrant(projectapp_id=1, amount=5000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000, first_yer_due=timezone.now())
     award.save()
     self.create_yer(award.pk)
 
@@ -515,7 +495,7 @@ class RolloverYER(BaseGrantTestCase):
   def test_display_second_year_missing(self):
     """ Verify form if org has completed one but not both reports for their grant """
     award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
-        second_amount=1000)
+        second_amount=1000, first_yer_due=timezone.now())
     award.save()
     self.create_yer(award.pk)
 
@@ -527,7 +507,7 @@ class RolloverYER(BaseGrantTestCase):
     """ Verify display of form when there is a valid rollover option """
 
     # create award and YER
-    award = models.GivingProjectGrant(projectapp_id=1, amount=5000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000, first_yer_due=timezone.now())
     award.save()
     self.create_yer(award.pk)
 
@@ -536,7 +516,8 @@ class RolloverYER(BaseGrantTestCase):
     papp.save()
     mailed = timezone.now() - timedelta(days=355)
     award = models.GivingProjectGrant(projectapp=papp, amount=8000,
-        agreement_mailed=mailed, agreement_returned=mailed + timedelta(days=3))
+        agreement_mailed=mailed, agreement_returned=mailed + timedelta(days=3),
+        first_yer_due=timezone.now())
     award.save()
 
     response = self.client.get(self.url, follow=True)
