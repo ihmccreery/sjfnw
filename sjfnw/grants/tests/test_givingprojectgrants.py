@@ -15,10 +15,14 @@ class NewGivingProjectGrant(BaseGrantTestCase):
     super(NewGivingProjectGrant, self).setUp()
 
   def test_minimum_grant_information(self):
-    award = models.GivingProjectGrant(projectapp_id=1, amount=5000)
+    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
+            first_yer_due=timezone.now().date())
     award.save()
 
-    self.assertEqual(award.next_yer_due(), None)
+    self.assertEqual(award.total_amount(), award.amount)
+    self.assertEqual(award.next_yer_due(), award.first_yer_due)
+    self.assertEqual(award.grant_length(), 1)
+
     self.assertEqual(award.check_number, None)
     self.assertEqual(award.check_mailed, None)
 
@@ -29,16 +33,6 @@ class NewGivingProjectGrant(BaseGrantTestCase):
     self.assertEqual(award.agreement_mailed, None)
     self.assertEqual(award.agreement_returned, None)
     self.assertEqual(award.approved, None)
-
-  def test_single_year_grant(self):
-    award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
-                                      first_yer_due=timezone.now().date())
-    award.save()
-
-    self.assertEqual(award.total_amount(), award.amount)
-    self.assertEqual(award.next_yer_due(), award.first_yer_due)
-    self.assertEqual(award.grant_length(), 1)
-    self.assertEqual(award.second_check_mailed, None)
 
   def test_two_year_grant(self):
     award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
