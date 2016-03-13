@@ -138,15 +138,15 @@
       <tr>
         <td></td>
         <td>
-          {% if award.agreement_mailed %}
-            {% for yer in award.yearendreport_set.all %}
-              {% if forloop.counter > 1 %}<br>{% endif %}
-              <a href="{% url 'sjfnw.grants.views.view_yer' report_id=yer.pk %}">Year end report</a> submitted {{ yer.submitted|date:"n/j/y" }}.
-            {% endfor %}
-            {% if award.yearendreport_set.all|length < award.grant_length %}
-              <div class="due"><a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ award.next_yer_due|date:"n/j/y" }}</div>.
+          {% for yer in award.yearendreport_set.all %}
+            {% if forloop.counter > 1 %}<br>{% endif %}
+            <a href="{% url 'sjfnw.grants.views.view_yer' report_id=yer.pk %}">Year end report</a> submitted {{ yer.submitted|date:"n/j/y" }}.
+          {% endfor %}
+          {% with next_due=award.next_yer_due %}
+            {% if next_due %}
+              <div class="due"><a href="/report/{{ award.pk }}{{ user_override|default:'' }}">Year end report</a> due {{ next_due|date:"n/j/y" }}</div>.
             {% endif %}
-          {% endif %}
+          {% endwith %}
         </td>
       </tr>
     {% endfor %}{# awards #}
