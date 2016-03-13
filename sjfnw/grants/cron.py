@@ -50,14 +50,13 @@ def yer_reminder_email(request):
 
   # get awards due in 7 or 30 days
   year_ago = today.replace(year=today.year - 1)
-  two_years_ago = today.replace(year=today.year - 2)
   award_dates = [
-      year_ago + timedelta(days=30),
+      today + timedelta(days=7),
+      today + timedelta(days=30),
       year_ago + timedelta(days=7),
-      two_years_ago + timedelta(days=30),
-      two_years_ago + timedelta(days=7)
+      year_ago + timedelta(days=30)
   ]
-  awards = GivingProjectGrant.objects.filter(first_yer_due=award_dates)
+  awards = GivingProjectGrant.objects.filter(first_yer_due__in=award_dates)
 
   for award in awards:
     if award.yearendreport_set.count() < award.grant_length():
