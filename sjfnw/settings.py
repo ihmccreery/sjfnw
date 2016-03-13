@@ -20,8 +20,9 @@ INSTALLED_APPS = [
   'libs.pytz',
 ]
 
-if (os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine') or
-    os.getenv('SETTINGS_MODE') == 'prod'):
+DEBUG = False
+
+if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
   DATABASES = {
     'default': {
       'ENGINE': 'django.db.backends.mysql',
@@ -31,7 +32,17 @@ if (os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine') or
       'PASSWORD': os.getenv('CLOUDSQL_PASSWORD')
     }
   }
-  DEBUG = False
+elif os.getenv('SETTINGS_MODE') == 'prod':
+  # locally accessing prod DB
+  DATABASES = {
+    'default': {
+      'ENGINE': 'django.db.backends.mysql',
+      'HOST': os.getenv('CLOUDSQL_IP'),
+      'NAME': 'sjfdb',
+      'USER': 'root',
+      'PASSWORD': os.getenv('CLOUDSQL_PASSWORD')
+    }
+  }
 elif 'test' in sys.argv:
   DATABASES = {
     'default': {
