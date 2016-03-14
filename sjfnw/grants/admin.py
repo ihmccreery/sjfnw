@@ -204,9 +204,8 @@ class SponsoredProgramI(BaseShowInline):
   edit.allow_tags = True
 
 
-class ProjectAppI(admin.TabularInline): # GrantApplication
-  """ Display giving projects assigned to this app, and related objects
-      (screening status, awards, YER) """
+class ProjectAppI(admin.TabularInline):
+  """ Display giving projects assigned to this app """
   model = models.ProjectApp
   extra = 1
   fields = ['giving_project', 'screening_status', 'granted', 'year_end_report']
@@ -382,7 +381,8 @@ class DraftGrantApplicationA(BaseModelAdmin):
 class GivingProjectGrantA(BaseModelAdmin):
   list_display = ['organization_name', 'grant_cycle', 'giving_project',
                   'short_created', 'total_grant', 'fully_paid', 'check_mailed']
-  search_fields = ['projectapp__application__organization__name', 'projectapp__giving_project__title' ]
+  search_fields = ['projectapp__application__organization__name',
+                   'projectapp__giving_project__title']
   list_filter = [CycleTypeFilter, GPGYearFilter, MultiYearGrantFilter]
   list_select_related = True
 
@@ -391,9 +391,13 @@ class GivingProjectGrantA(BaseModelAdmin):
       'fields': (
         ('projectapp', 'total_grant', 'created'),
         ('amount', 'check_number', 'check_mailed'),
-        ('agreement_mailed', 'agreement_returned', 'next_year_end_report_due'),
+        ('agreement_mailed', 'agreement_returned'),
         'approved'
       )
+    }),
+    ('', {
+      'classes': ('wide',),
+      'fields': ('first_yer_due',)
     }),
     ('Multi-Year Grant', {
       'fields': (('second_amount', 'second_check_number', 'second_check_mailed'),)
@@ -403,7 +407,7 @@ class GivingProjectGrantA(BaseModelAdmin):
 
   inlines = [YERInline]
 
-  # ModelAdmin methods (single view)
+  # overrides - change view only
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     """ Restrict db query to selected projectapp if specified in url """
@@ -424,7 +428,7 @@ class GivingProjectGrantA(BaseModelAdmin):
       self.readonly_fields.append('projectapp')
     return self.readonly_fields
 
-  # custom methods - list and single views
+  # custom methods - list and change views
 
   def next_year_end_report_due(self, obj):
     return obj.next_yer_due() or '-'
@@ -435,7 +439,7 @@ class GivingProjectGrantA(BaseModelAdmin):
       return '${:,}'.format(amt)
     return '-'
 
-  # custom methods - list page
+  # custom methods - list only
 
   def fully_paid(self, obj):
     return obj.fully_paid()
@@ -504,7 +508,6 @@ class YearEndReportA(BaseModelAdmin):
   award_link.allow_tags = True
   award_link.short_description = 'Award'
 
-
   def org(self, obj):
     return obj.award.projectapp.application.organization.name
   org.admin_order_field = 'award__projectapp__application__organization'
@@ -512,6 +515,7 @@ class YearEndReportA(BaseModelAdmin):
   def cycle(self, obj):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
+
 
 class DraftAdv(BaseModelAdmin):
   """ Only used in admin-advanced """
