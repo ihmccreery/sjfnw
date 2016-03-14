@@ -8,6 +8,7 @@ from django.utils.safestring import mark_safe
 from django.utils.text import capfirst
 
 from sjfnw.forms import IntegerCommaField, PhoneNumberField
+from sjfnw.grants import constants as gc
 from sjfnw.grants.models import Organization, GrantApplication, DraftGrantApplication, YearEndReport
 
 logger = logging.getLogger('sjfnw')
@@ -104,7 +105,7 @@ class GrantApplicationModelForm(forms.ModelForm):
 
   two_year_question = forms.CharField(required=False,
       widget=forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[8]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[8]
       }))
 
   formfield_callback = custom_fields
@@ -120,25 +121,25 @@ class GrantApplicationModelForm(forms.ModelForm):
         'rows': 3, 'onKeyUp': 'charLimitDisplay(this, 100)'
       }),
       'narrative1': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[1]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[1]
       }),
       'narrative2': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[2]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[2]
       }),
       'narrative3': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[3]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[3]
       }),
       'narrative4': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[4]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[4]
       }),
       'narrative5': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[5]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[5]
       }),
       'narrative6': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[6]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[6]
       }),
       'cycle_question': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % GrantApplication.NARRATIVE_CHAR_LIMITS[7]
+        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[7]
       }),
       'timeline': TimelineWidget()
     }

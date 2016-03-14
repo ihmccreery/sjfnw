@@ -22,6 +22,7 @@ from libs import unicodecsv
 
 from sjfnw import constants as c
 from sjfnw.fund.models import Member
+from sjfnw.grants import constants as gc
 from sjfnw.grants import models
 from sjfnw.grants.decorators import registered_org
 from sjfnw.grants.forms import (AdminRolloverForm, LoginAsOrgForm, LoginForm,
@@ -387,7 +388,7 @@ def grant_application(request, organization, cycle_id):
 
   return render(request, 'grants/org_app.html', {
       'form': form, 'cycle': cycle, 'file_urls': file_urls,
-      'limits': models.GrantApplication.NARRATIVE_CHAR_LIMITS,
+      'limits': gc.NARRATIVE_CHAR_LIMITS,
       'draft': draft, 'profiled': profiled, 'org': organization,
       'user_override': user_override, 'flag': draft.recently_edited() and draft.modified_by
   })
@@ -1167,7 +1168,7 @@ def get_app_results(options):
         # convert screening status to human-readable version
         val = getattr(app, field)
         if val:
-          convert = dict(models.PRE_SCREENING)
+          convert = dict(gc.PRE_SCREENING)
           val = convert[val]
         row.append(val)
       elif field == 'submission_time':
@@ -1199,7 +1200,7 @@ def get_app_results(options):
             if ss_col != '':
               ss_col += ', '
             if papp.screening_status:
-              ss_col += '%s (%s) ' % (dict(models.SCREENING)[papp.screening_status],
+              ss_col += '%s (%s) ' % (dict(gc.SCREENING)[papp.screening_status],
                 papp.giving_project.title)
             else:
               ss_col += '%s (none) ' % papp.giving_project.title
@@ -1531,7 +1532,7 @@ def get_file_urls(request, app, printing=False):
     if value:
       ext = value.name.lower().split('.')[-1]
       file_urls[field] += base_url + str(app.pk) + u'-' + field + u'.' + ext
-      if not settings.DEBUG and ext in c.VIEWER_FORMATS: # doc viewer
+      if not settings.DEBUG and ext in gc.VIEWER_FILE_TYPES:
         if printing:
           if not (ext == 'xls' or ext == 'xlsx'):
             file_urls[field] = 'https://docs.google.com/viewer?url=' + file_urls[field]

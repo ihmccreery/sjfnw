@@ -7,8 +7,9 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from sjfnw.fund.models import GivingProject
+from sjfnw.grants import constants as gc
 from sjfnw.grants.models import (Organization, GrantCycle, GrantApplication,
-    DraftGrantApplication, STATE_CHOICES, SCREENING, PRE_SCREENING)
+    DraftGrantApplication)
 
 logger = logging.getLogger('sjfnw')
 
@@ -175,7 +176,7 @@ class BaseReportForm(forms.Form):
       help_text='Organization name must contain the given text')
   city = forms.CharField(max_length=255, required=False,
       help_text='City must match the given text')
-  state = forms.MultipleChoiceField(choices=STATE_CHOICES[:5],
+  state = forms.MultipleChoiceField(choices=gc.STATE_CHOICES[:5],
       widget=forms.CheckboxSelectMultiple, required=False)
   has_fiscal_sponsor = forms.BooleanField(required=False)
 
@@ -242,10 +243,10 @@ class BaseAppRelatedReportForm(BaseReportForm):
 class AppReportForm(BaseAppRelatedReportForm):
 
   pre_screening_status = forms.MultipleChoiceField(
-      choices=PRE_SCREENING,
+      choices=gc.PRE_SCREENING,
       widget=forms.CheckboxSelectMultiple, required=False)
   screening_status = forms.MultipleChoiceField(label='Giving project screening status',
-      choices=SCREENING,
+      choices=gc.SCREENING,
       widget=forms.CheckboxSelectMultiple, required=False)
   poc_bonus = forms.BooleanField(required=False)
   geo_bonus = forms.BooleanField(required=False)
