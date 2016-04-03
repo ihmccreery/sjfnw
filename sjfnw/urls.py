@@ -47,6 +47,8 @@ urlpatterns = patterns('',
       'sjfnw.grants.views.revert_app_to_draft'),
   (r'^admin-advanced/grants/grantapplication/(?P<app_id>\d+)/rollover',
       'sjfnw.grants.views.admin_rollover'),
+  (r'^admin-advanced/grants/organizations/merge/(?P<org_a>\d+)/(?P<org_b>\d+)',
+      'sjfnw.grants.views.merge_orgs'),
 
   # reporting
   (r'^admin/grants/search/?', 'sjfnw.grants.views.grants_report'),

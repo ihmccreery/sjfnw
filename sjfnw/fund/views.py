@@ -746,6 +746,7 @@ def edit_contact(request, donor_id):
     logger.debug(request.POST)
     request.membership.last_activity = timezone.now()
     request.membership.save(skip=True)
+    # pylint: disable=redefined-variable-type
     if est:
       form = modelforms.DonorEditForm(request.POST, instance=donor,
                               auto_id=str(donor.pk) + '_id_%s')
