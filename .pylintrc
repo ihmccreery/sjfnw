@@ -26,7 +26,7 @@ disable=C0111,C1001,C0330,C0410,R0201,R0801,R0901,R0903,W0105,W0142,W0201,W0232,
 [REPORTS]
 
 output-format=colorized
-reports=no
+#reports=no
 
 [BASIC]
 

@@ -126,3 +126,15 @@ fieldset h2 a:link, fieldset h2 a:visited {
 .survey-choice {
   display: block;
 }
+
+/* Custom page - merge_orgs.html
+ *------------------------------*/
+
+.merge td {
+  border-left: 1px solid #eee;
+  font-size: 1em;
+}
+
+.big {
+  font-size: 1.25em;
+}

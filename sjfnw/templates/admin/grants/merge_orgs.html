@@ -1,0 +1,121 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+{% load admin_urls %}
+
+{% block content %}
+<h1>Merge organizations</h1>
+<br>
+<p><span class="big"><u>{{ orgs.0.name }}</u></span> <i>(last active: {{ orgs.0.user.last_login|date:"N d, Y"|default:"never" }})</i> and <span class="big"><u>{{ orgs.1.name }}</u></span> <i>(last active: {{ orgs.1.user.last_login|date:"N d, Y"|default:"never" }})</i></p>
+
+<div class="merge-box">
+<h2>About merging</h2>
+
+<p>The two organizations will be combined into one. All data from both is saved, <u>except</u> for organization name, email/username, and staff-entered contact info. Those fields will only be kept from one of the existing organizations - the one you choose below.<p>
+
+<p>Once the merge is complete, the redundant organization will be deleted.</p>
+
+<p><b>Warning</b>: Once the merge is complete, it will be impossible to distinguish which of the two <i>original</i> orgs something once belonged to.</p>
+
+<blockquote>For example: Say you are merging two orgs named Tulip and Daffodil. Pre-merge, Daffodil had received a sponsored program grant in 2013. Tulip is the new name the org uses, so you pick that when merging. After the merge, Daffodil no longer exists, and the database shows that Tulip received a sponsored program grant in 2013.</blockquote>
+
+<p>If you may need that kind of historical data, talk to Aisa before merging.</p>
+</div>
+
+<form action="" method="post">
+<table class="merge">
+  <tr>
+    <td colspan="3">
+      <h2>Select which org info to keep:</h2>
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    {% for choice in form.primary %}
+    <td>{{ choice }}</td>
+    {% endfor %}
+  </tr>
+  {% if form.primary.errors %}
+  <tr>
+    <td></td>
+    <td colspan="2">{{ form.primary.errors }}</td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>Organization name</th>
+    {% for org in orgs %}
+    <td>{{ org.name }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Login email/username</td>
+    {% for org in orgs %}
+    <td>{{ org.email }}</td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Staff-entered contact info</td>
+    {% for org in orgs %}
+      <td>
+        {{ org.get_staff_entered_contact_info|default:"-" }}
+      </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td colspan="3">
+      <h2>The following items from both organizations will be kept:</h2>
+    </td>
+  </tr>
+  <tr>
+    <td>Grant applications</td>
+    {% for org in orgs %}
+    <td>
+      {% for app in org.grantapplication_set.all %}
+      {{ app.grant_cycle }} - {{ app.submission_time|date:"N d, Y" }}<br>
+      {% empty %}
+      <i>none</i>
+      {% endfor %}
+    </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Draft grant applications</td>
+    {% for org in orgs %}
+    <td>
+      {% for app in org.draftgrantapplication_set.all %}
+      {{ app.grant_cycle }} - last modified {{ app.modified|date:"N d, Y" }}<br> 
+      {% empty %}
+      <i>none</i>
+      {% endfor %}
+    </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Giving project grants</td>
+    {% for org in orgs %}
+    <td>
+      {% for awawrd in org.givingprojectgrant_set.all %}
+      {{ award.amount }} - check mailed {{ award.check_mailed|date:"N d, Y" }}<br> 
+      {% empty %}
+      <i>none</i>
+      {% endfor %}
+    </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td>Sponsored program grants</td>
+    {% for org in orgs %}
+    <td>
+      {% for award in org.sponsoredprogramgrant_set.all %}
+      {{ award.amount }} - check mailed {{ award.check_mailed|date:"N d, Y" }}<br> 
+      {% empty %}
+      <i>none</i>
+      {% endfor %}
+    </td>
+    {% endfor %}
+  </tr>
+</table>
+<p><i>As well as any year-end reports and logs (notes entered by SJF staff)</p>
+
+  <input class="big" type="submit" value="Merge" />
+</form>
+{% endblock %}
