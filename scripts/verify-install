@@ -5,55 +5,55 @@ red="\033[0;31m"
 bold="\033[1m"
 reset="\033[0m"
 
-semver="\([0-9]\+.[0-9]\+.[0-9]\+\)"
-
-echo -e "Checking installation...\n"
-
 has_error=0
 
 check_version() {
-  if [ $(expr "$version" : ".*not found") -gt 0 ] ; then
+  if [ $(expr "$raw_version" : ".*not found") -gt 0 ] ; then
     has_error=1
     echo -e "$red$prefix: not found $reset"
   else
-    local version_semver=$(expr "$version" : "$match")
-    if [ "$version_semver" = "" ] ; then
+    local version_match=$(expr "$raw_version" : "$pattern")
+    if [ "$version_match" = "" ] ; then
       has_error=1
-      echo -e "$red$prefix: could not parse current version. $reset. Output: $version $valid"
-    elif [ $(expr "$version_semver" : "$match_valid") -gt 0 ] ; then
-      echo -e "$green$prefix: $version_semver $reset$valid"
+      echo -e "$red$prefix: could not parse current version.$reset Output: $raw_version $valid"
+    elif [ $(expr "$version_match" : "$pattern_valid") -gt 0 ] ; then
+      echo -e "$green$prefix: $version_match $reset$valid"
     else
       has_error=1
-      echo -e "$red$prefix: wrong version $version_semver $reset$valid"
+      echo -e "$red$prefix: wrong version $version_match $reset$valid"
     fi
   fi
 }
+
+semver="\([0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}\)"
+
+echo -e "Checking installation...\n"
 
 # Python 2.7
 
 prefix="Python"
 valid="(required: 2.7.x)"
-match="Python $semver"
-match_valid="^2.7"
-version="$(python --version 2>&1)"
+pattern="Python $semver"
+pattern_valid="^2.7"
+raw_version="$(python --version 2>&1)"
 check_version
 
 # pip
 
 prefix="pip"
 valid="(required: any)"
-match="pip $semver"
-match_valid="^[0-9]"
-version="$(pip --version 2>&1)"
+pattern="pip $semver"
+pattern_valid="^[0-9]"
+raw_version="$(pip --version 2>&1)"
 check_version
 
 # Mysql 5.5/6
 
 prefix="Mysql"
 valid="(required: 5.5.x or 5.6.x)"
-match="mysql.*Distrib $semver"
-match_valid="^5.[5-6]"
-version="$(mysql --version 2>&1)"
+pattern="mysql.*Distrib $semver"
+pattern_valid="^5.[5-6]"
+raw_version="$(mysql --version 2>&1)"
 check_version
 
 # GAE
@@ -75,7 +75,7 @@ else
 
 # Libs
 lib_missing=0
-echo -e "\nChecking libs..."
+echo -e "\nChecking libs directory..."
 cd "$(dirname "$0")/.."
 for dir in "django" "pytz" "unicodecsv" ; do
   if [ -d "./libs/$dir" ] ; then
@@ -87,9 +87,9 @@ for dir in "django" "pytz" "unicodecsv" ; do
 done
 
 if [ $has_error -gt 0 ] ; then
-  echo -e "\n$redX $reset$bold One or more errors were detected.\n\nFor a step-by-step guide to installation, check the docs:\nhttp://aisapatino.github.io/sjfnw/getting-started/installation-and-setup/ $reset"
+  echo -e "\n${red}X$reset$bold One or more errors were detected.$reset\n\nFor a step-by-step guide to installation, check the docs:\nhttp://aisapatino.github.io/sjfnw/getting-started/installation-and-setup/ $reset"
 elif [ $lib_missing -gt 0 ] ; then
-  echo -e "\n$redX $reset$bold Missing one or more libraries. Run ./install-libs\n $reset"
+  echo -e "\n${red}X $reset$bold Missing one or more libraries. Run ./scripts/install-libs\n$reset"
 else
-  echo -e "\n$greenOK $reset$bold Basic installation checks passed.\n $reset"
+  echo -e "\n${green}OK $reset$bold Basic installation checks passed.\n$reset"
 fi

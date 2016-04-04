@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 
+# use this dir instead of project root to avoid path mismatch
+# between astroid and pylint_plugin_utils
+
+cd "$(dirname "$0")"
+
 # run python linter (configured by .pylintrc)
-pylint --rcfile=.pylintrc sjfnw
+pylint --rcfile=../.pylintrc ../sjfnw
 
 # run javascript linter (configured by .eslintrc)
-eslint sjfnw/static/js/*.js
+#eslint sjfnw/static/js/*.js
