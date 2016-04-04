@@ -6,12 +6,16 @@ load-plugins=pylint_django
 
 [MESSAGES CONTROL]
 
-disable=C0111,C1001,C0330,R0201,R0901,R0903,W0105,W0142,W0201,W0232
+disable=C0111,C1001,C0330,C0410,R0201,R0801,R0901,R0903,W0105,W0142,W0201,W0232,
+  too-many-branches,too-many-nested-blocks,too-many-statements,too-many-locals,
+  too-many-lines,locally-disabled,too-many-boolean-expressions,redefined-variable-type
 
 # C0111 missing-docstring
+# C0410 multiple-imports
 # C1001 old-style-class
 # C0330 bad-continuation
 # R0201 no-self-use
+# R0801 duplicate-code
 # R0901 too-many-ancestors
 # R0903 too-few-public-methods
 # W0105 pointless-string-statement
@@ -27,7 +31,7 @@ reports=no
 [BASIC]
 
 bad-functions=map,filter,input,print # defaults + print
-good-names=i,_,pk,gp,qs
+good-names=i,j,_,pk,gp,qs
 
 # allow setUp as an exception since it's built in
 method-rgx=setUp|([a-z_][a-z0-9_]{2,30})$
