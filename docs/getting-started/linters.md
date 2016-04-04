@@ -21,7 +21,7 @@ See [text editor setup](text-editor-setup.md) for more info.
 
 ### Usage - CLI
 
-- To lint the whole project: `./scripts/lint`
+- To lint the whole project: `./scripts/lint` (add `-E` to see errors only)
 - That will output results to the console. If you want to save results to a file, you can do `./scripts/lint > filename.txt`
 
 ### Configuration

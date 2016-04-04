@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+pip_version=$(pip --version 2>&1)
+if [ $(expr "$pip_version" : '.*not found') -gt 0 ] ; then
+  echo "Pip is required to install dependencies. See http://aisapatino.github.io/sjfnw/getting-started/installation-and-setup/"
+  exit 1
+fi
+
+echo "Installing pylint..."
+
+cd "$(dirname "$0")/.."
+
+pip install pylint==1.5.4 -t libs
+pip install --upgrade git+git://github.com/aisapatino/pylint-django.git -t ./libs
