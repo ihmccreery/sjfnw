@@ -147,7 +147,7 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     # assert website autofilled from app
     self.assertEqual(form['website'].value(), application.website)
     expected_title = 'Year-end Report for {:%b %d, %Y} - {:%b %d, %Y}'.format(
-        mailed.replace(year=mailed.year), mailed.replace(year=mailed.year+1))
+        award.first_yer_due.replace(year=award.first_yer_due.year-1), award.first_yer_due)
     self.assertContains(response, expected_title)
 
   def test_start_second_report(self):
@@ -166,9 +166,8 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     response = self.client.get(_get_yer_url(self.award_id))
 
     self.assertTemplateUsed(response, 'grants/yer_form.html')
-    mailed = award.agreement_mailed
     expected_title = 'Year-end Report for {:%b %d, %Y} - {:%b %d, %Y}'.format(
-        mailed.replace(year=mailed.year+1), mailed.replace(year=mailed.year+2))
+        award.first_yer_due, award.first_yer_due.replace(year=award.first_yer_due.year+1))
     self.assertContains(response, expected_title)
 
     application = models.GrantApplication.objects.get(pk=1)
