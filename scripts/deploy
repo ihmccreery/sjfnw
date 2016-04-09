@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+green="\033[0;32m"
+red="\033[0;31m"
+yellow="\033[0;33m"
+boldred="\033[1;31m"
+bold="\033[1m"
+reset="\033[0m"
+
+sep="
+                                   -----
+
+"
+ok="${green}ok$reset"
+error="$sep${boldred}X$reset"
+
+cd "$(dirname "$0")/.."
+
+echo -ne "
+                                  ABOUT
+
+This script will deploy your code via GAE's appcfg.py, after verifying that
+basic prereqs are met. You will be prompted to confirm or cancel before
+deployment is started.
+
+All files in this directory are included except for those that match a
+skip_files pattern from app.yaml.
+
+You may enter a version when prompted. Using the default will update the
+in-use live site at sjf-nw.appspot.com. Using a different version will deploy
+to <version>-dot-sjf-nw.appspot.com. Keep in mind that all versions share the
+same database.$sep
+
+${bold}1. Prerequisites$reset
+   libs: "
+
+lib_missing=0
+for dir in "django" "pytz" "unicodecsv" ; do
+  if [ ! -d "./libs/$dir" ] ; then
+    if [ $lib_missing -eq 1 ] ; then
+      echo -n ", "
+    fi
+    echo -ne "$red$dir not found$reset"
+    lib_missing=1
+  fi
+done
+if [ $lib_missing -gt 0 ] ; then
+  echo -e "$error Missing one or more required libraries. Run ${bold}./scripts/install-libs$reset\n"
+  exit 1
+else
+  echo -ne "$ok"
+fi
+
+echo -ne "\n   clean git status: "
+if [[ `git status --porcelain` ]]; then
+  echo -e "${red}fail$reset$error Local uncommitted changes found. Commit or stash them before deploying."
+  exit 1
+else
+  echo -e "$ok"
+fi
+
+echo -e "\n${bold}2. Enter Cloud SQL password$reset (this will set CLOUDSQL_PASSWORD env var in prod)"
+read -p "   CLOUDSQL_PASSWORD: " pw
+
+if [ ! $pw ] ; then
+  echo -e "$error Cloud SQL password is required for deployment\n"
+  exit 1
+fi
+
+echo -e "\n${bold}3. Enter a version$reset to deploy to. Leave blank to use default version."
+read -p "   Version: " version
+
+if [ ! $version ] ; then
+  versionwarning="You are deploying to the default version which ${yellow}will update the live in-use site.$reset\n\n"
+else
+  versiondisplay="--version=$version"
+fi
+
+echo -e "
+${bold}4. Confirm$reset
+   ${versionwarning}The following command will be executed:
+
+   ${green}appcfg.py update $versiondisplay --env_variable=CLOUDSQL_PASSWORD:$pw .$reset
+"
+
+read -p "Continue? [y/N]: " confirm
+
+if [ ! $confirm ] ; then
+  echo -e "$error Canceled.\n"
+  exit 1
+elif [ $confirm != "y" ] && [ $confirm != "Y" ] ; then
+  echo -e "$error Canceled.\n"
+  exit 1
+fi
+
+appcfg.py update --version=$version --env_variable=CLOUDSQL_PASSWORD:"$pw" . || exit 1
+
+echo -ne "$sep
+Verify that your deployment works: https://"
+if [ $version ] ; then
+  echo -ne "$version-dot-"
+fi
+echo -e "sjf-nw.appspot.com
+
+Then tag the release: git tag -a $(date +%Y-%m-%d) -m \"$(date +%Y-%m-%d)\"
+"
