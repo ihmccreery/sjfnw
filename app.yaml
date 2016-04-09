@@ -13,6 +13,18 @@ libraries:
 - name: "webob"
   version: "1.2.3"
 
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+- ^(.*/)?.*dist-info$
+- ^docs$
+- ^site$
+- ^libs/dev$
+- ^sjfnw/(.*/)?tests$
+
 handlers:
 
 - url: /_ereporter.*
