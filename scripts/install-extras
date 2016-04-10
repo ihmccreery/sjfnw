@@ -6,9 +6,7 @@ if [ $(expr "$pip_version" : '.*not found') -gt 0 ] ; then
   exit 1
 fi
 
-echo "Installing pylint into libs/dev..."
+echo "Installing pylint and pylint_django..."
 
-cd "$(dirname "$0")/.."
-
-pip install pylint==1.5.4 -t libs/dev
-pip install --upgrade git+git://github.com/aisapatino/pylint-django.git -t libs/dev
+pip install --upgrade pylint==1.5.4
+pip install --upgrade git+git://github.com/aisapatino/pylint-django.git
