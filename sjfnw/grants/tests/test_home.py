@@ -110,7 +110,7 @@ class OrgRollover(BaseGrantTestCase):
     app.organization = Organization.objects.get(pk=1)
     app.save()
 
-    post_data = {'cycle':'2', 'draft':'', 'application':'1'},
+    post_data = {'cycle':'2', 'draft':'', 'application':'1'}
     response = self.client.post('/apply/copy', post_data, follow=True)
 
     self.assertEqual(response.status_code, 200)
