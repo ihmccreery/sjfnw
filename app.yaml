@@ -22,7 +22,6 @@ skip_files:
 - ^(.*/)?.*dist-info$
 - ^docs$
 - ^site$
-- ^libs/dev$
 - ^sjfnw/(.*/)?tests$
 
 handlers:

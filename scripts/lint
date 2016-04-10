@@ -4,7 +4,7 @@
 cd "$(dirname "$0")"
 
 # run python linter on the whole project
-./pylint_exec --rcfile=../.pylintrc ../sjfnw
+pylint --rcfile=../.pylintrc ../sjfnw
 
 # run javascript linter (configured by .eslintrc)
 #eslint sjfnw/static/js/*.js
