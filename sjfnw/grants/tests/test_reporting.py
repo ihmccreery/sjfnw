@@ -1,3 +1,5 @@
+import logging
+
 from django import forms
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -9,9 +11,7 @@ from sjfnw.grants import models
 
 from libs import unicodecsv
 
-import logging
 logger = logging.getLogger('sjfnw')
-
 
 class ReportingHomePage(BaseGrantTestCase):
 

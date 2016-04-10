@@ -423,7 +423,8 @@ class YearEndReportReminders(BaseGrantTestCase):
                                submitted=first_yer_due, donations_count=50)
     yer.save()
 
-    self.assertEqual(award.next_yer_due(), award.first_yer_due.replace(year = first_yer_due.year + 1))
+    self.assertEqual(award.next_yer_due(),
+                     award.first_yer_due.replace(year=first_yer_due.year + 1))
 
     # create second YER
     second_yer = models.YearEndReport(
@@ -491,7 +492,7 @@ class RolloverYER(BaseGrantTestCase):
     self.assertRegexpMatches(response.context['error_msg'],
         'You have a submitted or draft year-end report for all of your grants')
 
-  def test_display_second_year_missing(self):
+  def test_display_second_yr_missing(self):
     """ Verify form if org has completed one but not both reports for their grant """
     award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
         second_amount=1000, first_yer_due=timezone.now())

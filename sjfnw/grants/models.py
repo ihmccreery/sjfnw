@@ -1,7 +1,5 @@
 from datetime import timedelta
-import json
-import logging
-import re
+import json, logging, re
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -208,11 +206,8 @@ class DraftGrantApplication(models.Model):
     deadline = self.grant_cycle.close
     logger.debug('deadline is ' + str(self.grant_cycle.close))
     now = timezone.now()
-    if (self.grant_cycle.open < now and
-        deadline > now or (self.extended_deadline and self.extended_deadline > now)):
-      return True
-    else:
-      return False
+    return (self.grant_cycle.open < now and deadline > now or
+           (self.extended_deadline and self.extended_deadline > now))
 
   @classmethod
   def file_fields(cls):
@@ -534,7 +529,7 @@ class GrantApplication(models.Model):
       self.organization.save()
       logger.info('Org profile updated')
 
-  def timeline_display(self): #TODO move to modelform?
+  def timeline_display(self):
     logger.info(type(self.timeline))
     timeline = json.loads(self.timeline)
     html = ('<table id="timeline_display">'

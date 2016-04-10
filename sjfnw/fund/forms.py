@@ -102,8 +102,8 @@ class MassStep(forms.Form):
         self._errors["description"] = self.error_class([msg])
     elif desc: # desc, no date - invalid
       self._errors["date"] = self.error_class(['Please enter a date in mm/dd/yyyy format.'])
-    else: #neither - valid, but not wanted in data
-      cleaned_data = []
+    else: # neither - valid, but not wanted in data
+      cleaned_data = {}
     return cleaned_data
 
 
@@ -194,7 +194,7 @@ class StepDoneForm(forms.Form):
 
     if next_step and not next_step_date: #next step - date missing
       self._errors["next_step_date"] = self.error_class(["Enter a date in mm/dd/yyyy format."])
-      del cleaned_data["next_step"] #TODO is this necessary?
+      del cleaned_data["next_step"]
     elif next_step_date and not next_step: #next step - desc missing
       self._errors["next_step"] = self.error_class(["Enter a description."])
       del cleaned_data["next_step_date"]

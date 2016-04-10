@@ -1,4 +1,4 @@
-import setup_env
+import setup_env # pylint: disable=unused-import
 
 from django.core.wsgi import get_wsgi_application
 from django.core.signals import got_request_exception

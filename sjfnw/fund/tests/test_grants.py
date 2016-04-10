@@ -1,10 +1,11 @@
+import logging
+
 from django.core.urlresolvers import reverse
 
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
 from sjfnw.grants.models import ProjectApp
 
-import logging
 logger = logging.getLogger('sjfnw')
 
 class Grants(BaseFundTestCase):

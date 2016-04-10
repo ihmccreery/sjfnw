@@ -1,7 +1,6 @@
 import logging
 
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase

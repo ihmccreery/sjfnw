@@ -1,13 +1,14 @@
+from datetime import timedelta
+import json, logging
+
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 
 from sjfnw.grants.tests.base import BaseGrantTestCase
-from sjfnw.grants import models
+from sjfnw.grants.models import (DraftGrantApplication, GrantApplication,
+    Organization, GivingProjectGrant)
 
-from datetime import timedelta
-import json, logging
 logger = logging.getLogger('sjfnw')
-
 
 class OrgHomeAwards(BaseGrantTestCase):
   """ Verify that correct data is showing on the org home page """
@@ -29,7 +30,7 @@ class OrgHomeAwards(BaseGrantTestCase):
 
   def test_early(self):
     """ org has an award, but agreement has not been mailed. verify not shown """
-    award = models.GivingProjectGrant(projectapp_id=1, amount=9000,
+    award = GivingProjectGrant(projectapp_id=1, amount=9000,
                                       first_yer_due=timezone.now()+timedelta(weeks=53))
     award.save()
 
@@ -41,7 +42,7 @@ class OrgHomeAwards(BaseGrantTestCase):
   def test_sent(self):
     """ org has award, agreement mailed. verify shown """
     today = timezone.now()
-    award = models.GivingProjectGrant(
+    award = GivingProjectGrant(
         projectapp_id=1,
         amount=9000,
         agreement_mailed=today-timedelta(days=1),
@@ -69,26 +70,28 @@ class OrgRollover(BaseGrantTestCase):
           new draft contents = old draft contents (ignoring cycle q)
           new draft files = old draft files  """
 
-    draft = models.DraftGrantApplication.objects.get(pk=2)
-    draft.organization = models.Organization.objects.get(pk=1)
+    draft = DraftGrantApplication.objects.get(pk=2)
+    draft.organization = Organization.objects.get(pk=1)
     draft.save()
     # prior to rollover, make sure target draft does not exist
-    self.assertEqual(0, models.DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
+    self.assertEqual(0,
+        DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
 
     response = self.client.post('/apply/copy',
         {'cycle':'1', 'draft':'2', 'application':''}, follow=True)
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
-    self.assertEqual(1, models.DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
-    new_draft = models.DraftGrantApplication.objects.get(organization_id=1, grant_cycle_id=1)
-    old_contents = json.loads(draft.contents) # TODO could this use the compare function defined in base?
+    self.assertEqual(1,
+        DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
+    new_draft = DraftGrantApplication.objects.get(organization_id=1, grant_cycle_id=1)
+    old_contents = json.loads(draft.contents)
     old_cycle_q = old_contents.pop('cycle_question', None)
     new_contents = json.loads(new_draft.contents)
     new_cycle_q = new_contents.pop('cycle_question', '')
     self.assertEqual(old_contents, new_contents)
     self.assertNotEqual(old_cycle_q, new_cycle_q)
-    for field in models.GrantApplication.file_fields():
+    for field in GrantApplication.file_fields():
       if hasattr(draft, field):
         self.assertEqual(getattr(draft, field), getattr(new_draft, field))
 
@@ -100,19 +103,22 @@ class OrgRollover(BaseGrantTestCase):
           draft contents = app contents (ignoring cycle q)
           draft files = app files  """
 
-    self.assertEqual(0, models.DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=2).count())
+    self.assertEqual(0,
+        DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=2).count())
 
-    app = models.GrantApplication.objects.get(organization_id=2, grant_cycle_id=1)
-    app.organization = models.Organization.objects.get(pk=1)
+    app = GrantApplication.objects.get(organization_id=2, grant_cycle_id=1)
+    app.organization = Organization.objects.get(pk=1)
     app.save()
 
-    response = self.client.post('/apply/copy', {'cycle':'2', 'draft':'', 'application':'1'}, follow=True)
+    post_data = {'cycle':'2', 'draft':'', 'application':'1'},
+    response = self.client.post('/apply/copy', post_data, follow=True)
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
-    self.assertEqual(1, models.DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=2).count())
+    self.assertEqual(1,
+        DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=2).count())
 
-    draft = models.DraftGrantApplication.objects.get(organization_id=1, grant_cycle_id=2)
+    draft = DraftGrantApplication.objects.get(organization_id=1, grant_cycle_id=2)
     self.assert_draft_matches_app(draft, app, exclude_cycle_q=True)
 
   def test_rollover_form_display(self):

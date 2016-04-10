@@ -1,10 +1,10 @@
+import logging
+
 from django.core.urlresolvers import reverse
-from django.test.utils import override_settings
 
 from sjfnw.fund import models
 from sjfnw.fund.tests.base import BaseFundTestCase
 
-import logging, json
 logger = logging.getLogger('sjfnw')
 
 
@@ -106,9 +106,6 @@ class CopyContacts(BaseFundTestCase):
     self.assertContains(response, 'An alliterative fellow')
     self.assertContains(response, 'Attison')
 
-    print('TO DO - test submit')
-
-
   def test_skip(self):
     """ Verify that skip works
 
@@ -125,6 +122,7 @@ class CopyContacts(BaseFundTestCase):
     # show that copy contacts shows up
     self.assertFalse(self.membership.copied_contacts)
     response = self.client.get(self.get_url, follow=True)
+    self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(self.template)
 
     # post a skip

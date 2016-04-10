@@ -1,4 +1,3 @@
-from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -9,8 +8,9 @@ class Command(BaseCommand):
   help = ('Update an organization\'s profile based on most recent grant app. '
           '(Use if changes have been made to app since submission)')
 
-  def handle(self, *args, **kwargs):
-    
+  def handle(self, *args, **kwargs): # pylint: disable=unused-argument
+    # pylint: disable=bare-except,protected-access
+
     self.stdout.write('Using ' + settings.DATABASES['default']['NAME'])
 
     org_id = raw_input('Enter id of organization you wish to update: ')
@@ -45,6 +45,6 @@ class Command(BaseCommand):
         self.stdout.write('Setting ' + field)
         setattr(org, field, getattr(app, field))
     org.save()
-    
+
     self.stdout.write('Updated organization profile.')
-    
+

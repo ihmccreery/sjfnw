@@ -1,3 +1,5 @@
+import datetime, logging
+
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -7,8 +9,6 @@ from django.utils.safestring import mark_safe
 from sjfnw.fund.models import GivingProject
 from sjfnw.grants.models import (Organization, GrantCycle, GrantApplication,
     DraftGrantApplication, STATE_CHOICES, SCREENING, PRE_SCREENING)
-
-import datetime, logging
 
 logger = logging.getLogger('sjfnw')
 

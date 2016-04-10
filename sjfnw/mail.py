@@ -9,8 +9,7 @@ from google.appengine.api import mail as gaemail
 from google.appengine.ext import deferred
 from google.appengine.runtime import apiproxy_errors
 
-# MODIFIED VERSION OF DJANGOAPPENGINE'S MAIL.PY FILE
-# SEE LICENSE AT BOTTOM
+# MODIFIED VERSION OF DJANGOAPPENGINE'S MAIL.PY FILE. SEE LICENSE AT BOTTOM
 
 logger = logging.getLogger('sjfnw')
 

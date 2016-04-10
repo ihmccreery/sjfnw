@@ -8,7 +8,8 @@ from sjfnw.fund.models import Member
 
 class Command(BaseCommand):
 
-  help = 'Load fixture data into local db for manual testing purposes. Loads from live fixtures; use dump_live_data first if needed.'
+  help = ('Load fixture data into local db for manual testing purposes. '
+          'Loads from live fixtures; use dump_live_data first if needed.')
 
   def handle(self, *args, **options):
     if settings.DATABASES['default']['NAME'] != 'sjfdb_multi':
