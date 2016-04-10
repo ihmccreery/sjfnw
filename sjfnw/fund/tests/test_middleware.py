@@ -18,6 +18,7 @@ class Middleware(BaseFundTestCase):
     self.request = HttpRequest()
 
   # pylint: disable=no-member
+  # for request members added by middleware
 
   def test_not_authenticated(self):
     self.request.user = AnonymousUser()
