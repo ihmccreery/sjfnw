@@ -122,16 +122,19 @@ def org_support(request):
 
 def cycle_info(request, cycle_id):
   """ Fetches cycle info page from external URL and embeds it """
+
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
+
   error_display = ('<h4 class="center">Sorry, the cycle information page could '
       'not be loaded.<br>Try visiting it directly: <a href="' +
       cycle.info_page +'" target="_blank">grant cycle information</a>')
   content = ''
+
   if not cycle.info_page:
     raise Http404
   try:
     info_page = urllib2.urlopen(cycle.info_page)
-  except urllib2.URLError as err:
+  except (urllib2.URLError, ValueError) as err:
     logger.error('Error fetching cycle info page: %s', err)
   else:
     content = info_page.read()
