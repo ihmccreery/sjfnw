@@ -16,7 +16,6 @@ class Command(BaseCommand):
     prior = None
     for donor in donors:
       # check if donor matches prev, & has no completed steps
-      # pylint: disable=too-many-boolean-expressions
       if (prior and donor.membership == prior.membership and
           donor.firstname == prior.firstname and
           donor.lastname and donor.lastname == prior.lastname and

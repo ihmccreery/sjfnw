@@ -6,27 +6,33 @@ load-plugins=pylint_django
 
 [MESSAGES CONTROL]
 
-disable=C0111,C1001,C0330,C0410,R0201,R0801,R0901,R0903,W0105,W0142,W0201,W0232,
-  too-many-branches,too-many-nested-blocks,too-many-statements,too-many-locals,
-  too-many-lines,locally-disabled,too-many-boolean-expressions,redefined-variable-type
+disable=attribute-defined-outside-init,
+        bad-continuation,
+        duplicate-code,
+        locally-disabled,
+        missing-docstring,
+        multiple-imports,
+        no-init,
+        no-self-use,
+        pointless-string-statement,
+        redefined-variable-type,
+        star-args,
+        too-few-public-methods,
+        too-many-ancestors,
+        too-many-boolean-expressions,
+        too-many-branches,
+        too-many-lines,
+        too-many-locals,
+        too-many-nested-blocks,
+        too-many-statements
 
-# C0111 missing-docstring
-# C0410 multiple-imports
-# C1001 old-style-class
-# C0330 bad-continuation
-# R0201 no-self-use
-# R0801 duplicate-code
-# R0901 too-many-ancestors
-# R0903 too-few-public-methods
-# W0105 pointless-string-statement
-# W0142 star-args
-# W0201 attribute-defined-outside-init
-# W0232 no-init
+# would like to eventually re-enable the "too-many-*"
+# except too-many-ancestors since that's mostly out of our control
 
 [REPORTS]
 
 output-format=colorized
-#reports=no
+reports=no
 
 [BASIC]
 
