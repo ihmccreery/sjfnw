@@ -142,10 +142,9 @@ def cycle_info(request, cycle_id):
       logger.error('Info page content at %s could not be split', cycle.info_page)
     else:
       logger.info('Received info page content from ' + cycle.info_page)
-  finally:
-    return render(request, 'grants/cycle_info.html', {
-      'cycle': cycle, 'content': content or error_display
-    })
+  return render(request, 'grants/cycle_info.html', {
+    'cycle': cycle, 'content': content or error_display
+  })
 
 #------------------------------------------------------------------------------
 # Org home
@@ -367,7 +366,7 @@ def grant_application(request, organization, cycle_id):
     referer = request.META.get('HTTP_REFERER')
     if (not (referer and referer.find('copy') != -1) and
         organization.mission and
-        ((not 'grant_request' in org_dict) or (not org_dict['grant_request']))):
+        (('grant_request' not in org_dict) or (not org_dict['grant_request']))):
       profiled = True
 
     form = GrantApplicationModelForm(cycle, initial=org_dict)
@@ -531,10 +530,6 @@ def add_file(request, draft_type, draft_id):
     return HttpResponse('ERROR') #TODO use status code
 
   file_urls = get_file_urls(request, draft)
-  # TODO test this replacement:
-  #content = (u'{0} ~~<a href="{1}" target="_blank" title="{2}">{2}</a> '
-  #    '[<a onclick="fileUploads.removeFile(\'{0}\');">remove</a>]').format(
-  #        field_name, file_urls[field_name], blob_file)
   content = (field_name + u'~~<a href="' + file_urls[field_name] +
              u'" target="_blank" title="' + unicode(blob_file) + u'">' +
              unicode(blob_file) + u'</a> [<a onclick="fileUploads.removeFile(\'' +
@@ -542,7 +537,7 @@ def add_file(request, draft_type, draft_id):
   logger.info(u'add_file returning: ' + content)
   return HttpResponse(content)
 
-def remove_file(request, draft_type, draft_id, file_field):
+def remove_file(_, draft_type, draft_id, file_field):
   """ Remove file from draft by setting that field to empty string
 
       Note: does not delete file from Blobstore, since it could be used
@@ -674,7 +669,7 @@ def copy_app(request, organization):
 
 @require_http_methods(['DELETE'])
 @registered_org()
-def discard_draft(request, organization, draft_id):
+def discard_draft(_, organization, draft_id):
   try:
     saved = models.DraftGrantApplication.objects.get(pk=draft_id)
   except models.DraftGrantApplication.DoesNotExist:
@@ -849,18 +844,18 @@ def serve_app_file(application, field_name):
   return  HttpResponse(blobstore.BlobReader(blobinfo).read(),
                        content_type=blobinfo.content_type)
 
-def view_file(request, obj_type, obj_id, field_name):
-  MODEL_TYPES = {
+def view_file(_, obj_type, obj_id, field_name):
+  model_types = {
     'app': models.GrantApplication,
     'report': models.YearEndReport,
     'adraft': models.DraftGrantApplication,
     'rdraft': models.YERDraft
   }
-  if not obj_type in MODEL_TYPES:
+  if not obj_type in model_types:
     logger.warning('Unknown obj type %s', obj_type)
     raise Http404
 
-  obj = get_object_or_404(MODEL_TYPES[obj_type], pk=obj_id)
+  obj = get_object_or_404(model_types[obj_type], pk=obj_id)
   return serve_app_file(obj, field_name)
 
 def view_yer(request, report_id):
@@ -1006,7 +1001,6 @@ def grants_report(request):
   }
 
   if request.method == 'POST':
-
     # Determine type of report
     if 'run-application' in request.POST:
       logger.info('App report')
@@ -1239,9 +1233,9 @@ def get_org_results(options):
 
   # filters
   reg = options.get('registered')
-  if reg == True:
+  if reg is True:
     orgs = orgs.exclude(email='')
-  elif reg == False:
+  elif reg is False:
     org = orgs.filter(email='')
   if options.get('organization_name'):
     orgs = orgs.filter(name__contains=options['organization_name'])
@@ -1364,9 +1358,13 @@ def get_gpg_results(options):
     gp_awards = gp_awards.exclude(projectapp__application__fiscal_org='')
 
   if options.get('grant_cycle'):
-    gp_awards = gp_awards.filter(projectapp__application__grant_cycle__title__in=options.get('grant_cycle'))
+    gp_awards = gp_awards.filter(
+      projectapp__application__grant_cycle__title__in=options.get('grant_cycle')
+    )
   if options.get('giving_projects'):
-    gp_awards = gp_awards.filter(projectapp__giving_project__title__in=options.get('giving_projects'))
+    gp_awards = gp_awards.filter(
+      projectapp__giving_project__title__in=options.get('giving_projects')
+    )
 
   # fields
   fields = ['check_mailed', 'first_year_amount', 'second_year_amount', 'total_amount',

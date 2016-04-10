@@ -1,13 +1,14 @@
-﻿from django.utils.decorators import available_attrs
+from functools import wraps
+import logging
+
+from django.utils.decorators import available_attrs
 from django.shortcuts import redirect
 
 from sjfnw.grants.models import Organization
 
-from functools import wraps
-import logging
 logger = logging.getLogger('sjfnw')
 
-def registered_org(function=None):
+def registered_org():
   """ Requires that the logged in user corresponds to an Organization and
       passes that organization as an arg to the view
 

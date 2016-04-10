@@ -272,7 +272,7 @@ class MembershipA(BaseModelAdmin):
 
   def approve(self, _, queryset):
     for memship in queryset:
-      if memship.approved == False:
+      if memship.approved is False:
         fund_utils.notify_approval(memship)
     queryset.update(approved=True)
 

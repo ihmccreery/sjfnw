@@ -1,14 +1,13 @@
-from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from sjfnw.grants.models import Organization, GrantApplication
+from sjfnw.grants.models import Organization
 
 class Command(BaseCommand):
 
   help = ('Update org profiles.')
 
-  def handle(self, *args, **kwargs):
+  def handle(self, *args, **kwargs): # pylint: disable=unused-argument
 
     self.stdout.write('Using ' + settings.DATABASES['default']['NAME'])
     confirm = raw_input('Continue? (y/n) ')
@@ -19,9 +18,10 @@ class Command(BaseCommand):
     orgs = Organization.objects.all()
 
     for org in orgs:
-      apps = org.grantapplication_set.order_by('-submission_time');
+      apps = org.grantapplication_set.order_by('-submission_time')
       if len(apps) > 0:
         app = apps[0]
+        # pylint: disable=protected-access
         for field in Organization._meta.get_all_field_names():
           if field != 'id' and hasattr(app, field):
             setattr(org, field, getattr(app, field))

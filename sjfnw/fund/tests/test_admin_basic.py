@@ -1,5 +1,4 @@
 import logging
-import pprint
 
 from sjfnw.fund.tests.base import BaseFundTestCase
 

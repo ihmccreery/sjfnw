@@ -18,5 +18,5 @@ class ModelUnicodes(TestCase):
     membership = Membership(giving_project=project, member=member)
     self.assertEqual(u'Al Fiüsher', unicode(member))
     self.assertEqual(u'Â Fake Giving Project %d' % timezone.now().year, unicode(project))
-    self.assertEqual(u'Al Fiüsher, Â Fake Giving Project %d' % timezone.now().year, unicode(membership))
-
+    self.assertEqual(u'Al Fiüsher, Â Fake Giving Project %d' % timezone.now().year,
+                     unicode(membership))

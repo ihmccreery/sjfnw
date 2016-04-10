@@ -1,10 +1,11 @@
+import logging
+
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
 from sjfnw import constants as c
 
-import logging
 logger = logging.getLogger('sjfnw')
 
 def notify_approval(membership):
@@ -20,4 +21,3 @@ def notify_approval(membership):
   msg.attach_alternative(html_content, 'text/html')
   msg.send()
   logger.info(u'Approval email sent to %s at %s', membership, to_email)
-

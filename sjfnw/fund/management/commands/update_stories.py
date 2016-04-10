@@ -1,7 +1,9 @@
-﻿from django.core.management.base import BaseCommand
-from django.utils import timezone
-from sjfnw.fund.models import Step, Membership
 import datetime
+
+from django.core.management.base import BaseCommand
+from django.utils import timezone
+
+from sjfnw.fund.models import Step, Membership
 
 class Command(BaseCommand):
 
@@ -22,12 +24,11 @@ class Command(BaseCommand):
 
     for ship_id in ships:
       try:
-        ship = Membership.objects.get(id = ship_id)
-      except:
+        ship = Membership.objects.get(id=ship_id)
+      except Membership.DoesNotExist:
         self.stderr.write('Trying to update story for non-existent member ' + unicode(ship_id))
       self.stdout.write('creating stories for ' + unicode(ship_id) + '\n')
       for i in range(0, 6):
         ship.update_story(start + datetime.timedelta(days=i))
 
     self.stdout.write('Script complete.\n')
-

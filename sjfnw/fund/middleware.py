@@ -1,7 +1,8 @@
+import logging
+
 from sjfnw import constants as c
 from sjfnw.fund import models
 
-import logging
 logger = logging.getLogger('sjfnw')
 
 class MembershipMiddleware(object):
@@ -25,7 +26,7 @@ class MembershipMiddleware(object):
     Returns None (never prevents next middleware/view from executing)
   """
 
-  def process_view(self, request, view_func, view_args, view_kwargs):
+  def process_view(self, request, view_func, view_args, view_kwargs): # pylint: disable=unused-argument
     # only run on fund views
     if not 'fund' in view_func.__module__:
       return None

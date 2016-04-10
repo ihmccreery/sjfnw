@@ -34,7 +34,7 @@ class PhoneNumberField(forms.Field):
     if value in validators.EMPTY_VALUES:
       return ''
 
-    try: #TODO this probably belongs elsewhere since we're not using the int value
+    try:
       int(str(value))
     except (ValueError, TypeError):
       raise ValidationError(self.error_messages['invalid'])

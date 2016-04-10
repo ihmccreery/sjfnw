@@ -1,3 +1,6 @@
+from datetime import timedelta
+import json, logging
+
 from django.core import mail
 from django.core.urlresolvers import reverse
 from django.utils import timezone
@@ -5,10 +8,7 @@ from django.utils import timezone
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants import models
 
-from datetime import timedelta
-import json, logging
 logger = logging.getLogger('sjfnw')
-
 
 class DraftExtension(BaseGrantTestCase):
 

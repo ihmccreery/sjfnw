@@ -1,13 +1,10 @@
-import logging
-import sys
-import time
+import logging, time, sys
+from unittest import TextTestRunner, TestResult
+from unittest.signals import registerResult
 
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
-
-from unittest import TextTestRunner, TestResult
-from unittest.signals import registerResult
 
 # Sets root & sjfnw loggers level. Comment out for less output.
 logging.getLogger().setLevel(logging.INFO)
@@ -53,8 +50,7 @@ class BaseTestCase(TestCase):
 # Code below overrides the default test runner to provide colored
 # output in the console
 
-# pylint: disable=too-many-arguments,too-many-branches,too-many-locals,
-# pylint: disable=redefined-builtin,invalid-name,bad-builtin
+# pylint: disable=too-many-arguments,redefined-builtin,invalid-name,bad-builtin
 
 class ColorTestSuiteRunner(DiscoverRunner):
   """ Redirects run_suite to ColorTestRunner """

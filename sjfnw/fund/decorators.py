@@ -8,7 +8,7 @@ from sjfnw import constants as c
 
 logger = logging.getLogger('sjfnw')
 
-def approved_membership(function=None):
+def approved_membership():
   """ Restrict access to view: only if request.membership_status is c.APPROVED
 
     If not allowing access to view, redirect to appropriate settings/notice page

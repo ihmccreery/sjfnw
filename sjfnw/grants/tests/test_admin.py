@@ -1,11 +1,11 @@
+import logging
+
 from django.core.urlresolvers import reverse
 
 from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
 
-import logging
 logger = logging.getLogger('sjfnw')
-
 
 class AdminInlines(BaseGrantTestCase):
   """ Verify basic display of related inlines for grants objects in admin """
@@ -95,6 +95,7 @@ class AdminRollover(BaseGrantTestCase):
       data={'cycle': u'99'}
     )
     self.assertEqual(response.status_code, 200)
+    # pylint: disable=protected-access
     self.assertIn('Select a valid choice', response.context['form']._errors['cycle'][0])
 
   def test_app_exists(self):
@@ -134,7 +135,6 @@ class AdminRollover(BaseGrantTestCase):
       reverse('sjfnw.grants.views.admin_rollover', kwargs={'app_id': 2}),
       data={'cycle': u'6'}
     )
-    print(response)
     self.assertEqual(response.status_code, 302)
     self.assertRegexpMatches(response.get('Location'), r'/admin/grants/grantapplication/\d/$')
     self.assertEqual(models.GrantApplication.objects.filter(grant_cycle_id=6).count(), 1)

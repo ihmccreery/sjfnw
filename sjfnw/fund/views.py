@@ -360,7 +360,7 @@ def registered(request):
   except models.Membership.DoesNotExist: # should not happen
     logger.error('Membership does not exist right at /registered ' + request.user.username)
     return redirect(home)
-  if ship.approved == True: # another precaution
+  if ship.approved is True: # another precaution
     logger.warning('Membership approved before check at /registered ' + request.user.username)
     return redirect(home)
 
@@ -554,7 +554,6 @@ def copy_contacts(request):
     # extract name, contact info, notes. handle duplicates
     initial_data = []
     for donor in all_donors:
-      # TODO make function for this check
       if (initial_data and donor.firstname == initial_data[-1]['firstname'] and
              (donor.lastname and donor.lastname == initial_data[-1]['lastname'] or
                  donor.phone and donor.phone == initial_data[-1]['phone'] or
@@ -597,7 +596,7 @@ def add_mult(request):
   else:
     contact_formset = formset_factory(forms.MassDonorPre, extra=5)
 
-  empty_error = ''
+  empty_error = u''
 
   if request.method == 'POST':
     membership.last_activity = timezone.now()
@@ -642,7 +641,7 @@ def add_mult(request):
 
         if duplicates:
           logger.info('Showing confirmation page for duplicates: ' + str(duplicates))
-          empty_error = ('<ul class="errorlist"><li>The contacts below have the '
+          empty_error = (u'<ul class="errorlist"><li>The contacts below have the '
               'same name as contacts you have already entered. Press submit again '
               'to confirm that you want to add them.</li></ul>')
           if est:
@@ -812,7 +811,7 @@ def add_step(request, donor_id):
 
   if donor.get_next_step():
     logger.error('Trying to add step, donor has an incomplete')
-    raise Http404 # TODO better error
+    raise Http404
 
   action = '/fund/' + donor_id + '/step'
   formid = 'nextstep-'+donor_id

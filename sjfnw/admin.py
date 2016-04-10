@@ -1,10 +1,11 @@
+import logging
+
 from django.contrib import admin, messages
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
-import logging
 logger = logging.getLogger('sjfnw')
 
 # Configure admin site
