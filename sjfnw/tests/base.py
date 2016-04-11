@@ -6,11 +6,6 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
 
-# Sets root & sjfnw loggers level. Comment out for less output.
-logging.getLogger().setLevel(logging.INFO)
-logger = logging.getLogger('sjfnw')
-logger.setLevel(logging.INFO)
-
 RED = '\033[00;31m'
 GREEN = '\033[00;32m'
 YELLOW = '\033[00;33m'
@@ -36,27 +31,116 @@ class BaseTestCase(TestCase):
     User.objects.create_superuser('admin@gmail.com', 'admin@gmail.com', 'admin')
     self.client.login(username='admin@gmail.com', password='admin')
 
-  def assert_message(self, response, text):
+  def assert_message(self, response, text, regex=False):
     """ Asserts that a message (django.contrib.messages) with the given text
         is displayed """
     messages = list(response.context['messages'])
     self.assertEqual(1, len(messages))
-    self.assertEqual(str(messages[0]), text)
+    message = str(messages[0])
+    if regex:
+      self.assertRegexpMatches(message, text)
+    else:
+      self.assertEqual(message, text)
 
-  class Meta: # pylint: disable=old-style-class
-    abstract = True
+  def assert_length(self, coll, expected):
+    actual = len(coll)
+    error_msg = 'Expected {} to have length {}, but got {}'.format(coll, expected, actual)
+    self.assertEqual(actual, expected, error_msg)
 
+  def assert_count(self, qs, expected):
+    actual = qs.count()
+    error_msg = 'Expected queryset count to be {}, but got {}'.format(expected, actual)
+    self.assertEqual(actual, expected, error_msg)
 
 # Code below overrides the default test runner to provide colored
 # output in the console
 
-# pylint: disable=too-many-arguments,redefined-builtin,invalid-name,bad-builtin
+# pylint: disable=invalid-name
 
 class ColorTestSuiteRunner(DiscoverRunner):
   """ Redirects run_suite to ColorTestRunner """
 
   def run_suite(self, suite, **kwargs):
-    return ColorTestRunner(verbosity=2, failfast=self.failfast).run(suite)
+    min_log_level = ['FATAL', 'ERROR', 'INFO', 'DEBUG']
+    level = getattr(logging, min_log_level[self.verbosity])
+    logging.getLogger().setLevel(level)
+    logging.getLogger('sjfnw').setLevel(level)
+
+    return ColorTestRunner(verbosity=self.verbosity, failfast=self.failfast).run(suite)
+
+
+class ColorTestRunner(TextTestRunner):
+  """ Colorizes the summary results at the end
+  Uses ColorTextResult instead of TextTestResult """
+
+  def __init__(self, verbosity=2, failfast=False):
+    stream = sys.stderr
+    descriptions = True
+    use_buffer = False
+    resultclass = ColorTextResult
+    super(ColorTestRunner, self).__init__(stream, descriptions, verbosity,
+                                          failfast, use_buffer, resultclass)
+
+  def run(self, test):
+    """ Copied and modified from TextTestRunner
+
+      Run the given test case or test suite."""
+
+    result = self._makeResult()
+    registerResult(result)
+    result.failfast = self.failfast
+    result.buffer = self.buffer
+    start_time = time.time()
+    startTestRun = getattr(result, 'startTestRun', None)
+    if startTestRun is not None:
+      startTestRun()
+    try:
+      test(result)
+    finally:
+      stopTestRun = getattr(result, 'stopTestRun', None)
+      if stopTestRun is not None:
+        stopTestRun()
+    stop_time = time.time()
+    timeTaken = stop_time - start_time
+    result.printErrors()
+    if hasattr(result, 'separator2'):
+      self.stream.writeln(result.separator1)
+    run = result.testsRun
+    self.stream.writeln(' \033[1mRan %d test%s in %.3fs' %
+        (run, run != 1 and 's' or '', timeTaken))
+    self.stream.writeln()
+
+    expectedFails = unexpectedSuccesses = skipped = 0
+    try:
+      results = map(len, (result.expectedFailures, # pylint: disable=bad-builtin
+        result.unexpectedSuccesses,
+        result.skipped))
+    except AttributeError:
+      pass
+    else:
+      expectedFails, unexpectedSuccesses, skipped = results
+
+    infos = []
+    if not result.wasSuccessful():
+      self.stream.write(' \033[1;31mFAILED\033[00m')
+      failed = len(result.failures)
+      errored = len(result.errors)
+      if failed:
+        infos.append('failures = \033[00;31m%d\033[00m' % failed)
+      if errored:
+        infos.append('errors = \033[00;31m%d\033[00m' % errored)
+    else:
+      self.stream.write(' \033[1;32mOK\033[00m')
+    if skipped:
+      infos.append('skipped = \033[00;33m%d\033[00m' % skipped)
+    if expectedFails:
+      infos.append('expected failures=%d' % expectedFails)
+    if unexpectedSuccesses:
+      infos.append('unexpected successes=%d' % unexpectedSuccesses)
+    if infos:
+      self.stream.writeln(' (%s)' % (', '.join(infos),))
+    self.stream.write('\n')
+    return result
 
 
 class ColorTextResult(TestResult):
@@ -77,10 +161,13 @@ class ColorTextResult(TestResult):
 
   def get_description(self, test):
     """ modified to bold test name and strip repeat parts (sjfnw, test_) """
+
     doc_first_line = test.shortDescription()
+
     # test.id() is in format module.filename.testclass.testmethod. example:
     # sjfnw.fund.tests.test_add_mult.AddMultipleDonorsPost.test_post_empty
     name = test.id().replace('sjfnw.', '').replace('tests.', '').replace('.test_', '  ')
+
     if self.descriptions and doc_first_line:
       return '\n{}{}{} {}'.format(BOLD, name, RESET, doc_first_line)
     else:
@@ -151,74 +238,3 @@ class ColorTextResult(TestResult):
       self.stream.writeln('{}{}{}: {}{}{}'.format(BOLD_RED, flavour, RESET, RED, test, RESET))
       self.stream.writeln(self.separator2)
       self.stream.writeln(err)
-
-
-class ColorTestRunner(TextTestRunner):
-  """ Colorizes the summary results at the end
-  Uses ColorTextResult instead of TextTestResult """
-
-  def __init__(self, stream=sys.stderr, descriptions=True, verbosity=2,
-               failfast=False, buffer=False, resultclass=None):
-    super(ColorTestRunner, self).__init__(stream, descriptions, verbosity,
-                                          failfast, buffer, resultclass)
-    self.resultclass = ColorTextResult
-
-  def run(self, test):
-    """ Copied and modified from TextTestRunner
-
-      Run the given test case or test suite."""
-
-    result = self._makeResult()
-    registerResult(result)
-    result.failfast = self.failfast
-    result.buffer = self.buffer
-    start_time = time.time()
-    startTestRun = getattr(result, 'startTestRun', None)
-    if startTestRun is not None:
-      startTestRun()
-    try:
-      test(result)
-    finally:
-      stopTestRun = getattr(result, 'stopTestRun', None)
-      if stopTestRun is not None:
-        stopTestRun()
-    stop_time = time.time()
-    timeTaken = stop_time - start_time
-    result.printErrors()
-    if hasattr(result, 'separator2'):
-      self.stream.writeln(result.separator1)
-    run = result.testsRun
-    self.stream.writeln(' \033[1mRan %d test%s in %.3fs' %
-        (run, run != 1 and 's' or '', timeTaken))
-    self.stream.writeln()
-
-    expectedFails = unexpectedSuccesses = skipped = 0
-    try:
-      results = map(len, (result.expectedFailures,
-        result.unexpectedSuccesses,
-        result.skipped))
-    except AttributeError:
-      pass
-    else:
-      expectedFails, unexpectedSuccesses, skipped = results
-
-    infos = []
-    if not result.wasSuccessful():
-      self.stream.write(' \033[1;31mFAILED\033[00m')
-      failed, errored = map(len, (result.failures, result.errors))
-      if failed:
-        infos.append('failures = \033[00;31m%d\033[00m' % failed)
-      if errored:
-        infos.append('errors = \033[00;31m%d\033[00m' % errored)
-    else:
-      self.stream.write(' \033[1;32mOK\033[00m')
-    if skipped:
-      infos.append('skipped = \033[00;33m%d\033[00m' % skipped)
-    if expectedFails:
-      infos.append('expected failures=%d' % expectedFails)
-    if unexpectedSuccesses:
-      infos.append('unexpected successes=%d' % unexpectedSuccesses)
-    if infos:
-      self.stream.writeln(' (%s)' % (', '.join(infos),))
-    self.stream.write('\n')
-    return result
