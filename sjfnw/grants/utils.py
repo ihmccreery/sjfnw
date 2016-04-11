@@ -9,7 +9,7 @@ from google.appengine.ext import blobstore
 logger = logging.getLogger('sjfnw')
 
 def local_date_str(timestamp):
-  """ Takes a UTC timestamp and converts to a local date string """
+  """ Convert UTC timestamp to local date string in mm/dd/yyyy format """
   timestamp = timezone.localtime(timestamp)
   return timestamp.strftime('%m/%d/%Y')
 

@@ -27,7 +27,7 @@ from sjfnw.grants import models
 from sjfnw.grants.decorators import registered_org
 from sjfnw.grants.forms import (AdminRolloverForm, LoginAsOrgForm, LoginForm,
    AppReportForm, SponsoredAwardReportForm, GPGrantReportForm, OrgReportForm,
-   RegisterForm, RolloverForm, RolloverYERForm)
+   RegisterForm, RolloverForm, RolloverYERForm, OrgMergeForm)
 from sjfnw.grants.modelforms import GrantApplicationModelForm, YearEndReportForm
 from sjfnw.grants.utils import local_date_str, find_blobinfo
 
@@ -126,28 +126,35 @@ def cycle_info(request, cycle_id):
 
   cycle = get_object_or_404(models.GrantCycle, pk=cycle_id)
 
-  error_display = ('<h4 class="center">Sorry, the cycle information page could '
-      'not be loaded.<br>Try visiting it directly: <a href="' +
-      cycle.info_page +'" target="_blank">grant cycle information</a>')
   content = ''
 
   if not cycle.info_page:
     raise Http404
+
+  content = ''
+
   try:
     info_page = urllib2.urlopen(cycle.info_page)
   except (urllib2.URLError, ValueError) as err:
     logger.error('Error fetching cycle info page: %s', err)
+    content = ('<h4 class="center">Sorry, the cycle information page could '
+      'not be loaded.<br>Try visiting it directly: <a href="' +
+      cycle.info_page +'" target="_blank">grant cycle information</a>')
   else:
     content = info_page.read()
+    # we're getting pages with a known format from socialjusticefund.org
+    # these are hacky ways to strip header/footer and make the img urls work
     start = content.find('<div id="content"')
     end = content.find('<!-- /#content')
     content = content[start:end].replace('modules/file/icons', 'static/images')
+
     if content == '':
       logger.error('Info page content at %s could not be split', cycle.info_page)
     else:
       logger.info('Received info page content from ' + cycle.info_page)
+
   return render(request, 'grants/cycle_info.html', {
-    'cycle': cycle, 'content': content or error_display
+    'cycle': cycle, 'content': content
   })
 
 #------------------------------------------------------------------------------
@@ -541,7 +548,7 @@ def add_file(request, draft_type, draft_id):
   logger.info(u'add_file returning: ' + content)
   return HttpResponse(content)
 
-def remove_file(_, draft_type, draft_id, file_field):
+def remove_file(request, draft_type, draft_id, file_field):
   """ Remove file from draft by setting that field to empty string
 
       Note: does not delete file from Blobstore, since it could be used
@@ -680,7 +687,7 @@ def discard_draft(_, organization, draft_id):
     return HttpResponse(status=404)
   else:
     if saved.organization != organization:
-      logger.warning(u'Failed attempt to discard draft %d by %s', draft_id, organization)
+      logger.warning(u'Failed attempt to discard draft %s by %s', draft_id, organization)
       return HttpResponse(status=400, content='User does not have permission to delete this draft')
     saved.delete()
     logger.info('Draft %d  discarded', draft_id)
@@ -848,7 +855,7 @@ def serve_app_file(application, field_name):
   return  HttpResponse(blobstore.BlobReader(blobinfo).read(),
                        content_type=blobinfo.content_type)
 
-def view_file(_, obj_type, obj_id, field_name):
+def view_file(request, obj_type, obj_id, field_name):
   model_types = {
     'app': models.GrantApplication,
     'report': models.YearEndReport,
@@ -889,6 +896,13 @@ def view_yer(request, report_id):
 #------------------------------------------------------------------------------
 
 def revert_app_to_draft(request, app_id):
+  """ Turn a submitted application back into a draft
+
+    By creating a DraftGrantApplication with all of its content and then
+    deleting the GrantApplication.
+
+    All GrantApplication-specific fields (screening status, etc) are lost.
+  """
 
   submitted_app = get_object_or_404(models.GrantApplication, pk=app_id)
   organization = submitted_app.organization
@@ -920,6 +934,8 @@ def revert_app_to_draft(request, app_id):
   return render(request, 'admin/grants/confirm_revert.html', {'application': submitted_app})
 
 def admin_rollover(request, app_id):
+  """ Copy a GrantApplication into another grant cycle """
+
   application = get_object_or_404(models.GrantApplication, pk=app_id)
   org = application.organization
 
@@ -927,7 +943,6 @@ def admin_rollover(request, app_id):
     form = AdminRolloverForm(org, request.POST)
     if form.is_valid():
       cycle = get_object_or_404(models.GrantCycle, pk=int(form.cleaned_data['cycle']))
-      logger.info(u'Successful rollover of %s to %s', application, cycle)
       application.pk = None # this + save makes new copy
       application.pre_screening_status = 10
       application.submission_time = timezone.now()
@@ -935,6 +950,7 @@ def admin_rollover(request, app_id):
       application.cycle_question = ''
       application.budget = ''
       application.save()
+      logger.info(u'Successful rollover of %s to %s', application, cycle)
       return redirect('/admin/grants/grantapplication/' + str(application.pk) + '/')
   else:
     form = AdminRolloverForm(org)
@@ -980,6 +996,86 @@ def login_as_org(request):
       return redirect('/apply/?user='+org)
   form = LoginAsOrgForm()
   return render(request, 'admin/grants/impersonate.html', {'form': form})
+
+def merge_orgs(request, id_a, id_b):
+
+  org_a = (models.Organization.objects
+        .prefetch_related('grantapplication_set', 'draftgrantapplication_set')
+        .get(pk=id_a))
+  org_b = (models.Organization.objects
+        .prefetch_related('grantapplication_set', 'draftgrantapplication_set')
+        .get(pk=id_b))
+
+  error = ''
+  cycles = {}
+
+  # check for conflicts
+  for appset in [org_a.grantapplication_set.all(), org_a.draftgrantapplication_set.all(),
+                 org_b.grantapplication_set.all(), org_b.draftgrantapplication_set.all()]:
+    for app in appset:
+      if app.grant_cycle_id in cycles:
+        error = 'Orgs have a draft or submitted application for the same grant cycle.'
+        break
+      else:
+        cycles[app.grant_cycle_id] = True
+
+  if error:
+    messages.error(request, error + ' Cannot be automatically merged.')
+    return redirect(reverse('admin:grants_organization_changelist'))
+
+  if request.method == 'POST':
+    form = OrgMergeForm(org_a, org_b, request.POST)
+
+    if form.is_valid():
+
+      primary_id = int(request.POST['primary'])
+
+      if primary_id == org_a.pk:
+        primary = org_a
+        sec = org_b
+      elif primary_id == org_b.pk:
+        primary = org_b
+        sec = org_a
+      else:
+        logger.error('Primary org (%s) is not one of originals (%s, %s)',
+          primary_id, org_a.pk, org_b.pk)
+        messages.error(request, 'Something went wrong; unable to merge.')
+        return redirect(reverse('admin:grants_organization_changelist'))
+
+      # check whether secondary has most recent app - org profile needs to be updated
+      if sec.grantapplication_set.exists():
+        sec_latest = sec.grantapplication_set.first()
+        primary_latest = primary.grantapplication_set.first()
+        if not primary_latest or (primary_latest.submission_time < sec_latest.submission_time):
+          primary.update_profile(sec_latest)
+
+      sec.grantapplication_set.update(organization_id=primary.pk)
+      sec.draftgrantapplication_set.update(organization_id=primary.pk)
+      sec.sponsoredprogramgrant_set.update(organization_id=primary.pk)
+      sec.grantapplicationlog_set.update(organization_id=primary.pk)
+
+      note = models.GrantApplicationLog(organization=primary, staff=request.user,
+          notes='Merged organization {} into this organization.'.format(sec.name))
+      note.save()
+
+      logger.info('Post-merge, deleting organization %s and associated User', sec.name)
+      User.objects.filter(email=sec.email).delete()
+      sec.delete()
+
+      messages.success(request, 'Merge successful. Redirected to new organization page')
+      return redirect(reverse('admin:grants_organization_change', args=(primary.pk,)))
+
+  else: # GET
+    org_a.user = User.objects.filter(username=org_a.email).first()
+    org_b.user = User.objects.filter(username=org_b.email).first()
+
+    form = OrgMergeForm(org_a, org_b)
+
+  return render(request, 'admin/grants/merge_orgs.html', {
+    'orgs': [org_a, org_b],
+    'form': form
+  })
+
 
 #------------------------------------------------------------------------------
 # Reporting

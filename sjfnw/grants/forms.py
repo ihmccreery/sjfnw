@@ -332,3 +332,14 @@ class LoginAsOrgForm(forms.Form):
     orgs = Organization.objects.order_by('name')
     self.fields['organization'] = forms.ChoiceField(
         choices=[('', '--- Organizations ---')] + [(o.email, unicode(o)) for o in orgs])
+
+
+class OrgMergeForm(forms.Form):
+
+  primary = forms.ChoiceField(widget=forms.widgets.RadioSelect,
+                              error_messages={'required': 'Please select one'})
+
+  def __init__(self, org_a, org_b, *args, **kwargs):
+    super(OrgMergeForm, self).__init__(*args, **kwargs)
+
+    self.fields['primary'].choices = [(org_a.pk, ''), (org_b.pk, '')]

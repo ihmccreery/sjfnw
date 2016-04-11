@@ -38,9 +38,6 @@ class BaseGrantFilesTestCase(BaseGrantTestCase):
     datastore.Put(entity)
     bs_stub.storage.CreateBlob('fakeblobkey123', kwargs['content'])
 
-  class Meta:
-    abstract = True
-
 
 def alter_draft_timeline(draft, values):
   """ values: list of timeline widget values (0-14) """

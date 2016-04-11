@@ -1,8 +1,9 @@
 import logging
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.shortcuts import redirect
 from django.utils.safestring import mark_safe
 
 from sjfnw import utils
@@ -72,9 +73,6 @@ class BaseShowInline(admin.TabularInline):
   extra = 0
   max_num = 0
   can_delete = False
-
-  class Meta:
-    abstract = True
 
 
 class LogReadonlyI(admin.TabularInline):
@@ -307,6 +305,22 @@ class OrganizationA(BaseModelAdmin):
     ]
     return super(OrganizationA, self).change_view(request, object_id)
 
+  def get_actions(self, request):
+    # don't allow 'delete' as mass action
+    return {
+      'merge': (OrganizationA.merge, 'merge', 'Merge')
+    }
+
+  def merge(self, request, queryset):
+    if len(queryset) != 2:
+      messages.warning(request,
+        'Merge can only be done on two organizations. You selected {}.'.format(len(queryset)))
+
+    else:
+      return redirect(reverse(
+        'sjfnw.grants.views.merge_orgs',
+        kwargs={'id_a': queryset[0].pk, 'id_b': queryset[1].pk}
+      ))
 
 class GrantApplicationA(BaseModelAdmin):
   list_display = ['organization', 'grant_cycle', 'submission_time', 'read']

@@ -81,8 +81,8 @@ class Organization(models.Model):
   def __unicode__(self):
     return self.name
 
-  @classmethod
-  def get_profile_fields(cls):
+  @staticmethod
+  def get_profile_fields():
     return [
       'address', 'city', 'state', 'zip', 'telephone_number', 'fax_number',
       'email_address', 'website', 'contact_person', 'contact_person_title',
@@ -90,6 +90,19 @@ class Organization(models.Model):
       'fiscal_telephone', 'fiscal_email', 'fiscal_address', 'fiscal_city',
       'fiscal_state', 'fiscal_zip', 'fiscal_letter'
     ]
+
+  def get_staff_entered_contact_info(self):
+    return ", ".join(filter(None, [
+      self.staff_contact_person, self.staff_contact_person_title,
+      self.staff_contact_phone, self.staff_contact_email
+    ]))
+
+  def update_profile(self, app):
+    for field in self.get_profile_fields():
+      if hasattr(app, field):
+        setattr(self, field, getattr(app, field))
+    self.save()
+    logger.info('org profile updated - %s', self.name)
 
 
 class GrantCycle(models.Model):
@@ -436,12 +449,7 @@ class GrantApplication(models.Model):
       logger.info('App updated, not the most recent for org, regular save')
     else:
       logger.info('App updated, is most recent, updating org profile')
-
-      for field in Organization.get_profile_fields():
-        if hasattr(self, field):
-          setattr(self.organization, field, getattr(self, field))
-      self.organization.save()
-      logger.info('Org profile updated')
+      self.organization.update_profile(self)
 
   def timeline_display(self):
     logger.info(type(self.timeline))

@@ -90,7 +90,3 @@ class BaseGrantTestCase(BaseTestCase):
         self.assertEqual(getattr(draft, field), getattr(app, field))
     if exclude_cycle_q:
       self.assertNotIn('cycle_question', draft_contents)
-
-  class Meta:
-    abstract = True
-
