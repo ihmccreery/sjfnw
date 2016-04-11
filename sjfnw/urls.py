@@ -6,8 +6,6 @@ from django.views.generic.base import RedirectView, TemplateView
 from sjfnw.admin import advanced_admin
 from sjfnw.grants.urls import apply_urls, report_urls, grants_urls, root_urls
 
-# pylint: disable=invalid-name
-
 handler404 = 'sjfnw.views.page_not_found'
 handler500 = 'sjfnw.views.server_error'
 
@@ -29,7 +27,7 @@ urlpatterns = patterns('',
   (r'^', include(root_urls)),
   (r'^org/?$', RedirectView.as_view(url='/apply/')),
   (r'^logout/?$', 'django.contrib.auth.views.logout', {'next_page': '/apply'}),
-  (r'^get-upload-url/?', 'sjfnw.grants.views.get_upload_url'), #TODO put this under /apply
+  (r'^get-upload-url/?', 'sjfnw.grants.views.get_upload_url'),
 
   # admin
   (r'^admin/', include(admin.site.urls)),
@@ -47,7 +45,7 @@ urlpatterns = patterns('',
       'sjfnw.grants.views.revert_app_to_draft'),
   (r'^admin-advanced/grants/grantapplication/(?P<app_id>\d+)/rollover',
       'sjfnw.grants.views.admin_rollover'),
-  (r'^admin-advanced/grants/organizations/merge/(?P<org_a>\d+)/(?P<org_b>\d+)',
+  (r'^admin-advanced/grants/organizations/merge/(?P<id_a>\d+)/(?P<id_b>\d+)',
       'sjfnw.grants.views.merge_orgs'),
 
   # reporting

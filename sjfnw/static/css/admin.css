@@ -135,6 +135,10 @@ fieldset h2 a:link, fieldset h2 a:visited {
   font-size: 1em;
 }
 
+.merge-box {
+  max-width: 800px;
+}
+
 .big {
   font-size: 1.25em;
 }

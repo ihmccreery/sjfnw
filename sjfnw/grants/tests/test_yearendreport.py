@@ -136,7 +136,6 @@ class YearEndReportForm(BaseGrantFilesTestCase):
 
   def test_start_report(self):
     award = models.GivingProjectGrant.objects.get(pk=self.award_id)
-    mailed = award.agreement_mailed
 
     response = self.client.get(_get_yer_url(self.award_id))
     self.assertTemplateUsed(response, 'grants/yer_form.html')
