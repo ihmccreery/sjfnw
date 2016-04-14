@@ -65,13 +65,13 @@ if [[ $onpath -gt 0 && onpythonpath -gt 0 ]] ; then
 else
   has_error=1
   if [ $onpath -gt 0 ] ; then
-    echo -e "$red$prefix $reset: Missing from PYTHONPATH"
+    echo -e "$red$prefix$reset: Missing from PYTHONPATH"
   elif [ $onpythonpath -gt 0 ] ; then
-    echo -e "$red$prefix $reset: Missing from PATH"
+    echo -e "$red$prefix$reset: Missing from PATH"
   else
-    echo -e "$red$prefix $reset: Missing from PATH and PYTHONPATH"
+    echo -e "$red$prefix$reset: Missing from PATH and PYTHONPATH"
   fi
- fi
+fi
 
 # Libs
 lib_missing=0
