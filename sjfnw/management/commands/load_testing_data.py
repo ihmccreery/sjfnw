@@ -53,4 +53,3 @@ class Command(BaseCommand):
 
     self.stdout.write('Loading donors..')
     call_command('loaddata', 'sjfnw/fund/fixtures/lg_donor.json')
-

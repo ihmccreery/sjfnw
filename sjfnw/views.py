@@ -9,7 +9,7 @@ def _get_context(path):
   if path.find('/fund') == 0:
     title_addition = ' - Project Central'
     contact_url = '/fund/support'
-  elif path.find('/org') == 0 or  path.find('/apply') == 0:
+  elif path.find('/org') == 0 or path.find('/apply') == 0:
     title_addition = ' - Social Justice Fund Grants'
     contact_url = '/org/support'
   else:

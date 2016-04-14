@@ -27,10 +27,9 @@ class DraftExtension(BaseGrantTestCase):
     })
 
     self.assertEqual(response.status_code, 302)
-    new = models.DraftGrantApplication.objects.get(organization_id=1) #in effect, asserts 1 draft
+    new = models.DraftGrantApplication.objects.get(organization_id=1)
     self.assertTrue(new.editable)
-    self.assertIn('/admin/grants/draftgrantapplication/',
-                  response.__getitem__('location')) # pylint: disable=no-member
+    self.assertIn('/admin/grants/draftgrantapplication/', response.__getitem__('location'))
 
 
 class Draft(BaseGrantTestCase):
@@ -47,7 +46,7 @@ class Draft(BaseGrantTestCase):
     )
     new_draft.save()
     dic = json.loads(complete_draft.contents)
-    #fake a user id like the js would normally do
+    # fake a user id like the js would normally do
     dic['user_id'] = 'asdFDHAF34qqhRHFEA'
     self.maxDiff = None # pylint: disable=invalid-name
 

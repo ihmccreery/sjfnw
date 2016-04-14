@@ -91,4 +91,3 @@ class CreateMembership(BaseFundTestCase):
     self.assertIsNone(error)
     self.assertIsInstance(membership, models.Membership)
     self.assertTrue(membership.approved)
-

@@ -23,7 +23,7 @@ def registered_org():
     @wraps(view_func, assigned=available_attrs(view_func))
     def _wrapped_view(request, *args, **kwargs):
       username = request.user.username
-      if request.user.is_staff and request.GET.get('user'): #staff override
+      if request.user.is_staff and request.GET.get('user'): # staff override
         username = request.GET.get('user')
         logger.info('Staff override - ' + request.user.username +
                      ' logging in as ' + username)
@@ -37,4 +37,3 @@ def registered_org():
     return _wrapped_view
 
   return decorator
-

@@ -36,7 +36,7 @@ class NewGivingProjectGrant(BaseGrantTestCase):
 
   def test_two_year_grant(self):
     award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
-      second_amount=5000, first_yer_due=timezone.now().date()-timedelta(days=5))
+      second_amount=5000, first_yer_due=timezone.now().date() - timedelta(days=5))
     award.save()
 
     self.assertEqual(award.total_amount(), award.amount + award.second_amount)

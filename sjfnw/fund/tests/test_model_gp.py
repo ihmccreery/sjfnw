@@ -39,4 +39,3 @@ class GetSuggestedSteps(BaseFundTestCase):
     self.assertEqual(suggested[0], 'Talk')
     self.assertEqual(suggested[1], 'Invite them')
     self.assertEqual(suggested[2], 'Thanks!!')
-

@@ -25,7 +25,7 @@ def make_custom_datefield(field):
     formfield.error_messages['invalid'] = 'Please enter a date in mm/dd/yyyy format.'
     formfield.widget.format = '%m/%d/%Y'
     formfield.widget.input_formats = ['%m/%d/%Y', '%m-%d-%Y', '%n/%j/%Y', '%n-%j-%Y']
-    formfield.widget.attrs.update({'class':'datePicker'})
+    formfield.widget.attrs.update({'class': 'datePicker'})
   return formfield
 
 
@@ -92,10 +92,10 @@ class CreateQuestionsWidget(widgets.MultiWidget):
     html = ('<table id="survey-questions">'
             '<tr><th></th><th>Title</th><th>Choices</th></tr>')
     for i in range(0, len(rendered_widgets), 6):
-      html += ('<tr><td>' + str((i+6)/6) + '</td><td>' +
-              rendered_widgets[i] + '</td><td>' + rendered_widgets[i+1] +
-              rendered_widgets[i+2] + rendered_widgets[i+3] +
-              rendered_widgets[i+4] + rendered_widgets[i+5] + '</td></tr>')
+      html += ('<tr><td>' + str((i + 6) / 6) + '</td><td>' +
+              rendered_widgets[i] + '</td><td>' + rendered_widgets[i + 1] +
+              rendered_widgets[i + 2] + rendered_widgets[i + 3] +
+              rendered_widgets[i + 4] + rendered_widgets[i + 5] + '</td></tr>')
     html += '</table>'
     return html
 
@@ -124,7 +124,7 @@ class CreateQuestionsWidget(widgets.MultiWidget):
       if not val: # first blank question signifies end of survey
         break
       question = {'question': val, 'choices': []}
-      for j in range(i+1, i+6):
+      for j in range(i + 1, i + 6):
         val = self.widgets[j].value_from_datadict(data, files, '{}_{}'.format(name, j))
         if val:
           question['choices'].append(val)
@@ -160,10 +160,9 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
         choices = [(choice, choice) for _, choice in enumerate(question['choices'])]
         _widgets.append(widgets.RadioSelect(choices=choices))
       else:
-        _widgets.append(widgets.Textarea(attrs={'class':'survey-text'}))
+        _widgets.append(widgets.Textarea(attrs={'class': 'survey-text'}))
 
     super(DisplayQuestionsWidget, self).__init__(_widgets, attrs)
-
 
   def decompress(self, value):
     """ Take single DB value, break it up for widget display """
@@ -181,10 +180,9 @@ class DisplayQuestionsWidget(widgets.MultiWidget):
     html = '<table id="survey-questions">'
     for i, question in enumerate(self.questions):
       html += '<tr><th>{}.</th><td>{}{}</td></tr>'.format(
-          i+1, question['question'], rendered_widgets[i])
+          i + 1, question['question'], rendered_widgets[i])
     html += '</table>'
     return html
-
 
   def value_from_datadict(self, data, files, name):
     """ Consolidate widget data into a single value for storage

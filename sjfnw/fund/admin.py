@@ -18,12 +18,12 @@ from sjfnw.grants.models import ProjectApp, GrantApplication
 logger = logging.getLogger('sjfnw')
 
 # -----------------------------------------------------------------------------
-# Filters
+#  Filters
 # -----------------------------------------------------------------------------
 
 class PromisedFilter(SimpleListFilter):
-
   """ Filter by promised field """
+
   title = 'promised'
   parameter_name = 'promised'
 
@@ -339,7 +339,7 @@ class DonorA(BaseModelAdmin):
       fields = [donor.firstname, donor.lastname, donor.phone, donor.email,
                 donor.membership.member, donor.membership.giving_project,
                 donor.amount, donor.asked, donor.promised, donor.received(),
-                year, donor.received_this, year+1, donor.received_next, year+2,
+                year, donor.received_this, year + 1, donor.received_next, year + 2,
                 donor.received_afternext, donor.notes,
                 donor.get_likely_to_join_display(),
                 donor.promise_reason_display(), donor.total_promised(),
@@ -392,7 +392,7 @@ class SurveyResponseA(BaseModelAdmin):
       disp = '<table><tr><th>Question</th><th>Answer</th></tr>'
       for i in range(0, len(resp_list), 2):
         disp += ('<tr><td>' + unicode(resp_list[i]) + '</td><td>' +
-                 unicode(resp_list[i+1]) + '</td></tr>')
+                 unicode(resp_list[i + 1]) + '</td></tr>')
       disp += '</table>'
       return mark_safe(disp)
   display_responses.short_description = 'Responses'
@@ -416,8 +416,8 @@ class SurveyResponseA(BaseModelAdmin):
       responses = json.loads(survey.responses)
       for i in range(0, len(responses), 2):
         fields.append(responses[i])
-        fields.append(responses[i+1])
-        questions = max(questions, (i+2)/2)
+        fields.append(responses[i + 1])
+        questions = max(questions, (i + 2) / 2)
       response_rows.append(fields)
 
     logger.info('Max %d questions', questions)
@@ -430,9 +430,9 @@ class SurveyResponseA(BaseModelAdmin):
 
     return response
 
-#------------------------------------------------------------------------------
-# Register
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Register
+# -----------------------------------------------------------------------------
 
 admin.site.register(GivingProject, GivingProjectA)
 admin.site.register(Membership, MembershipA)

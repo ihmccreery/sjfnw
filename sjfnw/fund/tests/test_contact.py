@@ -9,14 +9,14 @@ class EditContact(BaseFundTestCase):
     super(EditContact, self).setUp()
     self.use_test_acct()
     self.url = reverse('sjfnw.fund.views.edit_contact',
-                       kwargs={'donor_id' : self.donor_id})
+                       kwargs={'donor_id': self.donor_id})
     self.form_data = {
-      'phone' : '888-888-8888',
-      'firstname' : 'John',
-      'lastname' : 'Doe',
-      'likelihood' : '10',
-      'email' : 'testacct@gmail.com',
-      'notes' : 'adifjaoifjdoiajfoa'
+      'phone': '888-888-8888',
+      'firstname': 'John',
+      'lastname': 'Doe',
+      'likelihood': '10',
+      'email': 'testacct@gmail.com',
+      'notes': 'adifjaoifjdoiajfoa'
     }
 
   def test_negative_amount(self):

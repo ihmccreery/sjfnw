@@ -115,14 +115,14 @@ class GrantCycle(models.Model):
   conflicts = models.TextField(blank=True,
       help_text='Track any conflicts of interest (automatic & personally '
       'declared) that occurred  during this cycle.')
-  private = models.BooleanField(default=False, verbose_name=
-      'Private (will not be displayed to orgs, but can be accessed by '
-       'anyone who has the direct link)')
+  private = models.BooleanField(default=False,
+      verbose_name='Private (will not be displayed to orgs, but can be '
+      'accessed by anyone who has the direct link)')
   two_year_grants = models.BooleanField(default=False,
       help_text='Cycles associated with two-year grants have an extra '
       'question in their application.')
-  two_year_question = models.TextField(blank=True, default=
-      'This grant will provide funding for two years. While we know it can be '
+  two_year_question = models.TextField(blank=True,
+      default='This grant will provide funding for two years. While we know it can be '
       'difficult to predict your work beyond a year, please give us an idea of '
       'what the second year might look like.<ol><li>What overall goals and '
       'strategies do you forecast in the second year?</li><li>How will the '
@@ -254,7 +254,7 @@ class GrantApplication(models.Model):
   budget_last = models.PositiveIntegerField(verbose_name='Org. budget last fiscal year')
   budget_current = models.PositiveIntegerField(verbose_name='Org. budget this fiscal year')
 
-  #this grant info
+  # this grant info
   grant_request = models.TextField(verbose_name="Briefly summarize the grant request",
                                    validators=[WordLimitValidator(100)])
   contact_person = models.CharField(max_length=250, verbose_name='Name',
@@ -265,7 +265,7 @@ class GrantApplication(models.Model):
   amount_requested = models.PositiveIntegerField()
 
   SUPPORT_CHOICES = [('General support', 'General support'),
-                     ('Project support', 'Project support'),]
+                     ('Project support', 'Project support')]
   support_type = models.CharField(max_length=50, choices=SUPPORT_CHOICES)
   project_title = models.CharField(max_length=250, blank=True,
                                    verbose_name='Project title (if applicable)')
@@ -462,10 +462,10 @@ class GrantApplication(models.Model):
             '<th>goals/objectives</th>'
             '</tr>')
     for i in range(0, 15, 3):
-      html += ('<tr><th class="left">q' + str((i+3)/3) + '</th>'
+      html += ('<tr><th class="left">q' + str((i + 3)/3) + '</th>'
                '<td>' + timeline[i] + '</td>'
-               '<td>' + timeline[i+1] + '</td>'
-               '<td>' + timeline[i+2] +'</td></tr>')
+               '<td>' + timeline[i + 1] + '</td>'
+               '<td>' + timeline[i + 2] + '</td></tr>')
     html += '</table>'
     return html
   timeline_display.allow_tags = True
@@ -672,7 +672,7 @@ class YearEndReport(models.Model):
 
   other_comments = models.TextField(verbose_name=
       ('12. Other comments or information? Do you have any suggestions for how '
-        'SJF can improve its grantmaking programs?'), blank=True) #json dict - see modelforms
+        'SJF can improve its grantmaking programs?'), blank=True) # json dict - see modelforms
 
   photo1 = models.FileField(validators=[validate_photo_file_extension],
       upload_to='/', max_length=255,

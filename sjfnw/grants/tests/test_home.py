@@ -31,7 +31,7 @@ class OrgHomeAwards(BaseGrantTestCase):
   def test_early(self):
     """ org has an award, but agreement has not been mailed. verify not shown """
     award = GivingProjectGrant(projectapp_id=1, amount=9000,
-                                      first_yer_due=timezone.now()+timedelta(weeks=53))
+                                      first_yer_due=timezone.now() + timedelta(weeks=53))
     award.save()
 
     response = self.client.get(self.url)
@@ -45,8 +45,8 @@ class OrgHomeAwards(BaseGrantTestCase):
     award = GivingProjectGrant(
         projectapp_id=1,
         amount=9000,
-        agreement_mailed=today-timedelta(days=1),
-        first_yer_due=today+timedelta(weeks=52))
+        agreement_mailed=today - timedelta(days=1),
+        first_yer_due=today + timedelta(weeks=52))
     award.save()
 
     response = self.client.get(self.url)
@@ -78,7 +78,7 @@ class OrgRollover(BaseGrantTestCase):
         DraftGrantApplication.objects.filter(organization_id=1, grant_cycle_id=1).count())
 
     response = self.client.post('/apply/copy',
-        {'cycle':'1', 'draft':'2', 'application':''}, follow=True)
+        {'cycle': '1', 'draft': '2', 'application': ''}, follow=True)
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
@@ -110,7 +110,7 @@ class OrgRollover(BaseGrantTestCase):
     app.organization = Organization.objects.get(pk=1)
     app.save()
 
-    post_data = {'cycle':'2', 'draft':'', 'application':'1'}
+    post_data = {'cycle': '2', 'draft': '', 'application': '1'}
     response = self.client.post('/apply/copy', post_data, follow=True)
 
     self.assertEqual(response.status_code, 200)

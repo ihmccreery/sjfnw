@@ -27,7 +27,7 @@ class BaseTestCase(TestCase):
     User.objects.create_user('newacct@gmail.com', 'newacct@gmail.com', 'noob')
     self.client.login(username='newacct@gmail.com', password='noob')
 
-  def log_in_admin(self): #just a django superuser
+  def log_in_admin(self): # just a django superuser
     User.objects.create_superuser('admin@gmail.com', 'admin@gmail.com', 'admin')
     self.client.login(username='admin@gmail.com', password='admin')
 

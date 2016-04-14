@@ -28,8 +28,6 @@ class CopyContacts(BaseFundTestCase):
     member = models.Member.objects.get(email='testacct@gmail.com')
     member.current = membership.pk
     member.save()
-    #print(['%s %s' % (gp.pk, gp.title) for gp in models.GivingProject.objects.all()])
-    #print(models.Membership.objects.all())
 
   def test_no_duplicates(self):
     """ Verify that form display & submits properly without dup contacts
@@ -71,7 +69,6 @@ class CopyContacts(BaseFundTestCase):
 
     self.assertEqual(formset.initial_form_count(),
                      models.Donor.objects.filter(membership=self.membership).count())
-
 
   def test_merge_duplicates(self):
     """ Verify proper merging of contacts
@@ -133,4 +130,3 @@ class CopyContacts(BaseFundTestCase):
     self.assertTrue(membership.copied_contacts)
     response = self.client.get(self.get_url, follow=True)
     self.assertTemplateNotUsed(self.template)
-

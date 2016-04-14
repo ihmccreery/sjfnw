@@ -23,9 +23,9 @@ if not settings.DEBUG:
 
 logger = logging.getLogger('sjfnw')
 
-#-----------------------------------------------------------------------------
-# MAIN VIEWS
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  MAIN VIEWS
+# ----------------------------------------------------------------------------
 
 @login_required(login_url='/fund/login/')
 @approved_membership()
@@ -98,7 +98,7 @@ def home(request):
   form_type = request.GET.get('t')
   load_form = request.GET.get('load')
   if step and donor and form_type:
-    load = '/fund/'+donor+'/'+step
+    load = '/fund/' + donor + '/' + step
     if form_type == 'complete':
       load += '/done'
     loadto = donor + '-nextstep'
@@ -218,8 +218,8 @@ def project_page(request):
     elif donor.promised:
       progress['promised'] += donor.total_promised()
 
-  progress['contacts_remaining'] = progress['contacts'] - progress['talked'] -  progress['asked']
-  progress['togo'] = project.fund_goal - progress['promised'] -  progress['received']
+  progress['contacts_remaining'] = progress['contacts'] - progress['talked'] - progress['asked']
+  progress['togo'] = project.fund_goal - progress['promised'] - progress['received']
   if progress['togo'] < 0:
     progress['togo'] = 0
 
@@ -252,9 +252,9 @@ def grant_list(request):
     'membership': membership, 'grants': grants
   })
 
-#-----------------------------------------------------------------------------
-# LOGIN & REGISTRATION
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  LOGIN & REGISTRATION
+# ----------------------------------------------------------------------------
 
 def fund_login(request):
   error_msg = ''
@@ -270,7 +270,7 @@ def fund_login(request):
           return redirect(home)
         else:
           error_msg = 'Your account is not active.  Contact an administrator.'
-          logger.warning('Inactive account tried to log in. Username: '+username)
+          logger.warning('Inactive account tried to log in. Username: ' + username)
       else:
         error_msg = 'Your login and password didn\'t match.'
       logger.info(error_msg)
@@ -378,9 +378,9 @@ def registered(request):
     'member': member, 'proj': gp
   })
 
-#-----------------------------------------------------------------------------
-# MEMBERSHIP MANAGEMENT
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  MEMBERSHIP MANAGEMENT
+# ----------------------------------------------------------------------------
 
 @login_required(login_url='/fund/login/')
 def manage_account(request):
@@ -428,9 +428,9 @@ def set_current(request, ship_id):
 
   return redirect(home)
 
-#-----------------------------------------------------------------------------
-# ERROR & HELP PAGES
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  ERROR & HELP PAGES
+# ----------------------------------------------------------------------------
 
 @login_required(login_url='/fund/login/')
 def not_member(request):
@@ -472,9 +472,9 @@ def support(request):
     'support_form': c.FUND_SUPPORT_FORM
   })
 
-#-----------------------------------------------------------------------------
-# SURVEY
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  SURVEY
+# ----------------------------------------------------------------------------
 
 @login_required(login_url='/fund/login')
 @approved_membership()
@@ -509,9 +509,9 @@ def project_survey(request, gp_survey_id):
     'steps': steps, 'grants': grants
   })
 
-#-----------------------------------------------------------------------------
-# CONTACTS
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  CONTACTS
+# ----------------------------------------------------------------------------
 
 @login_required(login_url='/fund/login')
 @approved_membership()
@@ -765,7 +765,7 @@ def edit_contact(request, donor_id):
                                  '_id_%s')
   return render(request, 'fund/forms/edit_contact.html',
                 {'form': form, 'pk': donor.pk,
-                 'action': '/fund/'+str(donor_id)+'/edit'})
+                 'action': '/fund/' + str(donor_id) + '/edit'})
 
 
 @login_required(login_url='/fund/login/')
@@ -789,9 +789,9 @@ def delete_contact(request, donor_id):
 
   return render(request, 'fund/forms/delete_contact.html', {'action': action})
 
-#-----------------------------------------------------------------------------
-# STEPS
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  STEPS
+# ----------------------------------------------------------------------------
 
 @login_required(login_url='/fund/login/')
 @approved_membership()
@@ -814,8 +814,8 @@ def add_step(request, donor_id):
     raise Http404
 
   action = '/fund/' + donor_id + '/step'
-  formid = 'nextstep-'+donor_id
-  divid = donor_id+'-nextstep'
+  formid = 'nextstep-' + donor_id
+  divid = donor_id + '-nextstep'
 
   if request.method == 'POST':
     membership.last_activity = timezone.now()
@@ -851,7 +851,7 @@ def add_mult_step(request):
     if donor.received() == 0 and donor.promised is None and donor.get_next_step() is None:
       initial_form_data.append({'donor': donor})
       donor_list.append(donor)
-      size = size +1
+      size = size + 1
     if size > 9:
       break
   step_formset = formset_factory(forms.MassStep, extra=0)
@@ -874,7 +874,7 @@ def add_mult_step(request):
   else:
     formset = step_formset(initial=initial_form_data)
     logger.info('Multiple steps - loading initial formset, size ' + str(size) +
-                 ': ' +str(donor_list))
+                 ': ' + str(donor_list))
   formset_with_donors = zip(formset, donor_list)
   return render(request, 'fund/forms/add_mult_step.html', {
     'size': size, 'formset': formset, 'fd': formset_with_donors,
@@ -903,9 +903,9 @@ def edit_step(request, donor_id, step_id):
                   str(step_id))
     raise Http404
 
-  action = '/fund/'+str(donor_id)+'/'+str(step_id)
-  formid = 'edit-step-'+donor_id
-  divid = donor_id+'-nextstep'
+  action = '/fund/' + str(donor_id) + '/' + str(step_id)
+  formid = 'edit-step-' + donor_id
+  divid = donor_id + '-nextstep'
 
   if request.method == 'POST':
     request.membership.last_activity = timezone.now()
@@ -1012,7 +1012,7 @@ def complete_step(request, donor_id, step_id):
       # process next step input
       next_step = form.cleaned_data['next_step']
       next_date = form.cleaned_data['next_step_date']
-      if next_step != '' and next_date != None:
+      if next_step != '' and next_date is not None:
         form2 = modelforms.StepForm().save(commit=False)
         form2.date = next_date
         form2.description = next_step
@@ -1045,9 +1045,9 @@ def complete_step(request, donor_id, step_id):
     'step_id': step_id, 'step': step
   })
 
-#-----------------------------------------------------------------------------
-# METHODS USED BY MULTIPLE VIEWS
-#-----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
+#  METHODS USED BY MULTIPLE VIEWS
+# ----------------------------------------------------------------------------
 
 def _get_block_content(membership, get_steps=True):
   """ Provide upper block content for the 3 main views

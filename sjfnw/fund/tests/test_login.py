@@ -11,8 +11,8 @@ class Login(BaseFundTestCase):
     super(Login, self).setUp()
 
     self.form_data = {
-        'email': u'',
-        'password': u''
+      'email': u'',
+      'password': u''
     }
 
   def test_get(self):
@@ -64,4 +64,3 @@ class Login(BaseFundTestCase):
     response = self.client.post(self.url, self.form_data, follow=True)
 
     self.assertTemplateUsed(response, 'fund/not_member.html')
-

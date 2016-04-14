@@ -226,7 +226,7 @@ class StepComplete(BaseFundTestCase):
     self.assertEqual(1, models.Step.objects.filter(description='A BRAND NEW STEP').count())
 
   @unittest.skip('Incomplete')
-  def test_valid_response(self): #TODO
+  def test_valid_response(self):
     """ TO DO
     contact that was already asked
     add a response
@@ -245,7 +245,7 @@ class StepComplete(BaseFundTestCase):
     self.assertEqual(response.content, 'success')
 
     promised = form_data['promised_amount']
-    if promised == '5,000': #hacky workaround
+    if promised == '5,000': # hacky workaround
       promised = 5000
 
     # get donor and step after the POST
@@ -280,7 +280,6 @@ class StepComplete(BaseFundTestCase):
       self.assertEqual(donor.lastname, pre_donor.lastname)
       self.assertEqual(donor.phone, pre_donor.phone)
       self.assertEqual(donor.email, pre_donor.email)
-
 
   def test_valid_followup(self):
     """ Success with promise amount, last name and email """
@@ -460,4 +459,3 @@ class StepComplete(BaseFundTestCase):
     self.form_data['match_company'] = 'Company X'
 
     self.post_and_verify_followup_saved(self.form_data)
-

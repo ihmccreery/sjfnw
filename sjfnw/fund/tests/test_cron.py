@@ -243,9 +243,9 @@ class OverdueEmails(BaseFundTestCase):
 
   def test_several(self):
     """ overdue step in two memberships (different members) """
-    step = models.Step(donor_id=self.donor1, date=timezone.now()-timedelta(days=3))
+    step = models.Step(donor_id=self.donor1, date=timezone.now() - timedelta(days=3))
     step.save()
-    step = models.Step(donor_id=self.donor3, date=timezone.now()-timedelta(days=9))
+    step = models.Step(donor_id=self.donor3, date=timezone.now() - timedelta(days=9))
     step.save()
 
     self.assertEqual(len(mail.outbox), 0)
@@ -261,9 +261,9 @@ class OverdueEmails(BaseFundTestCase):
   def test_several_per_donor(self):
     """ Two overdue steps for one membership; expect only one email """
 
-    step = models.Step(donor_id=self.donor1, date=timezone.now()-timedelta(days=3))
+    step = models.Step(donor_id=self.donor1, date=timezone.now() - timedelta(days=3))
     step.save()
-    step = models.Step(donor_id=self.donor2, date=timezone.now()-timedelta(days=9))
+    step = models.Step(donor_id=self.donor2, date=timezone.now() - timedelta(days=9))
     step.save()
 
     self.assertEqual(len(mail.outbox), 0)
@@ -279,9 +279,9 @@ class OverdueEmails(BaseFundTestCase):
     donor = models.Donor(membership_id=self.post_id, firstname='Other')
     donor.save()
 
-    step = models.Step(donor_id=self.donor1, date=timezone.now()-timedelta(days=3))
+    step = models.Step(donor_id=self.donor1, date=timezone.now() - timedelta(days=3))
     step.save()
-    step = models.Step(donor=donor, date=timezone.now()-timedelta(days=9))
+    step = models.Step(donor=donor, date=timezone.now() - timedelta(days=9))
     step.save()
 
     self.assertEqual(len(mail.outbox), 0)
@@ -292,9 +292,9 @@ class OverdueEmails(BaseFundTestCase):
   def test_completed(self):
     """ overdue step in two memberships (different members) """
     now = timezone.now()
-    step = models.Step(donor_id=self.donor1, date=now-timedelta(days=3), completed=now)
+    step = models.Step(donor_id=self.donor1, date=now - timedelta(days=3), completed=now)
     step.save()
-    step = models.Step(donor_id=self.donor3, date=now-timedelta(days=9), completed=now)
+    step = models.Step(donor_id=self.donor3, date=now - timedelta(days=9), completed=now)
     step.save()
 
     self.assertEqual(len(mail.outbox), 0)
