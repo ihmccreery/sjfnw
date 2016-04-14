@@ -8,4 +8,6 @@ Generally follow google's [Python style guide](http://google-styleguide.googleco
 - Single quotes except for docstrings  
 - We're not as stringent with line length; aim for <100
 
-See the [linters](../getting-started/linters.md) page for information on plugins that check syntax/style. Note that pylint does _not_ check quotes or indentation, but should catch most other issues.
+### Checking code style
+
+Commits pushed to github are automatically checked through [landscape.io](https://landscape.io/github/aisapatino/sjfnw). See the [linting](../getting-started/linters.md) page for information on checking locally. Note that quotes (single vs double) are not checked.

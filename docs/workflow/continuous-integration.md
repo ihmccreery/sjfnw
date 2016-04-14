@@ -12,4 +12,10 @@ When previewing or creating a pull request, there will be icons next to some com
 
 Tool for tracking test coverage over time. When Travis runs tests, it reports the coverage results and they're recorded at the link above. You can click on a commit to see a breakdown by file, and click on a file to see line-by-line coverage.
 
-Codecov is configured to leave a comment on every pull request with the change in code coverage.
+If coverage drops below 75%, codecov's commit check will report failure.
+
+### Landscape.io
+
+[landscape.io/github/aisapatino/sjfnw](https://landscape.io/github/aisapatino/sjfnw)
+
+Tool for checking code "health" - runs `prospector` on every commit. See [linting](/getting-started/linters.md) for details.

@@ -9,3 +9,7 @@ The [resources](resources.md) page has links with more info on the various langu
 Check [issues labeled "ready"](https://github.com/aisapatino/sjfnw/labels/ready) to see what needs doing. Post a comment on the issue if you need clarification. See [issue tracking](workflow/issue-tracking.md) for more info.
 
 If you notice anything missing/wrong in the docs, please submit a PR! For more info, see the [documentation](./about/docs.md) page.
+
+#### What's new
+
+* Now using prospector & landscape.io. Updated: [linters](getting-started/linters.md), [text editor setup](getting-started/text-editor-setup.md), [continuous integration](workflow/continuous-integration.md), [code conventions](about/code-conventions)

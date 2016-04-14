@@ -7,11 +7,13 @@ Tool for maintaining consistent per-project coding style by automating some of y
   - [Sublime](https://github.com/sindresorhus/editorconfig-sublime#readme)
   - [Vim](https://github.com/editorconfig/editorconfig-vim#readme)
 
-### Pylint plugin
+### Prospector plugin
 
 Shows lint warnings in your editor so you don't need to run the command line script. [Install pylint](linters.md) first.
 
 **Sublime3**: [SublimeLinter](http://sublimelinter.readthedocs.org/en/latest/) + [SublimeLinter-pylint](https://packagecontrol.io/packages/SublimeLinter-pylint)
+
+_TODO: check for Sublime prospector plugin_
 
 In your [user settings](http://sublimelinter.readthedocs.org/en/latest/settings.html#settings-sources), under `"linters"`, include
 
@@ -26,6 +28,6 @@ In your [user settings](http://sublimelinter.readthedocs.org/en/latest/settings.
 In your `.vimrc`, include
 
 ```vim
-let g:syntastic_python_checkers = ['pylint']
-let g:syntastic_python_pylint_args = '--rcfile=[path to repo]/.pylintrc'
+let g:syntastic_python_checkers = ['prospector']
+let g:syntastic_python_prospector_args = '--profile=[path to repo]/.landscape.yml'
 ```
