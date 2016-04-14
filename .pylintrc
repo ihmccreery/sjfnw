@@ -6,6 +6,8 @@ load-plugins=pylint_django
 
 [MESSAGES CONTROL]
 
+# should eventually re-enable the "too-many-*"
+# except too-many-ancestors since that's mostly out of our control
 disable=attribute-defined-outside-init,
         bad-continuation,
         duplicate-code,
@@ -26,9 +28,6 @@ disable=attribute-defined-outside-init,
         too-many-nested-blocks,
         too-many-statements
 
-# would like to eventually re-enable the "too-many-*"
-# except too-many-ancestors since that's mostly out of our control
-
 [REPORTS]
 
 output-format=colorized
@@ -38,9 +37,6 @@ reports=no
 
 bad-functions=map,filter,input,print # defaults + print
 good-names=i,j,_,pk,gp,qs
-
-# allow setUp as an exception since it's built in
-method-rgx=setUp|([a-z_][a-z0-9_]{2,30})$
 
 # allow lower cased "constants" since detection is iffy
 const-rgx=(([A-Za-z_][A-Za-z0-9_]*)|(__.*__))$
