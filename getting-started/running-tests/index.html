@@ -242,6 +242,9 @@
         <li class="main active"><a href="#run-tests">Run tests</a></li>
         
     
+        <li class="main "><a href="#test-output">Test output</a></li>
+        
+    
         <li class="main "><a href="#coverage">Coverage</a></li>
         
     
@@ -266,6 +269,41 @@
 <li>Specific test suite: <code>./manage.py test sjfnw.fund.tests.test_steps.AddStep</code>  </li>
 <li>Specific test: <code>./manage.py test sjfnw.fund.tests.test_steps.AddStep.test_valid</code></li>
 </ul>
+<h3 id="test-output">Test output</h3>
+<p>Several verbosity levels are available. The default is <code>1</code>.</p>
+<table>
+<thead>
+<tr>
+<th align="center">Level</th>
+<th>Test display</th>
+<th>Logging</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><code>0</code></td>
+<td>dots</td>
+<td>fatal</td>
+</tr>
+<tr>
+<td align="center"><code>1</code></td>
+<td>dots</td>
+<td>error</td>
+</tr>
+<tr>
+<td align="center"><code>2</code></td>
+<td>text</td>
+<td>info</td>
+</tr>
+<tr>
+<td align="center"><code>3</code></td>
+<td>text</td>
+<td>debug</td>
+</tr>
+</tbody>
+</table>
+<p>Dots = single character per test<br />
+Text = full line per test</p>
 <h3 id="coverage">Coverage</h3>
 <p>Browse code coverage on <a href="https://codecov.io/github/aisapatino/sjfnw">codecov</a> (more info: <a href="../../workflow/continuous-integration/">CI</a>).</p>
 <p>To check test coverage locally, install <a href="http://nedbatchelder.com/code/coverage/">coverage.py</a>, then do</p>

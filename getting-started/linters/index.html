@@ -241,15 +241,8 @@
     
         <li class="main active"><a href="#installation">Installation</a></li>
         
-            <li><a href="#pylint-recommended">pylint: (recommended)</a></li>
-        
-            <li><a href="#eslint-only-if-youre-doing-a-lot-of-javascript-work">eslint: (only if you're doing a lot of javascript work)</a></li>
-        
     
-        <li class="main "><a href="#usage-in-text-editor">Usage - in text editor</a></li>
-        
-    
-        <li class="main "><a href="#usage-cli">Usage - CLI</a></li>
+        <li class="main "><a href="#usage">Usage</a></li>
         
     
         <li class="main "><a href="#configuration">Configuration</a></li>
@@ -265,38 +258,24 @@
             
           
 
-<p>The repo is set up to use <a href="http://www.pylint.org/">pylint</a> and <a href="http://eslint.org/docs/">eslint</a>, syntax &amp; style checkers for python and javascript.</p>
+<p>The repo is set up to use <a href="http://prospector.landscape.io/en/master/index.html">prospector</a>, a tool that combines several python code-checkers including <a href="http://www.pylint.org/">pylint</a>.</p>
+<p><code>prospector</code> is run for every commit pushed to github via <a href="https://landscape.io/github/aisapatino/sjfnw">landscape.io</a>; see <a href="/workflow/continuous-integration.md">CI page</a> for more info.</p>
 <h3 id="installation">Installation</h3>
-<h4 id="pylint-recommended">pylint: <em>(recommended)</em></h4>
-<ul>
-<li><code>pip install pylint</code> (details <a href="http://www.pylint.org/#install">here</a>)<ul>
-<li>make sure you have v1.4+ (do <code>pip list</code> to see, <code>pip -U pylint</code> to upgrade)</li>
-</ul>
-</li>
-<li><code>pip install pylint-django</code> (<a href="https://github.com/landscapeio/pylint-django">plugin</a> that makes pylint more django friendly)</li>
-</ul>
-<h4 id="eslint-only-if-youre-doing-a-lot-of-javascript-work">eslint: <em>(only if you're doing a lot of javascript work)</em></h4>
-<ul>
-<li>Install <a href="https://nodejs.org">node</a>, which comes with <a href="https://www.npmjs.com/">npm</a> (node package manager): <code>sudo apt-get install node</code> or <code>brew install node</code><ul>
-<li>See their <a href="https://docs.npmjs.com/getting-started/installing-node">docs</a> for more info if needed.</li>
-</ul>
-</li>
-<li><code>npm install -g eslint</code> will install eslint globally (i.e. always on your path).<ul>
-<li>See <a href="https://docs.npmjs.com/getting-started/fixing-npm-permissions">this page</a> if you get a permissions error.</li>
-</ul>
-</li>
-</ul>
-<h3 id="usage-in-text-editor">Usage - in text editor</h3>
-<p>See <a href="../text-editor-setup/">text editor setup</a> for more info.</p>
-<h3 id="usage-cli">Usage - CLI</h3>
-<ul>
-<li>To lint the whole project: <code>./scripts/lint</code></li>
-<li>That will output results to the console. If you want to save results to a file, you can do <code>./scripts/lint &gt; filename.txt</code></li>
-</ul>
+<p><code>./scripts/install-lint</code></p>
+<h3 id="usage">Usage</h3>
+<p><code>prospector</code></p>
+<p>For info on usage through a text editor see <a href="../text-editor-setup/">text editor setup</a>.</p>
 <h3 id="configuration">Configuration</h3>
 <ul>
-<li>current config: <a href="https://github.com/aisapatino/sjfnw/blob/master/.pylintrc">.pylintrc</a> , more info: <a href="http://docs.pylint.org/features.html">pylint docs</a></li>
-<li>current config: <a href="https://github.com/aisapatino/sjfnw/blob/master/.eslintrc">.eslintrc</a> , more info: <a href="http://eslint.org/docs/rules/">eslint docs</a></li>
+<li>Prospector: <a href="https://github.com/aisapatino/sjfnw/blob/master/.landscape.yml">.landscape.yml</a><ul>
+<li>Thus named because it also configures landscape.io runs</li>
+<li>More info: <a href="http://prospector.landscape.io/en/master/profiles.html#builtin-profiles">prospector profiles</a></li>
+</ul>
+</li>
+<li>Pylint: <a href="https://github.com/aisapatino/sjfnw/blob/master/.pylintrc">.pylintrc</a><ul>
+<li>More info: <a href="http://docs.pylint.org/features.html">pylint docs</a></li>
+</ul>
+</li>
 </ul>
         </div>
       
