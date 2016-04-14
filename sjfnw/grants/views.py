@@ -18,7 +18,7 @@ from django.views.decorators.http import require_http_methods
 
 from google.appengine.ext import blobstore
 
-from libs import unicodecsv
+import unicodecsv
 
 from sjfnw import constants as c
 from sjfnw.fund.models import Member
