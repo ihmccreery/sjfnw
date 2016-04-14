@@ -1,0 +1,34 @@
+python-targets:
+  - 2
+
+ignore-paths:
+  - docs
+  - libs
+  - site
+  - scripts
+
+requirements:
+  - requirements.txt
+  - requirements-lint.txt
+
+uses:
+  - django
+
+strictness: none
+member-warnings: true
+test-warnings: true
+
+mccabe:
+  run: false
+
+pyflakes:
+  run: false
+
+pep8:
+  disable:
+    - E1   # indentation
+    - E261 # require two+ spaces before inline comment
+    - E302 # require two blank lines
+    - E401 # multiple imports per line
+    - E501 # line length (checked by pylint)
+    - N    # naming (checked by pylint)
