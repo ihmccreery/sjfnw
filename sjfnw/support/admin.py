@@ -21,4 +21,3 @@ class GuideA(admin.ModelAdmin):
       return mark_safe(obj.contents)
 
 admin.site.register(Guide, GuideA)
-

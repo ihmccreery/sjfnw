@@ -73,7 +73,7 @@ class GivingProject(models.Model):
   def is_pre_approved(self, email):
     """ Check new membership for pre-approval status """
     if self.pre_approved:
-      approved_emails = [email.strip().lower() for email in self.pre_approved.split(',')]
+      approved_emails = [eml.strip().lower() for eml in self.pre_approved.split(',')]
       logger.info(u'Checking pre-approval for %s in %s. Pre-approved list: %s',
                   email, self, self.pre_approved)
       if email in approved_emails:
@@ -213,7 +213,7 @@ class Membership(models.Model):
         if step.donor_id in talkedlist: # don't count talked + asked for same donor
           talked -= 1
           talkedlist.remove(step.donor)
-      elif not step.donor in talkedlist and not step.donor in askedlist:
+      elif step.donor not in talkedlist and step.donor not in askedlist:
         talked += 1
         talkedlist.append(step.donor)
       if step.promised and step.promised > 0:
@@ -265,7 +265,7 @@ class Donor(models.Model):
   asked = models.BooleanField(default=False)
   promised = models.PositiveIntegerField(blank=True, null=True)
   # only if promised
-  promise_reason = models.TextField(blank=True, default='[]') #json'd list of strings
+  promise_reason = models.TextField(blank=True, default='[]') # json'd list of strings
   likely_to_join = models.PositiveIntegerField(null=True, blank=True,
       choices=LIKELY_TO_JOIN_CHOICES)
   received_this = models.PositiveIntegerField(default=0,
@@ -365,7 +365,7 @@ class Resource(models.Model):
     return self.title
 
 
-class ProjectResource(models.Model): #ties resource to project
+class ProjectResource(models.Model): # ties resource to project
   giving_project = models.ForeignKey(GivingProject)
   resource = models.ForeignKey(Resource)
   session = models.CharField(max_length=255)
@@ -379,10 +379,10 @@ class Survey(models.Model):
   updated = models.DateTimeField(default=timezone.now)
   updated_by = models.CharField(max_length=100, blank=True)
 
-  title = models.CharField(max_length=255, help_text=
-      ('Descriptive summary to aid in sharing survey templates between '
+  title = models.CharField(max_length=255,
+      help_text='Descriptive summary to aid in sharing survey templates between '
        'projects. For admin site only. E.g. \'GP session evaluation\', '
-       '\'Race workshop evaluation\', etc.'))
+       '\'Race workshop evaluation\', etc.')
   intro = models.TextField(
       help_text=('Introductory text to display before the questions when form '
                  'is shown to GP members.'),

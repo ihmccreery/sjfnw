@@ -3,37 +3,37 @@ from sjfnw import constants
 
 urlpatterns = patterns('sjfnw.fund.views',
 
-  #login, logout, registration
+  # login, logout, registration
   (r'^login/?$', 'fund_login'),
   (r'^register/?$', 'fund_register'),
   (r'^registered/?$', 'registered'),
 
-  #main pages
+  # main pages
   (r'^$', 'home'),
   (r'^gp/?', 'project_page'),
   (r'^grants/?', 'grant_list'),
 
-  #manage memberships
+  # manage memberships
   (r'^projects/?', 'manage_account'),
   (r'^set-current/(?P<ship_id>\d+)/?', 'set_current'),
 
-  #surveys
+  # surveys
   (r'^survey/(?P<gp_survey_id>\d+)$', 'project_survey'),
 
-  #forms - contacts
+  # forms - contacts
   (r'^add-contacts', 'add_mult'),
   (r'^(?P<donor_id>\d+)/edit', 'edit_contact'),
   (r'^(?P<donor_id>\d+)/delete', 'delete_contact'),
   (r'^add-estimates', 'add_estimates'),
   (r'^copy', 'copy_contacts'),
 
-  #forms - steps
+  # forms - steps
   (r'^(?P<donor_id>\d+)/step$', 'add_step'),
   (r'^stepmult$', 'add_mult_step'),
   (r'^(?P<donor_id>\d+)/(?P<step_id>\d+)$', 'edit_step'),
   (r'^(?P<donor_id>\d+)/(?P<step_id>\d+)/done', 'complete_step'),
 
-  #error/help pages
+  # error/help pages
   (r'^not-member/?', 'not_member'),
   (r'^pending/?$', 'not_approved'),
   (r'^support/?', 'support'),

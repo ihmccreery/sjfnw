@@ -61,8 +61,8 @@ else:
   }
   DEBUG = True
   # Uncomment below to enable debugging toolbar
-  #INSTALLED_APPS.append('django.contrib.staticfiles')
-  #INSTALLED_APPS.append('debug_toolbar')
+  # INSTALLED_APPS.append('django.contrib.staticfiles')
+  # INSTALLED_APPS.append('debug_toolbar')
 
 MIDDLEWARE_CLASSES = (
   'django.middleware.common.CommonMiddleware',
@@ -74,7 +74,7 @@ MIDDLEWARE_CLASSES = (
 
 TEMPLATE_CONTEXT_PROCESSORS = (
   'django.contrib.auth.context_processors.auth',
-  'django.core.context_processors.request', #only used in fund/base.html js
+  'django.core.context_processors.request', # only used in fund/base.html js
   'django.contrib.messages.context_processors.messages',
 )
 TEMPLATE_DIRS = (os.path.join(os.path.dirname(__file__), 'templates'),)
@@ -84,7 +84,7 @@ STATIC_URL = '/static/'
 ROOT_URLCONF = 'sjfnw.urls'
 APPEND_SLASH = False
 
-LOGGING = {'version': 1,}
+LOGGING = {'version': 1}
 
 EMAIL_BACKEND = 'sjfnw.mail.EmailBackend'
 EMAIL_QUEUE_NAME = 'default'

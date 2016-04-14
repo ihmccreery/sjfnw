@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 logger = logging.getLogger('sjfnw')
 
 # Configure admin site
-#----------------------
+# ---------------------
 
 admin.site.index_template = 'admin/index_custom.html'
 admin.site.site_header = 'Social Justice Fund NW Admin Site'
@@ -17,7 +17,7 @@ admin.site.site_title = 'SJF Admin'
 admin.site.index_title = None
 
 # Shared admin classes
-#----------------------
+# ---------------------
 
 class BaseModelAdmin(admin.ModelAdmin):
   """ Base class for setting a universal per-page limit """
@@ -73,7 +73,7 @@ class YearFilter(admin.SimpleListFilter):
 
 
 # Register
-#----------
+# ---------
 
 advanced_admin = AdminSite(name='advanced')
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-import setup_env
-
 import sys
+
+import setup_env # pylint: disable=unused-import
 
 from django.core.management import execute_from_command_line
 

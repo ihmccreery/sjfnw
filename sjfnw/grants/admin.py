@@ -13,9 +13,9 @@ from sjfnw.grants.modelforms import DraftAdminForm
 
 logger = logging.getLogger('sjfnw')
 
-#------------------------------------------------------------------------------
-# CUSTOM FILTERS
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  CUSTOM FILTERS
+# -----------------------------------------------------------------------------
 
 class GPGYearFilter(YearFilter):
   filter_model = models.GivingProjectGrant
@@ -34,10 +34,10 @@ class CycleTypeFilter(admin.SimpleListFilter):
       pos = title.find(' Grant Cycle')
       if pos > 1:
         cycle_type = title[:pos]
-        if not cycle_type in types:
+        if cycle_type not in types:
           types.append(cycle_type)
       else: # Grant Cycle not found - just use whole
-        if not title in types:
+        if title not in types:
           types.append(title)
     return [(t, t) for t in types]
 
@@ -64,9 +64,9 @@ class MultiYearGrantFilter(admin.SimpleListFilter):
       return queryset.filter(second_amount__isnull=False)
     return queryset
 
-#------------------------------------------------------------------------------
-# INLINES
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  INLINES
+# -----------------------------------------------------------------------------
 
 class BaseShowInline(admin.TabularInline):
   """ Base inline for read only items """
@@ -115,7 +115,7 @@ class LogI(admin.TabularInline):
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
     """ Give initial values for staff and/or org.
         This is called once on every foreign key field """
-    if not '/add' in request.path: # skip when creating new org/app
+    if '/add' not in request.path: # skip when creating new org/app
       # autofill staff field
       if db_field.name == 'staff':
         kwargs['initial'] = request.user.id
@@ -250,9 +250,9 @@ class YERInline(BaseShowInline):
     return utils.create_link('/report/view/{}'.format(obj.pk), 'View')
   view.allow_tags = True
 
-#------------------------------------------------------------------------------
-# MODELADMIN
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  MODELADMIN
+# -----------------------------------------------------------------------------
 
 class GrantCycleA(BaseModelAdmin):
   list_display = ['title', 'open', 'close']
@@ -278,7 +278,7 @@ class OrganizationA(BaseModelAdmin):
                    'staff_contact_phone', 'staff_contact_email'),)
     }),
     ('Contact info from most recent application', {
-      'fields':(
+      'fields': (
         ('address', 'city', 'state', 'zip'),
         ('contact_person', 'contact_person_title', 'telephone_number', 'email_address'),
         ('fax_number', 'website'))
@@ -537,9 +537,9 @@ class DraftAdv(BaseModelAdmin):
                   'extended_deadline']
   list_filter = ['grant_cycle']
 
-#------------------------------------------------------------------------------
-# REGISTER
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  REGISTER
+# -----------------------------------------------------------------------------
 
 admin.site.register(models.GrantCycle, GrantCycleA)
 admin.site.register(models.Organization, OrganizationA)

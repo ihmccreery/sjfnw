@@ -28,7 +28,7 @@ class MembershipMiddleware(object):
 
   def process_view(self, request, view_func, view_args, view_kwargs): # pylint: disable=unused-argument
     # only run on fund views
-    if not 'fund' in view_func.__module__:
+    if 'fund' not in view_func.__module__:
       return None
 
     request.member = None

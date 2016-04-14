@@ -14,20 +14,20 @@ logger = logging.getLogger('sjfnw')
 
 # MODIFIED VERSION OF DJANGOAPPENGINES STORAGE FILE. SEE LICENSE AT BOTTOM
 
-""" Uploading files
-  Assume view has set up a form that posts to a blobstore url, so we are getting
-  the modified form data with blobinfo in it.
-
-  1. BlobstoreFileUploadHandler.new_file
-    a. Extracts blobkey using get_blobkey_from_body
-  2. BlobstoreFileUploadHandler.file_complete
-  3. BlobstoreUploadedFile.__init__
-  4. BlobstoreStorage._save
-    a. data is blobinfo, key is stored
-
-  Serving files (via docs viewer or direct)
-    Using grants/utils.py
-"""
+# Uploading files
+# ---------------
+# Assume view has set up a form that posts to a blobstore url, so we are getting
+# the modified form data with blobinfo in it.
+#
+# 1. BlobstoreFileUploadHandler.new_file
+#   a. Extracts blobkey using get_blobkey_from_body
+# 2. BlobstoreFileUploadHandler.file_complete
+# 3. BlobstoreUploadedFile.__init__
+# 4. BlobstoreStorage._save
+#   a. data is blobinfo, key is stored
+#
+# Serving files (via docs viewer or direct)
+#   Using grants/utils.py
 
 class BlobstoreFileUploadHandler(FileUploadHandler):
   """ File upload handler for the Google App Engine Blobstore. """
@@ -149,32 +149,32 @@ class BlobstoreUploadedFile(UploadedFile):
   def multiple_chunks(self, chunk_size=1024 * 128):
     return True
 
-#Djangoappengine license:
+# Djangoappengine license:
 
-#Copyright (c) Waldemar Kornewald, Thomas Wanschik, and all contributors.
-#All rights reserved.
+# Copyright (c) Waldemar Kornewald, Thomas Wanschik, and all contributors.
+# All rights reserved.
 #
-#Redistribution and use in source and binary forms, with or without modification,
-#are permitted provided that the following conditions are met:
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
 #
-#    1. Redistributions of source code must retain the above copyright notice,
-#       this list of conditions and the following disclaimer.
+#     1. Redistributions of source code must retain the above copyright notice,
+#        this list of conditions and the following disclaimer.
 #
-#    2. Redistributions in binary form must reproduce the above copyright
-#       notice, this list of conditions and the following disclaimer in the
-#       documentation and/or other materials provided with the distribution.
+#     2. Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in the
+#        documentation and/or other materials provided with the distribution.
 #
-#    3. Neither the name of All Buttons Pressed nor
-#       the names of its contributors may be used to endorse or promote products
-#       derived from this software without specific prior written permission.
+#     3. Neither the name of All Buttons Pressed nor
+#        the names of its contributors may be used to endorse or promote products
+#        derived from this software without specific prior written permission.
 #
-#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND
-#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-#ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-#ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

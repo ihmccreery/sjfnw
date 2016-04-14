@@ -15,7 +15,7 @@ class AdminInlines(BaseGrantTestCase):
 
   fixtures = LIVE_FIXTURES
 
-  def setUp(self): #don't super, can't set cycle dates with this fixture
+  def setUp(self): # don't super, can't set cycle dates with this fixture
     self.log_in_admin()
 
   def test_organization(self):

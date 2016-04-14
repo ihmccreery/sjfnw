@@ -214,7 +214,7 @@ class BaseAppRelatedReportForm(BaseReportForm):
 
   year_min = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)],
-      initial=timezone.now().year-1)
+      initial=timezone.now().year - 1)
   year_max = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)])
   giving_projects = forms.MultipleChoiceField(
@@ -300,7 +300,7 @@ class SponsoredAwardReportForm(BaseReportForm):
 
   year_min = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)],
-      initial=timezone.now().year-1)
+      initial=timezone.now().year - 1)
   year_max = forms.ChoiceField(
       choices=[(n, n) for n in range(timezone.now().year, 1990, -1)])
   report_id = forms.BooleanField(required=False, label='ID number')

@@ -31,4 +31,3 @@ class Command(BaseCommand):
         self.stdout.write('Skipping %s, no applications submitted' % org.name)
 
     self.stdout.write('All org profiles updated.')
-

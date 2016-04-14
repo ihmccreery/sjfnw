@@ -29,21 +29,21 @@ class TimelineWidget(forms.widgets.MultiWidget):
 
   def __init__(self, attrs=None):
     _widgets = (
-      forms.Textarea(attrs={'rows':'5', 'cols':'20'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5', 'cols':'20'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5', 'cols':'20'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5', 'cols':'20'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5', 'cols':'20'}),
-      forms.Textarea(attrs={'rows':'5'}),
-      forms.Textarea(attrs={'rows':'5'}),
+      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
+      forms.Textarea(attrs={'rows': '5'}),
+      forms.Textarea(attrs={'rows': '5'}),
     )
     super(TimelineWidget, self).__init__(_widgets, attrs)
 
@@ -68,9 +68,9 @@ class TimelineWidget(forms.widgets.MultiWidget):
             '<th>Date range</th><th>Activities<br><i>(What will you be doing?)</i></th>'
             '<th>Goals/objectives<br><i>(What do you hope to achieve?)</i></th></tr>')
     for i in range(0, len(rendered_widgets), 3):
-      html += ('<tr><th class="left">Quarter ' + str((i+3)/3) + '</th><td>' +
-              rendered_widgets[i] + '</td><td>' + rendered_widgets[i+1] +
-              '</td><td>' + rendered_widgets[i+2] +'</td></tr>')
+      html += ('<tr><th class="left">Quarter ' + str((i + 3) / 3) + '</th><td>' +
+              rendered_widgets[i] + '</td><td>' + rendered_widgets[i + 1] +
+              '</td><td>' + rendered_widgets[i + 2] + '</td></tr>')
     html += '</table>'
     return html
 
@@ -86,7 +86,7 @@ class TimelineWidget(forms.widgets.MultiWidget):
     return json.dumps(val_list)
 
 
-def custom_fields(field, **kwargs): #sets phonenumber and money fields
+def custom_fields(field, **kwargs): # sets phonenumber and money fields
   money_fields = ['budget_last', 'budget_current', 'amount_requested', 'project_budget']
   phone_fields = ['telephone_number', 'fax_number', 'fiscal_telephone',
                   'collab_ref1_phone', 'collab_ref2_phone',
@@ -165,8 +165,8 @@ class GrantApplicationModelForm(forms.ModelForm):
     incomplete = False
     for i in range(0, 13, 3):
       date = timeline[i]
-      act = timeline[i+1]
-      obj = timeline[i+2]
+      act = timeline[i + 1]
+      obj = timeline[i + 2]
 
       if i == 0 and not (date or act or obj):
         empty = True
@@ -179,7 +179,7 @@ class GrantApplicationModelForm(forms.ModelForm):
     elif empty:
       self._errors['timeline'] = _form_error('This field is required.')
 
-    #collab refs - require phone or email
+    # collab refs - require phone or email
     phone = cleaned_data.get('collab_ref1_phone')
     email = cleaned_data.get('collab_ref1_email')
     if not phone and not email:
@@ -189,7 +189,7 @@ class GrantApplicationModelForm(forms.ModelForm):
     if not phone and not email:
       self._errors['collab_ref2_phone'] = _form_error('Enter a phone number or email.')
 
-    #racial justice refs - require full set if any
+    # racial justice refs - require full set if any
     name = cleaned_data.get('racial_justice_ref1_name')
     org = cleaned_data.get('racial_justice_ref1_org')
     phone = cleaned_data.get('racial_justice_ref1_phone')
@@ -213,7 +213,7 @@ class GrantApplicationModelForm(forms.ModelForm):
       if not phone and not email:
         self._errors['racial_justice_ref2_phone'] = _form_error('Enter a phone number or email.')
 
-    #project - require title & budget if type
+    # project - require title & budget if type
     support_type = cleaned_data.get('support_type')
     if support_type == 'Project support':
       if not cleaned_data.get('project_budget'):
@@ -223,7 +223,7 @@ class GrantApplicationModelForm(forms.ModelForm):
         self._errors['project_title'] = _form_error(
             'This field is required when applying for project support.')
 
-    #fiscal info/file - require all if any
+    # fiscal info/file - require all if any
     org = cleaned_data.get('fiscal_org')
     person = cleaned_data.get('fiscal_person')
     phone = cleaned_data.get('fiscal_telephone')

@@ -35,9 +35,9 @@ logger = logging.getLogger('sjfnw')
 
 LOGIN_URL = '/apply/login/'
 
-#------------------------------------------------------------------------------
-# Public views
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Public views
+# -----------------------------------------------------------------------------
 
 def org_login(request):
   if request.method == 'POST':
@@ -72,7 +72,7 @@ def org_register(request):
       password = request.POST['password']
       org = request.POST['organization']
 
-      #create User
+      # create User
       created = User.objects.create_user(username_email, username_email, password)
       created.first_name = org
       created.last_name = '(organization)'
@@ -90,7 +90,7 @@ def org_register(request):
         new_org.save()
       created.save()
 
-      #try to log in
+      # try to log in
       user = authenticate(username=username_email, password=password)
       if user:
         if user.is_active:
@@ -107,7 +107,7 @@ def org_register(request):
             'Please <a href=""/apply/support#contact">contact a site admin</a> for assistance.')
         logger.error('Password not working at registration, account:  ' + username_email)
 
-  else: #GET
+  else: # GET
     register = RegisterForm()
   form = LoginForm()
 
@@ -139,7 +139,7 @@ def cycle_info(request, cycle_id):
     logger.error('Error fetching cycle info page: %s', err)
     content = ('<h4 class="center">Sorry, the cycle information page could '
       'not be loaded.<br>Try visiting it directly: <a href="' +
-      cycle.info_page +'" target="_blank">grant cycle information</a>')
+      cycle.info_page + '" target="_blank">grant cycle information</a>')
   else:
     content = info_page.read()
     # we're getting pages with a known format from socialjusticefund.org
@@ -157,9 +157,9 @@ def cycle_info(request, cycle_id):
     'cycle': cycle, 'content': content
   })
 
-#------------------------------------------------------------------------------
-# Org home
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Org home
+# -----------------------------------------------------------------------------
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
@@ -174,7 +174,7 @@ def org_home(request, org):
   # get grant cycles and group by status
   cycles = (models.GrantCycle.objects
       .exclude(private=True)
-      .filter(close__gt=timezone.now()-timedelta(days=180))
+      .filter(close__gt=timezone.now() - timedelta(days=180))
       .order_by('open'))
 
   closed, current, applied, upcoming = [], [], [], []
@@ -193,7 +193,6 @@ def org_home(request, org):
   # get awards
   awards = (models.GivingProjectGrant.objects
       .filter(projectapp__application_id__in=submitted_ids)
-              #agreement_mailed__gte=timezone.now().date)
       .select_related('projectapp')
       .prefetch_related('yearendreport_set', 'yerdraft_set'))
 
@@ -230,9 +229,9 @@ def org_home(request, org):
     'user_override': user_override
   })
 
-#------------------------------------------------------------------------------
-# Grant application & Year-end report
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Grant application & Year-end report
+# -----------------------------------------------------------------------------
 
 def autosave_app(request, cycle_id):
   """ Save non-file fields to a draft """
@@ -261,7 +260,7 @@ def autosave_app(request, cycle_id):
   if request.method == 'POST':
     curr_user = request.POST.get('user_id')
 
-    #check for simultaneous editing
+    # check for simultaneous editing
     if request.GET.get('force') != 'true':
       if draft.recently_edited():
         if draft.modified_by and draft.modified_by != curr_user:
@@ -342,7 +341,7 @@ def grant_application(request, organization, cycle_id):
 
       return redirect('/apply/submitted')
 
-    else: #INVALID SUBMISSION
+    else: # INVALID SUBMISSION
       logger.info('Application form invalid')
       logger.info(form.errors)
 
@@ -419,7 +418,7 @@ def autosave_yer(request, award_id):
 @registered_org()
 def year_end_report(request, organization, award_id):
 
-  #staff override
+  # staff override
   user_override = request.GET.get('user')
   if user_override:
     user_override = '?user=' + user_override
@@ -455,11 +454,11 @@ def year_end_report(request, organization, award_id):
       # send confirmation email
       html_content = render_to_string('grants/email_yer_submitted.html')
       text_content = strip_tags(html_content)
-      msg = EmailMultiAlternatives('Year end report submitted', #subject
+      msg = EmailMultiAlternatives('Year end report submitted', # subject
                                     text_content,
-                                    c.GRANT_EMAIL, #from
-                                    [yer.email], #to
-                                    [c.SUPPORT_EMAIL]) #bcc
+                                    c.GRANT_EMAIL, # from
+                                    [yer.email], # to
+                                    [c.SUPPORT_EMAIL]) # bcc
       msg.attach_alternative(html_content, 'text/html')
       msg.send()
       logger.info('YER submission confirmation email send to %s', yer.email)
@@ -493,17 +492,17 @@ def year_end_report(request, organization, award_id):
     else:
       file_urls[field] = '<i>no file uploaded</i>'
 
-  due = award.first_yer_due.replace(year=award.first_yer_due.year+total_yers)
-  yer_period = '{:%b %d, %Y} - {:%b %d, %Y}'.format(due.replace(year=due.year-1), due)
+  due = award.first_yer_due.replace(year=award.first_yer_due.year + total_yers)
+  yer_period = '{:%b %d, %Y} - {:%b %d, %Y}'.format(due.replace(year=due.year - 1), due)
 
   return render(request, 'grants/yer_form.html', {
       'form': form, 'org': organization, 'draft': draft, 'award': award,
       'file_urls': file_urls, 'user_override': user_override, 'yer_period': yer_period
   })
 
-#------------------------------------------------------------------------------
-# File handling
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  File handling
+# -----------------------------------------------------------------------------
 
 def add_file(request, draft_type, draft_id):
   """ Upload a file to a draft
@@ -538,7 +537,7 @@ def add_file(request, draft_type, draft_id):
   draft.save()
 
   if not (blob_file and field_name):
-    return HttpResponse('ERROR') #TODO use status code
+    return HttpResponse('ERROR') # TODO use status code
 
   file_urls = get_file_urls(request, draft)
   content = (field_name + u'~~<a href="' + file_urls[field_name] +
@@ -588,9 +587,9 @@ def get_upload_url(request):
   upload_url = blobstore.create_upload_url('/%s/%d/add-file' % (prefix, draft_id) + user_override)
   return HttpResponse(upload_url)
 
-#------------------------------------------------------------------------------
-# Org home page tools
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Org home page tools
+# -----------------------------------------------------------------------------
 
 @login_required(login_url=LOGIN_URL)
 @registered_org()
@@ -605,21 +604,21 @@ def copy_app(request, organization):
       draft = form.cleaned_data.get('draft')
       app = form.cleaned_data.get('application')
 
-      #get cycle
+      # get cycle
       try:
         cycle = models.GrantCycle.objects.get(pk=int(new_cycle))
       except models.GrantCycle.DoesNotExist:
         logger.warning('copy_app GrantCycle %d not found', new_cycle)
         return render(request, 'grants/copy_app_error.html')
 
-      #make sure the combo does not exist already
+      # make sure the combo does not exist already
       new_draft, created = models.DraftGrantApplication.objects.get_or_create(
           organization=organization, grant_cycle=cycle)
       if not created:
         logger.warning('copy_app the combo already exists!?')
         return render(request, 'grants/copy_app_error.html')
 
-      #get app/draft and its contents (json format for draft)
+      # get app/draft and its contents (json format for draft)
       if app:
         try:
           application = models.GrantApplication.objects.get(pk=int(app))
@@ -629,7 +628,7 @@ def copy_app(request, organization):
                                     'submission_time', 'pre_screening_status',
                                     'giving_projects', 'scoring_bonus_poc',
                                     'scoring_bonus_geo', 'cycle_question',
-                                    'timeline', 'budget' #old all-in-one budget
+                                    'timeline', 'budget' # old all-in-one budget
                                   ])
           content.update(dict(zip(
               ['timeline_' + str(i) for i in range(15)],
@@ -651,7 +650,7 @@ def copy_app(request, organization):
         logger.warning('copy_app no draft or app...')
         return render(request, 'grants/copy_app_error.html')
 
-      #set contents & files
+      # set contents & files
       new_draft.contents = content
       for field in application.file_fields():
         setattr(new_draft, field, getattr(application, field))
@@ -660,18 +659,17 @@ def copy_app(request, organization):
 
       return redirect('/apply/' + new_cycle + user_override)
 
-    else: #INVALID FORM
+    else: # INVALID FORM
       logger.info('Invalid form: %s', form.errors)
-      #TODO
       cycle_count = str(form['cycle']).count('<option value') - 1
       apps_count = (str(form['application']).count('<option value') +
                     str(form['draft']).count('<option value') - 2)
 
-  else: #GET
+  else: # GET
     form = RolloverForm(organization)
     cycle_count = str(form['cycle']).count('<option value') - 1
     apps_count = (str(form['application']).count('<option value') +
-                  str(form['draft']).count('<option value') -2)
+                  str(form['draft']).count('<option value') - 2)
     logger.info(cycle_count)
     logger.info(apps_count)
 
@@ -724,7 +722,7 @@ def rollover_yer(request, organization):
         .filter(projectapp__application__organization_id=organization.pk))
     awards = []
     for award in raw_awards:
-      if (not award.pk in award_reports) or (award_reports[award.pk] < award.grant_length()):
+      if (award.pk not in award_reports) or (award_reports[award.pk] < award.grant_length()):
         awards.append(award)
 
     if not awards:
@@ -780,9 +778,9 @@ def rollover_yer(request, organization):
     form = RolloverYERForm(reports, awards)
     return render(request, 'grants/yer_rollover.html', {'form': form})
 
-#------------------------------------------------------------------------------
-# View apps/files
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  View apps/files
+# -----------------------------------------------------------------------------
 
 def _view_permission(user, application):
   """ Return a number indicating viewing permission for a submitted app.
@@ -852,7 +850,7 @@ def serve_app_file(application, field_name):
 
   blobinfo = find_blobinfo(file_field)
 
-  return  HttpResponse(blobstore.BlobReader(blobinfo).read(),
+  return HttpResponse(blobstore.BlobReader(blobinfo).read(),
                        content_type=blobinfo.content_type)
 
 def view_file(request, obj_type, obj_id, field_name):
@@ -862,7 +860,7 @@ def view_file(request, obj_type, obj_id, field_name):
     'adraft': models.DraftGrantApplication,
     'rdraft': models.YERDraft
   }
-  if not obj_type in model_types:
+  if obj_type not in model_types:
     logger.warning('Unknown obj type %s', obj_type)
     raise Http404
 
@@ -891,9 +889,9 @@ def view_yer(request, report_id):
     'report': report, 'form': form, 'award': award, 'projectapp': projectapp,
     'file_urls': file_urls, 'perm': perm})
 
-#------------------------------------------------------------------------------
-# Admin tools
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Admin tools
+# -----------------------------------------------------------------------------
 
 def revert_app_to_draft(request, app_id):
   """ Turn a submitted application back into a draft
@@ -909,7 +907,7 @@ def revert_app_to_draft(request, app_id):
   grant_cycle = submitted_app.grant_cycle
 
   if request.method == 'POST':
-    #create draft from app
+    # create draft from app
     draft = models.DraftGrantApplication(organization=organization, grant_cycle=grant_cycle)
     content = model_to_dict(submitted_app,
                             exclude=submitted_app.file_fields() + [
@@ -927,10 +925,10 @@ def revert_app_to_draft(request, app_id):
     draft.modified = timezone.now()
     draft.save()
     logger.info('Reverted to draft, draft id ' + str(draft.pk))
-    #delete app
+    # delete app
     submitted_app.delete()
-    #redirect to draft page
-    return redirect('/admin/grants/draftgrantapplication/'+str(draft.pk)+'/')
+    # redirect to draft page
+    return redirect('/admin/grants/draftgrantapplication/' + str(draft.pk) + '/')
   return render(request, 'admin/grants/confirm_revert.html', {'application': submitted_app})
 
 def admin_rollover(request, app_id):
@@ -993,7 +991,7 @@ def login_as_org(request):
     form = LoginAsOrgForm(request.POST)
     if form.is_valid():
       org = form.cleaned_data['organization']
-      return redirect('/apply/?user='+org)
+      return redirect('/apply/?user=' + org)
   form = LoginAsOrgForm()
   return render(request, 'admin/grants/impersonate.html', {'form': form})
 
@@ -1076,10 +1074,9 @@ def merge_orgs(request, id_a, id_b):
     'form': form
   })
 
-
-#------------------------------------------------------------------------------
-# Reporting
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Reporting
+# -----------------------------------------------------------------------------
 
 def grants_report(request):
   """ Handles grant reporting
@@ -1138,10 +1135,10 @@ def grants_report(request):
       options = form.cleaned_data
       logger.info('A valid form: ' + str(options))
 
-      #get results
+      # get results
       field_names, results = results_func(options)
 
-      #format results
+      # format results
       if options['format'] == 'browse':
         return render_to_response('grants/report_results.html',
                                   {'results': results, 'field_names': field_names})
@@ -1193,7 +1190,7 @@ def get_app_results(options):
   apps = models.GrantApplication.objects.order_by('-submission_time').select_related(
       'organization', 'grant_cycle')
 
-  #filters
+  # filters
   min_year, max_year = get_min_max_year(options)
   apps = apps.filter(submission_time__gte=min_year, submission_time__lte=max_year)
 
@@ -1355,7 +1352,7 @@ def get_org_results(options):
     fields += models.GrantApplication.fields_starting_with('fiscal')
     fields.remove('fiscal_letter')
 
-  field_names = [f.capitalize().replace('_', ' ') for f in fields] #for display
+  field_names = [f.capitalize().replace('_', ' ') for f in fields] # for display
 
   # related objects
   get_apps = False
@@ -1515,7 +1512,7 @@ def get_gpg_results(options):
     results.append(row)
 
   field_names = [f.capitalize().replace('_', ' ') for f in fields]
-  field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
+  field_names += ['Org. ' + f.capitalize().replace('_', ' ') for f in org_fields]
 
   return field_names, results
 
@@ -1562,13 +1559,13 @@ def get_sponsored_award_results(options):
     results.append(row)
 
   field_names = [f.capitalize().replace('_', ' ') for f in fields]
-  field_names += ['Org. '+ f.capitalize().replace('_', ' ') for f in org_fields]
+  field_names += ['Org. ' + f.capitalize().replace('_', ' ') for f in org_fields]
 
   return field_names, results
 
-#------------------------------------------------------------------------------
-# Helpers
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+#  Helpers
+# -----------------------------------------------------------------------------
 
 def get_file_urls(request, app, printing=False):
   """ Get html links to view files in a given app or year-end report, draft or final

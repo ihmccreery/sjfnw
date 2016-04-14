@@ -86,4 +86,3 @@ class Register(BaseFundTestCase):
       }, follow=True)
 
     self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
-

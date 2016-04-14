@@ -11,7 +11,7 @@ from sjfnw.tests.base import BaseTestCase
 """ This file provides a base test class and utilities specific to the grants
     module. See other files in sjfnw/grants/tests for actual tests """
 
-LIVE_FIXTURES = ['sjfnw/fund/fixtures/live_gp_dump.json', #not using these yet in most
+LIVE_FIXTURES = ['sjfnw/fund/fixtures/live_gp_dump.json', # not using these yet in most
                  'sjfnw/grants/fixtures/orgs.json',
                  'sjfnw/grants/fixtures/grant_cycles.json',
                  'sjfnw/grants/fixtures/apps.json',

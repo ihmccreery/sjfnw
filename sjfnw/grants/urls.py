@@ -2,7 +2,6 @@ from django.conf.urls import patterns
 from django.views.generic.base import TemplateView
 from sjfnw import constants
 
-# pylint: disable=invalid-name
 apply_urls = patterns('',
   (r'^nr', TemplateView.as_view(template_name='grants/not_grantee.html')),
   (r'^submitted/?', TemplateView.as_view(template_name='grants/submitted.html')),
@@ -10,21 +9,21 @@ apply_urls = patterns('',
 
 apply_urls += patterns('sjfnw.grants.views',
 
-  #login, logout, registration
+  # login, logout, registration
   (r'^login/?$', 'org_login'),
   (r'^register/?$', 'org_register'),
 
-  #home page
+  # home page
   (r'^$', 'org_home'),
   (r'^draft/(?P<draft_id>\d+)/?$', 'discard_draft'),
   (r'^copy/?$', 'copy_app'),
   (r'^support/?', 'org_support'),
 
-  #application
+  # application
   (r'^(?P<cycle_id>\d+)/?$', 'grant_application'),
   (r'^info/(?P<cycle_id>\d+)/?$', 'cycle_info'),
 
-  #application ajax
+  # application ajax
   (r'^(?P<cycle_id>\d+)/autosave/?$', 'autosave_app')
 )
 
@@ -48,21 +47,21 @@ report_urls += patterns('',
 apply_urls += patterns('',
   # password reset
   (r'^reset/?$', 'django.contrib.auth.views.password_reset', {
-    'template_name':'grants/reset.html',
-    'from_email':constants.GRANT_EMAIL,
-    'email_template_name':'grants/password_reset_email.html',
-    'post_reset_redirect':'/apply/reset-sent'
+    'template_name': 'grants/reset.html',
+    'from_email': constants.GRANT_EMAIL,
+    'email_template_name': 'grants/password_reset_email.html',
+    'post_reset_redirect': '/apply/reset-sent'
   }),
   (r'^reset-sent/?$', 'django.contrib.auth.views.password_reset_done', {
-    'template_name':'grants/password_reset_done.html'
+    'template_name': 'grants/password_reset_done.html'
   }),
   (r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/?$',
     'django.contrib.auth.views.password_reset_confirm', {
-      'template_name':'grants/password_reset_confirm.html',
+      'template_name': 'grants/password_reset_confirm.html',
       'post_reset_redirect': '/apply/reset-complete'
     }, 'org-reset'),
   (r'^reset-complete/?', 'django.contrib.auth.views.password_reset_complete', {
-      'template_name':'grants/password_reset_complete.html'
+      'template_name': 'grants/password_reset_complete.html'
   }),
 )
 

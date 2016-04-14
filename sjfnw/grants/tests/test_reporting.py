@@ -127,7 +127,7 @@ class AppReports(BaseGrantTestCase):
     reader = unicodecsv.reader(response, encoding='utf8')
     row_count = sum(1 for row in reader)
     # 1st row is blank, 2nd is headers
-    self.assertEqual(row_count-2, models.GrantApplication.objects.count())
+    self.assertEqual(row_count - 2, models.GrantApplication.objects.count())
 
   def test_app_filters_all(self):
     """ Select/fill out all filters and verify that there are no errors """
@@ -202,7 +202,7 @@ class OrgReports(BaseGrantTestCase):
 
     reader = unicodecsv.reader(response, encoding='utf8')
     row_count = sum(1 for row in reader)
-    self.assertEqual(row_count-2, models.Organization.objects.count())
+    self.assertEqual(row_count - 2, models.Organization.objects.count())
 
   def test_org_filters_all(self):
     """ Verify that all filters can be selected in org report without error
@@ -286,7 +286,7 @@ class GPGReports(BaseGrantTestCase):
 
     reader = unicodecsv.reader(response, encoding='utf8')
     row_count = sum(1 for row in reader)
-    self.assertEqual(row_count-2, models.GivingProjectGrant.objects.count())
+    self.assertEqual(row_count - 2, models.GivingProjectGrant.objects.count())
 
   def test_gp_grant_filters_all(self):
     """ Verify that all filters can be selected in gp grant report without error
@@ -370,7 +370,7 @@ class SponsoredAwardReports(BaseGrantTestCase):
 
     reader = unicodecsv.reader(response, encoding='utf8')
     row_count = sum(1 for row in reader)
-    self.assertEqual(row_count-2, models.SponsoredProgramGrant.objects.count())
+    self.assertEqual(row_count - 2, models.SponsoredProgramGrant.objects.count())
 
   def test_sponsored_all_filters(self):
     """ Verify that all filters can be selected without error """

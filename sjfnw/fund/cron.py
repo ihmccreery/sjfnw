@@ -87,7 +87,7 @@ def gift_notify(request):
 
   memberships = {}
   for donor in donors:
-    if not donor.membership in memberships:
+    if donor.membership not in memberships:
       memberships[donor.membership] = []
     memberships[donor.membership].append(donor)
 

@@ -132,7 +132,8 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     response = self.client.get(_get_yer_url(self.award_id))
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/yer_form.html')
-    self.assertEqual(models.YERDraft.objects.filter(award_id=self.award_id).count(), draft_count+1)
+    self.assertEqual(models.YERDraft.objects.filter(award_id=self.award_id).count(),
+                     draft_count + 1)
 
   def test_start_report(self):
     award = models.GivingProjectGrant.objects.get(pk=self.award_id)
@@ -146,7 +147,7 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     # assert website autofilled from app
     self.assertEqual(form['website'].value(), application.website)
     expected_title = 'Year-end Report for {:%b %d, %Y} - {:%b %d, %Y}'.format(
-        award.first_yer_due.replace(year=award.first_yer_due.year-1), award.first_yer_due)
+        award.first_yer_due.replace(year=award.first_yer_due.year - 1), award.first_yer_due)
     self.assertContains(response, expected_title)
 
   def test_start_second_report(self):
@@ -166,7 +167,7 @@ class YearEndReportForm(BaseGrantFilesTestCase):
 
     self.assertTemplateUsed(response, 'grants/yer_form.html')
     expected_title = 'Year-end Report for {:%b %d, %Y} - {:%b %d, %Y}'.format(
-        award.first_yer_due, award.first_yer_due.replace(year=award.first_yer_due.year+1))
+        award.first_yer_due, award.first_yer_due.replace(year=award.first_yer_due.year + 1))
     self.assertContains(response, expected_title)
 
     application = models.GrantApplication.objects.get(pk=1)
@@ -243,14 +244,14 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     # verify report matches draft
     yer = models.YearEndReport.objects.filter(award_id=self.award_id)
 
-    self.assertEqual(len(yer), yer_count+1)
+    self.assertEqual(len(yer), yer_count + 1)
     yer = yer[yer_count]
 
     self.assertEqual(yer.photo1, draft.photo1)
     self.assertEqual(yer.photo2, draft.photo2)
     self.assertEqual(yer.photo_release, draft.photo_release)
 
-    self.assertEqual(len(mail.outbox), mail_count+1)
+    self.assertEqual(len(mail.outbox), mail_count + 1)
     email = mail.outbox[mail_count]
     self.assertEqual(email.subject, 'Year end report submitted')
     self.assertEqual(email.to, [yer.email])
@@ -383,7 +384,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     """ Verify that reminder email is sent if second year end report due"""
 
     today = timezone.now().date()
-    first_yer_due = (today + timedelta(days=7)).replace(year=today.year-1)
+    first_yer_due = (today + timedelta(days=7)).replace(year=today.year - 1)
     award = models.GivingProjectGrant(
         projectapp_id=1, amount=5000, second_amount=5000,
         first_yer_due=first_yer_due, second_check_mailed=today
@@ -410,7 +411,7 @@ class YearEndReportReminders(BaseGrantTestCase):
     """ Verify that reminder email is not sent if second year end report completed"""
 
     today = timezone.now().date()
-    first_yer_due = (today + timedelta(days=7)).replace(year=today.year-1)
+    first_yer_due = (today + timedelta(days=7)).replace(year=today.year - 1)
     award = models.GivingProjectGrant(
           projectapp_id=1, amount=5000, second_amount=5000,
           first_yer_due=first_yer_due, second_check_mailed=today

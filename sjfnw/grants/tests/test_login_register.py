@@ -102,7 +102,7 @@ class Register(BaseGrantTestCase):
     response = self.client.post(self.url, registration, follow=True)
 
     self.assertEqual(1, models.Organization.objects.filter(name='OfficeMax Foundation').count())
-    #self.assertEqual(0, User.objects.filter(email='uniquenewyork@gmail.com').count())
+    self.assertEqual(0, User.objects.filter(email='uniquenewyork@gmail.com').count())
     self.assertTemplateUsed(response, self.template_error)
     self.assertFormError(response, 'register', None,
         'That organization is already registered. Log in instead.')

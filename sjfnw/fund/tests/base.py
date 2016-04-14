@@ -21,12 +21,12 @@ class BaseFundTestCase(BaseTestCase):
     """ Creates pre- and post-training giving projects """
     today = timezone.now()
     gp = models.GivingProject(title="Post training", fund_goal=5000,
-        fundraising_training=today-timedelta(days=10),
-        fundraising_deadline=today+timedelta(days=80))
+        fundraising_training=today - timedelta(days=10),
+        fundraising_deadline=today + timedelta(days=80))
     gp.save()
     gp = models.GivingProject(title="Pre training", fund_goal=10000,
-        fundraising_training=today+timedelta(days=10),
-        fundraising_deadline=today+timedelta(days=30))
+        fundraising_training=today + timedelta(days=10),
+        fundraising_deadline=today + timedelta(days=30))
     gp.save()
 
   # convenience methods for use in child test classes
