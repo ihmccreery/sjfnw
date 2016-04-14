@@ -87,6 +87,28 @@ class GPYearFilter(SimpleListFilter):
       return queryset
     return queryset.filter(fundraising_deadline__year=year)
 
+
+class DonorLikelyToJoinFilter(SimpleListFilter):
+  title = 'likely to join'
+  parameter_name = 'ltj'
+
+  def lookups(self, request, model_admin):
+    return ((3, '3 - Definitely'),
+            (2, '2 - Likely'),
+            (1, '1 - Unlikely'),
+            (0, '0 - No chance'),
+            ('positive', 'Likely or definitely'),
+            ('none', 'No answer'))
+
+  def queryset(self, request, queryset):
+    val = self.value()
+    if val == 'positive':
+      return queryset.filter(likely_to_join__gt=1)
+    elif val == 'none':
+      return queryset.filter(likely_to_join__isnull=True)
+    else:
+      return queryset.filter(likely_to_join=val)
+
 # -----------------------------------------------------------------------------
 # Inlines
 # -----------------------------------------------------------------------------
@@ -297,7 +319,7 @@ class DonorA(BaseModelAdmin):
                   'received_afternext', 'match_expected', 'match_received']
   list_editable = ['received_this', 'received_next', 'received_afternext',
                    'match_expected', 'match_received']
-  list_filter = ['asked', PromisedFilter, ReceivedBooleanFilter,
+  list_filter = ['asked', PromisedFilter, ReceivedBooleanFilter, DonorLikelyToJoinFilter,
                  'membership__giving_project']
   list_select_related = ['membership__giving_project', 'membership__member']
 
