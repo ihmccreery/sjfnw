@@ -9,7 +9,7 @@ from sjfnw.grants.forms import (AppReportForm, SponsoredAwardReportForm,
 from sjfnw.grants.tests.base import BaseGrantTestCase, LIVE_FIXTURES
 from sjfnw.grants import models
 
-from libs import unicodecsv
+import unicodecsv
 
 logger = logging.getLogger('sjfnw')
 

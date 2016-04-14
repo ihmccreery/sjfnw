@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from libs import unicodecsv
+import unicodecsv
 
 from sjfnw import utils
 from sjfnw.admin import BaseModelAdmin, advanced_admin
