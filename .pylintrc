@@ -3,6 +3,7 @@
 [MASTER]
 
 load-plugins=pylint_django
+jobs: 4
 
 [MESSAGES CONTROL]
 
