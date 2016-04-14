@@ -164,9 +164,9 @@ class Register(BaseGrantTestCase):
 
     response = self.client.post(self.url, registration, follow=True)
 
-    org = models.Organization(name='Ye olde Orge')
+    org = models.Organization.objects.get(name='Ye olde Orge')
     # org email was updated
-    #self.assertEqual(org.email, registration['email'])
+    self.assertEqual(org.email, registration['email'])
     # user was created, is_active = False
     self.assertEqual(1, User.objects.filter(email='bababa@gmail.com', is_active=False).count())
     # stayed on login page
