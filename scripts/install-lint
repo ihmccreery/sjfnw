@@ -6,7 +6,10 @@ if [ $(expr "$pip_version" : '.*not found') -gt 0 ] ; then
   exit 1
 fi
 
-echo "Installing pylint and pylint_django..."
+echo "Installing prospector and forked pylint_django..."
 
-pip install --upgrade pylint==1.5.4
-pip install --upgrade git+git://github.com/aisapatino/pylint-django.git
+pip install -r requirements-lint.txt
+
+echo "
+To run lint, use the command 'prospector'
+"
