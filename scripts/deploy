@@ -100,7 +100,8 @@ Verify that your deployment works: https://"
 if [ $version ] ; then
   echo -ne "$version-dot-"
 fi
-echo -e "sjf-nw.appspot.com
+echo -e "sjf-nw.appspot.com"
 
-Then tag the release: git tag -a $(date +%Y-%m-%d) -m \"$(date +%Y-%m-%d)\"
-"
+if [ $version ] ; then
+  echo -e "Then tag the release: git tag -a $(date +%Y-%m-%d) -m \"$(date +%Y-%m-%d)\"\n"
+fi
