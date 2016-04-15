@@ -6,7 +6,6 @@ urlpatterns = patterns('sjfnw.fund.views',
   # login, logout, registration
   (r'^login/?$', 'fund_login'),
   (r'^register/?$', 'fund_register'),
-  (r'^registered/?$', 'registered'),
 
   # main pages
   (r'^$', 'home'),
