@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.shortcuts import render, render_to_response, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.utils import timezone
@@ -559,7 +559,7 @@ def remove_file(request, draft_type, draft_id, file_field):
     draft_model = models.DraftGrantApplication
   else:
     logger.error('Unknown draft type %s', draft_type)
-    raise Http404
+    return HttpResponseBadRequest('Unknown draft type')
 
   draft = get_object_or_404(draft_model, pk=draft_id)
 
@@ -678,7 +678,7 @@ def copy_app(request, organization):
 
 @require_http_methods(['DELETE'])
 @registered_org()
-def discard_draft(_, organization, draft_id):
+def discard_draft(request, organization, draft_id):
   try:
     saved = models.DraftGrantApplication.objects.get(pk=draft_id)
   except models.DraftGrantApplication.DoesNotExist:
@@ -688,7 +688,7 @@ def discard_draft(_, organization, draft_id):
       logger.warning(u'Failed attempt to discard draft %s by %s', draft_id, organization)
       return HttpResponse(status=400, content='User does not have permission to delete this draft')
     saved.delete()
-    logger.info('Draft %d  discarded', draft_id)
+    logger.info('Draft %s  discarded', draft_id)
     return HttpResponse('success')
 
 

@@ -173,3 +173,83 @@ class DiscardDraft(BaseGrantTestCase):
     response = self.client.delete(self.url)
     self.assertEqual(response.status_code, 400)
     self.assertEqual(response.content, 'User does not have permission to delete this draft')
+
+class DraftRemoveFile(BaseGrantTestCase):
+
+  def setUp(self):
+    super(DraftRemoveFile, self).setUp()
+
+  def test_unknown_draft_type(self):
+
+    url = reverse('sjfnw.grants.views.remove_file', kwargs={
+      'draft_type': 'madeup', 'draft_id': '4', 'file_field': 'budget'
+    })
+
+    res = self.client.get(url, follow=True)
+
+    self.assertEqual(res.status_code, 400)
+
+  def test_obj_not_found(self):
+
+    url = reverse('sjfnw.grants.views.remove_file', kwargs={
+      'draft_type': 'apply', 'draft_id': '1880', 'file_field': 'budget'
+    })
+
+    res = self.client.get(url, follow=True)
+
+    self.assertEqual(res.status_code, 404)
+
+  def test_unknown_field(self):
+
+    url = reverse('sjfnw.grants.views.remove_file', kwargs={
+      'draft_type': 'apply', 'draft_id': '1', 'file_field': 'madeup'
+    })
+
+    modified = models.DraftGrantApplication.objects.get(pk=1).modified
+
+    res = self.client.get(url, follow=True)
+
+    self.assertEqual(res.status_code, 200)
+    modified_after = models.DraftGrantApplication.objects.get(pk=1).modified
+    self.assertEqual(modified, modified_after)
+
+  def test_remove_draft_app_file(self):
+
+    url = reverse('sjfnw.grants.views.remove_file', kwargs={
+      'draft_type': 'apply', 'draft_id': '2', 'file_field': 'budget1'
+    })
+
+    draft = models.DraftGrantApplication.objects.get(pk=2)
+    self.assertTrue(draft.budget1)
+    self.assertEqual(draft.budget1.name, 'budget1.docx')
+
+    res = self.client.get(url, follow=True)
+
+    self.assertEqual(res.status_code, 200)
+
+    draft = models.DraftGrantApplication.objects.get(pk=2)
+    self.assertFalse(draft.budget1)
+    self.assertEqual(draft.budget1.name, '')
+
+  def test_remove_draft_yer_file(self):
+
+    # create YER draft, which requires creating an award
+    award = models.GivingProjectGrant(projectapp_id=1, amount=10000, first_yer_due='2016-01-01')
+    award.save()
+    yer_draft = models.YERDraft(award_id=award.pk, photo_release='cats.jpg')
+    yer_draft.save()
+
+    draft = models.YERDraft.objects.get(pk=yer_draft.pk)
+    self.assertTrue(draft.photo_release)
+    self.assertEqual(draft.photo_release.name, 'cats.jpg')
+
+    url = reverse('sjfnw.grants.views.remove_file', kwargs={
+      'draft_type': 'report', 'draft_id': yer_draft.pk, 'file_field': 'photo_release'
+    })
+    res = self.client.get(url, follow=True)
+
+    self.assertEqual(res.status_code, 200)
+
+    draft = models.YERDraft.objects.get(pk=yer_draft.pk)
+    self.assertFalse(draft.photo_release)
+    self.assertEqual(draft.photo_release.name, '')
