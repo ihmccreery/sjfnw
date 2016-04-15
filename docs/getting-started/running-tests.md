@@ -15,7 +15,7 @@ Examples:
 
 ### Test output
 
-Several verbosity levels are available. The default is `1`.
+Several verbosity levels are available, using `-v`. The default is `1`.
 
 Level | Test display | Logging
 :----:|--------------|---------
@@ -31,8 +31,10 @@ Text = full line per test
 
 Browse code coverage on [codecov](https://codecov.io/github/aisapatino/sjfnw) (more info: [CI](../workflow/continuous-integration.md)).
 
-To check test coverage locally, install [coverage.py](http://nedbatchelder.com/code/coverage/), then do
+To check test coverage locally, install [coverage.py](http://coverage.readthedocs.org/en/latest/) with `pip install coverage`.
+
+Then:
 
 `./scripts/coverage`
 
-then open `./coverage-html/index.html`
+Open `./coverage-html/index.html`
