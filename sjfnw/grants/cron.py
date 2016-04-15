@@ -12,8 +12,6 @@ from sjfnw.grants.models import DraftGrantApplication, GivingProjectGrant
 
 logger = logging.getLogger('sjfnw')
 
-# pylint: disable=unused-argument
-
 def draft_app_warning(request):
   """ Warn orgs of impending draft freezes
       NOTE: must run exactly once a day
