@@ -19,6 +19,8 @@ class BaseTestCase(TestCase):
 
     Provides login methods and custom assertion(s) """
 
+  BASE_URL = 'http://testserver'
+
   def log_in_testy(self):
     User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')
     self.client.login(username='testacct@gmail.com', password='testy')
