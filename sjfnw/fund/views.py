@@ -10,6 +10,7 @@ from django.forms.formsets import formset_factory
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, redirect
 from django.utils import timezone
+from django.utils.http import is_safe_url
 
 from google.appengine.ext import deferred, ereporter
 
@@ -258,6 +259,8 @@ def grant_list(request):
 
 def fund_login(request):
   error_msg = ''
+  redirect_to = request.POST.get('next', request.GET.get('next', ''))
+
   if request.method == 'POST':
     form = forms.LoginForm(request.POST)
     if form.is_valid():
@@ -267,16 +270,22 @@ def fund_login(request):
       if user:
         if user.is_active:
           auth.login(request, user)
-          return redirect(home)
+          if not redirect_to or not is_safe_url(url=redirect_to, host=request.get_host()):
+            redirect_to = home
+          return redirect(redirect_to)
         else:
           error_msg = 'Your account is not active.  Contact an administrator.'
           logger.warning('Inactive account tried to log in. Username: ' + username)
       else:
         error_msg = 'Your login and password didn\'t match.'
       logger.info(error_msg)
+
   else:
     form = forms.LoginForm()
-  return render(request, 'fund/login.html', {'form': form, 'error_msg': error_msg})
+
+  return render(request, 'fund/login.html', {
+    'form': form, 'error_msg': error_msg, 'redirect_to': redirect_to
+  })
 
 
 def fund_register(request):
