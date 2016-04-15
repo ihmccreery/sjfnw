@@ -812,14 +812,16 @@ def add_mult_step(request):
   membership = request.membership
   suggested = membership.giving_project.get_suggested_steps()
 
-  for donor in membership.donor_set.order_by('-added'): # sort by added
+  for donor in membership.donor_set.order_by('-added'):
     if donor.received() == 0 and donor.promised is None and donor.get_next_step() is None:
       initial_form_data.append({'donor': donor})
       donor_list.append(donor)
       size = size + 1
     if size > 9:
       break
+
   step_formset = formset_factory(forms.MassStep, extra=0)
+
   if request.method == 'POST':
     membership.last_activity = timezone.now()
     membership.save(skip=True)
@@ -836,11 +838,13 @@ def add_mult_step(request):
       return HttpResponse("success")
     else:
       logger.info('Multiple steps invalid')
-  else:
+
+  else: # GET
     formset = step_formset(initial=initial_form_data)
-    logger.info('Multiple steps - loading initial formset, size ' + str(size) +
-                 ': ' + str(donor_list))
+    logger.debug('Multiple steps - loading initial formset, size %s', size)
+
   formset_with_donors = zip(formset, donor_list)
+
   return render(request, 'fund/forms/add_mult_step.html', {
     'size': size, 'formset': formset, 'fd': formset_with_donors,
     'multi': True, 'suggested': suggested
