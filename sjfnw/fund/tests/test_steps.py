@@ -459,3 +459,72 @@ class StepComplete(BaseFundTestCase):
     self.form_data['match_company'] = 'Company X'
 
     self.post_and_verify_followup_saved(self.form_data)
+
+class AddMultStep(BaseFundTestCase):
+
+  url = reverse('sjfnw.fund.views.add_mult_step')
+
+  def setUp(self):
+    super(AddMultStep, self).setUp()
+    self.use_test_acct()
+
+  def test_get_none(self):
+    donor = models.Donor.objects.get(membership_id=self.ship_id)
+    next_step = donor.get_next_step()
+    self.assertIsNotNone(next_step)
+    self.assertFalse(next_step.completed)
+
+    res = self.client.get(self.url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertEqual(res.context['size'], 0)
+
+  def test_get_some(self):
+    donor = models.Donor(firstname='A', membership_id=self.ship_id)
+    donor.save()
+    donor = models.Donor(firstname='B', membership_id=self.ship_id)
+    donor.save()
+
+    res = self.client.get(self.url, follow=True)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertEqual(res.context['size'], 2)
+
+  def test_get_received(self):
+    donor = models.Donor(firstname='A', membership_id=self.ship_id)
+    donor.save()
+    donor = models.Donor(firstname='B', membership_id=self.ship_id, received_this=25)
+    donor.save()
+
+    res = self.client.get(self.url, follow=True)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertEqual(res.context['size'], 1)
+
+  def test_get_promised(self):
+    donor = models.Donor(firstname='A', membership_id=self.ship_id, promised=300)
+    donor.save()
+    donor = models.Donor(firstname='B', membership_id=self.ship_id)
+    donor.save()
+
+    res = self.client.get(self.url, follow=True)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertEqual(res.context['size'], 1)
+
+  def test_post_none(self):
+    res = self.client.get(self.url)
+
+    last_activity = models.Membership.objects.get(pk=self.ship_id).last_activity
+
+    prefix = res.context['formset'].management_form.prefix
+    initial = res.context['formset'].management_form.initial
+    post_data = {}
+    for key, value in initial.iteritems():
+      post_data[prefix + '-' + key] = value
+
+    res = self.client.post(self.url, post_data)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertEqual(res.content, 'success')
+    self.assertNotEqual(last_activity, models.Membership.objects.get(pk=self.ship_id).last_activity)
