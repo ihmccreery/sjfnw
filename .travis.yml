@@ -16,8 +16,6 @@ install:
   - unzip -q google_appengine_1.9.35.zip
   - pip install codecov
   - pip install -r requirements.txt -t libs
-  # - "pip install pylint"
-  # - "pip install pylint-django"
 
 before_script:
   - export PATH=$PATH:$PWD/google_appengine
