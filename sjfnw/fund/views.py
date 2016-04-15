@@ -334,50 +334,6 @@ def fund_register(request):
     'form': register, 'error_msg': error_msg
   })
 
-
-@login_required(login_url='/fund/login/')
-def registered(request):
-  """ Sets up a member after registration # TODO could this be a func instead of view?
-
-  If they have no memberships, send them to projects page
-
-  Checks membership for pre-approval status
-  """
-
-  if request.membership_status == c.NO_MEMBER:
-    return redirect(not_member)
-  elif request.membership_status == c.NO_MEMBERSHIP:
-    return redirect(manage_account)
-  else:
-    member = models.Member.objects.get(email=request.user.username)
-
-  # if they came here from manage_aaccount, 'sh' should be a url param
-  # if from register, member.current should be set
-  ship_id = request.GET.get('sh') or member.current
-  try:
-    ship = models.Membership.objects.get(pk=ship_id, member=member)
-
-  except models.Membership.DoesNotExist: # should not happen
-    logger.error('Membership does not exist right at /registered ' + request.user.username)
-    return redirect(home)
-  if ship.approved is True: # another precaution
-    logger.warning('Membership approved before check at /registered ' + request.user.username)
-    return redirect(home)
-
-  # check if they're on the pre-approved list
-  gp = ship.giving_project
-  if gp.is_pre_approved(member.email):
-    ship.approved = True
-    ship.save(skip=True)
-    member.current = ship_id
-    member.save()
-    logger.info('Pre-approval succeeded')
-    return redirect(home)
-
-  return render(request, 'fund/registered.html', {
-    'member': member, 'proj': gp
-  })
-
 # ----------------------------------------------------------------------------
 #  MEMBERSHIP MANAGEMENT
 # ----------------------------------------------------------------------------
