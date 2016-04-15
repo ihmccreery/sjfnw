@@ -1,5 +1,18 @@
 # See http://docs.pylint.org/features.html
 
+[BASIC]
+
+bad-functions=map,filter,input,print # defaults + print
+good-names=i,j,_,pk,gp,qs
+
+# allow lower cased "constants" since detection is iffy
+const-rgx=(([A-Za-z_][A-Za-z0-9_]*)|(__.*__))$
+
+[FORMAT]
+
+indent-string='  '
+max-line-length=100
+
 [MASTER]
 
 load-plugins=pylint_django
@@ -29,20 +42,6 @@ disable=attribute-defined-outside-init,
         too-many-nested-blocks,
         too-many-statements
 
-[REPORTS]
+[VARIABLES]
 
-output-format=colorized
-reports=no
-
-[BASIC]
-
-bad-functions=map,filter,input,print # defaults + print
-good-names=i,j,_,pk,gp,qs
-
-# allow lower cased "constants" since detection is iffy
-const-rgx=(([A-Za-z_][A-Za-z0-9_]*)|(__.*__))$
-
-[FORMAT]
-
-indent-string='  '
-max-line-length=100
+dummy-variables-rgx=_$|dummy|request

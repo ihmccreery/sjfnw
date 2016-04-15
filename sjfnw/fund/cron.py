@@ -12,8 +12,6 @@ from sjfnw.fund import models
 
 logger = logging.getLogger('sjfnw')
 
-# pylint: disable=unused-argument
-
 def email_overdue(request):
   today = datetime.date.today()
   ships = models.Membership.objects.filter(giving_project__fundraising_deadline__gte=today)
