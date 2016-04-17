@@ -102,6 +102,6 @@ if [ $version ] ; then
 fi
 echo -e "sjf-nw.appspot.com"
 
-if [ $version ] ; then
+if [ ! $version ] ; then
   echo -e "Then tag the release: git tag -a $(date +%Y-%m-%d) -m \"$(date +%Y-%m-%d)\"\n"
 fi
