@@ -510,7 +510,7 @@ class GrantApplicationLog(models.Model):
     ordering = ['-date']
 
   def __unicode__(self):
-    return 'Log entry from {:%sm/%d/%y}'.format(self.date)
+    return 'Log entry from {:%m/%d/%y}'.format(self.date)
 
 
 class GivingProjectGrant(models.Model):
