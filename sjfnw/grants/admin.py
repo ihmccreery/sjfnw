@@ -86,6 +86,7 @@ class LogReadonlyI(admin.TabularInline):
   verbose_name = 'Log'
   verbose_name_plural = 'Logs'
   collapsed = True
+  show_change_link = True
 
   def get_queryset(self, request):
     qs = super(LogReadonlyI, self).get_queryset(request)
@@ -530,6 +531,12 @@ class YearEndReportA(BaseModelAdmin):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
 
+class LogA(BaseModelAdmin):
+
+  def get_model_perms(self, *args, **kwargs):
+    perms = super(LogA, self).get_model_perms(*args, **kwargs)
+    perms['unlisted'] = True
+    return perms
 
 class DraftAdv(BaseModelAdmin):
   """ Only used in admin-advanced """
@@ -548,6 +555,7 @@ admin.site.register(models.DraftGrantApplication, DraftGrantApplicationA)
 admin.site.register(models.GivingProjectGrant, GivingProjectGrantA)
 admin.site.register(models.SponsoredProgramGrant, SponsoredProgramGrantA)
 admin.site.register(models.YearEndReport, YearEndReportA)
+admin.site.register(models.GrantApplicationLog, LogA)
 
 advanced_admin.register(models.GrantCycle, GrantCycleA)
 advanced_admin.register(models.Organization, OrganizationA)
