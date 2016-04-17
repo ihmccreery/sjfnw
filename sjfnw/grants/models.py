@@ -201,11 +201,15 @@ class DraftGrantApplication(models.Model):
 
 class WordLimitValidator(BaseValidator):
   """ Custom validator that checks number of words in a string """
-  compare = lambda self, a, b: a > b
-  clean = lambda self, x: len(re.findall(r'[^ \n\r]+', x))
-  message = (u'Ensure this value has at most %(limit_value)d words '
-             '(it has %(show_value)d).')
+  message = (u'This field has a maximum word count of %(limit_value)d '
+              '(current count: %(show_value)d)')
   code = 'max_words'
+
+  def compare(self, count_a, count_b):
+    return count_a > count_b
+
+  def clean(self, val):
+    return len(re.findall(r'[^ \n\r]+', val))
 
 
 def validate_file_extension(value):
