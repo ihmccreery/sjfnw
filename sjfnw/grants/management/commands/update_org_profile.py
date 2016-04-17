@@ -47,4 +47,3 @@ class Command(BaseCommand):
     org.save()
 
     self.stdout.write('Updated organization profile.')
-

@@ -19,7 +19,7 @@ class AdminHome(BaseFundTestCase):
   def test_fund_home(self):
     response = self.client.get('/admin/fund/', follow=True)
     self.assertEqual(response.status_code, 200)
-    self.assertEqual(response.context['title'], 'Fund administration')
+    self.assertEqual(response.context['title'], 'Fundraising administration')
     self.assertEqual(len(response.context['app_list']), 1)
 
 
