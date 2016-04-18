@@ -533,6 +533,8 @@ class YearEndReportA(BaseModelAdmin):
 
 class LogA(BaseModelAdmin):
 
+  list_display = ['date', 'organization', 'application', 'staff']
+
   def get_model_perms(self, *args, **kwargs):
     perms = super(LogA, self).get_model_perms(*args, **kwargs)
     perms['unlisted'] = True
