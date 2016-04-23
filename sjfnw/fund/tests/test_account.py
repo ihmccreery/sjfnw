@@ -1,8 +1,10 @@
+from datetime import timedelta
 import logging
 
 from django.core.urlresolvers import reverse
+from django.utils import timezone
 
-from sjfnw.fund import models
+from sjfnw.fund.models import Member, Membership, GivingProject
 from sjfnw.fund.tests.base import BaseFundTestCase
 
 logger = logging.getLogger('sjfnw')
@@ -30,11 +32,11 @@ class SetCurrent(BaseFundTestCase):
     self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.manage_account'))
 
   def test_valid(self):
-    pre_gp = models.GivingProject.objects.get(title='Pre training')
-    new_ship = models.Membership(member_id=self.member_id, giving_project=pre_gp, approved=True)
+    pre_gp = GivingProject.objects.get(title='Pre training')
+    new_ship = Membership(member_id=self.member_id, giving_project=pre_gp, approved=True)
     new_ship.save()
 
-    member = models.Member.objects.get(pk=self.member_id)
+    member = Member.objects.get(pk=self.member_id)
     self.assertNotEqual(member.current, new_ship.pk)
 
     url = reverse('sjfnw.fund.views.set_current', kwargs={'ship_id': new_ship.pk})
@@ -44,5 +46,150 @@ class SetCurrent(BaseFundTestCase):
     self.assertEqual(res.status_code, 302)
     self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.home'))
 
-    member = models.Member.objects.get(pk=self.member_id)
+    member = Member.objects.get(pk=self.member_id)
     self.assertEqual(member.current, new_ship.pk)
+
+class ManageAccount(BaseFundTestCase):
+
+  url = reverse('sjfnw.fund.views.manage_account')
+
+  def setUp(self):
+    super(ManageAccount, self).setUp()
+
+  def test_load_not_logged_in(self):
+    res = self.client.get(self.url)
+
+    self.assertEqual(res.status_code, 302)
+    self.assertEqual(res.url,
+        self.BASE_URL + reverse('sjfnw.fund.views.fund_login') + '/?next=' + self.url)
+
+  def test_load_not_member(self):
+    self.use_admin_acct()
+
+    res = self.client.get(self.url)
+
+    self.assertEqual(res.status_code, 302)
+    self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.not_member'))
+
+  def test_load(self):
+    self.use_test_acct()
+
+    now = timezone.now()
+    # create GPs that should be hidden
+    yesterday = now - timedelta(days=1)
+    private_gp = GivingProject(title='Private Group', fundraising_training=yesterday,
+                               fundraising_deadline=now + timedelta(days=40),
+                               public=False)
+    private_gp.save()
+    past_gp = GivingProject(title='Ye Olde Projecte', fundraising_training=yesterday,
+                            fundraising_deadline=yesterday)
+    past_gp.save()
+
+    res = self.client.get(self.url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/account_projects.html')
+
+    expected_gps = GivingProject.objects.filter(public=True, fundraising_deadline__gte=now)
+    gp_choices = res.context['form'].fields.get('giving_project').choices
+    self.assertEqual(len(gp_choices), expected_gps.count() + 1) # 1 blank choice
+
+    gp_ids = [int(choice[0]) for choice in gp_choices if choice[0]]
+    self.assertNotIn(private_gp.pk, gp_ids)
+    self.assertNotIn(past_gp.pk, gp_ids)
+
+  def test_unknown_gp(self):
+    self.use_test_acct()
+    gp_id = 988
+    self.assert_count(GivingProject.objects.filter(pk=gp_id), 0)
+    membership_count = Membership.objects.filter(member_id=self.member_id).count()
+
+    res = self.client.post(self.url, {'giving_project': str(gp_id)})
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/account_projects.html')
+    self.assertEqual(res.context['form'].errors['giving_project'][0],
+        'Select a valid choice. That choice is not one of the available choices.')
+    self.assertEqual(Membership.objects.filter(member_id=self.member_id).count(), membership_count)
+
+  def test_already_registered(self):
+    self.use_test_acct()
+    gp_id = GivingProject.objects.get(title='Post training').pk
+    self.assert_count(
+      Membership.objects.filter(member_id=self.member_id, giving_project_id=gp_id), 1)
+
+    res = self.client.post(self.url, {'giving_project': str(gp_id)})
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/account_projects.html')
+    self.assertEqual(res.context['custom_error'],
+        'You are already registered with that giving project.')
+    self.assert_count(
+      Membership.objects.filter(member_id=self.member_id, giving_project_id=gp_id), 1)
+
+  def test_post_valid(self):
+    self.use_test_acct()
+    gp_id = GivingProject.objects.get(title='Pre training').pk
+    self.assert_count(
+      Membership.objects.filter(member_id=self.member_id, giving_project_id=gp_id), 0)
+
+    res = self.client.post(self.url, {'giving_project': str(gp_id)})
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/registered.html')
+    new_membership = Membership.objects.get(member_id=self.member_id, giving_project_id=gp_id)
+    self.assertEqual(new_membership.approved, False)
+
+  def test_post_valid_pre_approved(self):
+    self.use_test_acct()
+    gp = GivingProject.objects.get(title='Pre training')
+    gp.pre_approved += 'testacct@gmail.com'
+    gp.save()
+    self.assert_count(
+      Membership.objects.filter(member_id=self.member_id, giving_project_id=gp), 0)
+
+    res = self.client.post(self.url, {'giving_project': str(gp.pk)})
+
+    self.assertEqual(res.status_code, 302)
+    self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.home'))
+    new_membership = Membership.objects.get(member_id=self.member_id, giving_project_id=gp.pk)
+    self.assertEqual(new_membership.approved, True)
+    member = Member.objects.get(pk=self.member_id)
+    self.assertEqual(member.current, new_membership.pk)
+
+class NotApproved(BaseFundTestCase):
+
+  url = reverse('sjfnw.fund.views.not_approved')
+
+  def setUp(self):
+    super(NotApproved, self).setUp()
+
+  def test_not_member(self):
+    self.log_in_admin()
+
+    res = self.client.get(self.url)
+
+    self.assertEqual(res.status_code, 302)
+    self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.not_member'))
+
+  def test_member(self):
+    self.use_new_acct()
+
+    res = self.client.get(self.url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/not_approved.html')
+
+
+class Blocked(BaseFundTestCase):
+
+  url = reverse('sjfnw.fund.views.blocked')
+
+  def setUp(self):
+    super(Blocked, self).setUp()
+
+  def test_get(self):
+    res = self.client.get(self.url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/blocked.html')

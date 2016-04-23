@@ -1,15 +1,13 @@
 from django.core.urlresolvers import reverse
 
-from sjfnw.fund import models
+from sjfnw.fund.modelforms import DonorEditForm, DonorPreForm
+from sjfnw.fund.models import Donor, Membership
 from sjfnw.fund.tests.base import BaseFundTestCase
 
 class EditContact(BaseFundTestCase):
 
   def setUp(self):
     super(EditContact, self).setUp()
-    self.use_test_acct()
-    self.url = reverse('sjfnw.fund.views.edit_contact',
-                       kwargs={'donor_id': self.donor_id})
     self.form_data = {
       'phone': '888-888-8888',
       'firstname': 'John',
@@ -19,20 +17,71 @@ class EditContact(BaseFundTestCase):
       'notes': 'adifjaoifjdoiajfoa'
     }
 
+  def _get_url(self, donor_id):
+    return reverse('sjfnw.fund.views.edit_contact', kwargs={'donor_id': donor_id})
+
+  def test_get_without_est(self):
+    self.use_new_acct()
+    donor = Donor(membership_id=self.pre_id, firstname='Maebe')
+    donor.save()
+
+    res = self.client.get(self._get_url(donor.pk))
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/forms/edit_contact.html')
+    self.assertIsInstance(res.context['form'], DonorPreForm)
+
+  def test_get(self):
+    self.use_test_acct()
+
+    res = self.client.get(self._get_url(self.donor_id))
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/forms/edit_contact.html')
+    self.assertIsInstance(res.context['form'], DonorEditForm)
+
+  def test_donor_not_found(self):
+    self.use_test_acct()
+
+    res = self.client.post(self._get_url(8888), self.form_data)
+
+    self.assertEqual(res.status_code, 404)
+
+  def test_no_amount(self):
+    self.use_test_acct()
+
+    res = self.client.post(self._get_url(self.donor_id), self.form_data)
+
+    self.assertTemplateUsed(res, 'fund/forms/edit_contact.html')
+    self.assertFormError(res, 'form', 'amount', 'This field is required.')
+
   def test_negative_amount(self):
+    self.use_test_acct()
     self.form_data['amount'] = '-10'
-    response = self.client.post(self.url, self.form_data, follow=True)
 
-    self.assertTemplateUsed(response, 'fund/forms/edit_contact.html')
-    self.assertFormError(response, 'form', 'amount', 'Must be greater than or equal to 0.')
+    res = self.client.post(self._get_url(self.donor_id), self.form_data)
 
-  def test_positive_amount(self):
+    self.assertTemplateUsed(res, 'fund/forms/edit_contact.html')
+    self.assertFormError(res, 'form', 'amount', 'Must be greater than or equal to 0.')
+
+  def test_valid_pre(self):
+    self.use_new_acct()
+    donor = Donor(membership_id=self.pre_id, firstname='Maebe')
+    donor.save()
+
+    res = self.client.post(self._get_url(donor.pk), self.form_data)
+
+    self.assertEqual(res.content, 'success')
+
+  def test_valid(self):
+    self.use_test_acct()
     self.form_data['amount'] = '10'
-    response = self.client.post(self.url, self.form_data, follow=True)
 
-    self.assertEqual(response.content, 'success')
+    res = self.client.post(self._get_url(self.donor_id), self.form_data)
 
-    contact = models.Donor.objects.get(pk=self.donor_id)
+    self.assertEqual(res.content, 'success')
+
+    contact = Donor.objects.get(pk=self.donor_id)
     self.assertEqual(contact.amount, 10)
 
 
@@ -42,54 +91,52 @@ class DeleteContact(BaseFundTestCase):
     super(DeleteContact, self).setUp()
     self.use_test_acct()
     # set copied contacts to avoid redirect after delete
-    membership = models.Membership.objects.get(pk=self.ship_id)
+    membership = Membership.objects.get(pk=self.ship_id)
     membership.copied_contacts = True
     membership.save()
 
-  def test_success(self):
-    """ Verify success of deleting existing contact """
+  def _get_url(self, donor_id):
+    return reverse('sjfnw.fund.views.delete_contact', kwargs={'donor_id': donor_id})
 
-    donor = models.Donor.objects.get(pk=self.donor_id)
+  def test_get_valid(self):
+    res = self.client.get(self._get_url(self.donor_id))
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/forms/delete_contact.html')
+
+  def test_success(self):
+
+    donor = Donor.objects.get(pk=self.donor_id)
     self.assertEqual(donor.membership_id, self.ship_id)
 
-    url = reverse('sjfnw.fund.views.delete_contact', kwargs={'donor_id': self.donor_id})
-    response = self.client.post(url, {}, follow=True)
+    res = self.client.post(self._get_url(self.donor_id), {})
 
-    self.assertEqual(response.status_code, 200)
-    self.assertTemplateUsed(response, 'fund/_base_personal.html')
-    self.assertTemplateUsed(response, 'fund/forms/add_contacts.html')
+    self.assertEqual(res.status_code, 302)
+    self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.home'))
 
-    donor = models.Donor.objects.filter(pk=self.donor_id)
+    donor = Donor.objects.filter(pk=self.donor_id)
     self.assertEqual(len(donor), 0)
 
   def test_nonexistent(self):
-    """ Verify 404 if donor does not exist """
+    donor_id = 894
+    self.assert_count(Donor.objects.filter(pk=donor_id), 0)
 
-    test_id = 894
-    self.assertEqual(0, models.Donor.objects.filter(pk=test_id).count())
+    res = self.client.post(self._get_url(donor_id), {})
 
-    url = reverse('sjfnw.fund.views.delete_contact', kwargs={'donor_id': test_id})
-    response = self.client.post(url, {}, follow=True)
-
-    self.assertEqual(response.status_code, 404)
+    self.assertEqual(res.status_code, 404)
 
   def test_permission(self):
     """ Verify failure when requesting to delete another membership's contact """
 
     # switch to newbie account and verify that test donor is not associated with it
     self.use_new_acct()
-    test_id = 1
-    donor = models.Donor.objects.get(pk=test_id)
-    self.assertNotEqual(donor.membership_id, self.pre_id)
+    current_membership = Membership.objects.get(pk=self.ship_id)
+
+    donor_id = 1
+    donor = Donor.objects.get(pk=donor_id)
+
+    self.assertNotEqual(donor.membership, current_membership)
     self.assertNotEqual(donor.membership.member_id, self.member_id)
 
-    # visit home page and verify that it loads under the expected membership
-    response = self.client.get(reverse('sjfnw.fund.views.home'), follow=True)
-    self.assertEqual(response.status_code, 200)
-    self.assertEqual(response.context['request'].membership.pk, self.pre_id)
+    res = self.client.post(self._get_url(donor_id), {})
 
-    # attempt to delete test donor
-    url = reverse('sjfnw.fund.views.delete_contact', kwargs={'donor_id': test_id})
-    response = self.client.post(url, {}, follow=True)
-
-    self.assertEqual(response.status_code, 404)
+    self.assertEqual(res.status_code, 404)
