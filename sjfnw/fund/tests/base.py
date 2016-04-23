@@ -81,5 +81,6 @@ class BaseFundTestCase(BaseTestCase):
     ship = models.Membership(giving_project=pre, member=mem, approved=True)
     ship.save()
     self.pre_id = ship.pk
+    self.ship_id = ship.pk
     mem.current = ship.pk
     mem.save()

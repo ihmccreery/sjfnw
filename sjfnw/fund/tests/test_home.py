@@ -204,3 +204,47 @@ class CompileMembershipProgress(BaseFundTestCase):
       self.assertIsInstance(donor.next_step, models.Step)
       self.assertIs(type(donor.completed_steps), list)
       self.assertTrue(len(donor.completed_steps) > 0)
+
+
+class FormQueryParams(BaseFundTestCase):
+  """
+  The logic for loading the forms is in the javascript - all we can test is that
+  the url query params are passed into the template via context.
+  """
+  url = reverse('sjfnw.fund.views.home')
+
+  def setUp(self):
+    super(FormQueryParams, self).setUp()
+    self.use_test_acct()
+
+  def test_add_mult_step(self):
+    res = self.client.get(self.url + '?load=stepmult')
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/home.html')
+    self.assertEqual(res.context['load'], reverse('sjfnw.fund.views.add_mult_step'))
+    self.assertEqual(res.context['loadto'], 'addmult')
+
+  def test_edit_step(self):
+    url = self.url + '?donor={}&step={}&t=edit'.format(self.donor_id, self.step_id)
+    res = self.client.get(url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/home.html')
+    expected_load_url = reverse(
+        'sjfnw.fund.views.edit_step',
+        kwargs={'donor_id': self.donor_id, 'step_id': self.step_id})
+    self.assertEqual(res.context['load'], expected_load_url)
+    self.assertEqual(res.context['loadto'], '{}-nextstep'.format(self.donor_id))
+
+  def test_complete_step(self):
+    url = self.url + '?t=complete&donor={}&step={}'.format(self.donor_id, self.step_id)
+    res = self.client.get(url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/home.html')
+    expected_load_url = reverse(
+        'sjfnw.fund.views.complete_step',
+        kwargs={'donor_id': self.donor_id, 'step_id': self.step_id})
+    self.assertEqual(res.context['load'], expected_load_url)
+    self.assertEqual(res.context['loadto'], '{}-nextstep'.format(self.donor_id))

@@ -12,6 +12,7 @@ class GivingProjectPage(BaseFundTestCase):
 
   def test_basic_load(self):
 
-    response = self.client.get(self.url, follow=True)
+    res = self.client.get(self.url)
 
-    self.assertTemplateUsed(response, 'fund/project.html')
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/project.html')

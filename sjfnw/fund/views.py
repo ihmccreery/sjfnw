@@ -362,20 +362,20 @@ def manage_account(request):
     form = forms.AddProjectForm(request.POST)
     if form.is_valid():
       logger.debug('Valid add project')
-      gp = request.POST['giving_project']
-      giv = models.GivingProject.objects.get(pk=gp)
-      membership, error_msg = _create_membership(member, giv)
-      if membership:
+      gp_id = request.POST['giving_project']
+      gp = models.GivingProject.objects.get(pk=gp_id)
+      membership, error_msg = _create_membership(member, gp)
+      if membership and not error_msg:
         if membership.approved:
           return redirect(home)
         return render(request, 'fund/registered.html', {
-          'member': member, 'proj': giv
+          'member': member, 'proj': gp
         })
   else: # GET
     form = forms.AddProjectForm()
 
   return render(request, 'fund/account_projects.html', {
-    'member': member, 'form': form, 'printout': error_msg, 'ships': ships
+    'member': member, 'form': form, 'custom_error': error_msg, 'ships': ships
   })
 
 
