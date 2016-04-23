@@ -117,7 +117,7 @@ class BlobstoreStorage(Storage):
   def get_valid_name(self, name):
     return force_unicode(name).strip().replace('\\', '/')
 
-  def get_available_name(self, name):
+  def get_available_name(self, name, max_length=None):
     return name.replace('\\', '/')
 
   def _get_key(self, name):
