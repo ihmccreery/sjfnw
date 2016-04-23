@@ -702,7 +702,7 @@ def edit_contact(request, donor_id):
   except models.Donor.DoesNotExist:
     logger.error('Tried to edit a nonexist donor. User: ' +
                   unicode(request.membership) + ', id given: ' + str(donor_id))
-    raise Http404
+    raise Http404('Donor not found')
 
   # check whether to require estimates
   est = request.membership.giving_project.require_estimates()
@@ -742,7 +742,7 @@ def delete_contact(request, donor_id):
   except models.Donor.DoesNotExist:
     logger.warning(str(request.user) + 'tried to delete nonexistent donor: ' +
                     str(donor_id))
-    raise Http404
+    raise Http404('Donor not found')
 
   action = '/fund/' + str(donor_id) + '/delete'
 
@@ -772,11 +772,11 @@ def add_step(request, donor_id):
     donor = models.Donor.objects.get(pk=donor_id, membership=membership)
   except models.Donor.DoesNotExist:
     logger.error('Single step - tried to add step to nonexistent donor.')
-    raise Http404
+    raise Http404('Donor not found')
 
   if donor.get_next_step():
     logger.error('Trying to add step, donor has an incomplete')
-    raise Http404
+    return HttpResponse(status=400, content='Donor already has a next step')
 
   action = '/fund/' + donor_id + '/step'
   formid = 'nextstep-' + donor_id
@@ -863,14 +863,14 @@ def edit_step(request, donor_id, step_id):
   except models.Donor.DoesNotExist:
     logger.error(str(request.user) + 'edit step on nonexistent donor ' +
                   str(donor_id))
-    raise Http404
+    raise Http404('Donor not found')
 
   try:
     step = models.Step.objects.get(id=step_id)
   except models.Step.DoesNotExist:
     logger.error(str(request.user) + 'edit step on nonexistent step ' +
                   str(step_id))
-    raise Http404
+    raise Http404('Step not found')
 
   action = '/fund/' + str(donor_id) + '/' + str(step_id)
   formid = 'edit-step-' + donor_id

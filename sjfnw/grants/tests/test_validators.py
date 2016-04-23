@@ -23,7 +23,7 @@ class WordLimit(TestCase):
     validator = WordLimitValidator(limit_value=5)
 
     validator('a b c')
-       
+
     self.assertRaisesRegexp(
         ValidationError,
         "[u'This field has a maximum word count of 5 (current count: 7)']",

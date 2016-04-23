@@ -92,10 +92,10 @@ class Organization(models.Model):
     ]
 
   def get_staff_entered_contact_info(self):
-    return ", ".join(filter(None, [
+    return ', '.join([val for val in [
       self.staff_contact_person, self.staff_contact_person_title,
       self.staff_contact_phone, self.staff_contact_email
-    ]))
+    ] if val])
 
   def update_profile(self, app):
     for field in self.get_profile_fields():
@@ -466,7 +466,7 @@ class GrantApplication(models.Model):
             '<th>goals/objectives</th>'
             '</tr>')
     for i in range(0, 15, 3):
-      html += ('<tr><th class="left">q' + str((i + 3)/3) + '</th>'
+      html += ('<tr><th class="left">q' + str((i + 3) / 3) + '</th>'
                '<td>' + timeline[i] + '</td>'
                '<td>' + timeline[i + 1] + '</td>'
                '<td>' + timeline[i + 2] + '</td></tr>')
@@ -475,7 +475,7 @@ class GrantApplication(models.Model):
   timeline_display.allow_tags = True
 
 
-class GrantApplicationOverflow(models.Model):
+class GrantApplicationOverflow(models.Model): # pylint: disable=model-missing-unicode
 
   grant_application = models.OneToOneField(GrantApplication, related_name='overflow')
   two_year_question = models.TextField(
@@ -631,52 +631,50 @@ class YearEndReport(models.Model):
   phone = models.CharField(max_length=20)
   website = models.CharField(max_length=255) # autofill based on app
 
-  summarize_last_year = models.TextField(
-      verbose_name=
-        ('1. Thinking about the Giving Project volunteers who decided to fund '
-        'you last year, including those you met on your site visit, what would '
-        'you like to tell them about what you\'ve done over the last year?'))
-  goal_progress = models.TextField(verbose_name=
-        ('2. Please refer back to your application from last year. Looking at '
-         'the goals you outlined in your application, what progress have you '
-         'made on each? If you were unable to achieve those goals or changed '
-         'your direction, please explain why.'))
-  quantitative_measures = models.TextField(verbose_name=
-      ('3. Do you evaluate your work by any quantitative measures (e.g., number '
-        'of voters registered, members trained, leaders developed, etc.)? If '
-        'so, provide that information:'), blank=True)
-  evaluation = models.TextField(verbose_name=
-      ('4. What other type of evaluations do you use internally? Please share '
-       'any outcomes that are relevant to the work funded by this grant.'))
-  achieved = models.TextField(verbose_name=
-      ('5. What specific victories, benchmarks, and/or policy changes (local, '
-       'state, regional, or national) have you achieved over the past year?'))
-  collaboration = models.TextField(verbose_name=
-      ('6. What other organizations did you work with to achieve those '
-       'accomplishments?'))
-  new_funding = models.TextField(verbose_name=
-      ('7. Did your grant from Social Justice Fund help you access any new '
-       'sources of funding? If so, please explain.'), blank=True)
-  major_changes = models.TextField(verbose_name=
-      ('8. Describe any major staff or board changes or other major '
-        'organizational changes in the past year.'), blank=True)
-  total_size = models.PositiveIntegerField(verbose_name=
-      ('9. What is the total size of your base? That is, how many people, '
-        'including paid staff, identify as part of your organization?'))
-  donations_count = models.PositiveIntegerField(verbose_name=
-      ('10. How many individuals gave a financial contribution of any size to '
-        'your organization in the last year?'))
-  donations_count_prev = models.PositiveIntegerField(null=True, verbose_name=
-      ('How many individuals made a financial contribution the previous '
-      'year?'))
+  summarize_last_year = models.TextField(verbose_name=(
+      '1. Thinking about the Giving Project volunteers who decided to fund '
+      'you last year, including those you met on your site visit, what would '
+      'you like to tell them about what you\'ve done over the last year?'))
+  goal_progress = models.TextField(verbose_name=(
+      '2. Please refer back to your application from last year. Looking at '
+      'the goals you outlined in your application, what progress have you '
+      'made on each? If you were unable to achieve those goals or changed '
+      'your direction, please explain why.'))
+  quantitative_measures = models.TextField(verbose_name=(
+      '3. Do you evaluate your work by any quantitative measures (e.g., number '
+      'of voters registered, members trained, leaders developed, etc.)? If '
+      'so, provide that information:'), blank=True)
+  evaluation = models.TextField(verbose_name=(
+      '4. What other type of evaluations do you use internally? Please share '
+      'any outcomes that are relevant to the work funded by this grant.'))
+  achieved = models.TextField(verbose_name=(
+      '5. What specific victories, benchmarks, and/or policy changes (local, '
+      'state, regional, or national) have you achieved over the past year?'))
+  collaboration = models.TextField(verbose_name=(
+      '6. What other organizations did you work with to achieve those '
+      'accomplishments?'))
+  new_funding = models.TextField(verbose_name=(
+      '7. Did your grant from Social Justice Fund help you access any new '
+      'sources of funding? If so, please explain.'), blank=True)
+  major_changes = models.TextField(verbose_name=(
+      '8. Describe any major staff or board changes or other major '
+      'organizational changes in the past year.'), blank=True)
+  total_size = models.PositiveIntegerField(verbose_name=(
+      '9. What is the total size of your base? That is, how many people, '
+      'including paid staff, identify as part of your organization?'))
+  donations_count = models.PositiveIntegerField(verbose_name=(
+      '10. How many individuals gave a financial contribution of any size to '
+      'your organization in the last year?'))
+  donations_count_prev = models.PositiveIntegerField(null=True, verbose_name=(
+      'How many individuals made a financial contribution the previous year?'))
 
-  stay_informed = models.TextField(verbose_name=
-      ('11. What is the best way for us to stay informed about your work? '
-       '(Enter any/all that apply)'), default='{}')
+  stay_informed = models.TextField(verbose_name=(
+    '11. What is the best way for us to stay informed about your work? '
+    '(Enter any/all that apply)'), default='{}')
 
-  other_comments = models.TextField(verbose_name=
-      ('12. Other comments or information? Do you have any suggestions for how '
-        'SJF can improve its grantmaking programs?'), blank=True) # json dict - see modelforms
+  other_comments = models.TextField(verbose_name=(
+    '12. Other comments or information? Do you have any suggestions for how '
+    'SJF can improve its grantmaking programs?'), blank=True) # json dict - see modelforms
 
   photo1 = models.FileField(validators=[validate_photo_file_extension],
       upload_to='/', max_length=255,
