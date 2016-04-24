@@ -1,4 +1,4 @@
-Overview of current process: manual deploy with `appcfg.py`, then add git tag using the date. Tagging is so we can easily see what exact code is live, and compare it to the last release, in cases where something is going wrong.
+Overview of current process: verify that everything works locally, then use `scripts/deploy` to deploy.
 
 ### Prepare for release
 
@@ -9,18 +9,19 @@ Overview of current process: manual deploy with `appcfg.py`, then add git tag us
 
 ### Release
 
-1. **Tag** the commit you will be releasing.
-  **`git tag -a 2015-08-09 -m "summary of changes"`**
-  a. Make sure the first line is under 72 chars like with commit messages.
-  b. The message doesn't need to be comprehensive; commit messages and diffs can be used to get the full details.
-  c. If it's not the first tag in a day, do `2015-08-09.2` etc.
-2. **Deploy**
-  a. Make sure you don't have any local uncommitted changes; they will be deployed.
-  b. **`appcfg.py -E CLOUDSQL_PASSWORD:[pw] update .`** (from root of repo) to deploy to App Engine.
+If your change involves migrations, these instructions don't cover that. Contact @aisapatino.
+
+1. Run `scripts/deploy`
+  a. If you want to be safe, you can first deploy to an alternate version (I usually use '2') and check that it works before updating the live site.
+2. Check deployment
+  a. The output of the script should include a link. Navigate to the affected areas and verify that they work.
+3. Tag updates to default version
+  a. The output of the script should include instructions for tagging. Add an annotated tag with the current date.
+  b. If it's not the first tag in a day, do `yyyy-mm-dd.2`, etc.
   c. **`git push --tags`** to push the release tag.
-3. **Verify** that the live site is working.
 
 ### More info
 
+- [deploy script source](https://github.com/aisapatino/sjfnw/blob/master/scripts/deploy)
 - [appcfg](https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Uploading_the_app)
 - [git tags](https://git-scm.com/book/en/v1/Git-Basics-Tagging)
