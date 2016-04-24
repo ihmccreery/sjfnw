@@ -1,14 +1,20 @@
+# configure coverage tool: http://coverage.readthedocs.org/en/latest/
+# used in travis.ci runs or locally with scripts/coverage
+
 [run]
+
 branch = true
 source = sjfnw
 omit =
+  *__init__.py
+  *management*
+  *migrations*
+  *tests*
   sjfnw/constants.py
   sjfnw/mail.py
   sjfnw/settings.py
   sjfnw/wsgi.py
-  *tests*
-  *__init__.py
-  *commands/*
 
 [html]
+
 directory = .coverage-html

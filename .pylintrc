@@ -1,11 +1,12 @@
-# See http://docs.pylint.org/features.html
+# configure pylint tool: http://docs.pylint.org/features.html
+# used by landscape.io and scripts/lint
 
 [BASIC]
 
 bad-functions=map,filter,input,print # defaults + print
 good-names=i,j,_,pk,gp,qs
 
-# allow lower cased "constants" since detection is iffy
+# allow lower cased 'constants' since detection is iffy
 const-rgx=(([A-Za-z_][A-Za-z0-9_]*)|(__.*__))$
 
 [FORMAT]
@@ -20,7 +21,7 @@ jobs: 4
 
 [MESSAGES CONTROL]
 
-# should eventually re-enable the "too-many-*"
+# should eventually re-enable the 'too-many-*'
 # except too-many-ancestors since that's mostly out of our control
 disable=attribute-defined-outside-init,
         bad-continuation,
@@ -44,4 +45,5 @@ disable=attribute-defined-outside-init,
 
 [VARIABLES]
 
+# ignore unused 'request' argument
 dummy-variables-rgx=_$|dummy|request

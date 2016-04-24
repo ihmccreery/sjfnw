@@ -1,3 +1,5 @@
+# configure travis.ci: https://travis-ci.org/aisapatino/sjfnw
+
 language: python
 python:
   - "2.7"
