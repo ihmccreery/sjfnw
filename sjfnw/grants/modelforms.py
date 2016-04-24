@@ -9,7 +9,8 @@ from django.utils.text import capfirst
 
 from sjfnw.forms import IntegerCommaField, PhoneNumberField
 from sjfnw.grants import constants as gc
-from sjfnw.grants.models import Organization, GrantApplication, DraftGrantApplication, YearEndReport
+from sjfnw.grants.models import (Organization, GrantApplication, DraftGrantApplication,
+    YearEndReport, GrantApplicationLog)
 
 logger = logging.getLogger('sjfnw')
 
@@ -353,3 +354,11 @@ class DraftAdminForm(ModelForm):
         raise ValidationError('This organization has already submitted an '
                               'application to this grant cycle.')
     return cleaned_data
+
+class LogAdminForm(ModelForm):
+
+  def __init__(self, *args, **kwargs):
+    super(LogAdminForm, self).__init__(*args, **kwargs)
+    if self.instance and self.instance.organization_id:
+      self.fields['application'].queryset = GrantApplication.objects.filter(
+          organization_id=self.instance.organization_id)
