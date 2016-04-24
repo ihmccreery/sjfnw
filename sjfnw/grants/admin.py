@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from sjfnw import utils
 from sjfnw.admin import BaseModelAdmin, advanced_admin, YearFilter
 from sjfnw.grants import models
-from sjfnw.grants.modelforms import DraftAdminForm
+from sjfnw.grants.modelforms import DraftAdminForm, LogAdminForm
 
 logger = logging.getLogger('sjfnw')
 
@@ -532,13 +532,20 @@ class YearEndReportA(BaseModelAdmin):
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
 
 class LogA(BaseModelAdmin):
-
+  form = LogAdminForm
+  fields = (('organization', 'date'),
+            'staff',
+            'application',
+            ('contacted'),
+            'notes')
+  readonly_fields = ['organization']
   list_display = ['date', 'organization', 'application', 'staff']
 
   def get_model_perms(self, *args, **kwargs):
     perms = super(LogA, self).get_model_perms(*args, **kwargs)
     perms['unlisted'] = True
     return perms
+
 
 class DraftAdv(BaseModelAdmin):
   """ Only used in admin-advanced """
