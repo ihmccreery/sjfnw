@@ -1,0 +1,9 @@
+# configure codecov.io: https://codecov.io/github/aisapatino/sjfnw
+
+coverage:
+  status:
+    patch: false
+    project:
+      default:
+        target: '80'
+  precision: 1
