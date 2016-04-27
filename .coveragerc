@@ -10,7 +10,9 @@ omit =
   *management*
   *migrations*
   *tests*
+  *admin.py
   sjfnw/constants.py
+  sjfnw/log.py
   sjfnw/mail.py
   sjfnw/settings.py
   sjfnw/wsgi.py
