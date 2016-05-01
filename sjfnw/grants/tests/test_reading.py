@@ -15,18 +15,19 @@ class GrantReading(BaseGrantTestCase):
               'sjfnw/fund/fixtures/test_fund.json']
 
   def setUp(self):
-    papp = ProjectApp(application_id=1, giving_project_id=2)
+    papp = ProjectApp(application_id=1, giving_project_id=1)
     papp.save()
     award = GivingProjectGrant(projectapp_id=papp.pk, amount=8900, first_yer_due=timezone.now())
     award.save()
-    yer = YearEndReport(award=award, total_size=83,
-        donations_count_prev=6, donations_count=9,
-        other_comments='Critical feedback')
+    yer = YearEndReport(
+      award=award, total_size=83, donations_count_prev=6, donations_count=9,
+      other_comments='Critical feedback'
+    )
     yer.save()
     self.yer_id = yer.pk
 
   def test_author(self):
-    self.log_in_test_org()
+    self.login_as_org('test')
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -35,7 +36,7 @@ class GrantReading(BaseGrantTestCase):
     self.assertContains(response, 'year end report')
 
   def test_other_org(self):
-    self.log_in_new_org()
+    self.login_as_org('new')
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -44,7 +45,7 @@ class GrantReading(BaseGrantTestCase):
     self.assertNotContains(response, 'year end report')
 
   def test_staff(self):
-    self.log_in_admin()
+    self.login_as_admin()
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -53,7 +54,7 @@ class GrantReading(BaseGrantTestCase):
     self.assertContains(response, 'year end report')
 
   def test_valid_member_not_visible(self):
-    self.log_in_newbie()
+    self.login_as_member('first')
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -62,7 +63,7 @@ class GrantReading(BaseGrantTestCase):
     self.assertNotContains(response, 'year end report')
 
   def test_invalid_member_not_visible(self):
-    self.log_in_testy()
+    self.login_as_member('blank')
 
     response = self.client.get('/grants/view/1', follow=True)
 
@@ -71,7 +72,7 @@ class GrantReading(BaseGrantTestCase):
     self.assertNotContains(response, 'year end report')
 
   def test_valid_member_visible(self):
-    self.log_in_newbie()
+    self.login_as_member('first')
     yer = YearEndReport.objects.get(pk=self.yer_id)
     yer.visible = True
     yer.save()
@@ -83,7 +84,7 @@ class GrantReading(BaseGrantTestCase):
     self.assertContains(response, 'year end report')
 
   def test_invalid_member_visible(self):
-    self.log_in_testy()
+    self.login_as_member('blank')
     yer = YearEndReport.objects.get(pk=self.yer_id)
     yer.visible = True
     yer.save()
@@ -95,7 +96,7 @@ class GrantReading(BaseGrantTestCase):
     self.assertNotContains(response, 'year end report')
 
   def test_two_year_grant_question(self):
-    self.log_in_test_org()
+    self.login_as_org('test')
 
     response = self.client.get('/grants/view/1', follow=True)
 

@@ -14,7 +14,7 @@ class AddEstimates(BaseFundTestCase):
 
   def setUp(self):
     super(AddEstimates, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
     # use post training project to require estimates
     membership = models.Membership.objects.get(member_id=self.member_id,

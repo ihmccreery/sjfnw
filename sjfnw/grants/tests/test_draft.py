@@ -14,7 +14,7 @@ class DraftExtension(BaseGrantTestCase):
 
   def setUp(self):
     super(DraftExtension, self).setUp()
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_create_draft(self):
     """ Admin create a draft for Fresh New Org """
@@ -36,7 +36,7 @@ class Draft(BaseGrantTestCase):
 
   def setUp(self):
     super(Draft, self).setUp()
-    self.log_in_test_org()
+    self.login_as_org('test')
 
   def test_autosave1(self):
     complete_draft = models.DraftGrantApplication.objects.get(pk=2)
@@ -62,7 +62,7 @@ class DraftWarning(BaseGrantTestCase):
 
   def setUp(self):
     super(DraftWarning, self).setUp()
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_long_alert(self):
     """ Cycle created 12 days ago with cycle closing in 7.5 days
@@ -136,7 +136,7 @@ class DiscardDraft(BaseGrantTestCase):
 
   def setUp(self):
     super(DiscardDraft, self).setUp()
-    self.log_in_test_org()
+    self.login_as_org('test')
 
   def test_post(self):
     self.assertEqual(models.DraftGrantApplication.objects.filter(pk=1).count(), 1)

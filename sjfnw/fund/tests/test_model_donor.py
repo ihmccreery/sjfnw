@@ -5,7 +5,7 @@ class TotalPromised(BaseFundTestCase):
 
   def setUp(self):
     super(TotalPromised, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
   def test_no_promise(self):
     donor = Donor(membership_id=self.pre_id, firstname='Hello', amount=20, likelihood=75)

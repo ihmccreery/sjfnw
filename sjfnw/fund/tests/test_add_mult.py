@@ -11,7 +11,7 @@ class AddMultipleDonorsPre(BaseFundTestCase):
 
   def setUp(self):
     super(AddMultipleDonorsPre, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
     self.form_data = {
       'form-TOTAL_FORMS': u'5',
       'form-INITIAL_FORMS': u'0',
@@ -90,7 +90,7 @@ class AddMultipleDonorsPost(BaseFundTestCase):
 
   def setUp(self):
     super(AddMultipleDonorsPost, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
     # use post fundraising training membership
     member = models.Member.objects.get(pk=self.member_id)

@@ -6,6 +6,10 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
 
+from sjfnw.fund.models import Member
+
+logger = logging.getLogger('sjfnw')
+
 RED = '\033[00;31m'
 GREEN = '\033[00;32m'
 YELLOW = '\033[00;33m'
@@ -17,19 +21,27 @@ INDENT = '    '
 class BaseTestCase(TestCase):
   """ Base test case used by all other tests
 
-    Provides login methods and custom assertion(s) """
+    Provides login methods and custom assertions """
 
   BASE_URL = 'http://testserver'
 
-  def log_in_testy(self):
-    User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')
-    self.client.login(username='testacct@gmail.com', password='testy')
+  def login_as_member(self, name):
+    if name == "first":
+      User.objects.create_user('firstacct@gmail.com', 'firstacct@gmail.com', 'one')
+      self.client.login(username='firstacct@gmail.com', password='one')
+      if 'sjfnw/fund/fixtures/test_fund.json' in self.fixtures:
+        self.member_id = 1
+        self.ship_id = 1
+    elif name == "blank":
+      User.objects.create_user('blankacct@gmail.com', 'testacct@gmail.com', 'empty')
+      member = Member(email='blankacct@gmail.com', first_name='Blank', last_name='Account')
+      member.save()
+      self.member_id = member.pk
+      self.client.login(username='blankacct@gmail.com', password='empty')
+    else:
+      raise ValueError('Unknown member "{}". Available members: "first", "blank"'.format(name))
 
-  def log_in_newbie(self):
-    User.objects.create_user('newacct@gmail.com', 'newacct@gmail.com', 'noob')
-    self.client.login(username='newacct@gmail.com', password='noob')
-
-  def log_in_admin(self): # just a django superuser
+  def login_as_admin(self): # just a django superuser
     User.objects.create_superuser('admin@gmail.com', 'admin@gmail.com', 'admin')
     self.client.login(username='admin@gmail.com', password='admin')
 
@@ -44,9 +56,10 @@ class BaseTestCase(TestCase):
     else:
       self.assertEqual(message, text)
 
-  def assert_length(self, coll, expected):
-    actual = len(coll)
-    error_msg = 'Expected {} to have length {}, but got {}'.format(coll, expected, actual)
+  def assert_length(self, collection, expected):
+    actual = len(collection)
+    error_msg = 'Expected {} to have length {}, but got {}'.format(
+        collection, expected, actual)
     self.assertEqual(actual, expected, error_msg)
 
   def assert_count(self, qs, expected):
@@ -54,17 +67,24 @@ class BaseTestCase(TestCase):
     error_msg = 'Expected queryset count to be {}, but got {}'.format(expected, actual)
     self.assertEqual(actual, expected, error_msg)
 
-# Code below overrides the default test runner to provide colored
-# output in the console
+# Code below overrides the default test runner to provide colored console output
 
+# many of the built-in method names are not "valid" python names
 # pylint: disable=invalid-name
 
+# map log levels to verbosity levels
+MIN_LOG_LEVEL = [
+  'FATAL', # 0 - quiet
+  'FATAL', # 1 - default
+  'INFO',  # 2 - verbose
+  'DEBUG'  # 3 - extra verbose
+]
+
 class ColorTestSuiteRunner(DiscoverRunner):
-  """ Redirects run_suite to ColorTestRunner """
+  """ Uses ColorTestRunner """
 
   def run_suite(self, suite, **kwargs):
-    min_log_level = ['FATAL', 'ERROR', 'INFO', 'DEBUG']
-    level = getattr(logging, min_log_level[self.verbosity])
+    level = getattr(logging, MIN_LOG_LEVEL[self.verbosity])
     logging.getLogger().setLevel(level)
     logging.getLogger('sjfnw').setLevel(level)
 

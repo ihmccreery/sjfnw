@@ -7,9 +7,7 @@ from django.utils import timezone
 from sjfnw.grants import models
 from sjfnw.tests.base import BaseTestCase
 
-
-""" This file provides a base test class and utilities specific to the grants
-    module. See other files in sjfnw/grants/tests for actual tests """
+# This file provides a base test class and utilities specific to the grants module
 
 LIVE_FIXTURES = ['sjfnw/fund/fixtures/live_gp_dump.json', # not using these yet in most
                  'sjfnw/grants/fixtures/orgs.json',
@@ -53,21 +51,22 @@ def set_cycle_dates():
   cycle.save()
 
 class BaseGrantTestCase(BaseTestCase):
-  """ Abstract base cass for grants tests. """
 
   fixtures = ['sjfnw/grants/fixtures/test_grants.json']
 
   def setUp(self):
     set_cycle_dates()
 
-  # see ./test_grants_guide.md for what is associated with each org
-  def log_in_new_org(self):
-    User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
-    self.client.login(username='neworg@gmail.com', password='noob')
-
-  def log_in_test_org(self):
-    User.objects.create_user('testorg@gmail.com', 'testorg@gmail.com', 'noob')
-    self.client.login(username='testorg@gmail.com', password='noob')
+  # see sjfnw/grants/fixtures/README.md for what objects are associated with each org
+  def login_as_org(self, name):
+    if name == "new":
+      User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
+      self.client.login(username='neworg@gmail.com', password='noob')
+    elif name == "test":
+      User.objects.create_user('testorg@gmail.com', 'testorg@gmail.com', 'noob')
+      self.client.login(username='testorg@gmail.com', password='noob')
+    else:
+      raise ValueError('Unknown org name {}'.format(name))
 
   def assert_draft_matches_app(self, draft, app, exclude_cycle_q=False):
     """ Assert that app is a superset of draft

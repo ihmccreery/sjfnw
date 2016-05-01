@@ -11,7 +11,7 @@ class AddContacts(BaseFundTestCase):
 
   def setUp(self):
     super(AddContacts, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
   def test_new(self):
     """ Verify that add mult form is shown to new memberships """
@@ -82,7 +82,7 @@ class AddEstimates(BaseFundTestCase):
 
   def setUp(self):
     super(AddEstimates, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
   def test_estimates_done(self):
     """ Verify add estimates form is not shown if contacts have estimates """
@@ -112,7 +112,7 @@ class HomeSurveys(BaseFundTestCase):
 
   def setUp(self):
     super(HomeSurveys, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
     survey = models.Survey(title='First Meeting')
     survey.save()
     self.survey_id = survey.pk
@@ -215,7 +215,7 @@ class FormQueryParams(BaseFundTestCase):
 
   def setUp(self):
     super(FormQueryParams, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
 
   def test_add_mult_step(self):
     res = self.client.get(self.url + '?load=stepmult')

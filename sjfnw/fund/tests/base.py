@@ -1,6 +1,7 @@
 from datetime import timedelta
 import logging
 
+from django.contrib.auth.models import User
 from django.utils import timezone
 
 from sjfnw.fund import models
@@ -10,15 +11,14 @@ logger = logging.getLogger('sjfnw')
 
 
 class BaseFundTestCase(BaseTestCase):
-  """ Base test case for fundraising tests """
 
-  fixtures = ['sjfnw/fund/fixtures/testy.json']
+  fixtures = ['sjfnw/fund/fixtures/test_fund.json']
 
   def setUp(self):
     self.create_projects()
 
   def create_projects(self):
-    """ Creates pre- and post-training giving projects """
+    """ Create pre- and post-training giving projects """
     today = timezone.now()
     gp = models.GivingProject(title="Post training", fund_goal=5000,
         fundraising_training=today - timedelta(days=10),
@@ -29,24 +29,32 @@ class BaseFundTestCase(BaseTestCase):
         fundraising_deadline=today + timedelta(days=30))
     gp.save()
 
-  # convenience methods for use in child test classes
-  # login methods are defined on BaseTestCase
+  def login_as_member(self, name):
+    """ Expands on method from BaseTestCase, adding additional members """
+    error_msg = ''
+    try:
+      super(BaseFundTestCase, self).login_as_member(name)
+      return
+    except ValueError, err:
+      error_msg = err.message
 
-  def use_test_acct(self):
-    self.create_test()
-    self.log_in_testy()
-
-  def use_new_acct(self):
-    self.create_new()
-    self.log_in_newbie()
-
-  def use_admin_acct(self):
-    self.log_in_admin()
+    if name == "current":
+      self.create_test()
+      User.objects.create_user('testacct@gmail.com', 'testacct@gmail.com', 'testy')
+      self.client.login(username='testacct@gmail.com', password='testy')
+    elif name == "new":
+      self.create_new()
+      User.objects.create_user('newacct@gmail.com', 'newacct@gmail.com', 'noob')
+      self.client.login(username='newacct@gmail.com', password='noob')
+    else:
+      raise ValueError(error_msg + ', "current", "new"')
 
   def create_test(self):
-    """ Sets up "test" membership - in post GP with one donor """
+    """ Sets up "current" membership - in post GP with one donor """
 
-    member = models.Member.objects.get(email='testacct@gmail.com')
+    member = models.Member(email='testacct@gmail.com', first_name='Test',
+                           last_name='Member')
+    member.save()
     self.member_id = member.pk
 
     # create membership in post-training gp
@@ -69,7 +77,7 @@ class BaseFundTestCase(BaseTestCase):
 
   def create_new(self):
     """ Creates newbie member with memberships in pre & post """
-    mem = models.Member(first_name='New', last_name='Account',
+    mem = models.Member(first_name='New', last_name='Member',
                         email='newacct@gmail.com')
     mem.save()
     self.member_id = mem.pk

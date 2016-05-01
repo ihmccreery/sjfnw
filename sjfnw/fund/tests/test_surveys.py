@@ -17,8 +17,24 @@ class GPSurveys(BaseFundTestCase):
   def setUp(self):
     super(GPSurveys, self).setUp()
 
+  def _create_survey(self):
+    """ Utility method for other tests. Create survey and connect it to GP 1 """
+    survey = models.Survey(
+      title='Basic Survey',
+      intro=('Please fill out this quick survey evaluating our last meeting.'
+             ' Responses are completely anonymous. Once you have completed '
+             'it, you\'ll be taken to your regular home page.'),
+      questions=(
+        '[{"question": "How well did we meet our goals? (1 = did not meet, 5 = met all our goals)",'
+        ' "choices": [1, 2, 3, 4, 5]}, '
+        '{"question": "Any other comments for us?", "choices": []}]'))
+    survey.save()
+    gp_survey = models.GPSurvey(survey=survey, giving_project_id=1, date=timezone.now())
+    gp_survey.save()
+    self.gps_pk = gp_survey.pk
+
   def test_creation(self):
-    self.log_in_admin()
+    self.login_as_admin()
     form_data = {
      'title': 'Another Survey',
      'intro': 'Please fill this out!',
@@ -45,7 +61,7 @@ class GPSurveys(BaseFundTestCase):
     gp_survey.save()
 
     # log into PC and verify it displays as expected
-    self.log_in_testy()
+    self.login_as_member('first')
 
     res = self.client.get(self.url, follow=True)
 
@@ -54,35 +70,18 @@ class GPSurveys(BaseFundTestCase):
     self.assertContains(res, '<textarea', count=1)
     self.assertContains(res, '<li><label for', count=2)
 
-  def _pre_create_survey(self):
-    """ Create survey and connect it to GP 1 """
-    survey = models.Survey(
-      title='Basic Survey',
-      intro=('Please fill out this quick survey evaluating our last meeting.'
-             ' Responses are completely anonymous. Once you have completed '
-             'it, you\'ll be taken to your regular home page.'),
-      questions=(
-        '[{"question": "How well did we meet our goals? (1 = did not meet, 5 = met all our goals)",'
-        ' "choices": [1, 2, 3, 4, 5]}, '
-        '{"question": "Any other comments for us?", "choices": []}]'))
-    survey.save()
-    gp_survey = models.GPSurvey(survey=survey, giving_project_id=1, date=timezone.now())
-    gp_survey.save()
-    self.gps_pk = gp_survey.pk
-
   def test_fill(self):
-    self._pre_create_survey()
-    self.log_in_testy()
+    self._create_survey()
+    self.login_as_member('first')
 
-    membership = models.Membership.objects.get(pk=1)
+    membership = models.Membership.objects.get(pk=self.ship_id)
     self.assertEqual(membership.completed_surveys, '[]')
 
     res = self.client.get(self.url, follow=True)
     self.assertTemplateUsed(res, self.template)
-
     self.assert_count(models.SurveyResponse.objects, 0)
 
-    # Post a survey res
+    # Post a survey response
     form_data = {
         'responses_0': '2',
         'responses_1': 'No comments.',
@@ -93,28 +92,33 @@ class GPSurveys(BaseFundTestCase):
                        kwargs={'gp_survey_id': self.gps_pk})
     res = self.client.post(post_url, form_data)
 
+    self.assertEqual(res.status_code, 200)
     self.assertEqual(res.content, 'success')
+
     new_response = models.SurveyResponse.objects.get(gp_survey_id=self.gps_pk)
     self.assertEqual(new_response.responses, json.dumps(
       ["How well did we meet our goals? (1 = did not meet, 5 = met all our goals)", "2",
        "Any other comments for us?", "No comments."]))
 
   def test_future_survey(self):
-    self._pre_create_survey()
-    self.log_in_testy()
+    self._create_survey()
+    self.login_as_member('first')
 
     gp_survey = models.GPSurvey.objects.get(giving_project_id=1)
     gp_survey.date = timezone.now() + timedelta(days=20)
     gp_survey.save()
 
     res = self.client.get(self.url)
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'fund/home.html')
     self.assertTemplateNotUsed(res, self.template)
 
   def test_completed_survey(self):
-    self._pre_create_survey()
-    self.log_in_testy()
+    self._create_survey()
+    self.login_as_member('first')
 
-    membership = models.Membership.objects.get(pk=1)
+    # mark the survey complete
+    membership = models.Membership.objects.get(pk=self.ship_id)
     membership.completed_surveys = '[1]'
     membership.save()
 
@@ -124,7 +128,7 @@ class GPSurveys(BaseFundTestCase):
     self.assertTemplateNotUsed(res, self.template)
 
   def test_load_not_found(self):
-    self.log_in_testy()
+    self.login_as_member('first')
 
     url = reverse('sjfnw.fund.views.project_survey', kwargs={'gp_survey_id': '9999'})
     res = self.client.get(url)

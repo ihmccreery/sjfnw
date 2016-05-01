@@ -11,7 +11,7 @@ class GetProgress(BaseFundTestCase):
 
   def setUp(self):
     super(GetProgress, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
   def test_none(self):
     membership = Membership.objects.get(pk=self.pre_id)
