@@ -26,7 +26,7 @@ class YearEndReportForm(BaseGrantFilesTestCase):
 
   def setUp(self):
     super(YearEndReportForm, self).setUp()
-    self.log_in_test_org()
+    self.login_as_org('test')
     today = timezone.now()
     award = models.GivingProjectGrant(
         projectapp_id=1,
@@ -281,7 +281,7 @@ class YearEndReportReminders(BaseGrantTestCase):
 
   def setUp(self):
     super(YearEndReportReminders, self).setUp()
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_two_months_prior(self):
     """ Verify reminder is not sent 2 months before report is due """
@@ -449,7 +449,7 @@ class RolloverYER(BaseGrantTestCase):
 
   def setUp(self):
     super(RolloverYER, self).setUp()
-    self.log_in_test_org()
+    self.login_as_org('test')
 
   def create_yer(self, award_id):
     yer = models.YearEndReport(award_id=award_id, total_size=10,
@@ -465,7 +465,7 @@ class RolloverYER(BaseGrantTestCase):
   def test_display_no_awards(self):
     """ Verify correct error msg, no form, if org has no grants """
 
-    self.log_in_new_org()
+    self.login_as_org('new')
     response = self.client.get(self.url, follow=True)
     self.assertEqual(response.context['error_msg'],
         'You don\'t have any submitted reports to copy.')
@@ -546,3 +546,37 @@ class RolloverYER(BaseGrantTestCase):
 
     self.assertTemplateUsed(response, 'grants/yer_form.html')
     self.assertEqual(1, models.YERDraft.objects.filter(award=award2).count())
+
+
+class ViewYER(BaseGrantTestCase):
+
+  def setUp(self):
+    super(ViewYER, self).setUp()
+    today = timezone.now()
+    award = models.GivingProjectGrant(
+        projectapp_id=1,
+        amount=5000,
+        agreement_mailed=today - timedelta(days=345),
+        agreement_returned=today - timedelta(days=350),
+        first_yer_due=today + timedelta(days=9))
+    award.save()
+    self.award_id = award.pk
+    yer = models.YearEndReport(award_id=award.pk, total_size=10,
+        donations_count=50, contact_person='Name, Position')
+    yer.save()
+    self.yer_id = yer.pk
+
+  def test_not_logged_in(self):
+    url = reverse('sjfnw.grants.views.view_yer', kwargs={'report_id': self.yer_id})
+    res = self.client.get(url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'grants/blocked.html')
+
+  def test_org_author(self):
+    self.login_as_org('test')
+    url = reverse('sjfnw.grants.views.view_yer', kwargs={'report_id': self.yer_id})
+    res = self.client.get(url)
+
+    self.assertEqual(res.status_code, 200)
+    self.assertTemplateUsed(res, 'grants/yer_display.html')

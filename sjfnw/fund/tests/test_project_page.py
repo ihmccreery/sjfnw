@@ -8,7 +8,7 @@ class GivingProjectPage(BaseFundTestCase):
 
   def setUp(self):
     super(GivingProjectPage, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
   def test_basic_load(self):
 

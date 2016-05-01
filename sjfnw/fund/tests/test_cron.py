@@ -18,7 +18,7 @@ class GiftNotifications(BaseFundTestCase):
 
   def setUp(self):
     super(GiftNotifications, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
 
   def test_no_gift_notification(self):
     response = self.client.get(self.url, follow=True)
@@ -103,7 +103,7 @@ class PendingApproval(BaseFundTestCase):
 
   def setUp(self):
     super(PendingApproval, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
     pre_ship = models.Membership.objects.get(pk=self.pre_id)
     pre_ship.leader = True
     pre_ship.save()
@@ -215,7 +215,7 @@ class OverdueEmails(BaseFundTestCase):
 
   def setUp(self):
     super(OverdueEmails, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
 
     # create 2 donors on new member's pre membership
     donor = models.Donor(firstname='En', membership_id=self.pre_id)

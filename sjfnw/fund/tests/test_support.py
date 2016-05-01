@@ -18,7 +18,7 @@ class Support(BaseFundTestCase):
     self.assertFalse(res.context['member'])
 
   def test_logged_in(self):
-    self.log_in_testy()
+    self.login_as_member('current')
 
     res = self.client.get(self.url)
 
@@ -27,7 +27,7 @@ class Support(BaseFundTestCase):
     self.assertIsInstance(res.context['member'], Member)
 
   def test_logged_in_no_ship(self):
-    self.log_in_admin()
+    self.login_as_admin()
     member = Member(email='admin@gmail.com')
     member.save()
 

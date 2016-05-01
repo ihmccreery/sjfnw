@@ -112,7 +112,7 @@ class ApplySuccessful(BaseGrantFilesTestCase):
 
   def setUp(self):
     super(ApplySuccessful, self).setUp()
-    self.log_in_test_org()
+    self.login_as_org('test')
 
   def test_saved_timeline1(self):
     """ Verify that a timeline with just a complete first row is accepted """
@@ -219,7 +219,7 @@ class ApplyBlocked(BaseGrantTestCase):
 
   def setUp(self):
     super(ApplyBlocked, self).setUp()
-    self.log_in_test_org()
+    self.login_as_org('test')
 
   def test_closed_cycle(self):
     response = self.client.get('/apply/3/')
@@ -250,7 +250,7 @@ class ApplyValidation(BaseGrantFilesTestCase):
 
   def setUp(self):
     super(ApplyValidation, self).setUp()
-    self.log_in_test_org()
+    self.login_as_org('test')
 
   def test_project_requirements(self):
     draft = DraftGrantApplication.objects.get(pk=2)
@@ -307,7 +307,7 @@ class StartApplication(BaseGrantTestCase):
 
   def test_load_first_app(self):
     ids = {'organization_id': 1, 'grant_cycle_id': 1}
-    self.log_in_new_org()
+    self.login_as_org('new')
     self.assertEqual(0, DraftGrantApplication.objects.filter(**ids).count())
 
     response = self.client.get('/apply/1/')
@@ -320,7 +320,7 @@ class StartApplication(BaseGrantTestCase):
 
   def test_load_second_app(self):
     ids = {'organization_id': 2, 'grant_cycle_id': 6}
-    self.log_in_test_org()
+    self.login_as_org('test')
     self.assertEqual(0, DraftGrantApplication.objects.filter(**ids).count())
 
     response = self.client.get('/apply/6/')
@@ -340,7 +340,7 @@ class StartApplication(BaseGrantTestCase):
     cycle.two_year_grants = True
     cycle.save()
 
-    self.log_in_test_org()
+    self.login_as_org('test')
 
     response = self.client.get('/apply/6/')
 

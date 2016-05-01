@@ -15,7 +15,7 @@ class AddStep(BaseFundTestCase):
 
   def setUp(self):
     super(AddStep, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
     donor = Donor(firstname='user', lastname='', membership_id=self.pre_id)
     donor.save()
     self.donor_id = donor.pk
@@ -83,7 +83,7 @@ class EditStep(BaseFundTestCase):
 
   def setUp(self):
     super(EditStep, self).setUp()
-    self.use_new_acct()
+    self.login_as_member('new')
     donor = Donor(firstname='user', lastname='', membership_id=self.pre_id)
     donor.save()
     self.donor_id = donor.pk
@@ -148,7 +148,7 @@ class StepComplete(BaseFundTestCase):
 
   def setUp(self):
     super(StepComplete, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
     self.url = reverse('sjfnw.fund.views.complete_step', kwargs={
       'donor_id': self.donor_id, 'step_id': self.step_id
     })
@@ -493,7 +493,7 @@ class AddMultStep(BaseFundTestCase):
 
   def setUp(self):
     super(AddMultStep, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
 
   def test_get_none(self):
     donor = Donor.objects.get(membership_id=self.ship_id)

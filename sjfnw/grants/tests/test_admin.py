@@ -16,7 +16,7 @@ class AdminInlines(BaseGrantTestCase):
   fixtures = LIVE_FIXTURES
 
   def setUp(self): # don't super, can't set cycle dates with this fixture
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_organization(self):
     """ Verify that related inlines show existing objs """
@@ -52,7 +52,7 @@ class AdminRevert(BaseGrantTestCase):
 
   def setUp(self):
     super(AdminRevert, self).setUp()
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_load_revert(self):
 
@@ -86,7 +86,7 @@ class AdminRollover(BaseGrantTestCase):
 
   def setUp(self):
     super(AdminRollover, self).setUp()
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_unknown_app(self):
     res = self.client.post(reverse('sjfnw.grants.views.admin_rollover',
@@ -147,7 +147,7 @@ class MergeOrgs(BaseGrantTestCase):
   admin_url = reverse('admin:grants_organization_changelist')
 
   def setUp(self):
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_action_available(self):
 

@@ -21,7 +21,7 @@ class EditContact(BaseFundTestCase):
     return reverse('sjfnw.fund.views.edit_contact', kwargs={'donor_id': donor_id})
 
   def test_get_without_est(self):
-    self.use_new_acct()
+    self.login_as_member('new')
     donor = Donor(membership_id=self.pre_id, firstname='Maebe')
     donor.save()
 
@@ -32,7 +32,7 @@ class EditContact(BaseFundTestCase):
     self.assertIsInstance(res.context['form'], DonorPreForm)
 
   def test_get(self):
-    self.use_test_acct()
+    self.login_as_member('current')
 
     res = self.client.get(self._get_url(self.donor_id))
 
@@ -41,14 +41,14 @@ class EditContact(BaseFundTestCase):
     self.assertIsInstance(res.context['form'], DonorEditForm)
 
   def test_donor_not_found(self):
-    self.use_test_acct()
+    self.login_as_member('current')
 
     res = self.client.post(self._get_url(8888), self.form_data)
 
     self.assertEqual(res.status_code, 404)
 
   def test_no_amount(self):
-    self.use_test_acct()
+    self.login_as_member('current')
 
     res = self.client.post(self._get_url(self.donor_id), self.form_data)
 
@@ -56,7 +56,7 @@ class EditContact(BaseFundTestCase):
     self.assertFormError(res, 'form', 'amount', 'This field is required.')
 
   def test_negative_amount(self):
-    self.use_test_acct()
+    self.login_as_member('current')
     self.form_data['amount'] = '-10'
 
     res = self.client.post(self._get_url(self.donor_id), self.form_data)
@@ -65,7 +65,7 @@ class EditContact(BaseFundTestCase):
     self.assertFormError(res, 'form', 'amount', 'Must be greater than or equal to 0.')
 
   def test_valid_pre(self):
-    self.use_new_acct()
+    self.login_as_member('new')
     donor = Donor(membership_id=self.pre_id, firstname='Maebe')
     donor.save()
 
@@ -74,7 +74,7 @@ class EditContact(BaseFundTestCase):
     self.assertEqual(res.content, 'success')
 
   def test_valid(self):
-    self.use_test_acct()
+    self.login_as_member('current')
     self.form_data['amount'] = '10'
 
     res = self.client.post(self._get_url(self.donor_id), self.form_data)
@@ -89,7 +89,7 @@ class DeleteContact(BaseFundTestCase):
 
   def setUp(self):
     super(DeleteContact, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
     # set copied contacts to avoid redirect after delete
     membership = Membership.objects.get(pk=self.ship_id)
     membership.copied_contacts = True
@@ -128,7 +128,7 @@ class DeleteContact(BaseFundTestCase):
     """ Verify failure when requesting to delete another membership's contact """
 
     # switch to newbie account and verify that test donor is not associated with it
-    self.use_new_acct()
+    self.login_as_member('new')
     current_membership = Membership.objects.get(pk=self.ship_id)
 
     donor_id = 1

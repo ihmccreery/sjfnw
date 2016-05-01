@@ -16,7 +16,7 @@ logger = logging.getLogger('sjfnw')
 class ReportingHomePage(BaseGrantTestCase):
 
   def setUp(self):
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_load_page(self):
     response = self.client.get(reverse('sjfnw.grants.views.grants_report'))
@@ -98,7 +98,7 @@ class AppReports(BaseGrantTestCase):
   template_error = 'grants/reporting.html'
 
   def setUp(self): # don't super, can't set cycle dates with this fixture
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_app_fields(self):
     """ Fetch all fields with no filters for browsing without error """
@@ -153,7 +153,7 @@ class OrgReports(BaseGrantTestCase):
   template_error = 'grants/reporting.html'
 
   def setUp(self): # don't super, can't set cycle dates with this fixture
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_org_fields(self):
     """ Verify that org fields can be fetched
@@ -237,7 +237,7 @@ class GPGReports(BaseGrantTestCase):
   template_error = 'grants/reporting.html'
 
   def setUp(self): # don't super, can't set cycle dates with this fixture
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_gp_grant_fields(self):
     """ Verify that gp grant fields can be fetched
@@ -321,7 +321,7 @@ class SponsoredAwardReports(BaseGrantTestCase):
   template_error = 'grants/reporting.html'
 
   def setUp(self): # don't super, can't set cycle dates with this fixture
-    self.log_in_admin()
+    self.login_as_admin()
 
   def test_sponsored_fields(self):
     """ Verify that sponsored grant fields can be fetched

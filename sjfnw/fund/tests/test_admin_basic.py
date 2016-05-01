@@ -8,7 +8,7 @@ class AdminHome(BaseFundTestCase):
 
   def setUp(self):
     super(AdminHome, self).setUp()
-    self.use_admin_acct()
+    self.login_as_admin()
 
   def test_home(self):
     response = self.client.get('/admin', follow=True)
@@ -36,7 +36,7 @@ class AdminGivingProjects(BaseFundTestCase):
 
   def setUp(self):
     super(AdminGivingProjects, self).setUp()
-    self.use_admin_acct()
+    self.login_as_admin()
 
   def test_giving_projects(self):
     response = self.client.get('/admin/fund/givingproject/', follow=True)
@@ -56,7 +56,7 @@ class AdminMembershipRelated(BaseFundTestCase):
 
   def setUp(self):
     super(AdminMembershipRelated, self).setUp()
-    self.use_admin_acct()
+    self.login_as_admin()
 
   def test_memberships(self):
     response = self.client.get('/admin/fund/membership/', follow=True)
@@ -81,7 +81,7 @@ class AdminResources(BaseFundTestCase):
 
   def setUp(self):
     super(AdminResources, self).setUp()
-    self.use_admin_acct()
+    self.login_as_admin()
 
   def test_resource(self):
     response = self.client.get('/admin/fund/resource/', follow=True)
@@ -95,7 +95,7 @@ class AdminMisc(BaseFundTestCase):
 
   def setUp(self):
     super(AdminMisc, self).setUp()
-    self.use_admin_acct()
+    self.login_as_admin()
 
   def test_news_items(self):
     response = self.client.get('/admin/fund/newsitem/', follow=True)

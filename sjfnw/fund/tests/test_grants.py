@@ -11,7 +11,7 @@ logger = logging.getLogger('sjfnw')
 class Grants(BaseFundTestCase):
   """ Grants listing page """
 
-  fixtures = ['sjfnw/fund/fixtures/testy.json',
+  fixtures = ['sjfnw/fund/fixtures/test_fund.json',
               'sjfnw/fund/fixtures/live_gp_dump.json',
               'sjfnw/grants/fixtures/orgs.json',
               'sjfnw/grants/fixtures/grant_cycles.json',
@@ -22,7 +22,7 @@ class Grants(BaseFundTestCase):
 
   def setUp(self):
     super(Grants, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
 
   def test_grants_display(self):
     """ Verify that assigned grants are shown on grants page """

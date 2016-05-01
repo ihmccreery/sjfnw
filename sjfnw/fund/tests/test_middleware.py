@@ -29,7 +29,7 @@ class Middleware(BaseFundTestCase):
     self.assertEqual(self.request.membership_status, -1)
 
   def test_not_member(self):
-    self.log_in_admin()
+    self.login_as_admin()
     self.request.user = User.objects.get(email='admin@gmail.com')
 
     res = middleware.process_view(self.request, MockView(), [], {})
@@ -39,7 +39,7 @@ class Middleware(BaseFundTestCase):
     self.assertEqual(self.request.membership_status, c.NO_MEMBER)
 
   def test_no_memberships(self):
-    self.log_in_admin()
+    self.login_as_admin()
     self.request.user = User.objects.get(email='admin@gmail.com')
     member = models.Member(email='admin@gmail.com')
     member.save()
@@ -52,7 +52,7 @@ class Middleware(BaseFundTestCase):
     self.assertEqual(self.request.membership_status, c.NO_MEMBERSHIP)
 
   def test_no_approved(self):
-    self.log_in_admin()
+    self.login_as_admin()
     self.request.user = User.objects.get(email='admin@gmail.com')
     member = models.Member(email='admin@gmail.com')
     member.save()
@@ -69,7 +69,7 @@ class Middleware(BaseFundTestCase):
     self.assertEqual(self.request.membership_status, c.NO_APPROVED)
 
   def test_approved_not_current(self):
-    self.log_in_admin()
+    self.login_as_admin()
     self.request.user = User.objects.get(email='admin@gmail.com')
     member = models.Member(email='admin@gmail.com')
     member.save()

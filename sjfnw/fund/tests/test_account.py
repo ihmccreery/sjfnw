@@ -13,7 +13,7 @@ class SetCurrent(BaseFundTestCase):
 
   def setUp(self):
     super(SetCurrent, self).setUp()
-    self.use_test_acct()
+    self.login_as_member('current')
 
   def test_not_logged_in(self):
     self.client.logout()
@@ -64,7 +64,7 @@ class ManageAccount(BaseFundTestCase):
         self.BASE_URL + reverse('sjfnw.fund.views.fund_login') + '/?next=' + self.url)
 
   def test_load_not_member(self):
-    self.use_admin_acct()
+    self.login_as_admin()
 
     res = self.client.get(self.url)
 
@@ -72,7 +72,7 @@ class ManageAccount(BaseFundTestCase):
     self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.not_member'))
 
   def test_load(self):
-    self.use_test_acct()
+    self.login_as_member('current')
 
     now = timezone.now()
     # create GPs that should be hidden
@@ -99,7 +99,7 @@ class ManageAccount(BaseFundTestCase):
     self.assertNotIn(past_gp.pk, gp_ids)
 
   def test_unknown_gp(self):
-    self.use_test_acct()
+    self.login_as_member('current')
     gp_id = 988
     self.assert_count(GivingProject.objects.filter(pk=gp_id), 0)
     membership_count = Membership.objects.filter(member_id=self.member_id).count()
@@ -113,7 +113,7 @@ class ManageAccount(BaseFundTestCase):
     self.assertEqual(Membership.objects.filter(member_id=self.member_id).count(), membership_count)
 
   def test_already_registered(self):
-    self.use_test_acct()
+    self.login_as_member('current')
     gp_id = GivingProject.objects.get(title='Post training').pk
     self.assert_count(
       Membership.objects.filter(member_id=self.member_id, giving_project_id=gp_id), 1)
@@ -128,7 +128,7 @@ class ManageAccount(BaseFundTestCase):
       Membership.objects.filter(member_id=self.member_id, giving_project_id=gp_id), 1)
 
   def test_post_valid(self):
-    self.use_test_acct()
+    self.login_as_member('current')
     gp_id = GivingProject.objects.get(title='Pre training').pk
     self.assert_count(
       Membership.objects.filter(member_id=self.member_id, giving_project_id=gp_id), 0)
@@ -141,7 +141,7 @@ class ManageAccount(BaseFundTestCase):
     self.assertEqual(new_membership.approved, False)
 
   def test_post_valid_pre_approved(self):
-    self.use_test_acct()
+    self.login_as_member('current')
     gp = GivingProject.objects.get(title='Pre training')
     gp.pre_approved += 'testacct@gmail.com'
     gp.save()
@@ -165,7 +165,7 @@ class NotApproved(BaseFundTestCase):
     super(NotApproved, self).setUp()
 
   def test_not_member(self):
-    self.log_in_admin()
+    self.login_as_admin()
 
     res = self.client.get(self.url)
 
@@ -173,7 +173,7 @@ class NotApproved(BaseFundTestCase):
     self.assertEqual(res.url, self.BASE_URL + reverse('sjfnw.fund.views.not_member'))
 
   def test_member(self):
-    self.use_new_acct()
+    self.login_as_member('new')
 
     res = self.client.get(self.url)
 
