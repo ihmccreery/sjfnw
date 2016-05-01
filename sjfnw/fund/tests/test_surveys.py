@@ -14,9 +14,6 @@ class GPSurveys(BaseFundTestCase):
   url = reverse('sjfnw.fund.views.home')
   template = 'fund/forms/gp_survey.html'
 
-  def setUp(self):
-    super(GPSurveys, self).setUp()
-
   def _create_survey(self):
     """ Utility method for other tests. Create survey and connect it to GP 1 """
     survey = models.Survey(

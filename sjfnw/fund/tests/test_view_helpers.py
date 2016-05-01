@@ -11,9 +11,6 @@ TEST_EMAIL = 'testemail124@gmail.com'
 
 class CreateUser(BaseFundTestCase):
 
-  def setUp(self):
-    super(CreateUser, self).setUp()
-
   def test_member_exists(self):
     existing_member = models.Member(email=TEST_EMAIL, first_name='A', last_name='P')
     existing_member.save()
@@ -52,9 +49,6 @@ class CreateUser(BaseFundTestCase):
     self.assertIsInstance(member, models.Member)
 
 class CreateMembership(BaseFundTestCase):
-
-  def setUp(self):
-    super(CreateMembership, self).setUp()
 
   def test_already_exists(self):
     gp = models.GivingProject.objects.get(title='Pre training')

@@ -7,9 +7,6 @@ class Support(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.support')
 
-  def setUp(self):
-    super(Support, self).setUp()
-
   def test_logged_out(self):
     res = self.client.get(self.url)
 

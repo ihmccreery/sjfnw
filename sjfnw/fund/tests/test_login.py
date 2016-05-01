@@ -9,7 +9,6 @@ class Login(BaseFundTestCase):
 
   def setUp(self):
     super(Login, self).setUp()
-
     self.form_data = {
       'email': u'',
       'password': u''

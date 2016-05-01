@@ -11,9 +11,6 @@ logger = logging.getLogger('sjfnw')
 class NewGivingProjectGrant(BaseGrantTestCase):
   """ Test GivingProjectGrant model methods """
 
-  def setUp(self):
-    super(NewGivingProjectGrant, self).setUp()
-
   def test_minimum_grant_information(self):
     award = models.GivingProjectGrant(projectapp_id=1, amount=5000,
             first_yer_due=timezone.now().date())

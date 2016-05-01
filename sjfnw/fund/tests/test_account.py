@@ -53,9 +53,6 @@ class ManageAccount(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.manage_account')
 
-  def setUp(self):
-    super(ManageAccount, self).setUp()
-
   def test_load_not_logged_in(self):
     res = self.client.get(self.url)
 
@@ -161,9 +158,6 @@ class NotApproved(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.not_approved')
 
-  def setUp(self):
-    super(NotApproved, self).setUp()
-
   def test_not_member(self):
     self.login_as_admin()
 
@@ -184,9 +178,6 @@ class NotApproved(BaseFundTestCase):
 class Blocked(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.blocked')
-
-  def setUp(self):
-    super(Blocked, self).setUp()
 
   def test_get(self):
     res = self.client.get(self.url)

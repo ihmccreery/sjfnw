@@ -62,9 +62,6 @@ class CycleInfo(BaseGrantTestCase):
   url = reverse('sjfnw.grants.views.cycle_info', kwargs={'cycle_id': 1})
   info_url = 'http://www.socialjusticefund.org/grant-app/criminal-justice-grant-cycle-2014'
 
-  def setUp(self):
-    super(CycleInfo, self).setUp()
-
   def test_no_url(self):
     cycle = GrantCycle.objects.get(pk=1)
     self.assertTrue(cycle.is_open())
@@ -351,9 +348,6 @@ class StartApplication(BaseGrantTestCase):
     self.assertTrue(form.fields['two_year_question'].required)
 
 class AddFile(BaseGrantFilesTestCase):
-
-  def setUp(self):
-    super(AddFile, self).setUp()
 
   def test_draft_not_found(self):
     url = reverse('sjfnw.grants.views.add_file',
