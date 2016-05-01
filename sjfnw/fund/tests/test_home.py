@@ -144,9 +144,6 @@ class HomeSurveys(BaseFundTestCase):
 class CompileMembershipProgress(BaseFundTestCase):
   """ Test _compile_membership_progress method used by home view """
 
-  def setUp(self):
-    super(CompileMembershipProgress, self).setUp()
-
   def test_empty(self):
     progress, incomplete_steps = _compile_membership_progress([])
 

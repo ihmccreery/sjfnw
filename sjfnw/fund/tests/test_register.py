@@ -11,18 +11,13 @@ class Register(BaseFundTestCase):
 
   url = reverse('sjfnw.fund.views.fund_register')
 
-  def setUp(self):
-    super(Register, self).setUp()
-
   def test_load(self):
-
     response = self.client.get(self.url, follow=True)
 
     self.assertTemplateUsed(response, 'fund/register.html')
     self.assertEqual(response.context['error_msg'], '', msg='Error message is blank on load')
 
   def test_post_blank(self):
-
     response = self.client.post(self.url, {
       'first_name': u'',
       'last_name': u'',
@@ -41,7 +36,6 @@ class Register(BaseFundTestCase):
     self.assertIn('passwordtwo', errors, msg='Error for passwordtwo')
 
   def test_post_valid_no_gp(self):
-
     response = self.client.post(self.url, {
       'first_name': u'New',
       'last_name': u'User',
@@ -55,7 +49,6 @@ class Register(BaseFundTestCase):
     self.assertEqual(len(response.context['ships']), 0)
 
   def test_post_valid_gp(self):
-
     gp = models.GivingProject.objects.get(title='Pre training')
 
     response = self.client.post(self.url, {
@@ -71,7 +64,6 @@ class Register(BaseFundTestCase):
     self.assertEqual(response.context['proj'], gp)
 
   def test_post_valid_gp_preapproved(self):
-
     gp = models.GivingProject.objects.get(title='Pre training')
     gp.pre_approved += 'newemail@gmail.com'
     gp.save()

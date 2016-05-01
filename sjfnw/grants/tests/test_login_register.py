@@ -13,9 +13,6 @@ class Login(BaseGrantTestCase):
 
   url = reverse('sjfnw.grants.views.org_login')
 
-  def setUp(self):
-    super(Login, self).setUp()
-
   def test_get(self):
     response = self.client.get(self.url, follow=True)
     self.assertEqual(response.status_code, 200)
@@ -64,9 +61,6 @@ class Register(BaseGrantTestCase):
   url = reverse('sjfnw.grants.views.org_register')
   template_success = 'grants/org_home.html'
   template_error = 'grants/org_login_register.html'
-
-  def setUp(self):
-    super(Register, self).setUp()
 
   def test_valid_registration(self):
     """ All fields provided, neither email nor name match an org in db """

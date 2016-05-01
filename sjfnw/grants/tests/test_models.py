@@ -4,9 +4,6 @@ from sjfnw.grants.models import Organization
 
 class OrganizationGetStaffEntered(TestCase):
 
-  def setUp(self):
-    super(OrganizationGetStaffEntered, self).setUp()
-
   def test_none(self):
     org = Organization()
     self.assertEqual(org.get_staff_entered_contact_info(), '')

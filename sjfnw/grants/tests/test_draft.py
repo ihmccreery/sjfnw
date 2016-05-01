@@ -176,9 +176,6 @@ class DiscardDraft(BaseGrantTestCase):
 
 class DraftRemoveFile(BaseGrantTestCase):
 
-  def setUp(self):
-    super(DraftRemoveFile, self).setUp()
-
   def test_unknown_draft_type(self):
 
     url = reverse('sjfnw.grants.views.remove_file', kwargs={
