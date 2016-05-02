@@ -396,7 +396,6 @@ def grant_application(request, organization, cycle_id):
 
   return render(request, 'grants/org_app.html', {
       'form': form, 'cycle': cycle, 'file_urls': file_urls,
-      'limits': gc.NARRATIVE_CHAR_LIMITS,
       'draft': draft, 'profiled': profiled, 'org': organization,
       'user_override': user_override, 'flag': draft.recently_edited() and draft.modified_by
   })

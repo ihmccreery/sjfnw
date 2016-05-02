@@ -68,21 +68,24 @@ formUtils.logTime = function () {
 
 
 /**
- * Update word limit indicator for text field. TODO rename
+ * Update word limit indicator for text field.
  *
- * @param {HTMLElement} area - textarea element
- * @param {number} limit - word limit for that field
+ * @param {jQuery.Event} event - jQuery keyup event
  */
-function charLimitDisplay(area, limit) {
-  var counter = document.getElementById(area.name + '_counter');
+function updateWordCount(event) {
+  var area = event.target;
+  var limit = area.dataset.limit;
+  var display = document.getElementById(area.name + '_wordcount');
+
   var words = area.value.match(/[^ \r\n]+/g) || [];
   var diff = limit - words.length;
+
   if (diff >= 0) {
-    counter.innerHTML = diff + ' words remaining';
-    counter.className = 'char_counter_ok';
+    display.innerHTML = diff + ' words remaining';
+    display.className = 'wordcount';
   } else {
-    counter.innerHTML = -diff + ' words over the limit';
-    counter.className = 'char_counter_over';
+    display.innerHTML = -diff + ' words over the limit';
+    display.className = 'wordcount_over';
   }
 }
 
