@@ -229,12 +229,12 @@ table.narrative_references .label {
   padding-left: 2px;
 }
 
-span.char_counter_ok, span.char_counter_over {
+.wordcount, .wordcount_over {
   float: right;
   padding-right: 2%; /* to match text boxes */
 }
 
-span.char_counter_over {
+.wordcount_over {
   color: red;
 }
 

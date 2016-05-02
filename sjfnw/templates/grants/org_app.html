@@ -15,7 +15,6 @@ function setUserID() {
     result += chars[Math.round(Math.random() * (chars.length - 1))];
   }
   user_id = result;
-  console.log(user_id);
   return user_id;
 }
 
@@ -93,10 +92,10 @@ function setInfoClicks(){
 
 $(document).ready(function() {
   formUtils.init('apply', {{ draft.pk }}, {{ cycle.pk }}, setUserID(), '{{ user_override|default:"" }}');
-  var counted_fields = $('[onKeyUp]'); // TODO hacky
-  for(var i = 0; i < counted_fields.length; i++) {
-    $(counted_fields[i]).keyup();
-  }
+
+  var word_limited = $('textarea.wordlimited');
+  word_limited.on('keyup', updateWordCount)
+  word_limited.keyup();
 
   //check whether it was edited recently -- show override confirmation
   if ('{{ flag }}' == 'True'){
@@ -199,7 +198,9 @@ $(document).ready(function() {
         <td>{{ form.ein.label_tag }}{{ form.ein }}</td>
         <td>{{ form.founded.label_tag }}{{ form.founded }}</td>
       </tr><tr>
-        <td colspan="2"><div class="vertical_cushion">{{ form.contact_person.help_text }}</div></td>
+        <td colspan="2">
+          <div class="vertical_cushion">{{ form.contact_person.help_text }}</div>
+        </td>
       </tr><tr>
         <td>{{ form.contact_person.errors }}</td>
         <td>{{ form.contact_person_title.errors }}</td>
@@ -207,8 +208,13 @@ $(document).ready(function() {
         <td>{{ form.contact_person.label_tag }}{{ form.contact_person }}</td>
         <td>{{ form.contact_person_title.label_tag }}{{ form.contact_person_title }}</td>
       </tr><tr>
-        <td colspan="2"><div class="vertical_cushion">{{ form.mission.label_tag }}{{ form.mission.errors }}<span class="char_counter" id="mission_counter">150</span></div>
-        {{ form.mission }}</td>
+        <td colspan="2">
+          <div class="vertical_cushion">
+            {{ form.mission.label_tag }}{{ form.mission.errors }}
+            <span class="wordcount" id="mission_wordcount"></span>
+          </div>
+          {{ form.mission }}
+        </td>
       </tr><tr>
         <td colspan="2">{{ form.previous_grants.errors }}</td>
       </tr><tr>
@@ -231,7 +237,8 @@ $(document).ready(function() {
       <tr>
         <td colspan="2">{{ form.grant_period.label_tag }}{{ form.grant_period }}{{ form.grant_period.errors }}</td>
       </tr><tr>
-        <td>{{ form.amount_requested.errors }}</td><td>{{ form.support_type.errors }}</td>
+        <td>{{ form.amount_requested.errors }}</td>
+        <td>{{ form.support_type.errors }}</td>
       </tr><tr>
         <td>{{ form.amount_requested.label_tag }}${{ form.amount_requested }}</td>
         <td>{{ form.support_type.label_tag }}{{ form.support_type }}</td>
@@ -242,8 +249,13 @@ $(document).ready(function() {
         <td>{{ form.project_title.label_tag }}{{ form.project_title }}</td>
         <td>{{ form.project_budget.label_tag }} ${{ form.project_budget }}</td>
       </tr><tr>
-        <td colspan="2"><div class="vertical_cushion">{{ form.grant_request.label_tag }}{{ form.grant_request.errors }}<span class="char_counter" id="grant_request_counter">100</span></div>
-        {{ form.grant_request }}</td>
+        <td colspan="2">
+          <div class="vertical_cushion">
+            {{ form.grant_request.label_tag }}{{ form.grant_request.errors }}
+            <span class="wordcount" id="grant_request_wordcount"></span>
+          </div>
+          {{ form.grant_request }}
+        </td>
       </tr>
 
       <tr>
@@ -255,7 +267,8 @@ $(document).ready(function() {
         <td>{{ form.fiscal_org.label_tag }}{{ form.fiscal_org }}</td>
         <td>{{ form.fiscal_person.label_tag }}{{ form.fiscal_person }}</td>
       </tr><tr>
-        <td>{{ form.fiscal_telephone.errors }}</td><td>{{ form.fiscal_email.errors }}</td>
+        <td>{{ form.fiscal_telephone.errors }}</td>
+        <td>{{ form.fiscal_email.errors }}</td>
       </tr><tr>
         <td>{{ form.fiscal_telephone.label_tag }}{{ form.fiscal_telephone }}</td>
         <td>{{ form.fiscal_email.label_tag }}{{ form.fiscal_email }}</td>
@@ -287,25 +300,26 @@ $(document).ready(function() {
       <li class="narrative_q">
         {{ form.narrative1.label }}<br><br>
         {{ form.narrative1.errors }}{{ form.narrative1 }}
-        <span class="char_counter" id="narrative1_counter">{{ limits.1 }}</span>
+        <span class="wordcount" id="narrative1_wordcount"></span>
       </li>
 
       <li class="narrative_q">
         {{ form.narrative2.label }}
         <div class="more-info" id="nar-2-info" style="display:none;">{{ form.narrative2.help_text }}</div>
         {{ form.narrative2.errors }}{{ form.narrative2 }}
-      <span class="char_counter" id="narrative2_counter">{{ limits.2 }}</span></li>
+        <span class="wordcount" id="narrative2_wordcount"></span>
+      </li>
 
       <li class="narrative_q">
         {{ form.narrative3.label }}{{ form.narrative3.errors }}{{ form.narrative3 }}
-        <span class="char_counter" id="narrative3_counter">{{ limits.3 }}</span>
+        <span class="wordcount" id="narrative3_wordcount"></span>
       </li>
 
       <li class="narrative_q">
         {{ form.narrative4.label }}
         <div class="more-info" id="nar-4-info" style="display:none;">{{ form.narrative4.help_text }}</div>
         {{ form.narrative4.errors }}{{ form.narrative4 }}
-        <span class="char_counter" id="narrative4_counter">{{ limits.4 }}</span>
+        <span class="wordcount" id="narrative4_wordcount"></span>
 
         <br><br>
         <p>{{ form.timeline.label }}</p>
@@ -318,7 +332,7 @@ $(document).ready(function() {
           {{ form.two_year_question.label }}
           {{ form.two_year_question.errors }}
           {{ form.two_year_question }}
-          <span class="char_counter" id="two_year_question_counter">{{ limits.8 }}</span>
+          <span class="wordcount" id="two_year_question_wordcount"></span>
         </li>
       {% endif %}
 
@@ -326,7 +340,7 @@ $(document).ready(function() {
         {{ form.narrative5.label }}
         {{ form.narrative5.errors }}
         {{ form.narrative5 }}
-        <span class="char_counter" id="narrative5_counter">{{ limits.5 }}</span>
+        <span class="wordcount" id="narrative5_wordcount"></span>
         <br><br><br>{{ form.collab_ref1_name.help_text }}
         <table class="narrative_references">
           <tr class="main_row">
@@ -361,41 +375,42 @@ $(document).ready(function() {
       <li class="narrative_q">{{ form.narrative6.label }}
       <div class="more-info" id="nar-6-info" style="display:none;">{{ form.narrative6.help_text }}</div>
       {{ form.narrative6.errors }}{{ form.narrative6 }}
-      <span class="char_counter" id="narrative6_counter">{{ limits.6 }}</span>
+      <span class="wordcount" id="narrative6_wordcount"></span>
       <table class="narrative_references">
-      <tr class="main_row">
-      <td>{{ form.racial_justice_ref1_name.label_tag }}</td>
-      <td>{{ form.racial_justice_ref1_org.label_tag }}</td>
-      <td>{{ form.racial_justice_ref1_phone.label_tag }}</td>
-      <td>{{ form.racial_justice_ref1_email.label_tag }}</td>
-      </tr><tr>
-      <td>{{ form.racial_justice_ref1_name.errors }}</td>
-      <td>{{ form.racial_justice_ref1_org.errors }}</td>
-      <td>{{ form.racial_justice_ref1_phone.errors }}</td>
-      <td>{{ form.racial_justice_ref1_email.errors }}</td>
-      </tr><tr>
-      <td>{{ form.racial_justice_ref1_name }}</td>
-      <td>{{ form.racial_justice_ref1_org }}</td>
-      <td>{{ form.racial_justice_ref1_phone }}</td>
-      <td>{{ form.racial_justice_ref1_email }}</td>
-      </tr><tr>
-      <td>{{ form.racial_justice_ref2_name.errors }}</td>
-      <td>{{ form.racial_justice_ref2_org.errors }}</td>
-      <td>{{ form.racial_justice_ref2_phone.errors }}</td>
-      <td>{{ form.racial_justice_ref2_email.errors }}</td>
-      </tr><tr>
-      <td>{{ form.racial_justice_ref2_name }}</td>
-      <td>{{ form.racial_justice_ref2_org }}</td>
-      <td>{{ form.racial_justice_ref2_phone }}</td>
-      <td>{{ form.racial_justice_ref2_email }}</td>
-      </tr></table>
+        <tr class="main_row">
+        <td>{{ form.racial_justice_ref1_name.label_tag }}</td>
+        <td>{{ form.racial_justice_ref1_org.label_tag }}</td>
+        <td>{{ form.racial_justice_ref1_phone.label_tag }}</td>
+        <td>{{ form.racial_justice_ref1_email.label_tag }}</td>
+        </tr><tr>
+        <td>{{ form.racial_justice_ref1_name.errors }}</td>
+        <td>{{ form.racial_justice_ref1_org.errors }}</td>
+        <td>{{ form.racial_justice_ref1_phone.errors }}</td>
+        <td>{{ form.racial_justice_ref1_email.errors }}</td>
+        </tr><tr>
+        <td>{{ form.racial_justice_ref1_name }}</td>
+        <td>{{ form.racial_justice_ref1_org }}</td>
+        <td>{{ form.racial_justice_ref1_phone }}</td>
+        <td>{{ form.racial_justice_ref1_email }}</td>
+        </tr><tr>
+        <td>{{ form.racial_justice_ref2_name.errors }}</td>
+        <td>{{ form.racial_justice_ref2_org.errors }}</td>
+        <td>{{ form.racial_justice_ref2_phone.errors }}</td>
+        <td>{{ form.racial_justice_ref2_email.errors }}</td>
+        </tr><tr>
+        <td>{{ form.racial_justice_ref2_name }}</td>
+        <td>{{ form.racial_justice_ref2_org }}</td>
+        <td>{{ form.racial_justice_ref2_phone }}</td>
+        <td>{{ form.racial_justice_ref2_email }}</td>
+        </tr>
+      </table>
       </li>
 
       {% if cycle.extra_question %}
         <li class="narrative_q">
           {{ cycle.extra_question }}<br>
           {{ form.cycle_question.errors }}{{ form.cycle_question }}
-          <span class="char_counter" id="cycle_question_counter">{{ limits.7 }}</span>
+          <span class="wordcount" id="cycle_question_wordcount"></span>
         </li>
       {% endif %}
 
@@ -550,8 +565,6 @@ $(document).ready(function() {
     </tr>
   </table>
   {% endautoescape %}
-  <div align="center">
-  </div>
 
   <div align="center">
     <img class="ajax-loading" src="/static/images/ajaxloader.gif" style="display:none;">
@@ -564,4 +577,3 @@ $(document).ready(function() {
   </div>
 </div>
 {% endblock content %}
-

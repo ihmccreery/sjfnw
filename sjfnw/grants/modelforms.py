@@ -106,7 +106,8 @@ class GrantApplicationModelForm(forms.ModelForm):
 
   two_year_question = forms.CharField(required=False,
       widget=forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[8]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[8]
       }))
 
   formfield_callback = custom_fields
@@ -116,31 +117,42 @@ class GrantApplicationModelForm(forms.ModelForm):
     exclude = ['pre_screening_status', 'submission_time', 'giving_projects']
     widgets = {
       'mission': forms.Textarea(attrs={
-        'rows': 3, 'onKeyUp': 'charLimitDisplay(this, 150)'
+        'rows': 3,
+        'class': 'wordlimited',
+        'data-limit': 150
       }),
       'grant_request': forms.Textarea(attrs={
-        'rows': 3, 'onKeyUp': 'charLimitDisplay(this, 100)'
+        'rows': 3,
+        'class': 'wordlimited',
+        'data-limit': 100
       }),
       'narrative1': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[1]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[1]
       }),
       'narrative2': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[2]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[2]
       }),
       'narrative3': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[3]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[3]
       }),
       'narrative4': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[4]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[4]
       }),
       'narrative5': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[5]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[5]
       }),
       'narrative6': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[6]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[6]
       }),
       'cycle_question': forms.Textarea(attrs={
-        'onKeyUp': 'charLimitDisplay(this, %d)' % gc.NARRATIVE_CHAR_LIMITS[7]
+        'class': 'wordlimited',
+        'data-limit': gc.NARRATIVE_CHAR_LIMITS[7]
       }),
       'timeline': TimelineWidget()
     }
