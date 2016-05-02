@@ -457,6 +457,7 @@ class SurveyResponseA(BaseModelAdmin):
 # -----------------------------------------------------------------------------
 
 admin.site.register(GivingProject, GivingProjectA)
+admin.site.register(Member, MemberAdvanced)
 admin.site.register(Membership, MembershipA)
 admin.site.register(NewsItem, NewsA)
 admin.site.register(Donor, DonorA)
