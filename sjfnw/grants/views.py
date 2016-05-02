@@ -355,7 +355,9 @@ def grant_application(request, organization, cycle_id):
       draft.save()
       logger.debug('Created new draft')
       if cycle.info_page: # redirect to instructions first
-        return render(request, 'grants/cycle_info.html', {'cycle': cycle})
+        return redirect(
+          reverse('sjfnw.grants.views.cycle_info', kwargs={'cycle_id': cycle.pk})
+        )
 
     else: # load the draft
       org_dict = json.loads(draft.contents)
