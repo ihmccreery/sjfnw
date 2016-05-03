@@ -106,7 +106,7 @@ class DonorLikelyToJoinFilter(SimpleListFilter):
       return queryset.filter(likely_to_join__gt=1)
     elif val == 'none':
       return queryset.filter(likely_to_join__isnull=True)
-    else:
+    elif val:
       return queryset.filter(likely_to_join=val)
 
 # -----------------------------------------------------------------------------
