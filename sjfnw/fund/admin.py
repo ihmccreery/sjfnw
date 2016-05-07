@@ -160,6 +160,7 @@ class DonorInline(admin.TabularInline):
   readonly_fields = ['firstname', 'lastname', 'amount', 'talked', 'asked',
                      'promised', 'total_promised']
   fields = ['firstname', 'lastname', 'amount', 'talked', 'asked', 'promised']
+  show_change_link = True
 
 
 class ProjectAppInline(admin.TabularInline):
@@ -275,17 +276,18 @@ class MemberAdvanced(BaseModelAdmin):
 class MembershipA(BaseModelAdmin):
   actions = ['approve']
   search_fields = ['member__first_name', 'member__last_name']
-  list_display = ['member', 'giving_project', 'ship_progress', 'overdue_steps',
+  list_display = ['member', 'giving_project', 'list_progress', 'overdue_steps',
                   'last_activity', 'approved', 'leader']
   list_filter = ['approved', 'leader', 'giving_project']
-  readonly_list = ['ship_progress', 'overdue_steps']
+  readonly_list = ['list_progress', 'overdue_steps']
   list_select_related = ['member', 'giving_project']
 
   fields = [('member', 'giving_project', 'approved'),
-            ('leader', 'last_activity', 'emailed'),
-            ('ship_progress'),
+            ('leader',),
+            ('last_activity', 'emailed'),
+            ('progress'),
             'notifications']
-  readonly_fields = ['last_activity', 'emailed', 'ship_progress']
+  readonly_fields = ['last_activity', 'emailed', 'progress']
   inlines = [DonorInline]
   ordering = ['-last_activity']
 
@@ -298,16 +300,26 @@ class MembershipA(BaseModelAdmin):
         fund_utils.notify_approval(memship)
     queryset.update(approved=True)
 
-  def ship_progress(self, obj):
-    progress = obj.get_progress()
+  def list_progress(self, obj): # for membership list - mimics columns
+    membership_progress = obj.get_progress()
     return ('<table class="nested-column nested-column-4"><tr><td>${estimated}</td>'
             '<td>${promised}</td><td>${received_total}</td>'
             '<td>{received_this}, {received_next}, {received_afternext}</td>'
-            '</tr></table>').format(**progress)
-  ship_progress.short_description = mark_safe(
+            '</tr></table>').format(**membership_progress)
+  list_progress.short_description = mark_safe(
       '<table class="nested-column-4"><tr><td>Estimated</td><td>Total promised</td>'
       '<td>Received</td><td>Rec. by year</td></tr></table>')
-  ship_progress.allow_tags = True
+  list_progress.allow_tags = True
+
+  def progress(self, obj): # for single membership view
+    membership_progress = obj.get_progress()
+    year = obj.giving_project.fundraising_deadline.year
+    return (
+        'Estimated: ${estimated}<br>Promised: ${promised}<br>'
+        'Received: ${received_total}<br>Received by year: {year}: ${received_this} / '
+        '{next}: ${received_next} / {after_next}: ${received_afternext}'
+      ).format(year=year, next=year + 1, after_next=year + 2, **membership_progress)
+  progress.allow_tags = True
 
 
 class DonorA(BaseModelAdmin):
