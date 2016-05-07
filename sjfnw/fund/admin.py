@@ -118,6 +118,7 @@ class MembershipInline(admin.TabularInline):
   formset = forms.MembershipInlineFormset
   extra = 0
   fields = ['member', 'giving_project', 'approved', 'leader']
+  show_change_link = True
 
   def formfield_for_foreignkey(self, db_field, request, **kwargs):
 
