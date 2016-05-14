@@ -10,7 +10,7 @@ from django.utils.text import capfirst
 from sjfnw.forms import IntegerCommaField, PhoneNumberField
 from sjfnw.grants import constants as gc
 from sjfnw.grants.models import (Organization, GrantApplication, DraftGrantApplication,
-    YearEndReport, GrantApplicationLog)
+    YearEndReport)
 
 logger = logging.getLogger('sjfnw')
 
