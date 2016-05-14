@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+    
+    <link rel="shortcut icon" href="../../img/favicon.ico">
+
+    <title>Test classes - sjfnw</title>
+
+    <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+    <link href="../../css/font-awesome-4.0.3.css" rel="stylesheet">
+    <link href="../../css/base.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../css/highlight.css">
+      <link href="../../_theme/overrides.css" rel="stylesheet">
+
+    
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-28076150-3', 'auto');
+        ga('send', 'pageview');
+      </script>
+    
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-default navbar-fixed-top text-center" role="navigation">
+  <ul class="top-nav-ul">
+
+    <li>
+      
+        <a class="emphasize" href="https://github.com/aisapatino/sjfnw/" target="_blank">
+          <i class="fa fa-github"></i>
+          sjfnw
+        </a>
+      
+    </li>
+
+    <li class="spacer-right"></li>
+
+    
+      
+        <li >
+          <a href="../..">Home</a>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Getting started <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
+<li >
+    <a href="../../getting-started/installation-and-setup/">Installation and setup</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../getting-started/local-server/">Running a local server</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../getting-started/running-tests/">Running tests</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../getting-started/text-editor-setup/">Text editor setup</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../getting-started/linters/">Linters</a>
+</li>
+
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Project info <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
+<li >
+    <a href="../../about/models/">Overview of models</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../about/project-structure/">Project structure</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../about/code-conventions/">Code conventions</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../about/docs/">Documentation</a>
+</li>
+
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Workflow <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
+<li >
+    <a href="../../workflow/git/">Git</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../workflow/issue-tracking/">Issue tracking</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../workflow/continuous-integration/">Continuous Integration</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../workflow/deploying/">Deploying</a>
+</li>
+
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown active">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Testing <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
+<li >
+    <a href="../intro-to-testing/">Intro to testing</a>
+</li>
+
+          
+            
+<li class="active">
+    <a href="./">Test classes</a>
+</li>
+
+          
+            
+<li >
+    <a href="../writing-tests/">Writing tests</a>
+</li>
+
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">How to <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          
+            
+<li >
+    <a href="../../how-to/debugging-performance/">Performance debugging</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../how-to/database/">Database management</a>
+</li>
+
+          
+            
+<li >
+    <a href="../../how-to/support-requests/">Support requests</a>
+</li>
+
+          
+          </ul>
+        </li>
+      
+    
+      
+        <li >
+          <a href="../../resources/">Resources</a>
+        </li>
+      
+    
+
+    <li class="spacer-left"></li>
+
+    <li>
+      <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+        <i class="fa fa-search"></i> Search
+      </a>
+    </li>
+
+  </ul>
+</div>
+
+    <div class="container">
+      
+        <div class="col-md-3">
+          
+            <div class="bs-sidebar well affix" role="complementary">
+  <div class="toc-header">Test classes</div>
+    <ul class="nav">
+    
+        <li class="main active"><a href="#overview">Overview</a></li>
+        
+    
+        <li class="main "><a href="#basetestcase">BaseTestCase</a></li>
+        
+            <li><a href="#selfbase_url">self.BASE_URL</a></li>
+        
+            <li><a href="#account-shortcuts">Account shortcuts</a></li>
+        
+            <li><a href="#custom-asserts">Custom asserts</a></li>
+        
+    
+        <li class="main "><a href="#basefundtestcase">BaseFundTestCase</a></li>
+        
+            <li><a href="#fixtures">Fixtures</a></li>
+        
+            <li><a href="#setup-creates-2-giving-projects">setUp - creates 2 giving projects</a></li>
+        
+            <li><a href="#login_as_member_1">login_as_member</a></li>
+        
+    
+        <li class="main "><a href="#todo-basegranttestcase">TODO - BaseGrantTestCase</a></li>
+        
+    
+    </ul>
+</div>
+          
+        </div>
+        <div class="col-md-9 content" role="main">
+          
+              <h1>Test classes</h1>
+            
+          
+
+<p>Overview of what is provided by the base test classes.</p>
+<p><strong>NOTE</strong>: It is easy for documentation to get out of sync with code. If anything in here doesn't seem to match the results you're getting, take a look at the source:</p>
+<table>
+<thead>
+<tr>
+<th>Location</th>
+<th>Contains</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/tests/base.py"><code>sjfnw/tests/base.py</code></a></td>
+<td><code>BaseTestCase</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/fund/fixtures"><code>sjfnw/fund/fixtures/</code></a></td>
+<td>fixtures for fund models</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/fund/tests/base.py"><code>sjfnw/fund/tests/base.py</code></a></td>
+<td><code>BaseFundTestCase</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/grants/fixtures"><code>sjfnw/grants/fixtures/</code></a></td>
+<td>fixtures for grants models</td>
+</tr>
+<tr>
+<td><a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/grants/tests/base.py"><code>sjfnw/grants/tests/base.py</code></a></td>
+<td><code>BaseGrantTestCase</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="overview">Overview</h2>
+<p>See <a href="../intro-to-testing/"><code>intro-to-testing</code></a> for information about what Python/Django test cases provide. This page does over additional things we have added with our own base test case classes.</p>
+<p>TestCase inheritance (a → b means a inherits b)</p>
+<pre><code>                              unittest.TestCase
+                                      ↑
+                            django.test.TestCase
+                                      ↑
+                        sjfnw.tests.base.BaseTestCase
+                          ↑                      ↑
+sjfnw.fund.tests.base.BaseFundTestCase   sjfnw.grants.tests.base.BaseGrantTestCase
+</code></pre>
+
+<h2 id="basetestcase"><code>BaseTestCase</code></h2>
+<p>This class provides some basic conveniences that are relevant to both fund and grants tests.</p>
+<h3 id="selfbase_url"><code>self.BASE_URL</code></h3>
+<p>If you ever need to match the full url in a test, this constant has the base, so you can do something like:</p>
+<pre><code class="python">self.assertEqual(response.url, self.BASE_URL + reverse('sjfnw.some.view')
+</code></pre>
+
+<h3 id="account-shortcuts">Account shortcuts</h3>
+<h4 id="login_as_admin"><code>login_as_admin</code></h4>
+<p>Logs in as a superuser. No associated <code>Member</code> or <code>Organization</code></p>
+<h4 id="login_as_member"><code>login_as_member</code></h4>
+<p>These are a few pre-built members that can be used by calling <code>login_as_member(name)</code>, which creates the necessary objects and then log the test user in. It also sets <code>self.member_id</code> with the primary key of the <code>Member</code> object.</p>
+<h5 id="old">'old'</h5>
+<ul>
+<li>Email: <code>oldacct@gmail.com</code></li>
+<li>If <code>sjfnw/fund/fixtures/test_fund.json</code> is used:</li>
+<li>it has a membership and 8 donors - see <code>sjfnw/fund/fixtures/test_fund.json</code> for details</li>
+<li><code>self.member_id</code> and <code>self.ship_id</code> will be set</li>
+</ul>
+<h5 id="blank">'blank'</h5>
+<ul>
+<li>Email: <code>blankacct@gmail.com</code></li>
+<li>No memberships or other objects associated</li>
+</ul>
+<p>Note that <code>BaseFundTestCase</code> expands upon this method, supporting a few additional names. See below for details.</p>
+<h3 id="custom-asserts">Custom asserts</h3>
+<h4 id="assert_messageresponse-text-regexfalse"><code>assert_message(response, text, regex=False)</code></h4>
+<p>Assert that the given text has been set on the response as a message (via <code>django.contrib.messages</code>)</p>
+<h4 id="assert_lengthcollection-expected_length"><code>assert_length(collection, expected_length)</code></h4>
+<p>Assert that the given collection (list, dictionary, or anything that <code>len()</code> can be called on) has the expected length. Gives a more informative error message than using a plain <code>assertEqual</code>:</p>
+<pre><code class="py">assertEqual(len(my_list), 3) # AssertionError: 1 != 3
+assert_length(my_list, 3)    # AssertionError: Expected ['a'] to have length of 3, but got 1
+</code></pre>
+
+<h4 id="assert_countqueryset-expected_count"><code>assert_count(queryset, expected_count)</code></h4>
+<p>Calls <code>.count()</code> on the given queryset and asserts that it matches the expected number. Gives a more informative error message than using a plain <code>assertEqual</code>:</p>
+<pre><code class="py">assertEqual(qs.count(), 2) # AssertionError: 0 != 2
+assert_length(qs, 2)       # AssertionError: Expected queryset count to be 2, but got 0
+</code></pre>
+
+<h2 id="basefundtestcase"><code>BaseFundTestCase</code></h2>
+<h3 id="fixtures">Fixtures</h3>
+<p>By inheriting, your test will use the fixtures specified by <code>BaseFundTestCase</code> unless you overwrite that property.</p>
+<h3 id="setup-creates-2-giving-projects"><code>setUp</code> - creates 2 giving projects</h3>
+<p>Creates:</p>
+<ul>
+<li>Post-training GP (Fundraising training date has passed; estimates are required)</li>
+<li>Pre-training GP (Fundraising training has not happened; estimates not required)</li>
+</ul>
+<h3 id="login_as_member_1"><code>login_as_member</code></h3>
+<p>Additional options for the method provided by <code>BaseTestCase</code>:</p>
+<h4 id="current">'current'</h4>
+<ul>
+<li>Email: <code>testacct@gmail.com</code></li>
+<li>Membership in Post-training project</li>
+<li>One Donor (<code>self.donor_id</code>) with one incomplete, overdue step (<code>self.step_id</code>)</li>
+</ul>
+<h4 id="new">'new'</h4>
+<ul>
+<li><code>newacct@gmail.com</code></li>
+<li>2 Memberships:<ul>
+<li>Pre-training (<code>self.pre_id</code> or <code>self.ship_id</code>) <em>default</em></li>
+<li>Post-training (<code>self.post_id</code>)</li>
+</ul>
+</li>
+<li>No Donors</li>
+</ul>
+<p><em>default</em> means that <code>member.current</code> is set to that membership, so it will be used when the user logs into Project Central.</p>
+<h2 id="todo-basegranttestcase">TODO - <code>BaseGrantTestCase</code></h2>
+        </div>
+      
+
+      <footer class="col-md-12 text-center">
+        <p><a href="https://github.com/aisapatino/sjfnw/tree/master/docs/tests/test-classes.md" target="_blank"><i class="fa fa-github"></i> View page source</a></p>
+      </footer>
+    </div>
+
+    <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog"
+         aria-labelledby="Search Modal" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+            <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+          </div>
+          <div class="modal-body">
+            <p>Search the documentation.</p>
+            <form role="form">
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query">
+              </div>
+            </form>
+            <div id="mkdocs-search-results"></div>
+          </div>
+          <div class="modal-footer"></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../../js/jquery-1.10.2.min.js"></script>
+    <script src="../../js/bootstrap-3.0.3.min.js"></script>
+    <script>var base_url = '../..';</script>
+    <script data-main="../../mkdocs/js/search.js" src="../../mkdocs/js/require.js"></script>
+    <script src="../../js/base-override.js"></script>
+      <script src="../../_theme/base-override.js"></script>
+      <script src="../../_theme/custom-highlight.js"></script>
+
+  </body>
+</html>

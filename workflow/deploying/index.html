@@ -172,13 +172,13 @@
           
             
 <li >
-    <a href="../../tests/writing-tests/">Writing tests</a>
+    <a href="../../tests/test-classes/">Test classes</a>
 </li>
 
           
             
 <li >
-    <a href="../../tests/fund/">Fundraising tests</a>
+    <a href="../../tests/writing-tests/">Writing tests</a>
 </li>
 
           
@@ -258,7 +258,7 @@
             
           
 
-<p>Overview of current process: manual deploy with <code>appcfg.py</code>, then add git tag using the date. Tagging is so we can easily see what exact code is live, and compare it to the last release, in cases where something is going wrong.</p>
+<p>Overview of current process: verify that everything works locally, then use <code>scripts/deploy</code> to deploy.</p>
 <h3 id="prepare-for-release">Prepare for release</h3>
 <ol>
 <li>Merge the desired change into <code>master</code>.</li>
@@ -267,20 +267,20 @@
   b. Checkout master locally and test the app; particularly the parts that have been changed.</li>
 </ol>
 <h3 id="release">Release</h3>
+<p>If your change involves migrations, these instructions don't cover that. Contact @aisapatino.</p>
 <ol>
-<li><strong>Tag</strong> the commit you will be releasing.<br />
-<strong><code>git tag -a 2015-08-09 -m "summary of changes"</code></strong><br />
-  a. Make sure the first line is under 72 chars like with commit messages.<br />
-  b. The message doesn't need to be comprehensive; commit messages and diffs can be used to get the full details.<br />
-  c. If it's not the first tag in a day, do <code>2015-08-09.2</code> etc.</li>
-<li><strong>Deploy</strong><br />
-  a. Make sure you don't have any local uncommitted changes; they will be deployed.<br />
-  b. <strong><code>appcfg.py -E CLOUDSQL_PASSWORD:[pw] update .</code></strong> (from root of repo) to deploy to App Engine.<br />
+<li>Run <code>scripts/deploy</code><br />
+  a. If you want to be safe, you can first deploy to an alternate version (I usually use '2') and check that it works before updating the live site.</li>
+<li>Check deployment<br />
+  a. The output of the script should include a link. Navigate to the affected areas and verify that they work.</li>
+<li>Tag updates to default version<br />
+  a. The output of the script should include instructions for tagging. Add an annotated tag with the current date.<br />
+  b. If it's not the first tag in a day, do <code>yyyy-mm-dd.2</code>, etc.<br />
   c. <strong><code>git push --tags</code></strong> to push the release tag.</li>
-<li><strong>Verify</strong> that the live site is working.</li>
 </ol>
 <h3 id="more-info">More info</h3>
 <ul>
+<li><a href="https://github.com/aisapatino/sjfnw/blob/master/scripts/deploy">deploy script source</a></li>
 <li><a href="https://cloud.google.com/appengine/docs/python/tools/uploadinganapp#Python_Uploading_the_app">appcfg</a></li>
 <li><a href="https://git-scm.com/book/en/v1/Git-Basics-Tagging">git tags</a></li>
 </ul>

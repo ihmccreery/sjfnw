@@ -172,13 +172,13 @@
           
             
 <li >
-    <a href="../writing-tests/">Writing tests</a>
+    <a href="../test-classes/">Test classes</a>
 </li>
 
           
             
 <li >
-    <a href="../fund/">Fundraising tests</a>
+    <a href="../writing-tests/">Writing tests</a>
 </li>
 
           
@@ -282,8 +282,8 @@ Functional tests are often defined as verifying a certain function from the user
 <h3 id="django-and-python-testing">Django and Python testing</h3>
 <p>Django and Python provide a lot of tools/infrastructure for testing. To start:</p>
 <ul>
-<li>Due to our <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py#L33">database settings</a>, the tests will use a sqlite3 database (in-memory and much faster than using a local mysql).</li>
-<li>A test databases is created at the start and destroyed after all tests have run. Between tests, the database is restored to its prior state, so one test's changes in the db should not affect another test.</li>
+<li>Tests use a sqlite3 database, which is in-memory and much faster than using mysql. (configured in <a href="https://github.com/aisapatino/sjfnw/blob/master/sjfnw/settings.py#L33"><code>settings.py</code></a>)</li>
+<li>A test database is created at the start and destroyed after all tests have run. Between tests, the database is restored to its prior state, so one test's changes in the db should not affect another test.</li>
 <li>If fixtures are specified, they will be loaded into the db before each test.</li>
 </ul>
 <p>All of our test classes inherit from <a href="https://docs.djangoproject.com/en/1.8/topics/testing/overview/#testcase"><code>django.test.TestCase</code></a>, which inherits from Python's <a href="https://docs.python.org/2/library/unittest.html#unittest.TestCase"><code>unittest.TestCase</code></a>. This provides all our test classes with</p>
@@ -292,7 +292,7 @@ Functional tests are often defined as verifying a certain function from the user
 <li>Assertions are provided as methods on the test class. Python provides some <a href="https://docs.python.org/2/library/unittest.html#assert-methods">basic ones</a> and Django adds <a href="https://docs.djangoproject.com/en/1.8/topics/testing/overview/#assertions">additional ones</a></li>
 <li>Django provides a <a href="https://docs.djangoproject.com/en/1.8/topics/testing/overview/#module-django.test.client">test client</a> that can make requests</li>
 </ul>
-<p>Note: We have sub-classed Django's <code>TestCase</code> as <code>BaseTestCase</code>, which is further specialized as <code>BaseFundTestCase</code> and <code>BaseGrantTestCase</code>. They just provide a few convenient shortcuts for common tasks like creating a User and logging them in.</p>
+<p>Note: We have sub-classed Django's <code>TestCase</code> as <code>BaseTestCase</code>, which is further specialized as <code>BaseFundTestCase</code> and <code>BaseGrantTestCase</code>. They provide a few convenient shortcuts for common tasks like creating a User and logging them in. See <a href="../test-classes/">docs for test classes</a></p>
 <h3 id="test-files">Test files</h3>
 <p>Tests are located in <code>sjfnw/fund/tests/</code> and <code>sjfnw/grants/tests/</code></p>
 <ul>
