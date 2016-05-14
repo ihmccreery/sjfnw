@@ -20,4 +20,4 @@ If coverage drops below the target specified in `.codecov.yml`, codecov's commit
 
 [landscape.io/github/aisapatino/sjfnw](https://landscape.io/github/aisapatino/sjfnw)
 
-Tool for checking code "health" - runs `prospector` on every commit. See [linting](/getting-started/linters.md) for details. It provides the 'health' badge in the readme.
+Tool for checking code "health" - runs `prospector` on every commit. See [linting](../getting-started/linters.md) for details. It provides the 'health' badge in the readme.

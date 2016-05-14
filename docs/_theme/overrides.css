@@ -15,6 +15,11 @@ h2 {
 
 h3 {
   font-size: 24px;
+  margin: 21px 0; /* default is 21px top, 10.5px bottom */
+}
+
+h4 {
+  margin: 21px 0; /* default is 10.5px */
 }
 
 blockquote p {
