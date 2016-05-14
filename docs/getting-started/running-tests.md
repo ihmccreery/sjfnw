@@ -20,12 +20,12 @@ Several verbosity levels are available, using `-v`. The default is `1`.
 Level | Test display | Logging
 :----:|--------------|---------
 `0`   | dots         | fatal
-`1`   | dots         | error
+`1`   | dots         | fatal
 `2`   | text         | info
 `3`   | text         | debug
 
-Dots = single character per test
-Text = full line per test
+Dots = single character per test (`.` for success, `s` for skip, etc.)
+Text = full line per test with test name and description
 
 ### Coverage
 
