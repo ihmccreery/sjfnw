@@ -1,6 +1,6 @@
 The repo is set up to use [prospector](http://prospector.landscape.io/en/master/index.html), a tool that combines several python code-checkers including [pylint](http://www.pylint.org/).
 
-`prospector` is run for every commit pushed to github via [landscape.io](https://landscape.io/github/aisapatino/sjfnw); see [CI page](/workflow/continuous-integration.md) for more info.
+`prospector` is run for every commit pushed to github via [landscape.io](https://landscape.io/github/aisapatino/sjfnw); see [CI page](../workflow/continuous-integration.md) for more info.
 
 ### Installation
 

@@ -27,8 +27,8 @@ pages:
   - Deploying: 'workflow/deploying.md'
 - Testing:
   - Intro to testing: 'tests/intro-to-testing.md'
+  - Test classes: 'tests/test-classes.md'
   - Writing tests: 'tests/writing-tests.md'
-  - Fundraising tests: 'tests/fund.md'
 - How to:
   - Performance debugging: 'how-to/debugging-performance.md'
   - Database management: 'how-to/database.md'
