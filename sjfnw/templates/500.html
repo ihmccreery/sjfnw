@@ -1,7 +1,7 @@
-{% extends 'base.html' %}
-{% block title %}Server error{{title_addition}}{% endblock %}
+{% extends base_template %}
+{% block title %}Server error {{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>There was an error while handling your request.</h1>
-<p>The error has been logged.  {% if contact_url %}<a href="{{contact_url}}">Contact an administrator</a> if needed.{% endif %}</p>
+<h2>There was an error while handling your request.</h2>
+<p>The error has been logged.{% if contact_url %} <a href="{{contact_url}}">Contact an administrator</a> if needed.{% endif %}</p>
 {% endblock %}
