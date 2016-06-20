@@ -109,7 +109,7 @@ class MemberManager(models.Manager):
 class Member(models.Model):
   objects = MemberManager()
 
-  user = models.OneToOneField(User, null=True)
+  user = models.OneToOneField(User)
   first_name = models.CharField(max_length=100)
   last_name = models.CharField(max_length=100)
 
