@@ -382,8 +382,9 @@ class DraftGrantApplicationA(BaseModelAdmin):
                   'extended_deadline']
   list_filter = ['grant_cycle']
   fields = [('organization', 'grant_cycle', 'modified'),
-            ('extended_deadline')]
-  readonly_fields = ['modified']
+            ('extended_deadline'),
+            ('edit')]
+  readonly_fields = ['modified', 'edit']
   form = DraftAdminForm
   search_fields = ['organization__name']
 
@@ -392,6 +393,14 @@ class DraftGrantApplicationA(BaseModelAdmin):
       return self.readonly_fields + ['organization', 'grant_cycle']
     return self.readonly_fields
 
+  def edit(self, obj):
+    if not obj or not obj.organization:
+      return '-'
+    url = reverse('sjfnw.grants.views.grant_application',
+                  kwargs={'cycle_id': obj.grant_cycle_id})
+    url += '?user=' + obj.organization.email
+    return utils.create_link(url, "Edit this draft", new_tab=True) + '<br>(logs you in as the organization)'
+  edit.allow_tags = True
 
 class GivingProjectGrantA(BaseModelAdmin):
   list_display = ['organization_name', 'grant_cycle', 'giving_project',

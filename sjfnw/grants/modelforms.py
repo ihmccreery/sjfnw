@@ -168,6 +168,10 @@ class GrantApplicationModelForm(forms.ModelForm):
         self.fields['two_year_question'].required = True
         self.fields['two_year_question'].label = cycle.two_year_question
         logger.info('Requiring the two-year question')
+    if cycle.title == "Displaced Tenants Fund":
+      logger.info('Setting customized questions texts for Displaced Tenants Fund')
+      for i in range(1, 7):
+        self.fields['narrative{}'.format(i)].label = gc.NARRATIVE_TEXTS_DT[i]
 
   def clean(self):
     cleaned_data = super(GrantApplicationModelForm, self).clean()
