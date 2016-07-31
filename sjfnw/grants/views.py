@@ -324,18 +324,21 @@ def grant_application(request, organization, cycle_id):
             grant_application=application, two_year_question=draft_data['two_year_question'])
         overflow.save()
 
-      subject = 'Grant application submitted'
-      from_email = c.GRANT_EMAIL
-      to_email = organization.email
-      html_content = render_to_string('grants/email_submitted.html', {
-        'org': organization, 'cycle': cycle
-      })
-      text_content = strip_tags(html_content)
-      msg = EmailMultiAlternatives(subject, text_content, from_email,
-          [to_email], [c.SUPPORT_EMAIL])
-      msg.attach_alternative(html_content, 'text/html')
-      msg.send()
-      logger.info('Application created; confirmation email sent to ' + to_email)
+      if cycle.pk == 35:
+        logger.info('Displaced Tenants Fund application; skipping confirmation email')
+      else:
+        subject = 'Grant application submitted'
+        from_email = c.GRANT_EMAIL
+        to_email = organization.email
+        html_content = render_to_string('grants/email_submitted.html', {
+          'org': organization, 'cycle': cycle
+        })
+        text_content = strip_tags(html_content)
+        msg = EmailMultiAlternatives(subject, text_content, from_email,
+            [to_email], [c.SUPPORT_EMAIL])
+        msg.attach_alternative(html_content, 'text/html')
+        msg.send()
+        logger.info('Application created; confirmation email sent to ' + to_email)
 
       draft.delete()
 
