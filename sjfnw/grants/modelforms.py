@@ -89,16 +89,17 @@ class TimelineWidget(forms.widgets.MultiWidget):
 
 def custom_fields(field, **kwargs): # sets phonenumber and money fields
   money_fields = ['budget_last', 'budget_current', 'amount_requested', 'project_budget']
-  phone_fields = ['telephone_number', 'fax_number', 'fiscal_telephone',
-                  'collab_ref1_phone', 'collab_ref2_phone',
-                  'racial_justice_ref1_phone', 'racial_justice_ref2_phone']
+  # disabling this under PhoneNumberField can handle extensions
+  # phone_fields = ['telephone_number', 'fax_number', 'fiscal_telephone',
+  #                 'collab_ref1_phone', 'collab_ref2_phone',
+  #                'racial_justice_ref1_phone', 'racial_justice_ref2_phone']
   kwargs['required'] = not field.blank
   if field.verbose_name:
     kwargs['label'] = capfirst(field.verbose_name)
   if field.name in money_fields:
     return IntegerCommaField(**kwargs)
-  elif field.name in phone_fields:
-    return PhoneNumberField(**kwargs)
+  # elif field.name in phone_fields:
+  #   return PhoneNumberField(**kwargs)
   else:
     return field.formfield(**kwargs)
 
