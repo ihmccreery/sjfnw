@@ -36,7 +36,7 @@ SCREENING = (
 )
 
 # index matches question number
-NARRATIVE_CHAR_LIMITS = [0, 300, 150, 450, 300, 300, 450, 750, 300]
+NARRATIVE_CHAR_LIMITS = [0, 300, 200, 450, 300, 300, 450, 750, 300]
 NARRATIVE_TEXTS = ['Placeholder for 0',
   ('Describe your organization\'s mission, history and major '
    'accomplishments.'),
