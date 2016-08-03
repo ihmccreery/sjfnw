@@ -21,26 +21,32 @@ function setUserID() {
 /**
  * Show modal with conflict warning.
  *
- * @param {number} ver - version of the dialog to display. see html below
+ * @param {number} trigger - what is triggering the warning
+ *   determines which dialog to show. valid options: 'open', 'autosave'
  */
-function showConflictWarning(ver){
+function showConflictWarning(trigger){
+  if (trigger !== 'open' && trigger !== 'autosave') {
+    return;
+  }
+  // scroll to top so they don't miss the modal
   window.scrollTo(0, 0);
-  console.log('scrolled to top, showing override');
-  $('#override_dialog'+ver).dialog({
+
+  const elId = '#override_dialog_' + trigger;
+
+  $(elId).dialog({
     title: 'Warning: simultaneous editing',
     modal: true,
     buttons: [
       {
         text:'Proceed anyway',
         click: function(){
-          console.log('override!');
-          $('#override_dialog'+ver).dialog("close");
+          $(elId).dialog("close");
           autoSave.save(false, true);
           autoSave.resume();
         }
       },{
         text:'Cancel',
-        click: function(){
+        click: function (){
           location.href = '/apply/';
         }
       }
@@ -112,8 +118,7 @@ $(document).ready(function() {
 {% block content %}
 {% load tz %}
 
-<!-- when opening an app -->
-<div id="override_dialog1" style="display:none;">
+<div id="override_dialog_open" style="display:none;">
   <input type="hidden" autofocus="autofocus" />
   You may be seeing this message because:
   <ul>
@@ -124,8 +129,7 @@ $(document).ready(function() {
   Only one person should work on an application at a time.  If you proceed, your saves will overwrite any other changes that are being made from other sources.
 </div>
 
-<!-- when autosave reports a conflict -->
-<div id="override_dialog2" style="display:none;">
+<div id="override_dialog_autosave" style="display:none;">
   <input type="hidden" autofocus="autofocus" />
   The last autosave did not complete due to a potential conflict.  You may be seeing this if:
   <ul>

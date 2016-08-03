@@ -4,6 +4,15 @@
 /**----------------------------- formUtils ---------------------------------**/
 var formUtils = {};
 
+formUtils.log = function (message) {
+  var d = new Date();
+  var min = d.getMinutes();
+  min = min < 10 ? '0' + min : min;
+  var dateString = d.getHours() + ':' + min + ':' + d.getSeconds();
+
+  console.log(dateString, message);
+};
+
 formUtils.loadingImage = '<img src="/static/images/ajaxloader2.gif" height="16" width="16" alt="Loading...">';
 
 formUtils.statusTexts = { // for ajax error messages
@@ -57,17 +66,6 @@ formUtils.currentTimeDisplay = function() {
 
 
 /**
- * Return current time as a string for console logs. Format: hh:mm:ss
- */
-formUtils.logTime = function () {
-  var d = new Date();
-  var m = d.getMinutes();
-  m = m < 10 ? '0' + m : m;
-  return d.getHours() + ':' + m + ':' + d.getSeconds() + ' ';
-};
-
-
-/**
  * Update word limit indicator for text field.
  *
  * @param {jQuery.Event} event - jQuery keyup event
@@ -98,16 +96,13 @@ function updateWordCount(event) {
 
 /**------------------------------- autoSave --------------------------------**/
 
-var autoSave = {};
+var autoSave = {
+  INTERVAL_MS: 30000,
+  INITIAL_DELAY_MS: 10000
+};
 autoSave.saveTimer = false;
 autoSave.pauseTimer = false;
 
-/* autosave flow:
-
-   page load -> --> init ->
-   page blur -> pause() -> sets onfocus, sets pauseTimer -30-> clears saveTimer
-
-*/
 
 autoSave.init = function(urlPrefix, submitId, userId) {
   autoSave.submitUrl = '/' + urlPrefix + '/' + submitId;
@@ -118,69 +113,83 @@ autoSave.init = function(urlPrefix, submitId, userId) {
   } else {
     autoSave.userId = '';
   }
-  console.log('Autosave variables loaded');
-  autoSave.resume();
+  formUtils.log('Autosave variables loaded');
+  autoSave.resume(true);
 };
 
 
 autoSave.pause = function() {
   if ( !window.onfocus ) {
-    console.log(formUtils.logTime() + 'autoSave.pause called; setting timer');
+    formUtils.log('autoSave.pause called; setting timer to pause');
+
+    // clear initial delay timeout if applicable
+    window.clearTimeout(autoSave.initialDelayTimeout);
+
     // pause auto save
-    autoSave.pauseTimer = window.setTimeout(function() {
-       console.log(formUtils.logTime() + 'autoSave.pauseTimer up, pausing autosave');
-       window.clearInterval(autoSave.saveTimer);
-       autoSave.pauseTimer = false;
-       }, 30000);
+    autoSave.pauseTimer = window.setTimeout(function () {
+      formUtils.log('Pausing autosave');
+      window.clearInterval(autoSave.saveTimer);
+      autoSave.pauseTimer = false;
+    }, autoSave.INTERVAL_MS);
+
     // set to resume when window gains focus
     $(window).on('focus', autoSave.resume);
     // don't watch for further blurs
     $(window).off('blur');
   } else {
-    console.log(formUtils.logTime() + 'autoSave.pause called, but already paused');
+    formUtils.log('autoSave.pause called, but already paused');
   }
 };
 
-autoSave.resume = function() {
-  if ( !window.onblur ) { // avoid double-firing
-    console.log(formUtils.logTime() + ' autoSave.resume called');
-    // reload the pause binding
-    $(window).on('blur', autoSave.pause);
+autoSave.resume = function (firstTime) {
+  if ( !window.onblur ) { // avoid double-firing - if onblur is already set up, skip
+    formUtils.log(' autoSave.resume called');
+
     if (autoSave.pauseTimer) {
-      // clear timer if window recently lost focus (autosave is still going)
-      console.log('pause had been set; clearing it');
+      // clear timer if window recently lost focus (in this case autosave is still going)
+      formUtils.log('pause had been set; clearing it');
       window.clearTimeout(autoSave.pauseTimer);
       autoSave.pauseTimer = false;
+    } else if (firstTime) {
+      // just loaded page - delay and then resume autosave
+      formUtils.log('Waiting 10s to start autosave timer');
+      autoSave.initialDelayTimeout = window.setTimeout(autoSave.resume, autoSave.INITIAL_DELAY_MS);
     } else {
-      // set up save timer
-      console.log('Setting autosave interval');
-      autoSave.saveTimer = window.setInterval('autoSave.save()', 30000); // TODO should this be without parens?
+      // was paused - resume autosave
+      formUtils.log('Starting autosave at 30s intreval');
+      autoSave.saveTimer = window.setInterval(autoSave.save, autoSave.INTERVAL_MS);
     }
-    // unload the resume binding
+
+    // listen for blurs again
+    $(window).on('blur', autoSave.pause);
+    // stop listening to focus
     $(window).off('focus');
   } else {
-    console.log(formUtils.logTime() + ' window already has onblur');
+    formUtils.log('autoSave.resume called but window already has onblur');
   }
 };
 
 autoSave.save = function (submit, force) {
-  if (!force) { force = 'false'; }
   if (formUtils.staffUser) { // TODO use querystring function
-    force = '&force=' + force;
+    force = '&force=' + force || 'false';
   } else {
-    force = '?force=' + force;
+    force = '?force=' + force || 'false';
   }
-  console.log(formUtils.logTime() + 'autosaving');
+
+  formUtils.log('Autosaving');
+
   $.ajax({
     url: autoSave.saveUrl + force,
     type: 'POST',
     data: $('form').serialize() + '&user_id=' + autoSave.userId,
     success: function(data, textStatus, jqXHR) {
       if (jqXHR.status === 200) {
-        if (submit) { // trigger the submit button
+        if (submit) {
+          // button click - trigger the hidden submit button
           var submitAll = document.getElementById('hidden_submit_app');
           submitAll.click();
-        } else { // update 'last saved'
+        } else {
+          // autosave - update 'last saved'
           $('.autosaved').html(formUtils.currentTimeDisplay());
         }
       } else { // unexpected status code
@@ -189,9 +198,10 @@ autoSave.save = function (submit, force) {
     },
     error: function(jqXHR, textStatus) {
       var errortext = '';
-      if (jqXHR.status === 409)  { // conflict - pause autosave and confirm force
+      if (jqXHR.status === 409)  {
+        // conflict - pause autosave and confirm force
         window.clearInterval(autoSave.saveTimer);
-        showConflictWarning(2); // defined in org_app.html
+        showConflictWarning('autosave'); // method defined in org_app.html
       } else {
         if(jqXHR.status === 401) {
           location.href = jqXHR.responseText + '?next=' + location.href;
@@ -221,7 +231,7 @@ fileUploads.init = function(urlPrefix, draftId) {
   $("[type='file']").change(function() {
       fileUploads.fileChanged(this.id);
     });
-  console.log('fileUploads vars loaded, file fields scripted');
+  formUtils.log('fileUploads vars loaded, file fields scripted');
   $('.default-file-input').children('a').remove();
 };
 
@@ -234,28 +244,28 @@ fileUploads.init = function(urlPrefix, draftId) {
 fileUploads.clickFileInput = function(event, inputId) {
   /* triggered when 'choose file' label is clicked
      transfers the click to the hidden file input */
-  console.log(event);
-  console.log('clickFileInput' + inputId);
+  formUtils.log('clickFileInput' + inputId);
   var input = document.getElementById(inputId);
   if (input) {
     input.control.click();
-    console.log('Clicked it');
   } else {
-    console.log('Error - no input found');
+    formUtils.log('clickFileInput error - no input found with id ' + inputId);
   }
 };
 
-fileUploads.fileChanged = function(fieldId) {
-  /* triggered when a file is selected
-     show loader, call getuploadurl */
-  console.log('fileChanged');
+/**
+ * Update draft when file input is changed.
+ *
+ * @param fieldId - id of the file field that changed
+ *
+ * Set as change handler in fileUploads.init. Show loader and get upload url
+ **/
+fileUploads.fileChanged = function (fieldId) {
   if (fileUploads.uploading) {
-    console.log('Upload in progress; returning');
+    formUtils.log('fileChanged - Upload in progress; returning');
     return false;
   }
-  console.log(fieldId + ' onchange');
   var file = document.getElementById(fieldId).value;
-  console.log('Value: ' + file);
   if (file) {
     fileUploads.uploading = true;
     fileUploads.currentField = fieldId.replace('id_', '');
@@ -265,12 +275,17 @@ fileUploads.fileChanged = function(fieldId) {
   }
 };
 
-fileUploads.getUploadURL = function() {
-  console.log('getUploadURL');
+/**
+ * Fetch blobstore file upload url from backend, then trigger upload.
+ *
+ * Click hidden submit button for file field to trigger its upload
+ */
+fileUploads.getUploadURL = function () {
+  formUtils.log('getUploadURL calld');
   $.ajax({
     url: fileUploads.getUrl,
     success: function(data) {
-      console.log('current field: ' + fileUploads.currentField);
+      formUtils.log('got upload url for field: ' + fileUploads.currentField);
       var cform = document.getElementById(fileUploads.currentField + '_form');
       cform.action = data;
       var cbutton = document.getElementById(fileUploads.currentField + '_submit');
@@ -280,9 +295,9 @@ fileUploads.getUploadURL = function() {
 };
 
 fileUploads.iframeUpdated = function(iframe) { // process response
-  console.log(formUtils.logTime() + 'iframeUpdated');
+  formUtils.log('iframeUpdated');
   var results = iframe.contentDocument.body.innerHTML;
-  console.log('The iframe changed! New contents: ' + results);
+  formUtils.log('The iframe changed! New contents: ' + results);
   if (results) {
     var fieldName = results.split('~~')[0];
     var linky = results.split('~~')[1];
