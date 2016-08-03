@@ -4,6 +4,7 @@ from django.contrib import admin, messages
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from sjfnw import utils
@@ -46,6 +47,29 @@ class CycleTypeFilter(admin.SimpleListFilter):
       return queryset
     else:
       return queryset.filter(projectapp__application__grant_cycle__title__startswith=self.value())
+
+class CycleOpenFilter(admin.SimpleListFilter):
+  title = 'Cycle status'
+  parameter_name = 'status'
+
+  def lookups(self, request, model_admin):
+    return (
+      ('open', 'Open'),
+      ('closed', 'Closed'),
+      ('upcoming', 'Upcoming')
+    )
+
+  def queryset(self, request, queryset):
+    now = timezone.now()
+    if self.value() == 'open':
+      return queryset.filter(open__lte=now, close__gt=now)
+    elif self.value() == 'closed':
+      return queryset.filter(close__lt=now)
+    elif self.value() == 'upcoming':
+      return queryset.filter(open__gt=now)
+    return queryset
+
+
 
 class MultiYearGrantFilter(admin.SimpleListFilter):
   title = 'Grant length'
@@ -257,6 +281,7 @@ class YERInline(BaseShowInline):
 
 class GrantCycleA(BaseModelAdmin):
   list_display = ['title', 'open', 'close']
+  list_filter = (CycleOpenFilter,)
   fields = [
     ('title', 'open', 'close'),
     ('info_page', 'email_signature'),
