@@ -342,7 +342,7 @@ class YearEndReportForm(ModelForm):
   def clean(self):
     stay_informed = {}
     # declared_fields = the fields listed above (rather than fields inferred from model)
-    for field_name in self.declared_fields: # pylint: disable=no-member
+    for field_name in self.declared_fields:
       val = self.cleaned_data.get(field_name, None)
       if val:
         stay_informed[field_name] = val
