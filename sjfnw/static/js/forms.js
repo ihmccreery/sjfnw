@@ -77,8 +77,15 @@ function updateWordCount(event) {
   var limit = area.dataset.limit;
   var display = document.getElementById(area.name + '_wordcount');
 
-  var words = area.value.match(/[^ \r\n]+/g) || [];
-  var diff = limit - words.length;
+  var word_count = 0;
+  if (area.value && area.value.trim()) {
+    // match the chars in python's string.punctuation
+    word_count = area.value
+      .replace(/[!"#$%&'()*+,-.\/:;<=>?@\[\\\]\^_`{|}~]/g, '')
+      .split(/[ \r\n]+/)
+      .length;
+  }
+  var diff = limit - word_count;
 
   if (diff >= 0) {
     display.innerHTML = diff + ' words remaining';

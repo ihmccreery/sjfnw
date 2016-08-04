@@ -1,5 +1,5 @@
 from datetime import timedelta
-import json, logging, re
+import json, logging, string
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -209,7 +209,7 @@ class WordLimitValidator(BaseValidator):
     return count_a > count_b
 
   def clean(self, val):
-    return len(re.findall(r'[^ \n\r]+', val))
+    return len(unicode(val).translate({ord(c): None for c in string.punctuation}).split())
 
 
 def validate_file_extension(value):
