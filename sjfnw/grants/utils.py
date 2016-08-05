@@ -1,4 +1,6 @@
-import logging, re
+# encoding: utf-8
+
+import logging, re, string
 
 from django.conf import settings
 from django.http import HttpResponse, Http404
@@ -7,6 +9,13 @@ from django.utils import timezone
 from google.appengine.ext import blobstore
 
 logger = logging.getLogger('sjfnw')
+
+# checking subset of unicode punctuation for speed - chars most likely to be in user input
+punctuation = string.punctuation + u'‐‑‒–—―‘’‚‛“”‟ˆ•∘∙■□▢▪▫▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇○●'
+
+def strip_punctuation(input_str):
+  input_str = unicode(input_str) # input may or may not be unicode already
+  return ''.join([c for c in input_str if c not in punctuation])
 
 def local_date_str(timestamp):
   """ Convert UTC timestamp to local date string in mm/dd/yyyy format """

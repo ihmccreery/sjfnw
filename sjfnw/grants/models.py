@@ -1,5 +1,5 @@
 from datetime import timedelta
-import json, logging, string
+import json, logging
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
@@ -8,7 +8,7 @@ from django.db import models
 from django.utils import timezone
 
 from sjfnw.fund.models import GivingProject
-from sjfnw.grants import constants as gc
+from sjfnw.grants import constants as gc, utils
 
 logger = logging.getLogger('sjfnw')
 
@@ -209,7 +209,7 @@ class WordLimitValidator(BaseValidator):
     return count_a > count_b
 
   def clean(self, val):
-    return len(unicode(val).translate({ord(c): None for c in string.punctuation}).split())
+    return len(utils.strip_punctuation(val).split())
 
 
 def validate_file_extension(value):

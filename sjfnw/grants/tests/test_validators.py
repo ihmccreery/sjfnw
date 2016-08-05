@@ -31,10 +31,10 @@ EXAMPLES = [
   {
     'text': (u'This gránt will provide funding for two years. While we know it'
       u' can be difficult to predict your work beyond a year, please give us an'
-      u' idea of what the second year might look like.\t - What overall goals and'
-      u' strategies do you ø∆ forecast in the second year?\t* How will the second year'
-      u' of this grant build on your work in the first year?\r'),
-    'expected_count': 64,
+      u' idea of what the second year might look like.\t - • What overall goals and'
+      u' strategies ø∆ do you – forecast in the second year?\t* How will the second year'
+      u' of this grant éñô build on your work in the first year?\r'),
+    'expected_count': 65,
     'simple': False
   }
 ]
