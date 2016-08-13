@@ -1,5 +1,5 @@
-# configure pylint tool: http://docs.pylint.org/features.html
-# used by landscape.io and scripts/lint
+# config for pylint (see http://docs.pylint.org/features.html)
+# used by landscape.io and prospector
 
 [BASIC]
 
