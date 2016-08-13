@@ -1,10 +1,10 @@
-# configure travis.ci: https://travis-ci.org/aisapatino/sjfnw
+# config for https://travis-ci.org/aisapatino/sjfnw
 
 language: python
 python:
   - "2.7"
 
-# let travis run in container
+# disable sudo to let travis run in container
 sudo: false
 
 # only send emails for new failures
@@ -14,8 +14,8 @@ notifications:
     on_failure: change
 
 install:
-  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.35.zip
-  - unzip -q google_appengine_1.9.35.zip
+  - wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.40.zip
+  - unzip -q google_appengine_1.9.40.zip
   - pip install codecov
   - pip install -r requirements.txt -t libs
 
@@ -25,7 +25,7 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/webob-1.2.3
   - export PYTHONPATH=$PYTHONPATH:$PWD/google_appengine/lib/yaml/lib
 
-# script to run tests
+# run tests with coverage
 script: ./scripts/coverage skip-html
 
 # send coverage to coveralls if tests passed
