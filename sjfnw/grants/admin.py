@@ -540,6 +540,40 @@ class YearEndReportA(BaseModelAdmin):
     return obj.award.projectapp.application.grant_cycle
   cycle.admin_order_field = 'award__projectapp__application__grant_cycle'
 
+
+class YERDraftA(BaseModelAdmin):
+  list_display = ('award', 'organization', 'giving_project', 'grant_cycle', 'modified', 'due')
+
+  fields = (('organization',),
+            ('modified', 'due'),
+            ('giving_project', 'grant_cycle'))
+  readonly_fields = ('organization', 'modified', 'due', 'giving_project', 'grant_cycle')
+
+  def get_queryset(self, request):
+    qs = super(YERDraftA, self).get_queryset(request)
+    return qs.select_related(
+      'award__projectapp__application__grant_cycle',
+      'award__projectapp__application__organization',
+      'award__projectapp__giving_project'
+    )
+
+  def has_add_permission(self, request):
+    return False
+
+  def organization(self, obj):
+    return obj.award.projectapp.application.organization
+  organization.admin_order_field = 'award__projectapp__application__organization'
+
+  def giving_project(self, obj):
+    return obj.award.projectapp.giving_project
+
+  def grant_cycle(self, obj):
+    return obj.award.projectapp.application.grant_cycle
+
+  def due(self, obj):
+    return obj.award.next_yer_due()
+
+
 class LogA(BaseModelAdmin):
   form = LogAdminForm
   fields = (('organization', 'date'),
@@ -573,6 +607,7 @@ admin.site.register(models.DraftGrantApplication, DraftGrantApplicationA)
 admin.site.register(models.GivingProjectGrant, GivingProjectGrantA)
 admin.site.register(models.SponsoredProgramGrant, SponsoredProgramGrantA)
 admin.site.register(models.YearEndReport, YearEndReportA)
+admin.site.register(models.YERDraft, YERDraftA)
 admin.site.register(models.GrantApplicationLog, LogA)
 
 advanced_admin.register(models.GrantCycle, GrantCycleA)

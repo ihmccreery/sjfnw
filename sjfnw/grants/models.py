@@ -724,5 +724,8 @@ class YERDraft(models.Model):
 
   photo_release = models.FileField(upload_to='/', max_length=255)
 
+  class Meta:
+    verbose_name = 'Draft year-end report'
+
   def __unicode__(self):
     return 'DRAFT year-end report for ' + unicode(self.award)
