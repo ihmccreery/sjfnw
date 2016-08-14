@@ -1,13 +1,16 @@
+from datetime import timedelta
 import json
 import logging
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
+from django.utils import timezone
 
 from google.appengine.ext import testbed
 from google.appengine.api import blobstore, datastore
 
+from sjfnw.grants import constants as gc
 from sjfnw.grants.tests.base import BaseGrantTestCase
 from sjfnw.grants.models import (Organization, DraftGrantApplication,
   GrantApplication, GrantCycle)
@@ -29,14 +32,13 @@ class BaseGrantFilesTestCase(BaseGrantTestCase):
     self.testbed.deactivate()
 
   def create_blob(self, key, **kwargs):
-    logger.info(kwargs)
-    bs_stub = self.testbed.get_stub('blobstore')
+    blobstore_stub = self.testbed.get_stub('blobstore')
     entity = datastore.Entity(blobstore.BLOB_INFO_KIND, name=key, namespace='')
     entity['size'] = len(kwargs['content'])
     entity['filename'] = kwargs['filename']
     entity['content_type'] = kwargs['content_type']
     datastore.Put(entity)
-    bs_stub.storage.CreateBlob('fakeblobkey123', kwargs['content'])
+    blobstore_stub.storage.CreateBlob('fakeblobkey123', kwargs['content'])
 
 
 def alter_draft_timeline(draft, values):
@@ -48,11 +50,11 @@ def alter_draft_timeline(draft, values):
   draft.save()
 
 
-def alter_draft_files(draft, files_dict):
-  """ File list should match this order:
+def alter_draft_files(draft, file_values):
+  """ file_values list should match this order:
       ['demographics', 'funding_sources', 'budget1', 'budget2',
       'budget3', 'project_budget_file', 'fiscal_letter'] """
-  files = dict(zip(DraftGrantApplication.file_fields(), files_dict))
+  files = dict(zip(DraftGrantApplication.file_fields(), file_values))
   for key, val in files.iteritems():
     setattr(draft, key, val)
   draft.save()
@@ -155,8 +157,8 @@ class ApplySuccessful(BaseGrantFilesTestCase):
 
         verify: successful submission & files match  """
 
-    draft = DraftGrantApplication.objects.get(organization_id=self.org_id,
-                                              grant_cycle_id=self.cycle_id)
+    ids = {'organization_id': self.org_id, 'grant_cycle_id': self.cycle_id}
+    draft = DraftGrantApplication.objects.get(**ids)
     files = ['funding_sources.docx', 'diversity.doc', 'budget1.docx',
              'budget2.txt', 'budget3.png', '', '']
     alter_draft_files(draft, files)
@@ -165,10 +167,8 @@ class ApplySuccessful(BaseGrantFilesTestCase):
 
     Organization.objects.get(pk=2)
     self.assertTemplateUsed(response, 'grants/submitted.html')
-    app = GrantApplication.objects.get(organization_id=self.org_id, grant_cycle_id=self.cycle_id)
-    self.assertEqual(0, DraftGrantApplication.objects
-        .filter(organization_id=self.org_id, grant_cycle_id=self.cycle_id)
-        .count())
+    self.assert_count(DraftGrantApplication.objects.filter(**ids), 0)
+    app = GrantApplication.objects.get(**ids)
     self.assertEqual(app.budget1, files[2])
     self.assertEqual(app.budget2, files[3])
 
@@ -223,14 +223,16 @@ class ApplyBlocked(BaseGrantTestCase):
     self.assertTemplateUsed(response, 'grants/closed.html')
 
   def test_already_submitted(self):
-    self.assertEqual(0,
-        DraftGrantApplication.objects.filter(organization_id=2, grant_cycle_id=1).count())
+    self.assert_count(
+        DraftGrantApplication.objects.filter(organization_id=2, grant_cycle_id=1),
+        0)
 
     response = self.client.get('/apply/1/')
 
     self.assertTemplateUsed(response, 'grants/already_applied.html')
-    self.assertEqual(0,
-        DraftGrantApplication.objects.filter(organization_id=2, grant_cycle_id=1).count())
+    self.assert_count(
+        DraftGrantApplication.objects.filter(organization_id=2, grant_cycle_id=1),
+        0)
 
   def test_upcoming(self):
     response = self.client.get('/apply/4/')
@@ -259,8 +261,8 @@ class ApplyValidation(BaseGrantFilesTestCase):
     response = self.client.post('/apply/%d/' % self.ids['grant_cycle_id'], follow=True)
 
     self.assertTemplateUsed(response, 'grants/org_app.html')
-    self.assertEqual(0, GrantApplication.objects.filter(**self.ids).count())
-    self.assertEqual(1, DraftGrantApplication.objects.filter(**self.ids).count())
+    self.assert_count(GrantApplication.objects.filter(**self.ids), 0)
+    self.assert_count(DraftGrantApplication.objects.filter(**self.ids), 1)
 
     self.assertFormError(response, 'form', 'project_title',
         'This field is required when applying for project support.')
@@ -305,27 +307,27 @@ class StartApplication(BaseGrantTestCase):
   def test_load_first_app(self):
     ids = {'organization_id': 1, 'grant_cycle_id': 1}
     self.login_as_org('new')
-    self.assertEqual(0, DraftGrantApplication.objects.filter(**ids).count())
+    self.assert_count(DraftGrantApplication.objects.filter(**ids), 0)
 
     response = self.client.get('/apply/1/')
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
-    self.assertEqual(1, DraftGrantApplication.objects.filter(**ids).count())
+    self.assert_count(DraftGrantApplication.objects.filter(**ids), 1)
     form = response.context['form']
     self.assertFalse(form.fields['two_year_question'].required)
 
   def test_load_second_app(self):
     ids = {'organization_id': 2, 'grant_cycle_id': 6}
     self.login_as_org('test')
-    self.assertEqual(0, DraftGrantApplication.objects.filter(**ids).count())
+    self.assert_count(DraftGrantApplication.objects.filter(**ids), 0)
 
     response = self.client.get('/apply/6/')
 
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
     org = Organization.objects.get(pk=2)
-    self.assertEqual(1, DraftGrantApplication.objects.filter(**ids).count())
+    self.assert_count(DraftGrantApplication.objects.filter(**ids), 1)
     # mission should be pre-filled using last application
     self.assertContains(response, org.mission)
     form = response.context['form']
@@ -346,6 +348,41 @@ class StartApplication(BaseGrantTestCase):
     self.assertContains(response, cycle.two_year_question)
     form = response.context['form']
     self.assertTrue(form.fields['two_year_question'].required)
+
+  def test_custom_cycle_ayd(self):
+    cycle = GrantCycle(title='Alternatives to Youth Detention',
+                       open=timezone.now() - timedelta(days=2),
+                       close=timezone.now() + timedelta(days=5))
+    cycle.save()
+
+    self.login_as_org('test')
+
+    response = self.client.get(reverse('sjfnw.grants.views.grant_application',
+                                       kwargs={'cycle_id': cycle.pk}))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/org_app.html')
+
+    for text in gc.NARRATIVE_TEXTS_AYD.itervalues():
+      self.assertContains(response, text)
+
+  def test_custom_cycle_dt(self):
+    cycle = GrantCycle(title='Displaced Tenants Fund',
+                       open=timezone.now() - timedelta(days=2),
+                       close=timezone.now() + timedelta(days=5))
+    cycle.save()
+
+    self.login_as_org('test')
+
+    response = self.client.get(reverse('sjfnw.grants.views.grant_application',
+                                       kwargs={'cycle_id': cycle.pk}))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertTemplateUsed(response, 'grants/org_app.html')
+
+    for text in gc.NARRATIVE_TEXTS_DT.itervalues():
+      self.assertContains(response, text)
+
 
 class AddFile(BaseGrantFilesTestCase):
 

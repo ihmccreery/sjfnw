@@ -292,23 +292,23 @@ class GrantApplication(models.Model):
                                   choices=gc.STATE_CHOICES, blank=True)
   fiscal_zip = models.CharField(verbose_name='ZIP', max_length=50, blank=True)
 
-  narrative1 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[1])],
-                                verbose_name=gc.NARRATIVE_TEXTS[1])
-  narrative2 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[2])],
-                                verbose_name=gc.NARRATIVE_TEXTS[2],
+  narrative1 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['narrative1'])],
+                                verbose_name=gc.NARRATIVE_TEXTS['narrative1'])
+  narrative2 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['narrative2'])],
+                                verbose_name=gc.NARRATIVE_TEXTS['narrative2'],
                                 help_text=gc.HELP_TEXTS['leadership'])
-  narrative3 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[3])],
-                                verbose_name=gc.NARRATIVE_TEXTS[3])
-  narrative4 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[4])],
-                                verbose_name=gc.NARRATIVE_TEXTS[4],
+  narrative3 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['narrative3'])],
+                                verbose_name=gc.NARRATIVE_TEXTS['narrative3'])
+  narrative4 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['narrative4'])],
+                                verbose_name=gc.NARRATIVE_TEXTS['narrative4'],
                                 help_text=gc.HELP_TEXTS['goals'])
-  narrative5 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[5])],
-                                verbose_name=gc.NARRATIVE_TEXTS[5])
-  narrative6 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[6])],
-                                verbose_name=gc.NARRATIVE_TEXTS[6],
+  narrative5 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['narrative5'])],
+                                verbose_name=gc.NARRATIVE_TEXTS['narrative5'])
+  narrative6 = models.TextField(validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['narrative6'])],
+                                verbose_name=gc.NARRATIVE_TEXTS['narrative6'],
                                 help_text=gc.HELP_TEXTS['leadership'])
   cycle_question = models.TextField(
-      validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[7])], blank=True)
+      validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['cycle_question'])], blank=True)
 
   timeline = models.TextField(
       verbose_name='Please fill in this timeline to describe your activities '
@@ -488,8 +488,8 @@ class GrantApplication(models.Model):
 class GrantApplicationOverflow(models.Model): # pylint: disable=model-missing-unicode
 
   grant_application = models.OneToOneField(GrantApplication, related_name='overflow')
-  two_year_question = models.TextField(
-      validators=[WordLimitValidator(gc.NARRATIVE_CHAR_LIMITS[8])], blank=True)
+  two_year_question = models.TextField(blank=True,
+      validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['two_year_question'])])
 
 
 class ProjectApp(models.Model):
