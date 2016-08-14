@@ -441,15 +441,14 @@ class GrantApplication(models.Model):
     return '%s - %s' % (unicode(self.organization), unicode(self.grant_cycle))
 
   def get_file_name(self, field_name):
-    """
-    Get human-readable string representation of a FileField file name.
-
-    For example:
-    get_file_name('budget')
-    # '164_budget.xls'
-    """
-    file_name = getattr(self, field_name).name
-    return str(file_name.split("/")[-1])
+    file_attr = getattr(self, field_name)
+    if file_attr and hasattr(file_attr, 'name'):
+      file_info = file_attr.name.split('/', 1)
+      if len(file_info) > 1:
+        return file_info[1]
+      else:
+        return file_attr.name
+    return ''
 
   def save(self, *args, **kwargs):
     """ Update org profile if it is the most recent app for the org """

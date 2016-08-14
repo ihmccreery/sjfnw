@@ -70,7 +70,6 @@ class CycleOpenFilter(admin.SimpleListFilter):
     return queryset
 
 
-
 class MultiYearGrantFilter(admin.SimpleListFilter):
   title = 'Grant length'
   parameter_name = 'multiyear'
@@ -348,6 +347,7 @@ class OrganizationA(BaseModelAdmin):
         kwargs={'id_a': queryset[0].pk, 'id_b': queryset[1].pk}
       ))
 
+
 class GrantApplicationA(BaseModelAdmin):
   list_display = ['organization', 'grant_cycle', 'submission_time', 'read']
   list_filter = ['grant_cycle']
@@ -371,9 +371,7 @@ class GrantApplicationA(BaseModelAdmin):
     }),
     ('Uploaded files', {
         'classes': ('collapse',),
-        'description':
-            ('This should show a list of uploaded files'),
-        'fields': (('get_uploaded_file_names'),)
+        'fields': ('get_files_display',)
     }),
     ('Administration', {
       'fields': (
@@ -382,32 +380,33 @@ class GrantApplicationA(BaseModelAdmin):
       )
     })
   ]
-  readonly_fields = ['organization_link', 'grant_cycle', 'submission_time',
-                     'read', 'revert_grant', 'rollover', 'get_uploaded_file_names']
+  readonly_fields = ('organization_link', 'grant_cycle', 'submission_time',
+                     'read', 'revert_grant', 'rollover', 'get_files_display')
   inlines = [ProjectAppI, LogReadonlyI, LogI]
 
-  def get_uploaded_file_names(self, obj):
-    uploaded_files = {
-      'budget'             : 'No budget uploaded',
-      'demographics'       : 'No diversity chart uploaded',
-      'funding_sources'    : 'No funding sources uploaded',
-      'budget1'            : 'No annual statement uploaded',
-      'budget2'            : 'No annual operating budget uploaded',
-      'budget3'            : 'No balance sheet uploaded',
-      'project_budget_file': 'No project budget uploaded',
-      'fiscal_letter'      : 'No fiscal letter uploaded'
-    }
-    list_of_filefield_names = uploaded_files.keys()
+  def get_files_display(self, obj):
+    files = ''
 
-    for field_name in list_of_filefield_names:
-      matching_file_name = obj.get_file_name(field_name)
-      if matching_file_name:
-        uploaded_files[field_name] = matching_file_name
+    for field_name in models.GrantApplication.file_fields():
+      # attribute is a FieldFile instance if set
+      field_file = getattr(obj, field_name) if hasattr(obj, field_name) else None
 
-    return '<ul>' + '</li> '.join([("<li>" + str(f)) for f in uploaded_files.values()]) + '</ul>'
+      if field_file:
+        url = reverse('sjfnw.grants.views.view_file', kwargs={
+          'obj_type': 'app', 'obj_id': obj.pk, 'field_name': field_name
+        })
 
-  get_uploaded_file_names.allow_tags = True
-  get_uploaded_file_names.short_description = 'Uploaded files'
+        file_link = utils.create_link(url, obj.get_file_name(field_name), True)
+
+        # to get the human-readable field name, we need to access the FileField
+        verbose_name = obj._meta.get_field(field_name).verbose_name # pylint: disable=protected-access
+
+        files += '<tr><td>{}</td><td>{}</td></tr>'.format(verbose_name, file_link)
+
+    return '<table>' + (files or 'No files uploaded') + '</table>'
+
+  get_files_display.allow_tags = True
+  get_files_display.short_description = 'Uploaded files'
 
   def has_add_permission(self, request):
     return False
@@ -455,6 +454,7 @@ class DraftGrantApplicationA(BaseModelAdmin):
     url += '?user=' + obj.organization.email
     return utils.create_link(url, "Edit this draft", new_tab=True) + '<br>(logs you in as the organization)'
   edit.allow_tags = True
+
 
 class GivingProjectGrantA(BaseModelAdmin):
   list_display = ['organization_name', 'grant_cycle', 'giving_project',

@@ -839,6 +839,15 @@ def view_application(request, app_id):
                 {'app': app, 'form': form, 'file_urls': file_urls, 'print_urls': print_urls,
                  'awards': awards, 'perm': perm})
 
+def view_blob(request, blobkey):
+  blobinfo = blobstore.BlobInfo.get(blobkey)
+  if blobinfo:
+    return HttpResponse(blobstore.BlobReader(blobinfo).read(),
+                       content_type=blobinfo.content_type)
+  else:
+    raise Http404
+
+
 def serve_app_file(application, field_name):
   """ Returns response containing file from the Blobstore
 
@@ -1628,7 +1637,7 @@ def get_file_urls(request, app, printing=False):
     value = getattr(app, field)
     if value:
       ext = value.name.lower().split('.')[-1]
-      file_urls[field] += base_url + str(app.pk) + u'-' + field + u'.' + ext
+      file_urls[field] += base_url + str(app.pk) + u'-' + field
       if not settings.DEBUG and ext in gc.VIEWER_FILE_TYPES:
         if printing:
           if not (ext == 'xls' or ext == 'xlsx'):
