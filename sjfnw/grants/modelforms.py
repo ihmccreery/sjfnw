@@ -108,7 +108,7 @@ class GrantApplicationModelForm(forms.ModelForm):
   two_year_question = forms.CharField(required=False,
       widget=forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[8]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['two_year_question']
       }))
 
   formfield_callback = custom_fields
@@ -129,31 +129,31 @@ class GrantApplicationModelForm(forms.ModelForm):
       }),
       'narrative1': forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[1]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['narrative1']
       }),
       'narrative2': forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[2]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['narrative2']
       }),
       'narrative3': forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[3]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['narrative3']
       }),
       'narrative4': forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[4]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['narrative4']
       }),
       'narrative5': forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[5]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['narrative5']
       }),
       'narrative6': forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[6]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['narrative6']
       }),
       'cycle_question': forms.Textarea(attrs={
         'class': 'wordlimited',
-        'data-limit': gc.NARRATIVE_CHAR_LIMITS[7]
+        'data-limit': gc.NARRATIVE_WORD_LIMITS['cycle_question']
       }),
       'timeline': TimelineWidget()
     }
@@ -169,10 +169,18 @@ class GrantApplicationModelForm(forms.ModelForm):
         self.fields['two_year_question'].required = True
         self.fields['two_year_question'].label = cycle.two_year_question
         logger.info('Requiring the two-year question')
+
+    # hack to support customized grant cycles. pk matches prod, name is for local dev
     if cycle.pk == 35 or cycle.title == "Displaced Tenants Fund":
       logger.info('Setting customized questions texts for Displaced Tenants Fund')
       for i in range(1, 7):
-        self.fields['narrative{}'.format(i)].label = gc.NARRATIVE_TEXTS_DT[i]
+        field_name = 'narrative{}'.format(i)
+        self.fields[field_name].label = gc.NARRATIVE_TEXTS_DT[field_name]
+    elif cycle.pk == 36 or cycle.title == "Alternatives to Youth Detention":
+      logger.info('Setting customized questions texts for Alternatives to Youth Detention')
+      for i in range(1, 7):
+        field_name = 'narrative{}'.format(i)
+        self.fields[field_name].label = gc.NARRATIVE_TEXTS_AYD[field_name]
 
   def clean(self):
     cleaned_data = super(GrantApplicationModelForm, self).clean()
@@ -346,7 +354,6 @@ class YearEndReportForm(ModelForm):
       val = self.cleaned_data.get(field_name, None)
       if val:
         stay_informed[field_name] = val
-    logger.info(stay_informed)
     if stay_informed:
       self.cleaned_data['stay_informed'] = json.dumps(stay_informed)
     else:
