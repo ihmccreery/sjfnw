@@ -1,4 +1,5 @@
-# configure landscape.io: https://landscape.io/github/aisapatino/sjfnw
+# config for landscape.io: https://landscape.io/github/aisapatino/sjfnw
+# also used when running prospector locally
 
 python-targets:
   - 2
@@ -20,10 +21,10 @@ strictness: none
 member-warnings: true
 test-warnings: true
 
-mccabe:
+mccabe: # complexity checker
   run: false
 
-pyflakes:
+pyflakes: # static analyzer; mainly covered by pylint
   run: false
 
 pep8:

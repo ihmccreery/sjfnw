@@ -396,7 +396,7 @@ class GrantApplicationA(BaseModelAdmin):
           'obj_type': 'app', 'obj_id': obj.pk, 'field_name': field_name
         })
 
-        file_link = utils.create_link(url, obj.get_file_name(field_name), True)
+        file_link = utils.create_link(url, obj.get_file_name(field_name), new_tab=True)
 
         # to get the human-readable field name, we need to access the FileField
         verbose_name = obj._meta.get_field(field_name).verbose_name # pylint: disable=protected-access
@@ -452,7 +452,8 @@ class DraftGrantApplicationA(BaseModelAdmin):
     url = reverse('sjfnw.grants.views.grant_application',
                   kwargs={'cycle_id': obj.grant_cycle_id})
     url += '?user=' + obj.organization.email
-    return utils.create_link(url, "Edit this draft", new_tab=True) + '<br>(logs you in as the organization)'
+    return (utils.create_link(url, "Edit this draft", new_tab=True) +
+            '<br>(logs you in as the organization)')
   edit.allow_tags = True
 
 
