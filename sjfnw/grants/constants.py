@@ -179,11 +179,74 @@ NARRATIVE_TEXTS_DT = {
 # customized question text for Alternative to Youth Detention grant cycle
 NARRATIVE_TEXTS_AYD = {
   'narrative1': NARRATIVE_TEXTS['narrative1'],
-  'narrative2': 'PLACEHOLDER - Led by those most affected',
-  'narrative3': 'PLACEHOLDER - Root causes',
-  'narrative4': 'PLACEHOLDER - Timeline',
-  'narrative5': 'PLACEHOLDER - Coalition/collaboration',
-  'narrative6': 'PLACEHOLDER - Racial justice'
+  'narrative2': (
+    'The EPIC Alternatives to Youth Incarceration Grant prioritizes groups'
+    'that are led by people who are directly impacted by youth detention and '
+    'mass incarceration, center youth and families who have been '
+    'disproportionately impacted by mass incarceration or the P.I.C. (Prison '
+    'Industrial Complex), and continually build leadership from within their own '
+    'communities.<ol><li>Who are the communities most directly impacted by your '
+    'work?</li><li>How are impacted communities involved in the leadership of '
+    'your organization? How does your organization practice accountable '
+    'community engagement (we understand this as being responsive, transparent, '
+    'and serving the best interest of the communities most affected by youth '
+    'incarceration)?</li><li>What is your organization\'s leadership body? (Your '
+    'organization\'s leadership body is the group of people who together make '
+    'strategic decisions about the organization\'s direction, provide oversight '
+    'and guidance, and are ultimately responsible for the organization\'s '
+    'mission and ability to carry out its mission. In most cases, this will be a '
+    'Board of Directors, but it might also be a steering committee, collective, '
+    'or other leadership structure.)</li></ol>'
+  ),
+  'narrative3': (
+    'The EPIC Alternatives to Youth Detention Grant prioritizes groups that '
+    'understand and address the underlying root causes of the prison industrial '
+    'complex, mass incarceration and the school to prison pipeline, and that '
+    'bring people most affected together to build collective power.<ol><li>What '
+    'specific youth incarceration problems, needs or issues does your work '
+    'address?</li><li>What are the root causes of these issues?</li><li>How does '
+    'your organization build collective power?</li><li>How will your work make '
+    'structural change that will affect the root causes and underlying power '
+    'dynamics of the identified youth incarceration problems, needs or '
+    'issues?</li></ol>'
+  ),
+  'narrative4': (
+    'Please describe your alternative to youth incarceration work over the next '
+    '15 months.  (Please list the activities and objectives in timeline form '
+    'below this question.)<ol><li>What are your overall goals and strategies '
+    'for the next 12 months?</li><li>How will you assess whether you have met '
+    'your objectives and goals?</li></ol>'
+  ),
+  'narrative5': (
+    'The EPIC Alternatives to Youth Detention Grant prioritizes groups that see '
+    'themselves and their work to end youth incarceration as part of a larger '
+    'movement for social justice.<ol><li>Describe at least two coalitions, '
+    'collaborations, partnerships or networks that you participate in as an '
+    'approach to social justice.</li><li>How do these collaborations strengthen '
+    'the movement for Black liberation?</li><li>What is your organization\'s role '
+    'in these collaborations?</li><li>If your collaborations cross issue or '
+    'constituency lines, how this will help build a broad, unified, and winning '
+    'social justice movement?</li></ol>'
+  ),
+  'narrative6': (
+    'The EPIC Alternatives to Youth Detention Grant prioritizes groups working '
+    'on racial justice, especially those making connections between racism and '
+    'youth incarceration and can demonstrate an understanding of the '
+    'intersections between racial justice, economic justice, LGBTQ justice, '
+    'environmental justice, disability justice and other systems of oppression. '
+    '<p>If your organization\'s leadership body is majority white, describe how '
+    'you work as an ally and as an accountable community partner to communities '
+    'of color. Be as specific as possible, and list at least one organization '
+    'led by people of color that we can contact as a reference for your racial '
+    'justice work. Include their name, organization, phone number and email.*</p>'
+    '<p><i>* Please make sure you have asked permission to list someone as a racial '
+    'justice reference before submitting their contact information. Your racial '
+    'justice reference cannot be a representative from your organization. We '
+    'define "led by people of color" to mean that more that 51% or more of the '
+    'organizations leadership body (ie. board of directors or other leadership '
+    'model) are people of color. If your organization is majority people of '
+    'color led, leave the references blank.</i></p>'
+  )
 }
 
 HELP_TEXTS = {
