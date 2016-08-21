@@ -1,3 +1,10 @@
+/* Reset
+ *------------------------------------------------------------------------------*/
+
+h1[id]:before, h2[id]:before, h3[id]:before, h4[id]:before, h5[id]:before, h6[id]:before {
+    content: none;
+}
+
 /* Elements
  *---------------------------------------------------------------------------*/
 
@@ -14,7 +21,7 @@ h2 {
 }
 
 h3 {
-  font-size: 24px;
+  font-size: 24px; /* default is 26px; */
   margin: 21px 0; /* default is 21px top, 10.5px bottom */
 }
 

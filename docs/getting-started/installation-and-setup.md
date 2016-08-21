@@ -36,7 +36,6 @@ Create the database:
 #### Google App Engine SDK
 
 [Download](https://cloud.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python) & unzip (somewhere outside the repo).
-Follow the instructions to install using the GoogleAppEngineLauncher.
 
 #### Project dependencies
 
