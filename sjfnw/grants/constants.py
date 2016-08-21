@@ -191,10 +191,10 @@ NARRATIVE_TEXTS_DT = {
 }
 
 # customized question text for Alternative to Youth Detention grant cycle
-NARRATIVE_TEXTS_AYD = {
+NARRATIVE_TEXTS_EPIC = {
   'narrative1': NARRATIVE_TEXTS['narrative1'],
   'narrative2': (
-    'The EPIC Alternatives to Youth Incarceration Grant prioritizes groups'
+    'The EPIC Zero Detention Project Grant prioritizes groups'
     'that are led by people who are directly impacted by youth detention and '
     'mass incarceration, center youth and families who have been '
     'disproportionately impacted by mass incarceration or the P.I.C. (Prison '
@@ -213,7 +213,7 @@ NARRATIVE_TEXTS_AYD = {
     'or other leadership structure.)</li></ol>'
   ),
   'narrative3': (
-    'The EPIC Alternatives to Youth Detention Grant prioritizes groups that '
+    'The EPIC Zero Detention Project Grant prioritizes groups that '
     'understand and address the underlying root causes of the prison industrial '
     'complex, mass incarceration and the school to prison pipeline, and that '
     'bring people most affected together to build collective power.<ol><li>What '
@@ -233,7 +233,7 @@ NARRATIVE_TEXTS_AYD = {
   ),
   'timeline': NARRATIVE_TEXTS['timeline'].replace('five quarters', 'year'),
   'narrative5': (
-    'The EPIC Alternatives to Youth Detention Grant prioritizes groups that see '
+    'The EPIC Zero Detention Project Grant prioritizes groups that see '
     'themselves and their work to end youth incarceration as part of a larger '
     'movement for social justice.<ol><li>Describe at least two coalitions, '
     'collaborations, partnerships or networks that you participate in as an '
@@ -244,7 +244,7 @@ NARRATIVE_TEXTS_AYD = {
     'social justice movement?</li></ol>'
   ),
   'narrative6': (
-    'The EPIC Alternatives to Youth Detention Grant prioritizes groups working '
+    'The EPIC Zero Detention Project Grant prioritizes groups working '
     'on racial justice, especially those making connections between racism and '
     'youth incarceration and can demonstrate an understanding of the '
     'intersections between racial justice, economic justice, LGBTQ justice, '
