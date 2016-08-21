@@ -163,13 +163,13 @@ class GrantApplicationModelForm(forms.ModelForm):
       for i in range(1, 7):
         field_name = 'narrative{}'.format(i)
         self.fields[field_name].label = gc.NARRATIVE_TEXTS_DT[field_name]
-    elif cycle.pk == 36 or cycle.title == "Alternatives to Youth Detention":
-      logger.info('Setting customized questions texts for Alternatives to Youth Detention')
+    elif cycle.pk == 36 or cycle.title == "EPIC Zero Detention Project":
+      logger.info('Setting customized questions texts for EPIC Zero Detention Project')
       self.fields['timeline'].widget = TimelineWidget(quarters=4)
-      self.fields['timeline'].label = gc.NARRATIVE_TEXTS_AYD['timeline']
+      self.fields['timeline'].label = gc.NARRATIVE_TEXTS_EPIC['timeline']
       for i in range(1, 7):
         field_name = 'narrative{}'.format(i)
-        self.fields[field_name].label = gc.NARRATIVE_TEXTS_AYD[field_name]
+        self.fields[field_name].label = gc.NARRATIVE_TEXTS_EPIC[field_name]
 
   def clean(self):
     cleaned_data = super(GrantApplicationModelForm, self).clean()

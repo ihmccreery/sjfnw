@@ -350,7 +350,7 @@ class StartApplication(BaseGrantTestCase):
     self.assertTrue(form.fields['two_year_question'].required)
 
   def test_custom_cycle_ayd(self):
-    cycle = GrantCycle(title='Alternatives to Youth Detention',
+    cycle = GrantCycle(title='EPIC Zero Detention Project',
                        open=timezone.now() - timedelta(days=2),
                        close=timezone.now() + timedelta(days=5))
     cycle.save()
@@ -363,7 +363,7 @@ class StartApplication(BaseGrantTestCase):
     self.assertEqual(response.status_code, 200)
     self.assertTemplateUsed(response, 'grants/org_app.html')
 
-    for text in gc.NARRATIVE_TEXTS_AYD.itervalues():
+    for text in gc.NARRATIVE_TEXTS_EPIC.itervalues():
       self.assertContains(response, text)
 
   def test_custom_cycle_dt(self):
