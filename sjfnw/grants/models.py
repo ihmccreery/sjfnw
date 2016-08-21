@@ -310,22 +310,7 @@ class GrantApplication(models.Model):
   cycle_question = models.TextField(
       validators=[WordLimitValidator(gc.NARRATIVE_WORD_LIMITS['cycle_question'])], blank=True)
 
-  timeline = models.TextField(
-      verbose_name='Please fill in this timeline to describe your activities '
-                   'over the next five quarters. This will not exactly match '
-                   'up with the time period funded by this grant. We are '
-                   'asking for this information to give us an idea of what your '
-                   'work looks like: what you are doing and how those '
-                   'activities intersect and build on each other and move you '
-                   'towards your goals. Because our grants are usually general '
-                   'operating funds, we want to get a sense of what your '
-                   'organizing work looks like over time. Note: We understand '
-                   'that this timeline is based only on what you know right '
-                   'now and that circumstances change. If you receive this '
-                   'grant, you will submit a brief report one year later, which '
-                   'will ask you what progress you\'ve made on the goals '
-                   'outlined in this application or, if you changed direction, '
-                   'why.')
+  timeline = models.TextField(verbose_name=gc.NARRATIVE_TEXTS['timeline'])
 
   # collab references (after narrative 5)
   collab_ref1_name = models.CharField(verbose_name='Name', max_length=150,
