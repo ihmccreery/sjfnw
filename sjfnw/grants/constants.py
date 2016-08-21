@@ -76,6 +76,19 @@ NARRATIVE_TEXTS = {
     '<li>How will you assess whether you have met your goals and objectives?'
     '</li></ul>'
   ),
+  'timeline': (
+    'Please fill in this timeline to describe your activities over the next five '
+    'quarters. This will not exactly match up with the time period funded by '
+    'this grant. We are asking for this information to give us an idea of what '
+    'your work looks like: what you are doing and how those activities intersect '
+    'and build on each other and move you towards your goals. Because our grants '
+    'are usually general operating funds, we want to get a sense of what your '
+    'organizing work looks like over time. Note: We understand that this '
+    'timeline is based only on what you know right now and that circumstances '
+    'change. If you receive this grant, you will submit a brief report one year '
+    'later, which will ask you what progress you\'ve made on the goals outlined '
+    'in this application or, if you changed direction, why.'
+  ),
   'narrative5': (
     'Social Justice Fund prioritizes groups that see themselves as part of a '
     'larger movement for social change, and work towards strengthening that '
@@ -104,6 +117,7 @@ NARRATIVE_TEXTS = {
     'organization, phone number and email.'
   )
 }
+
 # customized question text for Displaced Tenants Fund grant cycle
 NARRATIVE_TEXTS_DT = {
   'narrative1': NARRATIVE_TEXTS['narrative1'],
@@ -212,11 +226,12 @@ NARRATIVE_TEXTS_AYD = {
   ),
   'narrative4': (
     'Please describe your alternative to youth incarceration work over the next '
-    '15 months.  (Please list the activities and objectives in timeline form '
+    '12 months. (Please list the activities and objectives in timeline form '
     'below this question.)<ol><li>What are your overall goals and strategies '
     'for the next 12 months?</li><li>How will you assess whether you have met '
     'your objectives and goals?</li></ol>'
   ),
+  'timeline': NARRATIVE_TEXTS['timeline'].replace('five quarters', 'year'),
   'narrative5': (
     'The EPIC Alternatives to Youth Detention Grant prioritizes groups that see '
     'themselves and their work to end youth incarceration as part of a larger '

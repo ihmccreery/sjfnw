@@ -28,24 +28,13 @@ class OrgProfile(ModelForm):
 
 class TimelineWidget(forms.widgets.MultiWidget):
 
-  def __init__(self, attrs=None):
-    _widgets = (
-      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5', 'cols': '20'}),
-      forms.Textarea(attrs={'rows': '5'}),
-      forms.Textarea(attrs={'rows': '5'}),
-    )
+  def __init__(self, attrs=None, quarters=5):
+    self._quarters = quarters
+    _widgets = []
+    for _ in range(0, quarters):
+      _widgets.append(forms.Textarea(attrs={'rows': '5', 'cols': '20'}))
+      _widgets.append(forms.Textarea(attrs={'rows': '5'}))
+      _widgets.append(forms.Textarea(attrs={'rows': '5'}))
     super(TimelineWidget, self).__init__(_widgets, attrs)
 
   def decompress(self, value):
@@ -55,8 +44,7 @@ class TimelineWidget(forms.widgets.MultiWidget):
 
     if value:
       return json.loads(value)
-    return [None, None, None, None, None, None, None, None,
-            None, None, None, None, None, None, None]
+    return [None for _ in range(0, self._quarters * 3)]
 
   def format_output(self, rendered_widgets):
     """
@@ -69,7 +57,7 @@ class TimelineWidget(forms.widgets.MultiWidget):
             '<th>Date range</th><th>Activities<br><i>(What will you be doing?)</i></th>'
             '<th>Goals/objectives<br><i>(What do you hope to achieve?)</i></th></tr>')
     for i in range(0, len(rendered_widgets), 3):
-      html += ('<tr><th class="left">Quarter ' + str((i + 3) / 3) + '</th><td>' +
+      html += ('<tr><th class="left">Quarter ' + str(i / 3 + 1) + '</th><td>' +
               rendered_widgets[i] + '</td><td>' + rendered_widgets[i + 1] +
               '</td><td>' + rendered_widgets[i + 2] + '</td></tr>')
     html += '</table>'
@@ -82,8 +70,7 @@ class TimelineWidget(forms.widgets.MultiWidget):
 
     val_list = []
     for i, widget in enumerate(self.widgets):
-      val_list.append(widget.value_from_datadict(data, files, name +
-                                                  '_%s' % i))
+      val_list.append(widget.value_from_datadict(data, files, '{}_{}'.format(name, i)))
     return json.dumps(val_list)
 
 
@@ -178,6 +165,8 @@ class GrantApplicationModelForm(forms.ModelForm):
         self.fields[field_name].label = gc.NARRATIVE_TEXTS_DT[field_name]
     elif cycle.pk == 36 or cycle.title == "Alternatives to Youth Detention":
       logger.info('Setting customized questions texts for Alternatives to Youth Detention')
+      self.fields['timeline'].widget = TimelineWidget(quarters=4)
+      self.fields['timeline'].label = gc.NARRATIVE_TEXTS_AYD['timeline']
       for i in range(1, 7):
         field_name = 'narrative{}'.format(i)
         self.fields[field_name].label = gc.NARRATIVE_TEXTS_AYD[field_name]
@@ -189,12 +178,12 @@ class GrantApplicationModelForm(forms.ModelForm):
     timeline = json.loads(cleaned_data.get('timeline'))
     empty = False
     incomplete = False
-    for i in range(0, 13, 3):
-      date = timeline[i]
-      act = timeline[i + 1]
-      obj = timeline[i + 2]
+    for i in range(2, len(timeline), 3):
+      date = timeline[i - 2]
+      act = timeline[i - 1]
+      obj = timeline[i]
 
-      if i == 0 and not (date or act or obj):
+      if i == 2 and not (date or act or obj):
         empty = True
       if (date or act or obj) and not (date and act and obj):
         incomplete = True
