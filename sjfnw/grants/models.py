@@ -604,8 +604,10 @@ class SponsoredProgramGrant(models.Model):
     ordering = ['organization']
 
   def __unicode__(self):
-    return 'Sponsored program grant to {}, {:%m/%d/%Y}'.format(
-        self.organization, self.approved)
+    desc = 'Sponsored program grant - {}'.format(self.organization)
+    if self.approved:
+      desc += ' - {:%m/%d/%Y}'.format(self.approved)
+    return desc
 
 
 def validate_photo_file_extension(value):
