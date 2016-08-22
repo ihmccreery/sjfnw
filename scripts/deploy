@@ -78,10 +78,13 @@ fi
 
 echo -e "
 ${bold}4. Confirm$reset
-   ${versionwarning}The following command will be executed:
+   ${versionwarning}The following commands will be executed:
 
    ${green}appcfg.py update $versiondisplay --env_variable=CLOUDSQL_PASSWORD:$pw .$reset
 "
+if [ ! $version ] ; then
+   echo -e "  ${green}git tag -a $(date +%Y-%m-%d) -m \"\"$reset\n"
+fi
 
 read -p "Continue? [y/N]: " confirm
 
@@ -93,15 +96,31 @@ elif [ $confirm != "y" ] && [ $confirm != "Y" ] ; then
   exit 1
 fi
 
-appcfg.py update --version=$version --env_variable=CLOUDSQL_PASSWORD:"$pw" . || exit 1
+#appcfg.py update --version=$version --env_variable=CLOUDSQL_PASSWORD:"$pw" . || exit 1
 
-echo -ne "$sep
+echo -n "$sep"
+
+i=0
+while true ; do
+  tag_name=$(date +%Y-%m-%d)
+  if [ $i -gt 0 ] ; then
+    tag_name+=".$i"
+  fi
+  git tag -a $tag_name -m \"\" && echo -e "Tag created: $tag_name\n" && break
+  i=$((i + 1))
+  if [ $i -gt 3 ] ; then
+    echo -e "${red}Could not create tag. Add it manually.$reset"
+    break
+  fi
+done
+
+if [ ! $version ] ; then
+  git tag -a $(date +%Y-%m-%d) && echo -e "Tag created: $(date +%Y-%m-%d)\n" || echo -e "${red}Tag could not be created - add one manually$reset"
+fi
+
+echo -ne "
 Verify that your deployment works: https://"
 if [ $version ] ; then
   echo -ne "$version-dot-"
 fi
 echo -e "sjf-nw.appspot.com"
-
-if [ ! $version ] ; then
-  echo -e "Then tag the release: git tag -a $(date +%Y-%m-%d) -m \"$(date +%Y-%m-%d)\"\n"
-fi
