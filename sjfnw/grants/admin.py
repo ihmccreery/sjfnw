@@ -169,13 +169,17 @@ class AppCycleI(BaseShowInline):
   model = models.GrantApplication
   readonly_fields = ['organization', 'submission_time', 'pre_screening_status']
   fields = ['organization', 'submission_time', 'pre_screening_status']
+  show_change_link = True
+  change_link_text = "View/edit"
 
 
 class GrantApplicationI(BaseShowInline):
   """ List grant applications on organization page """
   model = models.GrantApplication
-  readonly_fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
-  fields = ('submission_time', 'grant_cycle', 'summary', 'view_or_edit', 'read')
+  readonly_fields = ('submission_time', 'grant_cycle', 'summary', 'read')
+  fields = ('submission_time', 'grant_cycle', 'summary', 'read')
+  show_change_link = True
+  change_link_text = "View/edit"
 
   def get_queryset(self, request):
     return super(GrantApplicationI, self).get_queryset(request).select_related('grant_cycle')
@@ -199,12 +203,6 @@ class GrantApplicationI(BaseShowInline):
 
     return summary
 
-  def view_or_edit(self, obj):
-    """ Link to grant application change page """
-    return utils.create_link('/admin/grants/grantapplication/{}/'.format(obj.pk),
-                             'View details/Edit', new_tab=True)
-  view_or_edit.allow_tags = True
-
   def read(self, obj):
     return utils.create_link('/grants/view/{}'.format(obj.pk), 'Read application', new_tab=True)
   read.allow_tags = True
@@ -213,17 +211,11 @@ class GrantApplicationI(BaseShowInline):
 class SponsoredProgramI(BaseShowInline):
   """ List sponsored program grants on organization page """
   model = models.SponsoredProgramGrant
-  fields = ['amount', 'check_mailed', 'approved', 'edit']
+  fields = ['amount', 'check_mailed', 'approved']
   readonly_fields = fields
   template = 'admin/grants/sponsoredprogramgrant/tabular.html'
-
-  def edit(self, obj):
-    if obj.pk:
-      return utils.create_link('/admin/grants/sponsoredprogramgrant/{}/'.format(obj.pk),
-                               'View/edit', new_tab=True)
-    else:
-      return ''
-  edit.allow_tags = True
+  show_change_link = True
+  change_link_text = "View/edit"
 
 
 class ProjectAppI(admin.TabularInline):
@@ -399,7 +391,7 @@ class GrantApplicationA(BaseModelAdmin):
         file_link = utils.create_link(url, obj.get_file_name(field_name), new_tab=True)
 
         # to get the human-readable field name, we need to access the FileField
-        verbose_name = obj._meta.get_field(field_name).verbose_name # pylint: disable=protected-access
+        verbose_name = obj._meta.get_field(field_name).verbose_name
 
         files += '<tr><td>{}</td><td>{}</td></tr>'.format(verbose_name, file_link)
 
@@ -550,6 +542,10 @@ class SponsoredProgramGrantA(BaseModelAdmin):
             ('check_number', 'check_mailed', 'approved'),
             'description']
 
+  def get_readonly_fields(self, request, obj=None):
+    if obj is not None:
+      return self.readonly_fields + ('organization',)
+    return self.readonly_fields
 
 class YearEndReportA(BaseModelAdmin):
   list_display = ['org', 'award', 'cycle', 'submitted', 'visible', 'view_link']
