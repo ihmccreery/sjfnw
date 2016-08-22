@@ -6,13 +6,13 @@ yellow="\033[0;33m"
 boldred="\033[1;31m"
 bold="\033[1m"
 reset="\033[0m"
-
 sep="
                                    -----
-
 "
 ok="${green}ok$reset"
-error="$sep${boldred}X$reset"
+err="$sep
+${boldred}X$reset "
+indent="   "
 
 cd "$(dirname "$0")/.."
 
@@ -32,7 +32,7 @@ to <version>-dot-sjf-nw.appspot.com. Keep in mind that all versions share the
 same database.$sep
 
 ${bold}1. Prerequisites$reset
-   libs: "
+${indent}libs: "
 
 lib_missing=0
 for dir in "django" "pytz" "unicodecsv" ; do
@@ -45,7 +45,7 @@ for dir in "django" "pytz" "unicodecsv" ; do
   fi
 done
 if [ $lib_missing -gt 0 ] ; then
-  echo -e "$error Missing one or more required libraries. Run ${bold}./scripts/install-libs$reset\n"
+  echo -e "{$err}Missing one or more required libraries. Run ${bold}./scripts/install-libs$reset\n"
   exit 1
 else
   echo -ne "$ok"
@@ -53,55 +53,68 @@ fi
 
 echo -ne "\n   clean git status: "
 if [[ `git status --porcelain` ]]; then
-  echo -e "${red}fail$reset$error Local uncommitted changes found. Commit or stash them before deploying."
+  echo -e "${red}fail$reset${err}Local uncommitted changes found. Commit or stash them before deploying.\n"
   exit 1
 else
   echo -e "$ok"
 fi
 
 echo -e "\n${bold}2. Enter Cloud SQL password$reset (this will set CLOUDSQL_PASSWORD env var in prod)"
-read -p "   CLOUDSQL_PASSWORD: " pw
+read -p "${indent}CLOUDSQL_PASSWORD: " pw
 
 if [ ! $pw ] ; then
-  echo -e "$error Cloud SQL password is required for deployment\n"
+  echo -e "${err}Cloud SQL password is required for deployment\n"
   exit 1
 fi
 
 echo -e "\n${bold}3. Enter a version$reset to deploy to. Leave blank to use default version."
-read -p "   Version: " version
+read -p "${indent}Version: " version
 
 if [ ! $version ] ; then
-  versionwarning="You are deploying to the default version which ${yellow}will update the live in-use site.$reset\n\n"
+  versionwarning="You are deploying to the default version which ${yellow}will update the live in-use site.$reset\n\n$indent"
 else
-  versiondisplay="--version=$version"
+  versiondisplay=" --version=$version"
 fi
 
 echo -e "
 ${bold}4. Confirm$reset
-   ${versionwarning}The following command will be executed:
+$indent${versionwarning}The following commands will be executed:
 
-   ${green}appcfg.py update $versiondisplay --env_variable=CLOUDSQL_PASSWORD:$pw .$reset
+$indent${green}appcfg.py update$versiondisplay --env_variable=CLOUDSQL_PASSWORD:$pw .$reset
 "
+if [ ! $version ] ; then
+  echo -e "$indent${green}git tag -a $(date +%Y-%m-%d) -m \"\"$reset (tag name will be incremented if necessary)\n"
+fi
 
-read -p "Continue? [y/N]: " confirm
+read -p "Deploy? [y/N]: " confirm
 
 if [ ! $confirm ] ; then
-  echo -e "$error Canceled.\n"
+  echo -e "${err}Canceled.\n"
   exit 1
 elif [ $confirm != "y" ] && [ $confirm != "Y" ] ; then
-  echo -e "$error Canceled.\n"
+  echo -e "${err}Canceled.\n"
   exit 1
 fi
 
 appcfg.py update --version=$version --env_variable=CLOUDSQL_PASSWORD:"$pw" . || exit 1
 
-echo -ne "$sep
+echo "$sep"
+
+for i in 0 1 2 3; do
+  tag_name=$(date +%Y-%m-%d)
+  if [ $i -gt 0 ] ; then
+    tag_name+=".$i"
+  fi
+  git tag -a $tag_name -m "" 2>/dev/null && echo -e "Tag created: $tag_name" && break
+  if [ $i -gt 3 ] ; then
+    echo -e "${red}Unable to create tag. Add one manually.$reset"
+    break
+  fi
+done
+
+echo -ne "
 Verify that your deployment works: https://"
 if [ $version ] ; then
   echo -ne "$version-dot-"
 fi
-echo -e "sjf-nw.appspot.com"
-
-if [ ! $version ] ; then
-  echo -e "Then tag the release: git tag -a $(date +%Y-%m-%d) -m \"$(date +%Y-%m-%d)\"\n"
-fi
+echo -e "sjf-nw.appspot.com\n"
