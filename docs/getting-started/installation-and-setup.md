@@ -90,11 +90,7 @@ _If that didn't work, make sure `manage.py` has execute permissions. `chmod u+x 
 
 A superuser is a django user account with the highest access levels - you can use it to log into the admin site on your local server.
 
-#### Load fixtures
-
-We have fixtures with data from the real site. To load that data into your local db:
-
-`./manage.py load_testing_data`
+Your username should be an email address.
 
 ---
 
