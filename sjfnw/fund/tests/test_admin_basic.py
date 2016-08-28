@@ -26,12 +26,12 @@ class AdminHome(BaseFundTestCase):
 class AdminGivingProjects(BaseFundTestCase):
 
   fixtures = [
-    'sjfnw/fund/fixtures/lg_gp.json',
-    'sjfnw/fund/fixtures/lg_member.json',
-    'sjfnw/fund/fixtures/lg_membership.json',
-    'sjfnw/fund/fixtures/lg_donor.json',
-    'sjfnw/fund/fixtures/lg_resource.json',
-    'sjfnw/fund/fixtures/lg_proj_resource.json'
+    'sjfnw/fund/fixtures/giving_project.json',
+    'sjfnw/fund/fixtures/member.json',
+    'sjfnw/fund/fixtures/membership.json',
+    'sjfnw/fund/fixtures/donor.json',
+    'sjfnw/fund/fixtures/resource.json',
+    'sjfnw/fund/fixtures/project_resource.json'
   ]
 
   def setUp(self):

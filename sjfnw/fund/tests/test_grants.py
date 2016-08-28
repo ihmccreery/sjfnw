@@ -12,7 +12,7 @@ class Grants(BaseFundTestCase):
   """ Grants listing page """
 
   fixtures = ['sjfnw/fund/fixtures/test_fund.json',
-              'sjfnw/fund/fixtures/live_gp_dump.json',
+              # TODO replace with valid fixtures
               'sjfnw/grants/fixtures/orgs.json',
               'sjfnw/grants/fixtures/grant_cycles.json',
               'sjfnw/grants/fixtures/apps.json',

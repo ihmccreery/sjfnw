@@ -12,7 +12,7 @@ Overview of what is provided by the base test classes.
 
 ## Overview
 
-See [`intro-to-testing`](intro-to-testing.md) for information about what Python/Django test cases provide. This page does over additional things we have added with our own base test case classes.
+See [`intro-to-testing`](intro-to-testing.md) for information about what Python/Django test cases provide. This page goes over sjfnw-specific customizations.
 
 TestCase inheritance (a → b means a inherits b)
 
@@ -40,19 +40,19 @@ self.assertEqual(response.url, self.BASE_URL + reverse('sjfnw.some.view')
 
 ### Account shortcuts
 
-#### `login_as_admin`
+#### `self.login_as_admin()`
 
-Logs in as a superuser. No associated `Member` or `Organization`
+Logs in as a superuser (a user that can access the admin account). Has no associated `Member` or `Organization`.
 
-#### `login_as_member`
+#### `self.login_as_member(name)`
 
-These are a few pre-built members that can be used by calling `login_as_member(name)`, which creates the necessary objects and then log the test user in. It also sets `self.member_id` with the primary key of the `Member` object.
+Shortcut for logging in as one of a few pre-defined members. It creates the necessary objects (`Member`, `Membership`(s), `Donor`(s), etc.) and then log the test user in.  It also sets `self.member_id` with the primary key of the `Member` object.
 
-##### 'old'
+##### 'first'
 
-- Email: `oldacct@gmail.com`
+- Email: `firstacct@gmail.com`
 - If `sjfnw/fund/fixtures/test_fund.json` is used:
-  - it has a membership and 8 donors - see `sjfnw/fund/fixtures/test_fund.json` for details
+  - It has a membership and 8 donors - see `sjfnw/fund/fixtures/test_fund.json` for details
   - `self.member_id` and `self.ship_id` will be set
 
 ##### 'blank'
@@ -61,7 +61,7 @@ These are a few pre-built members that can be used by calling `login_as_member(n
 - No memberships or other objects associated
 
 
-Note that `BaseFundTestCase` expands upon this method, supporting a few additional names. See below for details.
+`BaseFundTestCase` expands upon this method, supporting a few additional names. See below for details.
 
 ### Custom asserts
 

@@ -79,18 +79,35 @@ class CopyContacts(BaseFundTestCase):
     unique_donors = models.Donor.objects.filter(membership__member_id=self.member_id).count()
     self.assertEqual(unique_donors, 8)
 
+    expect_to_contain = []
+
+    # create copies of existing donors from fixtures
     # match by first + last name, add notes
-    copy = models.Donor(membership_id=self.ship_id, firstname="Lyn", lastname="Long",
-                        notes="An alliterative fellow.")
+    donor = models.Donor.objects.get(pk=1)
+    self.assertTrue(donor.lastname)
+    self.assertEqual(donor.notes, '')
+    copy = models.Donor(membership_id=self.ship_id, firstname=donor.firstname,
+                        lastname=donor.lastname, notes='Beep.')
     copy.save()
+    expect_to_contain += [donor.firstname, donor.lastname, copy.notes]
+
     # match by first + email
-    copy = models.Donor(membership_id=self.ship_id, firstname="Nate",
-                        email="nat@yahoo.com")
+    donor = models.Donor.objects.get(pk=2)
+    self.assertTrue(donor.email)
+
+    copy = models.Donor(membership_id=self.ship_id, firstname=donor.firstname,
+                        email=donor.email)
     copy.save()
+    expect_to_contain += [donor.firstname, donor.email]
+
     # match by first + phone, add last name
-    copy = models.Donor(membership_id=self.ship_id, firstname="Patice", lastname="Attison",
-                        phone="555-555-8956")
+    donor = models.Donor.objects.get(pk=3)
+    self.assertEqual(donor.lastname, '')
+    self.assertTrue(donor.phone)
+    copy = models.Donor(membership_id=self.ship_id, firstname=donor.firstname,
+                        lastname='Surname', phone=donor.phone)
     copy.save()
+    expect_to_contain += [donor.firstname, copy.lastname, donor.phone]
 
     res = self.client.get(self.get_url, follow=True)
 
@@ -98,13 +115,10 @@ class CopyContacts(BaseFundTestCase):
     self.assertTemplateUsed(res, self.template)
 
     formset = res.context['formset']
-    self.assertEqual(formset.initial_form_count(), unique_donors)
 
-    self.assertContains(res, 'Lyn', 1)
-    self.assertContains(res, 'Patice', 1)
-    self.assertContains(res, 'Nate', 1)
-    self.assertContains(res, 'An alliterative fellow')
-    self.assertContains(res, 'Attison')
+    self.assertEqual(formset.initial_form_count(), unique_donors)
+    for expected_string in expect_to_contain:
+      self.assertContains(res, expected_string, 1)
 
   def test_skip(self):
     # verify that copy contacts shows up
