@@ -25,10 +25,10 @@ class Command(BaseCommand):
     call_command('loaddata', 'sjfnw/grants/fixtures/grant_cycles.json')
 
     self.stdout.write('Loading organizations..')
-    call_command('loaddata', 'sjfnw/grants/fixtures/orgs.json')
+    call_command('loaddata', 'sjfnw/grants/fixtures/organizations.json')
 
     self.stdout.write('Loading giving projects..')
-    call_command('loaddata', 'sjfnw/fund/fixtures/giving_project.json')
+    call_command('loaddata', 'sjfnw/fund/fixtures/giving_projects.json')
 
     self.stdout.write('Loading applications..')
     call_command('loaddata', 'sjfnw/grants/fixtures/apps.json')
@@ -46,13 +46,13 @@ class Command(BaseCommand):
     call_command('loaddata', 'sjfnw/grants/fixtures/drafts.json')
 
     self.stdout.write('Loading fund users..')
-    call_command('loaddata', 'sjfnw/fund/fixtures/user.json')
+    call_command('loaddata', 'sjfnw/fund/fixtures/users.json')
 
     self.stdout.write('Loading members..')
-    call_command('loaddata', 'sjfnw/fund/fixtures/member.json')
+    call_command('loaddata', 'sjfnw/fund/fixtures/members.json')
 
     self.stdout.write('Loading memberships..')
-    call_command('loaddata', 'sjfnw/fund/fixtures/membership.json')
+    call_command('loaddata', 'sjfnw/fund/fixtures/memberships.json')
 
     self.stdout.write('Loading donors..')
-    call_command('loaddata', 'sjfnw/fund/fixtures/donor.json')
+    call_command('loaddata', 'sjfnw/fund/fixtures/donors.json')
