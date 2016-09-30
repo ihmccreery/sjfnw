@@ -638,6 +638,8 @@ def copy_app(request, organization):
               ['timeline_' + str(i) for i in range(15)],
               json.loads(application.timeline)
               )))
+          if hasattr(application, 'overflow') and new_cycle.two_year_grants:
+            content['two_year_question'] = application.overflow.two_year_question
           content = json.dumps(content)
         except models.GrantApplication.DoesNotExist:
           logger.warning('copy_app - submitted app %s not found', app)
@@ -931,6 +933,8 @@ def revert_app_to_draft(request, app_id):
     content.update(dict(zip(['timeline_' + str(i) for i in range(15)],
                             json.loads(submitted_app.timeline))
                        ))
+    if hasattr(submitted_app, "overflow"):
+      content['two_year_question'] = submitted_app.overflow.two_year_question
     draft.contents = json.dumps(content)
     for field in submitted_app.file_fields():
       if hasattr(draft, field):
@@ -938,10 +942,11 @@ def revert_app_to_draft(request, app_id):
     draft.modified = timezone.now()
     draft.save()
     logger.info('Reverted to draft, draft id ' + str(draft.pk))
-    # delete app
+
     submitted_app.delete()
-    # redirect to draft page
+
     return redirect('/admin/grants/draftgrantapplication/' + str(draft.pk) + '/')
+
   return render(request, 'admin/grants/confirm_revert.html', {'application': submitted_app})
 
 def admin_rollover(request, app_id):
@@ -961,6 +966,12 @@ def admin_rollover(request, app_id):
       application.cycle_question = ''
       application.budget = ''
       application.save()
+      if hasattr(application, 'overflow') and cycle.two_year_grants:
+        overflow = models.GrantApplicationOverflow(
+            grant_application=application,
+            two_year_question=application.overflow.two_year_question
+        )
+        overflow.save()
       logger.info(u'Successful rollover of %s to %s', application, cycle)
       return redirect('/admin/grants/grantapplication/' + str(application.pk) + '/')
   else:
