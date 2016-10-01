@@ -1,4 +1,5 @@
 import logging
+from unittest import skip
 
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
@@ -10,6 +11,7 @@ from sjfnw.grants.models import (DraftGrantApplication, GrantApplication,
 
 logger = logging.getLogger('sjfnw')
 
+@skip("Needs additional fixtures")
 class AdminInlines(BaseGrantTestCase):
   """ Verify basic display of related inlines for grants objects in admin """
 

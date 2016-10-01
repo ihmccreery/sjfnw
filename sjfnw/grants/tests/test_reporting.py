@@ -1,4 +1,5 @@
 import logging
+from unittest import skip
 
 from django import forms
 from django.core.urlresolvers import reverse
@@ -129,6 +130,7 @@ class AppReports(BaseGrantTestCase):
     # 1st row is blank, 2nd is headers
     self.assertEqual(row_count - 2, models.GrantApplication.objects.count())
 
+  @skip("Needs additional fixtures")
   def test_app_filters_all(self):
     """ Select/fill out all filters and verify that there are no errors """
 
@@ -288,6 +290,7 @@ class GPGReports(BaseGrantTestCase):
     row_count = sum(1 for row in reader)
     self.assertEqual(row_count - 2, models.GivingProjectGrant.objects.count())
 
+  @skip("Needs additional fixtures")
   def test_gp_grant_filters_all(self):
     """ Verify that all filters can be selected in gp grant report without error
 
