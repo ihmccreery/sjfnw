@@ -100,17 +100,19 @@ appcfg.py update --version=$version --env_variable=CLOUDSQL_PASSWORD:"$pw" . || 
 
 echo "$sep"
 
-for i in 0 1 2 3; do
-  tag_name=$(date +%Y-%m-%d)
-  if [ $i -gt 0 ] ; then
-    tag_name+=".$i"
-  fi
-  git tag -a $tag_name -m "" 2>/dev/null && echo -e "Tag created: $tag_name" && break
-  if [ $i -gt 3 ] ; then
-    echo -e "${red}Unable to create tag. Add one manually.$reset"
-    break
-  fi
-done
+if [ ! $version ] ; then
+  for i in 0 1 2 3; do
+    tag_name=$(date +%Y-%m-%d)
+    if [ $i -gt 0 ] ; then
+      tag_name+=".$i"
+    fi
+    git tag -a $tag_name -m "" 2>/dev/null && echo -e "Tag created: $tag_name" && break
+    if [ $i -gt 3 ] ; then
+      echo -e "${red}Unable to create tag. Add one manually.$reset"
+      break
+    fi
+  done
+fi
 
 echo -ne "
 Verify that your deployment works: https://"
