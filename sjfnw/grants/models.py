@@ -451,7 +451,7 @@ class GrantApplication(models.Model):
       self.organization.update_profile(self)
 
   def timeline_display(self):
-    logger.info(type(self.timeline))
+    # TODO clean this up
     timeline = json.loads(self.timeline)
     html = ('<table id="timeline_display">'
             '<tr class="heading">'
@@ -460,11 +460,13 @@ class GrantApplication(models.Model):
             '<th>activities</th>'
             '<th>goals/objectives</th>'
             '</tr>')
+    row = '<tr><th class="left">q{}</th><td>{}</td><td>{}</td><td>{}</td></tr>'
     for i in range(0, 15, 3):
-      html += ('<tr><th class="left">q' + str((i + 3) / 3) + '</th>'
-               '<td>' + timeline[i] + '</td>'
-               '<td>' + timeline[i + 1] + '</td>'
-               '<td>' + timeline[i + 2] + '</td></tr>')
+      q = i/3 + 1
+      colA = timeline[i] if len(timeline) > i else ''
+      colB = timeline[i + 1] if len(timeline) > i + 1 else ''
+      colC = timeline[i + 2] if len(timeline) > i + 2 else ''
+      html += row.format(q, colA, colB, colC)
     html += '</table>'
     return html
   timeline_display.allow_tags = True
