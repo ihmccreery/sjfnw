@@ -97,7 +97,7 @@ function updateWordCount(event) {
 /**------------------------------- autoSave --------------------------------**/
 
 var autoSave = {
-  INTERVAL_MS: 30000,
+  INTERVAL_MS: 60000,
   INITIAL_DELAY_MS: 10000
 };
 autoSave.saveTimer = false;
@@ -156,7 +156,7 @@ autoSave.resume = function (firstTime) {
       autoSave.initialDelayTimeout = window.setTimeout(autoSave.resume, autoSave.INITIAL_DELAY_MS);
     } else {
       // was paused - resume autosave
-      formUtils.log('Starting autosave at 30s intreval');
+      formUtils.log('Starting autosave at 60s intreval');
       autoSave.saveTimer = window.setInterval(autoSave.save, autoSave.INTERVAL_MS);
     }
 
