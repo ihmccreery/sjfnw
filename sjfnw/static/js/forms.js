@@ -114,7 +114,7 @@ autoSave.init = function(urlPrefix, submitId, userId) {
     autoSave.userId = '';
   }
   formUtils.log('Autosave variables loaded');
-  autoSave.resume(true);
+  autoSave.resume();
 };
 
 
