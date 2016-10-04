@@ -460,7 +460,7 @@ class GrantApplication(models.Model):
             '<th>activities</th>'
             '<th>goals/objectives</th>'
             '</tr>')
-    row = '<tr><th class="left">q{}</th><td>{}</td><td>{}</td><td>{}</td></tr>'
+    row = u'<tr><th class="left">q{}</th><td>{}</td><td>{}</td><td>{}</td></tr>'
     for i in range(0, 15, 3):
       q = i/3 + 1
       colA = timeline[i] if len(timeline) > i else ''
