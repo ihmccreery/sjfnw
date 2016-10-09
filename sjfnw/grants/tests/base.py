@@ -55,12 +55,14 @@ class BaseGrantTestCase(BaseTestCase):
 
   # see sjfnw/grants/fixtures/README.md for what objects are associated with each org
   def login_as_org(self, name):
-    if name == "new":
+    if name == 'new':
       User.objects.create_user('neworg@gmail.com', 'neworg@gmail.com', 'noob')
       self.client.login(username='neworg@gmail.com', password='noob')
-    elif name == "test":
+      self.org_id = 1
+    elif name == 'test':
       User.objects.create_user('testorg@gmail.com', 'testorg@gmail.com', 'noob')
       self.client.login(username='testorg@gmail.com', password='noob')
+      self.org_id = 2
     else:
       raise ValueError('Unknown org name {}'.format(name))
 

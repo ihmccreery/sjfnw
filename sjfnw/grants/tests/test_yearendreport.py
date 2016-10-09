@@ -189,6 +189,21 @@ class YearEndReportForm(BaseGrantFilesTestCase):
     draft = models.YERDraft.objects.get(award_id=self.award_id)
     self.assertEqual(json.loads(draft.contents), post_data)
 
+  def test_autosave_logged_out(self):
+    self._create_draft()
+
+    self.client.logout()
+
+    post_data = {
+      'summarize_last_year': 'We did soooooo much stuff last year!!',
+      'goal_progress': 'What are goals?',
+      'total_size': '546 or 547',
+      'other_comments': 'All my single ladies'
+    }
+
+    response = self.client.post(_get_autosave_url(self.award_id), post_data)
+    self.assertEqual(401, response.status_code)
+
   def test_valid_stay_informed(self):
     self._create_draft()
 

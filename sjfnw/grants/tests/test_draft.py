@@ -19,7 +19,7 @@ class DraftExtension(BaseGrantTestCase):
   def test_create_draft(self):
     """ Admin create a draft for Fresh New Org """
 
-    self.assertEqual(0, models.DraftGrantApplication.objects.filter(organization_id=1).count())
+    self.assert_count(models.DraftGrantApplication.objects.filter(organization_id=1), 0)
 
     response = self.client.post('/admin/grants/draftgrantapplication/add/', {
       'organization': '1', 'grant_cycle': '3', 'extended_deadline_0': '2013-04-07',
@@ -32,30 +32,41 @@ class DraftExtension(BaseGrantTestCase):
     self.assertIn('/admin/grants/draftgrantapplication/', response.__getitem__('location'))
 
 
-class Draft(BaseGrantTestCase):
+class DraftAutosave(BaseGrantTestCase):
 
   def setUp(self):
-    super(Draft, self).setUp()
+    super(DraftAutosave, self).setUp()
     self.login_as_org('test')
+    self.cycle_id = 5
+    self.url = reverse('sjfnw.grants.views.autosave_app',
+                       kwargs={'cycle_id': self.cycle_id})
 
-  def test_autosave1(self):
-    complete_draft = models.DraftGrantApplication.objects.get(pk=2)
     new_draft = models.DraftGrantApplication(
-      organization=models.Organization.objects.get(pk=2),
-      grant_cycle=models.GrantCycle.objects.get(pk=5)
+        organization_id=self.org_id, grant_cycle_id=self.cycle_id
     )
     new_draft.save()
-    dic = json.loads(complete_draft.contents)
-    # fake a user id like the js would normally do
-    dic['user_id'] = 'asdFDHAF34qqhRHFEA'
-    self.maxDiff = None # pylint: disable=invalid-name
+    self.draft_id = new_draft.pk
 
-    response = self.client.post('/apply/5/autosave/', dic)
+  def test_valid(self):
+    # borrow contents from an existing draft
+    complete_draft = models.DraftGrantApplication.objects.get(pk=2)
+    post_data = json.loads(complete_draft.contents)
+
+    response = self.client.post(self.url, post_data)
     self.assertEqual(200, response.status_code)
-    new_draft = models.DraftGrantApplication.objects.get(organization_id=2, grant_cycle_id=5)
+
+    new_draft = models.DraftGrantApplication.objects.get(pk=self.draft_id)
     new_c = json.loads(new_draft.contents)
-    del new_c['user_id']
     self.assertEqual(json.loads(complete_draft.contents), new_c)
+
+  def test_not_logged_in(self):
+    response = self.client.post(self.url, {'mission': 'Something'})
+    self.assertEqual(200, response.status_code)
+
+    self.client.logout()
+
+    response = self.client.post(self.url, {'mission': 'Something'})
+    self.assertEqual(401, response.status_code)
 
 
 class DraftWarning(BaseGrantTestCase):
@@ -68,7 +79,7 @@ class DraftWarning(BaseGrantTestCase):
     """ Cycle created 12 days ago with cycle closing in 7.5 days
     Expect email to be sent """
 
-    self.assertEqual(len(mail.outbox), 0)
+    self.assert_length(mail.outbox, 0)
 
     now = timezone.now()
     draft = models.DraftGrantApplication.objects.get(pk=2)
@@ -79,13 +90,13 @@ class DraftWarning(BaseGrantTestCase):
     cycle.save()
 
     self.client.get('/mail/drafts/')
-    self.assertEqual(len(mail.outbox), 1)
+    self.assert_length(mail.outbox, 1)
 
   def test_long_alert_skip(self):
     """ Cycle created now with cycle closing in 7.5 days
     Expect email to not be sent """
 
-    self.assertEqual(len(mail.outbox), 0)
+    self.assert_length(mail.outbox, 0)
 
     now = timezone.now()
     draft = models.DraftGrantApplication.objects.get(pk=2)
@@ -96,12 +107,12 @@ class DraftWarning(BaseGrantTestCase):
     cycle.save()
 
     self.client.get('/mail/drafts/')
-    self.assertEqual(len(mail.outbox), 0)
+    self.assert_length(mail.outbox, 0)
 
   def test_short_alert(self):
     """ Cycle created now with cycle closing in 2.5 days """
 
-    self.assertEqual(len(mail.outbox), 0)
+    self.assert_length(mail.outbox, 0)
 
     now = timezone.now()
     draft = models.DraftGrantApplication.objects.get(pk=2)
@@ -112,11 +123,11 @@ class DraftWarning(BaseGrantTestCase):
     cycle.save()
 
     self.client.get('/mail/drafts/')
-    self.assertEqual(len(mail.outbox), 1)
+    self.assert_length(mail.outbox, 1)
 
   def test_short_alert_ignore(self):
     """ Cycle created 12 days ago with cycle closing in 2.5 days """
-    self.assertEqual(len(mail.outbox), 0)
+    self.assert_length(mail.outbox, 0)
 
     now = timezone.now()
     draft = models.DraftGrantApplication.objects.get(pk=2)
@@ -127,7 +138,7 @@ class DraftWarning(BaseGrantTestCase):
     cycle.save()
 
     self.client.get('/mail/drafts/')
-    self.assertEqual(len(mail.outbox), 0)
+    self.assert_length(mail.outbox, 0)
 
 
 class DiscardDraft(BaseGrantTestCase):

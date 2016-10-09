@@ -273,7 +273,7 @@ def autosave_app(request, cycle_id):
     logger.debug('Autosaving')
     draft.contents = json.dumps(request.POST)
     draft.modified = timezone.now()
-    draft.modified_by = curr_user
+    draft.modified_by = curr_user or 'none'
     draft.save()
     return HttpResponse('success')
 
