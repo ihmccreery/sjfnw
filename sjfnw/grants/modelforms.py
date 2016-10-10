@@ -114,6 +114,7 @@ class GrantApplicationModelForm(forms.ModelForm):
         'class': 'wordlimited',
         'data-limit': 100
       }),
+      'support_type': forms.RadioSelect(),
       'narrative1': forms.Textarea(attrs={
         'class': 'wordlimited',
         'data-limit': gc.NARRATIVE_WORD_LIMITS['narrative1']
