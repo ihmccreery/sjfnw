@@ -1480,6 +1480,8 @@ def get_gpg_results(options):
   fields = ['check_mailed', 'first_year_amount', 'second_year_amount', 'total_amount',
             'organization', 'giving_project', 'grant_cycle']
 
+  if options.get('report_id'):
+    fields.append('id')
   if options.get('report_check_number'):
     fields.append('check_number')
   if options.get('report_date_approved'):

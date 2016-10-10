@@ -287,6 +287,7 @@ class AppReportForm(BaseAppRelatedReportForm):
 
 class GPGrantReportForm(BaseAppRelatedReportForm):
 
+  report_id = forms.BooleanField(required=False, label='Unique ID number')
   report_check_number = forms.BooleanField(required=False, label='Check number')
   report_date_approved = forms.BooleanField(required=False, label='Date approved by E.D.')
   report_support_type = forms.BooleanField(required=False, label='Support type')
