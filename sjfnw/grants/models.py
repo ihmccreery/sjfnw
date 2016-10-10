@@ -270,7 +270,7 @@ class GrantApplication(models.Model):
 
   SUPPORT_CHOICES = [('General support', 'General support'),
                      ('Project support', 'Project support')]
-  support_type = models.CharField(max_length=50, choices=SUPPORT_CHOICES, default='blah') # what i set as default doesn't seem to matter, but need something to avoid line option
+  support_type = models.CharField(max_length=50, choices=SUPPORT_CHOICES, default='General support')
   project_title = models.CharField(max_length=250, blank=True,
                                    verbose_name='Project title (if applicable)')
   project_budget = models.PositiveIntegerField(null=True, blank=True,

@@ -318,13 +318,13 @@ iframe.upload {
 /*  make radio buttons more compact */
 #id_support_type li {
     margin: 0;
+    display: inline;
 }
 
 ul#id_support_type {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    display: inline;
 }
 
 #id_contact_person, #id_previous_grants, #id_fiscal_address {
