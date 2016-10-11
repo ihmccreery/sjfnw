@@ -14,6 +14,9 @@ def configure_logging():
   else:
     logging.basicConfig(format=log_format, datefmt=datefmt)
 
+  logging.info('STARTUP')
+  logging.info(os.environ)
+
 def log_exception(*args, **kwargs): # pylint: disable=unused-argument
   # stack trace is automatically added, as is basic request info
   logging.exception('Exception in request:')

@@ -59,13 +59,13 @@ else
   echo -e "$ok"
 fi
 
-echo -e "\n${bold}2. Enter Cloud SQL password$reset (this will set CLOUDSQL_PASSWORD env var in prod)"
-read -p "${indent}CLOUDSQL_PASSWORD: " pw
+#echo -e "\n${bold}2. Enter Cloud SQL password$reset (this will set CLOUDSQL_PASSWORD env var in prod)"
+#read -p "${indent}CLOUDSQL_PASSWORD: " pw
 
-if [ ! $pw ] ; then
-  echo -e "${err}Cloud SQL password is required for deployment\n"
-  exit 1
-fi
+#if [ ! $pw ] ; then
+#  echo -e "${err}Cloud SQL password is required for deployment\n"
+#  exit 1
+#fi
 
 echo -e "\n${bold}3. Enter a version$reset to deploy to. Leave blank to use default version."
 read -p "${indent}Version: " version
@@ -80,7 +80,7 @@ echo -e "
 ${bold}4. Confirm$reset
 $indent${versionwarning}The following commands will be executed:
 
-$indent${green}appcfg.py update$versiondisplay --env_variable=CLOUDSQL_PASSWORD:$pw .$reset
+$indent${green}appcfg.py update$versiondisplay .$reset
 "
 if [ ! $version ] ; then
   echo -e "$indent${green}git tag -a $(date +%Y-%m-%d) -m \"\"$reset (tag name will be incremented if necessary)\n"
@@ -96,7 +96,7 @@ elif [ $confirm != "y" ] && [ $confirm != "Y" ] ; then
   exit 1
 fi
 
-appcfg.py update --version=$version --env_variable=CLOUDSQL_PASSWORD:"$pw" . || exit 1
+appcfg.py update --version=$version . || exit 1
 
 echo "$sep"
 
