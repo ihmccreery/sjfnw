@@ -312,44 +312,10 @@ class GrantApplication(models.Model):
 
   timeline = models.TextField(verbose_name=gc.NARRATIVE_TEXTS['timeline'])
 
-  # collab references (after narrative 5)
-  collab_ref1_name = models.CharField(verbose_name='Name', max_length=150,
-      help_text=('Provide names and contact information for two people who '
-                 'are familiar with your organization\'s role in these '
-                 'collaborations so we can contact them for more information.'))
-  collab_ref1_org = models.CharField(verbose_name='Organization',
-                                     max_length=150)
-  collab_ref1_phone = models.CharField(verbose_name='Phone number',
-                                       max_length=20, blank=True)
-  collab_ref1_email = models.EmailField(max_length=100, verbose_name='Email',
-                                        blank=True)
-
-  collab_ref2_name = models.CharField(verbose_name='Name', max_length=150)
-  collab_ref2_org = models.CharField(verbose_name='Organization',
-                                     max_length=150)
-  collab_ref2_phone = models.CharField(verbose_name='Phone number',
-                                       max_length=20, blank=True)
-  collab_ref2_email = models.EmailField(max_length=100, verbose_name='Email',
-                                        blank=True)
-
-  # racial justice references (after narrative 6)
-  racial_justice_ref1_name = models.CharField(
-      verbose_name='Name', max_length=150, blank=True)
-  racial_justice_ref1_org = models.CharField(
-      verbose_name='Organization', max_length=150, blank=True)
-  racial_justice_ref1_phone = models.CharField(
-      verbose_name='Phone number', max_length=20, blank=True)
-  racial_justice_ref1_email = models.EmailField(
-      verbose_name='Email', max_length=100, blank=True)
-
-  racial_justice_ref2_name = models.CharField(verbose_name='Name',
-                                              max_length=150, blank=True)
-  racial_justice_ref2_org = models.CharField(verbose_name='Organization',
-                                             max_length=150, blank=True)
-  racial_justice_ref2_phone = models.CharField(verbose_name='Phone number',
-                                               max_length=20, blank=True)
-  racial_justice_ref2_email = models.EmailField(verbose_name='Email',
-                                                max_length=100, blank=True)
+  collab_ref1 = models.TextField()
+  collab_ref2 = models.TextField()
+  racial_justice_ref1 = models.TextField(blank=True)
+  racial_justice_ref2 = models.TextField(blank=True)
 
   # files
   budget = models.FileField( # no longer shown, but field holds file from early apps
