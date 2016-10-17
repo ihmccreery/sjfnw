@@ -13,39 +13,34 @@ logger = logging.getLogger('sjfnw')
 # ---------------------
 
 class BaseModelAdmin(admin.ModelAdmin):
-  """ Base class for setting a universal per-page limit """
+  """ Provide baseline per-page limit to reduce page load times """
   list_per_page = 30
 
 
 class BaseShowInline(admin.TabularInline):
-  """ Base inline for read only items """
+  """ For read only items """
   extra = 0
   max_num = 0
   can_delete = False
 
 
 class YearFilter(admin.SimpleListFilter):
-  """ Base filter by year. Usage: create a child class and override the class variables:
+  """ Filter results by the year on the given date field.
 
-    Required override:
-      filter_model: the model that has the date field to use for filtering
-
-    Optional overrides:
-      intermediate: string that connects the model being filtered to the filter_model
-                    (required if the model being filtered != the filter_model)
-      title: displayed in filters sidebar (default: 'year')
-      parameter_name: query parameter name (default: 'year')
+    Date field does not have to be on the model being filtered
+    To use, create a child class and override the class variables below.
   """
+  filter_model = None   # model being filtered
+  field = ''            # name of date field used to filter
+  intermediate = ''     # string path to the model that 'field' is on - if not filter_model
+
   title = 'year'
   parameter_name = 'year'
-  filter_model = None
-  field = ''
-  intermediate = ''
 
   def lookups(self, request, model_admin):
-    dates = (self.filter_model.objects
-        .values_list(self.field, flat=True)
-        .order_by('-%s' % self.field))
+    """ Returns an array of year values found in existing data """
+    dates = (self.filter_model.objects.values_list(self.field, flat=True)
+                                       .order_by('-%s' % self.field))
     prev = None
     years = []
     for date in dates:
@@ -70,6 +65,7 @@ class YearFilter(admin.SimpleListFilter):
       key = self.intermediate + '__' if self.intermediate else ''
       filt['{}{}__year'.format(key, self.field)] = year
       return queryset.filter(**filt)
+
 
 # Configure admin site
 # ---------------------
