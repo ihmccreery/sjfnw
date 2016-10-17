@@ -88,8 +88,13 @@ class MemberI(BaseShowInline):
   readonly_fields = ('first_name', 'last_name')
   show_change_link = True
 
+class OrganizationI(BaseShowInline):
+  model = Organization
+  fields = ('name',)
+  readonly_fields = ('name',)
+  show_change_link = True
+
 class UserA(UserAdmin):
-  """ Customized ModelAdmin using django's UserAdmin as base"""
   list_display = ('username', 'is_superuser')
   search_fields = ('username',)
   fieldsets = (
@@ -105,6 +110,6 @@ class UserA(UserAdmin):
   )
   readonly_fields = ['last_login', 'date_joined']
 
-  inlines = (MemberI,)
+  inlines = (MemberI, OrganizationI)
 
 admin.site.register(User, UserA)
