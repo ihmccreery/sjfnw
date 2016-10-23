@@ -257,7 +257,7 @@
         
             <li><a href="#setup-creates-2-giving-projects">setUp - creates 2 giving projects</a></li>
         
-            <li><a href="#login_as_member_1">login_as_member</a></li>
+            <li><a href="#login_as_member">login_as_member</a></li>
         
     
         <li class="main "><a href="#todo-basegranttestcase">TODO - BaseGrantTestCase</a></li>
@@ -306,7 +306,7 @@
 </tbody>
 </table>
 <h2 id="overview">Overview</h2>
-<p>See <a href="../intro-to-testing/"><code>intro-to-testing</code></a> for information about what Python/Django test cases provide. This page does over additional things we have added with our own base test case classes.</p>
+<p>See <a href="../intro-to-testing/"><code>intro-to-testing</code></a> for information about what Python/Django test cases provide. This page goes over sjfnw-specific customizations.</p>
 <p>TestCase inheritance (a → b means a inherits b)</p>
 <pre><code>                              unittest.TestCase
                                       ↑
@@ -325,15 +325,15 @@ sjfnw.fund.tests.base.BaseFundTestCase   sjfnw.grants.tests.base.BaseGrantTestCa
 </code></pre>
 
 <h3 id="account-shortcuts">Account shortcuts</h3>
-<h4 id="login_as_admin"><code>login_as_admin</code></h4>
-<p>Logs in as a superuser. No associated <code>Member</code> or <code>Organization</code></p>
-<h4 id="login_as_member"><code>login_as_member</code></h4>
-<p>These are a few pre-built members that can be used by calling <code>login_as_member(name)</code>, which creates the necessary objects and then log the test user in. It also sets <code>self.member_id</code> with the primary key of the <code>Member</code> object.</p>
-<h5 id="old">'old'</h5>
+<h4 id="selflogin_as_admin"><code>self.login_as_admin()</code></h4>
+<p>Logs in as a superuser (a user that can access the admin account). Has no associated <code>Member</code> or <code>Organization</code>.</p>
+<h4 id="selflogin_as_membername"><code>self.login_as_member(name)</code></h4>
+<p>Shortcut for logging in as one of a few pre-defined members. It creates the necessary objects (<code>Member</code>, <code>Membership</code>(s), <code>Donor</code>(s), etc.) and then log the test user in.  It also sets <code>self.member_id</code> with the primary key of the <code>Member</code> object.</p>
+<h5 id="first">'first'</h5>
 <ul>
-<li>Email: <code>oldacct@gmail.com</code></li>
+<li>Email: <code>firstacct@gmail.com</code></li>
 <li>If <code>sjfnw/fund/fixtures/test_fund.json</code> is used:</li>
-<li>it has a membership and 8 donors - see <code>sjfnw/fund/fixtures/test_fund.json</code> for details</li>
+<li>It has a membership and 8 donors - see <code>sjfnw/fund/fixtures/test_fund.json</code> for details</li>
 <li><code>self.member_id</code> and <code>self.ship_id</code> will be set</li>
 </ul>
 <h5 id="blank">'blank'</h5>
@@ -341,7 +341,7 @@ sjfnw.fund.tests.base.BaseFundTestCase   sjfnw.grants.tests.base.BaseGrantTestCa
 <li>Email: <code>blankacct@gmail.com</code></li>
 <li>No memberships or other objects associated</li>
 </ul>
-<p>Note that <code>BaseFundTestCase</code> expands upon this method, supporting a few additional names. See below for details.</p>
+<p><code>BaseFundTestCase</code> expands upon this method, supporting a few additional names. See below for details.</p>
 <h3 id="custom-asserts">Custom asserts</h3>
 <h4 id="assert_messageresponse-text-regexfalse"><code>assert_message(response, text, regex=False)</code></h4>
 <p>Assert that the given text has been set on the response as a message (via <code>django.contrib.messages</code>)</p>
@@ -366,7 +366,7 @@ assert_length(qs, 2)       # AssertionError: Expected queryset count to be 2, bu
 <li>Post-training GP (Fundraising training date has passed; estimates are required)</li>
 <li>Pre-training GP (Fundraising training has not happened; estimates not required)</li>
 </ul>
-<h3 id="login_as_member_1"><code>login_as_member</code></h3>
+<h3 id="login_as_member"><code>login_as_member</code></h3>
 <p>Additional options for the method provided by <code>BaseTestCase</code>:</p>
 <h4 id="current">'current'</h4>
 <ul>

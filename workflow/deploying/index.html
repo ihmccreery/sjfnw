@@ -273,10 +273,7 @@
   a. If you want to be safe, you can first deploy to an alternate version (I usually use '2') and check that it works before updating the live site.</li>
 <li>Check deployment<br />
   a. The output of the script should include a link. Navigate to the affected areas and verify that they work.</li>
-<li>Tag updates to default version<br />
-  a. The output of the script should include instructions for tagging. Add an annotated tag with the current date.<br />
-  b. If it's not the first tag in a day, do <code>yyyy-mm-dd.2</code>, etc.<br />
-  c. <strong><code>git push --tags</code></strong> to push the release tag.</li>
+<li>If you updated the main version, push the tag that the deploy script creates: <code>git push origin &lt;tagname&gt;</code></li>
 </ol>
 <h3 id="more-info">More info</h3>
 <ul>
