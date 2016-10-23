@@ -1,23 +1,8 @@
-### Basics
-
-Tests generally consist of a combination of actions and assertions. Assertions are used to describe the outcome you expect. If an assertion fails, it will raise an exception, and that test will stop running and be considered 'failed'.
-
-[Django testing overview](https://docs.djangoproject.com/en/1.8/topics/testing/overview/) has a lot of good information.
-
-### Types of tests
-
-There are many terms for types of tests, and they're often used differently by different people. For our purposes, we'll go with some basic definitions:
-
-**Unit tests** test a single small piece of your code - for instance, a single method. They shouldn't require dependencies or complex setup - they test a section of code in isolation, essentially. They don't use the test client.
-
-**Functional/integration tests**
-Functional tests are often defined as verifying a certain function from the user's perspective - e.g. 'When I load this url, I expect to see these things on the page'.  Integration tests are focused on testing that multiple parts of the app work together. For instance, 'If I submit this form, I expect that a new Donor model will be created with these properties.' We tend to go for a combo approach where we test what is in the response as well as what effects that has on the database. These tests take more setup, often use fixtures and usually revolve around http requests though the test client.
-
 ### Current state of tests in sjfnw
 
-Most of our tests are functional/integrational, focusing on a specific view, often involving at least one form and model. They are the easiest type to write given the way our code is set up and they test a lot of parts of the app. As we refactor some code into smaller pieces, we can write more unit tests, like these ones for [`_compile_membership_progress`](https://github.com/aisapatino/sjfnw/blob/master/sjfnw/fund/tests/test_home.py#L139).
+Most of the existing tests check the response returned by a view, and often also use queries to verify that expected objects were created/updated/deleted.. As we refactor some views into smaller pieces, we can write more unit tests.
 
-One major issue with our tests is that we don't have any way to test our front-end javascript. There is some key functionality there - things like loading and submitting forms, autosaving the grant application. There's an issue filed [here](https://github.com/aisapatino/sjfnw/issues/172).
+One major issue with existing tests is that we don't have any way to test the actual in-browser behavior, including javascript functionality like loading and submitting forms or autosaving the grant application. There's an issue filed [here](https://github.com/aisapatino/sjfnw/issues/172).
 
 At this point, the primary goal is to add [test coverage](../workflow/continuous-integration.md) in whatever ways seem best. In particular, we should **avoid adding any new functionality without accompanying tests**.
 
@@ -41,31 +26,7 @@ Note: We have sub-classed Django's `TestCase` as `BaseTestCase`, which is furthe
 
 Tests are located in `sjfnw/fund/tests/` and `sjfnw/grants/tests/`
 
-- Split tests into separate files by subject
+- Split tests into separate files by subject/view
 - Files all start with `test_` (to be found by the test runner)
 
 `sjfnw/tests.py` houses test-related classes and methods that are useful across both modules. For instance: custom test runner, base test classes, custom assertion methods, etc.
-
-### Organizing tests
-
-In Django, test classes represent test suites - bundles of tests that share a `setUp` method, fixtures, etc.
-
-```python
-from sjfnw.fund.tests.base import BaseFundTestCase
-
-class LoginForm(BaseFundTestCase):
-```
-
-A basic test class can inherit from `django.test.TestCase`, but more frequently you'll be using the fundraising base test case above, or the one in grants.
-
-Test methods have to start with `test_`. Meaning you can include helper methods (not tests themselves, but used by tests) as long as they don't use that prefix.
-
-I usually structure it like this:
-
-- A file has tests relating to a theme (`test_steps.py`, `test_home.py`, etc).
-- Inside the file, there's a class for each smaller breakdown of the theme, e.g. `AddStep`, `CompleteStep`, `EditStep`
-- If the file gets too long, you can split it into pieces. One class per file or multiple classes per file are ok.
-- Each class can have a `setUp` method that runs before *each* individual test method.
-- Individual test methods test different scenarios related to the same form, model, etc.
-
-See [writing tests](writing-tests) for an in-depth example.

@@ -15,10 +15,7 @@ If your change involves migrations, these instructions don't cover that. Contact
   a. If you want to be safe, you can first deploy to an alternate version (I usually use '2') and check that it works before updating the live site.
 2. Check deployment
   a. The output of the script should include a link. Navigate to the affected areas and verify that they work.
-3. Tag updates to default version
-  a. The output of the script should include instructions for tagging. Add an annotated tag with the current date.
-  b. If it's not the first tag in a day, do `yyyy-mm-dd.2`, etc.
-  c. **`git push --tags`** to push the release tag.
+3. If you updated the main version, push the tag that the deploy script creates: `git push origin <tagname>`
 
 ### More info
 

@@ -10,7 +10,7 @@ The [resources](resources.md) page has links with more info on the various langu
 
 ### Finding tasks to work on
 
-Look for [issues labeled "ready"](https://github.com/aisapatino/sjfnw/labels/ready) - they should be relatively self-contained and have some information in the description. Contact Aisa on slack or post a comment on the issue if you need clarification.
+Check the ["ready to work" github project](https://github.com/aisapatino/sjfnw/projects/2) for issues that are ready to be worked on by volunteers - they should be relatively self-contained and have some information in the description. Contact Aisa on slack or post a comment on the issue if you need clarification.
 
 ### Contribute to docs
 
