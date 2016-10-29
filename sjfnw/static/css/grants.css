@@ -129,7 +129,7 @@ div.form_error {
   padding-right: 12px;
 }
 
-.has-more-info: hover {
+.has-more-info:hover {
   cursor: help;
   text-decoration: underline;
 }
