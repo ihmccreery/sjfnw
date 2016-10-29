@@ -209,7 +209,7 @@ class WordLimitValidator(BaseValidator):
     return count_a > count_b
 
   def clean(self, val):
-    return len(utils.strip_punctuation(val).split())
+    return len(utils.strip_punctuation_and_non_ascii(val).split())
 
 
 def validate_file_extension(value):

@@ -10,12 +10,11 @@ from google.appengine.ext import blobstore
 
 logger = logging.getLogger('sjfnw')
 
-# checking subset of unicode punctuation for speed - chars most likely to be in user input
-punctuation = string.punctuation + u'‐‑‒–—―‘’‚‛“”‟ˆ•∘∙■□▢▪▫▲△▴▵▶▷▸▹►▻▼▽▾▿◀◁◂◃◄◅◆◇○●'
+# removing all non-ascii characters, which could be problem for words of only non-ascii characters, but javascript will be consistent, so okay for matching word counts.
 
-def strip_punctuation(input_str):
+def strip_punctuation_and_non_ascii(input_str):
   input_str = unicode(input_str) # input may or may not be unicode already
-  return ''.join([c for c in input_str if c not in punctuation])
+  return ''.join([c for c in input_str if c not in string.punctuation and ord(c)<128])
 
 def local_date_str(timestamp):
   """ Convert UTC timestamp to local date string in mm/dd/yyyy format """
