@@ -101,20 +101,27 @@ NARRATIVE_TEXTS = {
     'effective progressive movement?</li></ul>'
   ),
   'narrative6': (
-    'Social Justice Fund prioritizes groups working on racial justice, '
+    '<p>Social Justice Fund prioritizes groups working on racial justice, '
     'especially those making connections between racism, economic injustice, '
     'homophobia, and other forms of oppression. Tell us how your organization '
     'is working toward racial justice and how you are drawing connections to '
-    'economic injustice, homophobia, and other forms of oppression. <i>While '
+    'economic injustice, homophobia, and other forms of oppression. While '
     'we believe people of color must lead the struggle for racial justice, '
     'we also realize that the demographics of our region make the work of '
-    'white anti-racist allies critical to achieving racial justice.</i>'
+    'white anti-racist allies critical to achieving racial justice. '
     'If your organization\'s <span class="has-more-info" id="nar-6">'
     'leadership body</span> is majority white, also describe how you work as '
     'an ally to communities of color. Be as specific as possible, and list at '
     'least one organization led by people of color that we can contact as a '
-    'reference for your racial justice work. Include their name, '
-    'organization, phone number and email.'
+    'reference for your racial justice work. Include their name, organization, '
+    'phone number and email.</p>'
+    '<p><i>Please make sure you have asked permission to list someone as a racial '
+    'justice reference before submitting their contact information. Your racial '
+    'justice reference cannot be a representative from your organization. We '
+    'define "led by people of color" to mean that more that 51% or more of the '
+    'organizations leadership body (ie. board of directors or other leadership '
+    'model) are people of color. If your organization is majority people of '
+    'color led, leave the references blank.</i></p>'
   )
 }
 
