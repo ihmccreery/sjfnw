@@ -18,7 +18,7 @@ Examples:
 Several verbosity levels are available, using `-v`. The default is `1`.
 
 Level | Test display | Logging
-:----:|--------------|---------
+----|--------------|---------
 `0`   | dots         | fatal
 `1`   | dots         | fatal
 `2`   | text         | info
@@ -35,6 +35,4 @@ To check test coverage locally, install [coverage.py](http://coverage.readthedoc
 
 Then:
 
-`./scripts/coverage`
-
-Open `./coverage-html/index.html`
+`./scripts/coverage && open ./coverage-html/index.html`
