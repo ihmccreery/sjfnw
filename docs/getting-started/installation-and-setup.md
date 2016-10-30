@@ -51,6 +51,7 @@ Update your `~/.bashrc` (or other file depending on the shell you use)
 export PATH=$PATH:[path to Google App Engine]
 export PYTHONPATH=$PYTHONPATH:[path to Google App Engine]
 export PYTHONPATH=$PYTHONPATH:[path to Google App Engine]/lib/webob-1.2.3
+export PYTHONPATH=$PYTHONPATH:[path to Google App Engine]/lib/yaml/lib
 export PYTHONPATH=$PYTHONPATH:[path to repo]/sjfnw/libs
 ```
 
