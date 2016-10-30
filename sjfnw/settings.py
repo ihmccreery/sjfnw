@@ -97,3 +97,9 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
 FILE_UPLOAD_HANDLERS = ('sjfnw.grants.storage.BlobstoreFileUploadHandler',)
 
 TEST_RUNNER = 'sjfnw.tests.base.ColorTestSuiteRunner'
+
+# Determines whether site is in maintenance mode. See urls.py
+MAINTENANCE = False
+# Date and/or time when site is expected to be out of maintenance mode.
+# See maintenance.html. For display only.
+MAINTENANCE_END_DISPLAY = ''

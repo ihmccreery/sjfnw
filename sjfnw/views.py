@@ -1,7 +1,10 @@
 import logging
 
 from django import http
+from django.conf import settings
 from django.shortcuts import render
+
+from sjfnw import constants as c
 
 logger = logging.getLogger('sjfnw')
 
@@ -37,6 +40,14 @@ def server_error(request):
   """ Custom 500 handler. Renders template with app-specific context. """
   page_context = _get_context(request.path)
   return http.HttpResponseServerError(render(request, '500.html', page_context))
+
+def maintenance(request):
+  """ Page displayed if site is down for maintenance """
+  page_context = {
+    'maintenance_end': settings.MAINTENANCE_END_DISPLAY,
+    'support_email': c.SUPPORT_EMAIL
+  }
+  return render(request, 'maintenance.html', page_context, status=503)
 
 def log_javascript(request):
   """ Receives javascript errors and logs them """
