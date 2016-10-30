@@ -78,8 +78,10 @@ function updateWordCount(event) {
   var word_count = 0;
   if (area.value && area.value.trim()) {
     // match the chars in python's string.punctuation
+    // remove non-ascii characters
     word_count = area.value
       .replace(/[!"#$%&'()*+,-.\/:;<=>?@\[\\\]\^_`{|}~]/g, '')
+      .replace(/[^\x00-\x7F]/g, "")
       .split(/[ \r\n]+/)
       .length;
   }
